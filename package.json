@@ -1,11 +1,13 @@
 {
-  "name": "@williamthorsen/eslint-config",
+  "name": "@williamthorsen/eslint-config-monorepo",
   "version": "0.1.0",
+  "private": true,
   "description": "ESLint configs monorepo",
   "keywords": [],
   "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  }
+  },
+  "packageManager": "pnpm@7.14.0"
 }
