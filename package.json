@@ -1,0 +1,11 @@
+{
+  "name": "@williamthorsen/eslint-config",
+  "version": "0.1.0",
+  "description": "ESLint configs monorepo",
+  "keywords": [],
+  "license": "ISC",
+  "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
