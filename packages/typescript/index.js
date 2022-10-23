@@ -1,11 +1,12 @@
 const basic = require('@williamthorsen/eslint-config-basic');
-const markdownRules = basic.overrides.find(override => override.files === '**/*.md/*.*')?.rules || {};
+const basicMarkdownRules = basic.overrides.find(override => override.files === '**/*.md/*.*')?.rules || {};
 
 module.exports = {
   extends: [
-    '@williamthorsen/eslint-config-basic',
+    'standard-with-typescript',
     'plugin:import/typescript',
     'plugin:@typescript-eslint/recommended',
+    '@williamthorsen/eslint-config-basic',
   ],
   overrides: [
     ...basic.overrides,
@@ -13,7 +14,7 @@ module.exports = {
       // Code blocks in Markdown files
       files: ['**/*.md/*.*'],
       rules: {
-        ...markdownRules,
+        ...basicMarkdownRules,
         '@typescript-eslint/no-redeclare': 'off',
         '@typescript-eslint/no-unused-vars': 'off',
         '@typescript-eslint/no-use-before-define': 'off',
@@ -43,6 +44,12 @@ module.exports = {
       },
     },
     {
+      files: ['*.mts', '*.ts', '*.tsx'],
+      rules: {
+        '@typescript-eslint/semi': ['error', 'always'],
+      },
+    },
+    {
       files: ['*.test.ts'],
       rules: {
         'no-unused-expressions': 'off',
@@ -53,6 +60,7 @@ module.exports = {
   parserOptions: {
     module: 'es2020',
     parser: '@typescript-eslint/parser',
+    project: './tsconfig.json',
     sourceType: 'module',
   },
   rules: {},

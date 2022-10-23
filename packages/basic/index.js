@@ -2,8 +2,8 @@ module.exports = {
   root: true,
   reportUnusedDisableDirectives: true,
   env: {
-    es6: true,
     browser: true,
+    es6: true,
     node: true,
   },
   extends: [
@@ -252,6 +252,11 @@ module.exports = {
       ignoreMemberSort: false,
       memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
       allowSeparatedGroups: false,
+    }],
+    'space-before-function-paren': ['error', {
+      anonymous: 'always',
+      asyncArrow: 'always',
+      named: 'never',
     }],
 
     // ES6 rules

@@ -7,7 +7,7 @@
   "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "scripts": {
-    "lint": "eslint .",
+    "lint": "pnpm run --recursive lint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
