@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "module": "CommonJS",
+    "newLine": "LF",
+    "noEmit": true,
+    "noErrorTruncation": true,
+    "outDir": "lib",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "esnext"
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}

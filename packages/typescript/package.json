@@ -1,0 +1,34 @@
+{
+  "name": "@williamthorsen/eslint-config-typescript",
+  "version": "0.1.0",
+  "description": "ESLint config for TypeScript, JSON, Markdown & YML",
+  "keywords": [
+    "eslint-config"
+  ],
+  "homepage": "https://github.com/williamthorsen/eslint-config",
+  "license": "ISC",
+  "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
+  "main": "./index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "lint": "eslint . --config=index.js"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.36.1",
+    "@typescript-eslint/parser": "^5.36.1",
+    "@williamthorsen/eslint-config-basic": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.4.7",
+    "eslint": "^8.26.0"
+  },
+  "peerDependencies": {
+    "eslint": ">=8",
+    "typescript": ">=3.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
