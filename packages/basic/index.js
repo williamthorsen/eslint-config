@@ -11,7 +11,7 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:eslint-comments/recommended',
     'plugin:jsonc/recommended-with-jsonc',
-    'plugin:yml/standard',
+    'plugin:yml/recommended',
     'plugin:markdown/recommended',
   ],
   ignorePatterns: [
@@ -118,8 +118,8 @@ module.exports = {
               'cpu',
 
               'repository',
-              'bugs',
               'homepage',
+              'bugs',
               'funding', // Unlisted
               'license',
 
@@ -309,7 +309,7 @@ module.exports = {
     'n/no-callback-literal': 'off',
 
     // YML
-    'yml/quotes': ['error', { prefer: 'single', avoidEscape: false }],
+    'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
     'yml/no-empty-document': 'off',
   },
 };
