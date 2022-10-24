@@ -2,11 +2,12 @@ module.exports = {
   root: true,
   reportUnusedDisableDirectives: true,
   env: {
-    es6: true,
     browser: true,
+    es6: true,
     node: true,
   },
   extends: [
+    'standard',
     'plugin:import/recommended',
     'plugin:eslint-comments/recommended',
     'plugin:jsonc/recommended-with-jsonc',
@@ -205,24 +206,24 @@ module.exports = {
     },
   },
   rules: {
-    // Stylistic rules
-    'array-bracket-spacing': ['error', 'never'],
-    'block-spacing': ['error', 'always'],
-    'brace-style': ['error', 'stroustrup', { allowSingleLine: true }],
-    'camelcase': 'off',
-    'comma-dangle': ['error', 'always-multiline'],
-    'comma-spacing': ['error', { before: false, after: true }],
-    'comma-style': ['error', 'last'],
-    'curly': ['error', 'multi-or-nest', 'consistent'],
-    'func-call-spacing': ['off', 'never'],
-    'key-spacing': ['error', { beforeColon: false, afterColon: true }],
-    'indent': ['error', 2, { SwitchCase: 1, VariableDeclarator: 1, outerIIFEBody: 1 }],
+    // Best practices
+    'consistent-return': 'error',
+    'complexity': ['warn', 11],
+    'eqeqeq': ['error', 'always'],
+    'no-alert': 'error',
     'no-cond-assign': ['error', 'always'],
+    'no-return-assign': 'error',
+    'require-await': 'off',
+
+    // Stylistic rules
+    'brace-style': ['warn', 'stroustrup', { allowSingleLine: true }],
+    'camelcase': 'off',
+    'comma-dangle': ['warn', 'always-multiline'],
+    'curly': ['error', 'multi-or-nest', 'consistent'],
+    'indent': ['warn', 2, { SwitchCase: 1, VariableDeclarator: 1, outerIIFEBody: 1 }],
     'no-console': ['error', { allow: ['warn', 'error'] }],
-    'no-constant-condition': 'warn',
-    'no-debugger': 'error',
-    'no-dupe-class-members': 'error',
-    'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 1 }],
+    'no-constant-condition': ['warn', { checkLoops: false }],
+    'no-multiple-empty-lines': ['warn', { max: 1, maxBOF: 0, maxEOF: 1 }],
     'no-param-reassign': 'off',
     'no-restricted-syntax': [
       'error',
@@ -231,83 +232,68 @@ module.exports = {
       'WithStatement',
     ],
     'no-return-await': 'off',
-    'no-unused-vars': 'warn',
-    'object-curly-spacing': ['error', 'always'],
-    'quote-props': ['error', 'consistent-as-needed'],
-    'quotes': ['error', 'single'],
+    'no-trailing-spaces': 'warn',
+    'no-underscore-dangle': ['warn', { allowAfterThis: true }],
+    'no-unused-expressions': ['warn', {
+      allowShortCircuit: true,
+      allowTernary: true,
+      allowTaggedTemplates: true,
+    }],
+    'no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
+    'object-curly-newline': ['warn', { consistent: true }],
+    'object-curly-spacing': ['warn', 'always'],
+    'padded-blocks': 'off',
+    'quote-props': ['warn', 'as-needed', { unnecessary: false }],
+    'quotes': ['warn', 'single', { avoidEscape: true }],
     'semi': ['error', 'always'],
-    'space-before-function-paren': [
-      'error',
-      {
-        anonymous: 'always',
-        named: 'never',
-        asyncArrow: 'always',
-      },
-    ],
+    'sort-imports': ['warn', {
+      ignoreCase: false,
+      ignoreDeclarationSort: true,
+      ignoreMemberSort: false,
+      memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
+      allowSeparatedGroups: false,
+    }],
+    'space-before-function-paren': ['error', {
+      anonymous: 'always',
+      asyncArrow: 'always',
+      named: 'never',
+    }],
 
     // ES6 rules
-    'arrow-parens': ['error', 'as-needed', { requireForBlockBody: true }],
-    'generator-star-spacing': 'off',
-    'no-var': 'error',
-    'prefer-const': [
-      'error',
-      {
-        destructuring: 'any',
-        ignoreReadBeforeAssign: true,
-      },
-    ],
-    'prefer-arrow-callback': [
-      'error',
-      {
-        allowNamedFunctions: false,
-        allowUnboundThis: true,
-      },
-    ],
-    'object-shorthand': [
-      'error',
-      'always',
-      {
-        ignoreConstructors: false,
-        avoidQuotes: true,
-      },
-    ],
+    'no-var': 'off',
+    'object-shorthand': ['warn', 'always', {
+      avoidQuotes: true,
+      ignoreConstructors: false,
+    }],
+    'prefer-const': ['error', {
+      destructuring: 'any',
+      ignoreReadBeforeAssign: true,
+    }],
     'prefer-exponentiation-operator': 'error',
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
-    'prefer-template': 'error',
-    'template-curly-spacing': 'error',
-    'spaced-comment': ['error', 'always', {
-      line: {
-        markers: ['/'],
-        exceptions: ['/', '#'],
-      },
-      block: {
-        markers: ['!'],
-        exceptions: ['*'],
-        balanced: true,
-      },
+
+    // eslint-comments
+    'eslint-comments/disable-enable-pair': 'off',
+
+    // simple-import-sort
+    'simple-import-sort/exports': 'warn',
+    'simple-import-sort/imports': ['warn', {
+      groups: [
+        ['^node:'], // built-ins
+        ['^@?\\w'], // packages
+        ['^\\u0000"'], // side-effect imports
+        // absolute internal imports
+        // TODO: Inject package aliases via `config.settings`
+        // [`^(${packageAliases.join('|')})(/.*|$)`],
+        // relative internal imports
+        ['^\\.'],
+        ['^\\u0020*(?:\\u0020*import|\\u0020*export)'],
+        ['^[^.]'], // scss imports
+      ],
     }],
 
-    // Best practices
-    'array-callback-return': 'error',
-    'block-scoped-var': 'error',
-    'consistent-return': 'off',
-    'complexity': ['off', 11],
-    'eqeqeq': ['error', 'smart'],
-    'no-alert': 'warn',
-    'no-case-declarations': 'error',
-    'no-multi-spaces': 'error',
-    'no-multi-str': 'error',
-    'no-return-assign': 'off',
-    'no-with': 'error',
-    'no-void': 'error',
-    'no-useless-escape': 'off',
-    'operator-linebreak': ['error', 'before'],
-    'require-await': 'off',
-    'vars-on-top': 'error',
-
-    // Unicorn
-
+    // unicorn
     'unicorn/error-message': 'warn', // Pass an error message when throwing errors
     'unicorn/escape-case': 'error', // Uppercase regex escapes
     'unicorn/no-instanceof-array': 'error', // Prefer `Array.isArray` over `instanceof`
@@ -320,17 +306,7 @@ module.exports = {
     'unicorn/prefer-type-error': 'warn', // Prefer a TypeError when an error is thrown while checking `typeof`
     'unicorn/throw-new-error': 'error', // Use `new` when throwing an error
 
-    'no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
-    'eslint-comments/disable-enable-pair': 'off',
     'n/no-callback-literal': 'off',
-
-    'sort-imports': ['warn', {
-      ignoreCase: false,
-      ignoreDeclarationSort: true,
-      ignoreMemberSort: false,
-      memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
-      allowSeparatedGroups: false,
-    }],
 
     // YML
     'yml/quotes': ['error', { prefer: 'single', avoidEscape: false }],

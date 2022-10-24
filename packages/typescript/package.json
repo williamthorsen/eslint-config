@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ESLint config for TypeScript, JSON, Markdown & YML",
   "keywords": [
     "eslint-config"
@@ -18,7 +18,8 @@
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.36.1",
     "@typescript-eslint/parser": "^5.36.1",
-    "@williamthorsen/eslint-config-basic": "workspace:*"
+    "@williamthorsen/eslint-config-basic": "workspace:*",
+    "eslint-config-standard-with-typescript": "^23.0.0"
   },
   "devDependencies": {
     "@types/eslint": "^8.4.7",
