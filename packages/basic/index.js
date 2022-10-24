@@ -1,5 +1,4 @@
 module.exports = {
-  root: true,
   reportUnusedDisableDirectives: true,
   env: {
     browser: true,
@@ -45,8 +44,18 @@ module.exports = {
         'no-console': 'off',
         'no-restricted-imports': 'off',
         'no-undef': 'off',
-        'no-unused-expressions': 'off',
         'no-unused-vars': 'off',
+      },
+    },
+    {
+      files: ['*.cjs', '*.js', '*.jsx', '*.mjs'],
+      rules: {
+        'no-unused-expressions': ['warn', {
+          allowShortCircuit: true,
+          allowTernary: true,
+          allowTaggedTemplates: true,
+        }],
+        'semi': ['error', 'always'],
       },
     },
     {
@@ -77,12 +86,9 @@ module.exports = {
       files: ['*.yaml', '*.yml'],
       parser: 'yaml-eslint-parser',
       rules: {
+        'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
+        'yml/no-empty-document': 'off',
         'spaced-comment': 'off',
-      },
-    },
-    {
-      files: ['*.cjs', '*.js', '*.mjs'],
-      rules: {
       },
     },
     {
@@ -117,8 +123,8 @@ module.exports = {
               'os',
               'cpu',
 
-              'repository',
               'homepage',
+              'repository',
               'bugs',
               'funding', // Unlisted
               'license',
@@ -200,11 +206,6 @@ module.exports = {
     'simple-import-sort',
     'unicorn',
   ],
-  settings: {
-    'import/resolver': {
-      node: { extensions: ['.js', '.mjs'] },
-    },
-  },
   rules: {
     // Best practices
     'consistent-return': 'error',
@@ -234,18 +235,14 @@ module.exports = {
     'no-return-await': 'off',
     'no-trailing-spaces': 'warn',
     'no-underscore-dangle': ['warn', { allowAfterThis: true }],
-    'no-unused-expressions': ['warn', {
-      allowShortCircuit: true,
-      allowTernary: true,
-      allowTaggedTemplates: true,
-    }],
+    'no-unused-expressions': 'off',
     'no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
     'object-curly-newline': ['warn', { consistent: true }],
     'object-curly-spacing': ['warn', 'always'],
     'padded-blocks': 'off',
     'quote-props': ['warn', 'as-needed', { unnecessary: false }],
     'quotes': ['warn', 'single', { avoidEscape: true }],
-    'semi': ['error', 'always'],
+    'semi': 'off',
     'sort-imports': ['warn', {
       ignoreCase: false,
       ignoreDeclarationSort: true,
@@ -307,9 +304,10 @@ module.exports = {
     'unicorn/throw-new-error': 'error', // Use `new` when throwing an error
 
     'n/no-callback-literal': 'off',
-
-    // YML
-    'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
-    'yml/no-empty-document': 'off',
+  },
+  settings: {
+    'import/resolver': {
+      node: { extensions: ['.js', '.mjs'] },
+    },
   },
 };

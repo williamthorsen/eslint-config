@@ -48,6 +48,7 @@ module.exports = {
       rules: {
         // Best practices
         'no-unused-vars': 'off',
+        'import/no-unresolved': 'off',
 
         '@typescript-eslint/ban-types': 'error',
         '@typescript-eslint/ban-ts-comment': ['error', { 'ts-ignore': 'allow-with-description' }],
