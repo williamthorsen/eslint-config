@@ -5,14 +5,6 @@ module.exports = {
     es6: true,
     node: true,
   },
-  extends: [
-    'standard',
-    'plugin:import/recommended',
-    'plugin:eslint-comments/recommended',
-    'plugin:jsonc/recommended-with-jsonc',
-    'plugin:yml/recommended',
-    'plugin:markdown/recommended',
-  ],
   ignorePatterns: [
     'dist/',
     'dist-ssr/',
@@ -38,6 +30,9 @@ module.exports = {
     {
       // Code blocks in Markdown files
       files: ['**/*.md/*.*'],
+      extends: [
+        'plugin:markdown/recommended',
+      ],
       rules: {
         // 'no-alert': 'off',
         'no-alert': 'error',
@@ -49,17 +44,123 @@ module.exports = {
     },
     {
       files: ['*.cjs', '*.js', '*.jsx', '*.mjs'],
+      extends: [
+        'standard',
+        'plugin:import/recommended',
+        'plugin:eslint-comments/recommended',
+      ],
       rules: {
+        // Best practices
+        'consistent-return': 'error',
+        'complexity': ['warn', 11],
+        'eqeqeq': ['error', 'always'],
+        'no-alert': 'error',
+        'no-cond-assign': ['error', 'always'],
+        'no-param-reassign': 'off',
+        'no-restricted-syntax': [
+          'error',
+          'DebuggerStatement',
+          'LabeledStatement',
+          'WithStatement',
+        ],
+        'no-return-assign': 'error',
+        'no-return-await': 'off',
+        'no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
+        'require-await': 'off',
+
+        // Stylistic rules
+        'brace-style': ['warn', 'stroustrup', { allowSingleLine: true }],
+        'camelcase': 'off',
+        'comma-dangle': ['warn', 'always-multiline'],
+        'curly': ['error', 'multi-or-nest', 'consistent'],
+        'indent': ['warn', 2, { SwitchCase: 1, VariableDeclarator: 1, outerIIFEBody: 1 }],
+        'no-console': ['error', { allow: ['warn', 'error'] }],
+        'no-constant-condition': ['warn', { checkLoops: false }],
+        'no-extra-parens': 'warn',
+        'no-loss-of-precision': 'error',
+        'no-multiple-empty-lines': ['warn', { max: 1, maxBOF: 0, maxEOF: 1 }],
+        'no-redeclare': ['error', { builtinGlobals: true }],
+        'no-trailing-spaces': 'warn',
+        'no-underscore-dangle': ['warn', { allowAfterThis: true }],
         'no-unused-expressions': ['warn', {
           allowShortCircuit: true,
           allowTernary: true,
           allowTaggedTemplates: true,
         }],
+        'object-curly-newline': ['warn', { consistent: true }],
+        'object-curly-spacing': ['warn', 'always'],
+        'padded-blocks': 'off',
+        'quote-props': ['warn', 'as-needed', { unnecessary: false }],
+        'quotes': ['warn', 'single', { avoidEscape: true }],
         'semi': ['error', 'always'],
+        'sort-imports': ['warn', {
+          ignoreCase: false,
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: false,
+          memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
+          allowSeparatedGroups: false,
+        }],
+        'space-before-function-paren': ['error', {
+          anonymous: 'always',
+          asyncArrow: 'always',
+          named: 'never',
+        }],
+
+        // ES6 rules
+        'no-var': 'off',
+        'object-shorthand': ['warn', 'always', {
+          avoidQuotes: true,
+          ignoreConstructors: false,
+        }],
+        'prefer-const': ['error', {
+          destructuring: 'any',
+          ignoreReadBeforeAssign: true,
+        }],
+        'prefer-exponentiation-operator': 'error',
+        'prefer-rest-params': 'error',
+        'prefer-spread': 'error',
+
+        // eslint-comments
+        'eslint-comments/disable-enable-pair': 'off',
+
+        // simple-import-sort
+        'simple-import-sort/exports': 'warn',
+        'simple-import-sort/imports': ['warn', {
+          groups: [
+            ['^node:'], // built-ins
+            ['^@?\\w'], // packages
+            ['^\\u0000"'], // side-effect imports
+            // absolute internal imports
+            // TODO: Inject package aliases via `config.settings`
+            // [`^(${packageAliases.join('|')})(/.*|$)`],
+            // relative internal imports
+            ['^\\.'],
+            ['^\\u0020*(?:\\u0020*import|\\u0020*export)'],
+            ['^[^.]'], // scss imports
+          ],
+        }],
+
+        // unicorn
+        'unicorn/error-message': 'warn', // Pass an error message when throwing errors
+        'unicorn/escape-case': 'error', // Uppercase regex escapes
+        'unicorn/no-instanceof-array': 'error', // Prefer `Array.isArray` over `instanceof`
+        'unicorn/no-new-buffer': 'error', // Prevent deprecated `new Buffer()`
+        'unicorn/no-unsafe-regex': 'warn', // Keep regex literals safe
+        'unicorn/number-literal-case': 'error', // Lowercase number formatting for octal, hex, binary (0x1'error' instead of 0X1'error')
+        'unicorn/prefer-includes': 'warn', // Prefer `includes` over `indexOf` when checking for existence
+        'unicorn/prefer-string-starts-ends-with': 'warn', // Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
+        'unicorn/prefer-text-content': 'warn', // Prefer `textContent` over `innerText`
+        'unicorn/prefer-type-error': 'warn', // Prefer a TypeError when an error is thrown while checking `typeof`
+        'unicorn/throw-new-error': 'error', // Use `new` when throwing an error
+
+        'n/no-callback-literal': 'off',
       },
     },
     {
       files: ['*.json', '*.json5'],
+      extends: [
+        'plugin:jsonc/recommended-with-jsonc',
+      ],
       parser: 'jsonc-eslint-parser',
       rules: {
         'jsonc/array-bracket-spacing': ['warn', 'never'],
@@ -76,6 +177,9 @@ module.exports = {
     },
     {
       files: ['*.json5'],
+      extends: [
+        'plugin:jsonc/recommended-with-jsonc',
+      ],
       parser: 'jsonc-eslint-parser',
       rules: {
         'jsonc/comma-dangle': ['warn', 'always'],
@@ -84,6 +188,9 @@ module.exports = {
     },
     {
       files: ['*.yaml', '*.yml'],
+      extends: [
+        'plugin:yml/recommended',
+      ],
       parser: 'yaml-eslint-parser',
       rules: {
         'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
@@ -206,105 +313,7 @@ module.exports = {
     'simple-import-sort',
     'unicorn',
   ],
-  rules: {
-    // Best practices
-    'consistent-return': 'error',
-    'complexity': ['warn', 11],
-    'eqeqeq': ['error', 'always'],
-    'no-alert': 'error',
-    'no-cond-assign': ['error', 'always'],
-    'no-return-assign': 'error',
-    'require-await': 'off',
-
-    // Stylistic rules
-    'brace-style': ['warn', 'stroustrup', { allowSingleLine: true }],
-    'camelcase': 'off',
-    'comma-dangle': ['warn', 'always-multiline'],
-    'curly': ['error', 'multi-or-nest', 'consistent'],
-    'indent': ['warn', 2, { SwitchCase: 1, VariableDeclarator: 1, outerIIFEBody: 1 }],
-    'no-console': ['error', { allow: ['warn', 'error'] }],
-    'no-constant-condition': ['warn', { checkLoops: false }],
-    'no-multiple-empty-lines': ['warn', { max: 1, maxBOF: 0, maxEOF: 1 }],
-    'no-param-reassign': 'off',
-    'no-restricted-syntax': [
-      'error',
-      'DebuggerStatement',
-      'LabeledStatement',
-      'WithStatement',
-    ],
-    'no-return-await': 'off',
-    'no-trailing-spaces': 'warn',
-    'no-underscore-dangle': ['warn', { allowAfterThis: true }],
-    'no-unused-expressions': 'off',
-    'no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
-    'object-curly-newline': ['warn', { consistent: true }],
-    'object-curly-spacing': ['warn', 'always'],
-    'padded-blocks': 'off',
-    'quote-props': ['warn', 'as-needed', { unnecessary: false }],
-    'quotes': ['warn', 'single', { avoidEscape: true }],
-    'semi': 'off',
-    'sort-imports': ['warn', {
-      ignoreCase: false,
-      ignoreDeclarationSort: true,
-      ignoreMemberSort: false,
-      memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
-      allowSeparatedGroups: false,
-    }],
-    'space-before-function-paren': ['error', {
-      anonymous: 'always',
-      asyncArrow: 'always',
-      named: 'never',
-    }],
-
-    // ES6 rules
-    'no-var': 'off',
-    'object-shorthand': ['warn', 'always', {
-      avoidQuotes: true,
-      ignoreConstructors: false,
-    }],
-    'prefer-const': ['error', {
-      destructuring: 'any',
-      ignoreReadBeforeAssign: true,
-    }],
-    'prefer-exponentiation-operator': 'error',
-    'prefer-rest-params': 'error',
-    'prefer-spread': 'error',
-
-    // eslint-comments
-    'eslint-comments/disable-enable-pair': 'off',
-
-    // simple-import-sort
-    'simple-import-sort/exports': 'warn',
-    'simple-import-sort/imports': ['warn', {
-      groups: [
-        ['^node:'], // built-ins
-        ['^@?\\w'], // packages
-        ['^\\u0000"'], // side-effect imports
-        // absolute internal imports
-        // TODO: Inject package aliases via `config.settings`
-        // [`^(${packageAliases.join('|')})(/.*|$)`],
-        // relative internal imports
-        ['^\\.'],
-        ['^\\u0020*(?:\\u0020*import|\\u0020*export)'],
-        ['^[^.]'], // scss imports
-      ],
-    }],
-
-    // unicorn
-    'unicorn/error-message': 'warn', // Pass an error message when throwing errors
-    'unicorn/escape-case': 'error', // Uppercase regex escapes
-    'unicorn/no-instanceof-array': 'error', // Prefer `Array.isArray` over `instanceof`
-    'unicorn/no-new-buffer': 'error', // Prevent deprecated `new Buffer()`
-    'unicorn/no-unsafe-regex': 'warn', // Keep regex literals safe
-    'unicorn/number-literal-case': 'error', // Lowercase number formatting for octal, hex, binary (0x1'error' instead of 0X1'error')
-    'unicorn/prefer-includes': 'warn', // Prefer `includes` over `indexOf` when checking for existence
-    'unicorn/prefer-string-starts-ends-with': 'warn', // Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
-    'unicorn/prefer-text-content': 'warn', // Prefer `textContent` over `innerText`
-    'unicorn/prefer-type-error': 'warn', // Prefer a TypeError when an error is thrown while checking `typeof`
-    'unicorn/throw-new-error': 'error', // Use `new` when throwing an error
-
-    'n/no-callback-literal': 'off',
-  },
+  rules: {},
   settings: {
     'import/resolver': {
       node: { extensions: ['.js', '.mjs'] },
