@@ -1,3 +1,3 @@
-import basicConfig from './index.js';
+import basicConfig from './index.mjs';
 
 export default basicConfig;

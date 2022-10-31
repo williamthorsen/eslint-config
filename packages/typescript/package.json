@@ -8,9 +8,10 @@
   "homepage": "https://github.com/williamthorsen/eslint-config",
   "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
-  "main": "./index.js",
+  "type": "module",
+  "main": "index.mjs",
   "files": [
-    "index.js"
+    "index.mjs"
   ],
   "scripts": {
     "lint": "eslint ."
@@ -18,8 +19,7 @@
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.36.1",
     "@typescript-eslint/parser": "^5.36.1",
-    "@williamthorsen/eslint-config-basic": "workspace:*",
-    "eslint-config-standard-with-typescript": "^23.0.0"
+    "@williamthorsen/eslint-config-basic": "workspace:*"
   },
   "devDependencies": {
     "@types/eslint": "^8.4.7",

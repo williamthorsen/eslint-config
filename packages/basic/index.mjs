@@ -1,16 +1,15 @@
 // This configuration file uses the new flat syntax.
 // See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
 
+import standardConfig from 'eslint-config-standard';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
 import htmlPlugin from 'eslint-plugin-html';
 import jsoncPlugin from 'eslint-plugin-jsonc';
-import nPlugin from 'eslint-plugin-n';
-import promisePlugin from 'eslint-plugin-promise';
-import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
-import standardConfig from 'eslint-config-standard';
-import unicornPlugin from 'eslint-plugin-unicorn';
+import markdownPlugin from 'eslint-plugin-markdown';
 import ymlPlugin from 'eslint-plugin-yml';
 import jsonParser from 'jsonc-eslint-parser';
+
+import jsPlugins from './jsPlugins.mjs';
 
 export default [
   'eslint:recommended',
@@ -42,21 +41,20 @@ export default [
   },
   // HTML
   {
-    files: ['*.html'],
+    files: ['**/*.html'],
     plugins: {
       html: htmlPlugin,
     },
   },
   // JavaScript
   {
-    files: ['*.cjs', '*.js', '*.jsx', '*.mjs'],
-    plugins: {
-      'eslint-comments': eslintCommentsPlugin,
-      'n': nPlugin,
-      'promise': promisePlugin,
-      'simple-import-sort': simpleImportSortPlugin,
-      'unicorn': unicornPlugin,
+    files: ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+      },
     },
+    plugins: jsPlugins,
     rules: {
       // TODO: Replace eslint-config-standard with selected inline rules
       ...Object.fromEntries(
@@ -71,6 +69,7 @@ export default [
       'no-alert': 'error',
       'no-cond-assign': ['error', 'always'],
       'no-console': ['error', { allow: ['error', 'info', 'warn'] }],
+      'no-dupe-class-members': 'error',
       'no-loss-of-precision': 'error',
       'no-param-reassign': 'off',
       'no-redeclare': ['error', { builtinGlobals: true }],
@@ -152,7 +151,7 @@ export default [
       }],
 
       // eslint-comments
-      'eslint-comments/disable-enable-pair': 'warn',
+      'eslint-comments/disable-enable-pair': ['warn', { allowWholeFile: true }],
 
       // simple-import-sort
       'simple-import-sort/exports': 'warn',
@@ -189,7 +188,7 @@ export default [
   },
   // JSON
   {
-    files: ['*.json', '*.json5'],
+    files: ['**/*.json', '**/*.json5'],
     languageOptions: {
       parser: jsonParser,
     },
@@ -211,20 +210,22 @@ export default [
     },
   },
   {
-    files: ['*.json5'],
-    extends: [
-      'plugin:jsonc/recommended-with-jsonc',
-    ],
+    files: ['**/*.json5'],
     languageOptions: {
       parser: jsonParser,
     },
+    plugins: {
+      jsonc: jsoncPlugin,
+    },
     rules: {
+      // TODO: Enable these rules
+      // 'plugin:jsonc/recommended-with-jsonc',
       'jsonc/comma-dangle': ['warn', 'always'],
       'jsonc/comma-style': ['error', 'last'],
     },
   },
   {
-    files: ['*.yaml', '*.yml'],
+    files: ['**/*.yaml', '**/*.yml'],
     languageOptions: {
       parser: 'yml/parser',
     },
@@ -240,10 +241,11 @@ export default [
   },
   // Markdown: Code blocks in Markdown files
   {
-    files: ['**/*.md/*.*'],
-    extends: [
-      'plugin:markdown/recommended',
-    ],
+    files: ['**/*.md'],
+    plugins: {
+      markdown: markdownPlugin,
+    },
+    processor: 'markdown/markdown',
     rules: {
       // 'no-alert': 'off',
       'no-alert': 'error',
@@ -261,7 +263,7 @@ export default [
     },
   },
   {
-    files: ['*.test.[js'],
+    files: ['**/*.test.js'],
     rules: {
       'no-unused-expressions': 'off',
     },
@@ -370,3 +372,5 @@ export default [
     },
   },
 ];
+
+export { jsPlugins };
