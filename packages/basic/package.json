@@ -8,9 +8,10 @@
   "homepage": "https://github.com/williamthorsen/eslint-config",
   "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
-  "main": "./index.js",
+  "type": "module",
+  "main": "index.mjs",
   "files": [
-    "index.js"
+    "index.mjs"
   ],
   "scripts": {
     "lint": "eslint ."
@@ -20,7 +21,7 @@
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsonc": "^2.4.0",
+    "eslint-plugin-jsonc": "^2.5.0",
     "eslint-plugin-markdown": "^3.0.0",
     "eslint-plugin-n": "^15.3.0",
     "eslint-plugin-promise": "^6.1.1",
