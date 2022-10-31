@@ -17,12 +17,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.36.1",
-    "@typescript-eslint/parser": "^5.36.1",
+    "@typescript-eslint/eslint-plugin": "^5.41.0",
+    "@typescript-eslint/parser": "^5.41.0",
     "@williamthorsen/eslint-config-basic": "workspace:*"
   },
   "devDependencies": {
-    "@types/eslint": "^8.4.7",
+    "@types/eslint": "^8.4.9",
     "eslint": "^8.26.0"
   },
   "peerDependencies": {
