@@ -8,6 +8,7 @@ import jsoncPlugin from 'eslint-plugin-jsonc';
 import markdownPlugin from 'eslint-plugin-markdown';
 import ymlPlugin from 'eslint-plugin-yml';
 import jsonParser from 'jsonc-eslint-parser';
+import yamlParser from 'yaml-eslint-parser';
 
 import jsPlugins from './jsPlugins.mjs';
 
@@ -227,7 +228,7 @@ export default [
   {
     files: ['**/*.yaml', '**/*.yml'],
     languageOptions: {
-      parser: 'yml/parser',
+      parser: yamlParser,
     },
     plugins: {
       yml: ymlPlugin,
