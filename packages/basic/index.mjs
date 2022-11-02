@@ -14,32 +14,6 @@ import jsPlugins from './jsPlugins.mjs';
 
 export default [
   'eslint:recommended',
-  {
-    ignores: [
-      'dist/',
-      'dist-ssr/',
-      'coverage/',
-      'lib/',
-      'local/',
-      'output/',
-      'tmp/',
-      '*.min.*',
-      '*.d.ts',
-      'CHANGELOG.md',
-      'LICENSE*',
-      'package-lock.json',
-      'pnpm-lock.yaml',
-      'yarn.lock',
-      // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
-      '!.github/',
-      '!.*.cjs',
-      '!.*.mjs',
-      '!.vscode',
-    ],
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
-    },
-  },
   // HTML
   {
     files: ['**/*.html'],
@@ -370,6 +344,32 @@ export default [
           ],
         },
       ],
+    },
+  },
+  {
+    ignores: [
+      'dist/',
+      'dist-ssr/',
+      'coverage/',
+      'lib/',
+      'local/',
+      'output/',
+      'tmp/',
+      '*.min.*',
+      '*.d.ts',
+      'CHANGELOG.md',
+      'LICENSE*',
+      'package-lock.json',
+      'pnpm-lock.yaml',
+      'yarn.lock',
+      // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
+      '!.github/',
+      '!.*.cjs',
+      '!.*.mjs',
+      '!.vscode',
+    ],
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
     },
   },
 ];
