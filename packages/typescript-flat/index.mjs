@@ -1,40 +1,119 @@
-// This configuration file uses the new flat syntax.
-// See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
-
-import standardConfig from 'eslint-config-standard';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
-import htmlPlugin from 'eslint-plugin-html';
 import jsoncPlugin from 'eslint-plugin-jsonc';
 import markdownPlugin from 'eslint-plugin-markdown';
-import ymlPlugin from 'eslint-plugin-yml';
+import nPlugin from 'eslint-plugin-n';
+import promisePlugin from 'eslint-plugin-promise';
+import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
+import unicornPlugin from 'eslint-plugin-unicorn';
+import yamlPlugin from 'eslint-plugin-yml';
 import jsonParser from 'jsonc-eslint-parser';
 import yamlParser from 'yaml-eslint-parser';
 
-import jsPlugins from './jsPlugins.mjs';
+const commonIgnores = [
+  '**/dist/**/*',
+  '**/dist-ssr/**/*',
+  '**/coverage/**/*',
+  '**/lib/**/*',
+  '**/local/**/*',
+  '**/output/**/*',
+  '**/tmp/**/*',
+  '*.min.*',
+  '*.d.ts',
+  'CHANGELOG.md',
+  'LICENSE*',
+  'package-lock.json',
+  'pnpm-lock.yaml',
+  'yarn.lock',
+];
+
+const eslintRecommendedRules = {
+  'constructor-super': 'error',
+  'for-direction': 'error',
+  'getter-return': 'error',
+  'no-async-promise-executor': 'error',
+  'no-case-declarations': 'error',
+  'no-class-assign': 'error',
+  'no-compare-neg-zero': 'error',
+  'no-cond-assign': 'error',
+  'no-const-assign': 'error',
+  'no-constant-condition': 'error',
+  'no-control-regex': 'error',
+  'no-debugger': 'error',
+  'no-delete-var': 'error',
+  'no-dupe-args': 'error',
+  'no-dupe-class-members': 'error',
+  'no-dupe-else-if': 'error',
+  'no-dupe-keys': 'error',
+  'no-duplicate-case': 'error',
+  'no-empty': 'error',
+  'no-empty-character-class': 'error',
+  'no-empty-pattern': 'error',
+  'no-ex-assign': 'error',
+  'no-extra-boolean-cast': 'error',
+  'no-extra-semi': 'error',
+  'no-fallthrough': 'error',
+  'no-func-assign': 'error',
+  'no-global-assign': 'error',
+  'no-import-assign': 'error',
+  'no-inner-declarations': 'error',
+  'no-invalid-regexp': 'error',
+  'no-irregular-whitespace': 'error',
+  'no-loss-of-precision': 'error',
+  'no-misleading-character-class': 'error',
+  'no-mixed-spaces-and-tabs': 'error',
+  'no-new-symbol': 'error',
+  'no-nonoctal-decimal-escape': 'error',
+  'no-obj-calls': 'error',
+  'no-octal': 'error',
+  'no-prototype-builtins': 'error',
+  'no-redeclare': 'error',
+  'no-regex-spaces': 'error',
+  'no-self-assign': 'error',
+  'no-setter-return': 'error',
+  'no-shadow-restricted-names': 'error',
+  'no-sparse-arrays': 'error',
+  'no-this-before-super': 'error',
+  'no-unexpected-multiline': 'error',
+  'no-unreachable': 'error',
+  'no-unsafe-finally': 'error',
+  'no-unsafe-negation': 'error',
+  'no-unsafe-optional-chaining': 'error',
+  'no-unused-labels': 'error',
+  'no-unused-vars': 'error',
+  'no-useless-backreference': 'error',
+  'no-useless-catch': 'error',
+  'no-useless-escape': 'error',
+  'no-with': 'error',
+  'require-yield': 'error',
+  'use-isnan': 'error',
+  'valid-typeof': 'error',
+};
 
 export default [
-  'eslint:recommended',
-  // HTML
-  {
-    files: ['**/*.html'],
-    plugins: {
-      html: htmlPlugin,
-    },
-  },
   // JavaScript
   {
     files: ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
+    ignores: [
+      ...commonIgnores,
+      '!.*.cjs',
+      '!.*.mjs',
+    ],
     languageOptions: {
       globals: {
         console: 'readonly',
       },
     },
-    plugins: jsPlugins,
+    plugins: {
+      'eslint-comments': eslintCommentsPlugin,
+      'n': nPlugin,
+      'promise': promisePlugin,
+      'simple-import-sort': simpleImportSortPlugin,
+      'unicorn': unicornPlugin,
+    },
     rules: {
-      // TODO: Replace eslint-config-standard with selected inline rules
-      ...Object.fromEntries(
-        Object.entries(standardConfig.rules).filter(([ruleName]) => !ruleName.startsWith('import/')),
-      ),
+      ...eslintRecommendedRules,
       ...eslintCommentsPlugin.configs.recommended.rules,
 
       // Best practices
@@ -44,8 +123,6 @@ export default [
       'no-alert': 'error',
       'no-cond-assign': ['error', 'always'],
       'no-console': ['error', { allow: ['error', 'info', 'warn'] }],
-      'no-dupe-class-members': 'error',
-      'no-loss-of-precision': 'error',
       'no-param-reassign': 'off',
       'no-redeclare': ['error', { builtinGlobals: true }],
       'no-restricted-syntax': [
@@ -56,6 +133,7 @@ export default [
       ],
       'no-return-assign': 'error',
       'no-return-await': 'off',
+      'no-undef': 'error',
       'no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
       'no-var': 'off',
       'require-await': 'off',
@@ -201,14 +279,18 @@ export default [
   },
   {
     files: ['**/*.yaml', '**/*.yml'],
+    ignores: [
+      ...commonIgnores,
+      '!.github/**/*.yml',
+    ],
     languageOptions: {
       parser: yamlParser,
     },
     plugins: {
-      yml: ymlPlugin,
+      yml: yamlPlugin,
     },
     rules: {
-      ...ymlPlugin.rules.recommended,
+      ...yamlPlugin.rules.recommended,
       'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
       'yml/no-empty-document': 'off',
       'spaced-comment': 'off',
@@ -222,12 +304,17 @@ export default [
     },
     processor: 'markdown/markdown',
     rules: {
-      // 'no-alert': 'off',
       'no-alert': 'error',
       'no-console': 'off',
       'no-restricted-imports': 'off',
       'no-undef': 'off',
       'no-unused-vars': 'off',
+
+      '@typescript-eslint/no-redeclare': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-use-before-define': 'off',
+      '@typescript-eslint/no-var-requires': 'off',
+      '@typescript-eslint/comma-dangle': 'off',
     },
   },
   // Scripts
@@ -347,25 +434,121 @@ export default [
     },
   },
   {
+    files: ['**/*.d.ts'],
+    rules: {
+      'import/no-duplicates': 'off',
+    },
+  },
+  {
+    files: ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
+    ignores: commonIgnores,
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+      },
+      parser: tsParser,
+      parserOptions: {
+        module: 'es2020',
+        parser: '@typescript-eslint/parser',
+        project: ['./tsconfig.eslint.json', './packages/*/tsconfig.eslint.json'],
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+      // Best practices
+      '@typescript-eslint/ban-types': 'error',
+      '@typescript-eslint/ban-ts-comment': ['error', { 'ts-ignore': 'allow-with-description' }],
+      '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'],
+      '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports', disallowTypeAnnotations: false }],
+      '@typescript-eslint/explicit-module-boundary-types': 'warn',
+      '@typescript-eslint/no-inferrable-types': 'warn',
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', {
+        args: 'all',
+        argsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+        varsIgnorePattern: '^_',
+      }],
+      '@typescript-eslint/no-useless-constructor': 'warn',
+
+      '@typescript-eslint/brace-style': ['warn', 'stroustrup', { allowSingleLine: true }], 'brace-style': 'off',
+      '@typescript-eslint/comma-dangle': ['warn', {
+        'arrays': 'always-multiline',
+        'exports': 'always-multiline',
+        'functions': 'ignore',
+        'imports': 'always-multiline',
+        'objects': 'always-multiline',
+        // TypeScript only
+        'enums': 'always-multiline',
+        'generics': 'always-multiline',
+        'tuples': 'ignore',
+      }], 'comma-dangle': 'off',
+      'keyword-spacing': 'off',
+      'no-dupe-class-members': 'off',
+      'no-useless-constructor': 'off',
+      'space-before-blocks': 'off',
+
+      '@typescript-eslint/indent': ['warn', 2, {
+        ignoredNodes: [
+          'TemplateLiteral *',
+          'JSXElement',
+          'JSXElement > *',
+          'JSXAttribute',
+          'JSXIdentifier',
+          'JSXNamespacedName',
+          'JSXMemberExpression',
+          'JSXSpreadAttribute',
+          'JSXExpressionContainer',
+          'JSXOpeningElement',
+          'JSXClosingElement',
+          'JSXFragment',
+          'JSXOpeningFragment',
+          'JSXClosingFragment',
+          'JSXText',
+          'JSXEmptyExpression',
+          'JSXSpreadChild',
+          'TSTypeParameterInstantiation',
+          'FunctionExpression > .params[decorators.length > 0]',
+          'FunctionExpression > .params > :matches(Decorator, :not(:first-child))',
+          'ClassBody.body > PropertyDefinition[decorators.length > 0] > .key',
+        ],
+        SwitchCase: 1,
+      }], 'indent': 'off',
+      '@typescript-eslint/lines-between-class-members': ['warn', 'always', {
+        exceptAfterOverload: true,
+        exceptAfterSingleLine: true,
+      }], 'lines-between-class-members': 'off',
+      '@typescript-eslint/member-delimiter-style': 'warn',
+      '@typescript-eslint/no-empty-function': 'off', 'no-empty-function': 'off',
+      '@typescript-eslint/no-empty-interface': 'off',
+      '@typescript-eslint/no-extra-parens': 'warn', 'no-extra-parens': 'off',
+      '@typescript-eslint/no-loss-of-precision': 'error', 'no-loss-of-precision': 'off',
+      '@typescript-eslint/object-curly-spacing': ['warn', 'always'], 'object-curly-spacing': 'off',
+      '@typescript-eslint/quotes': ['warn', 'single', { avoidEscape: true }], 'quotes': 'off',
+      '@typescript-eslint/no-redeclare': ['error', { builtinGlobals: true }], 'no-redeclare': 'off',
+      '@typescript-eslint/semi': ['error', 'always'], 'semi': 'off',
+      '@typescript-eslint/space-before-blocks': ['warn', 'always'],
+      '@typescript-eslint/space-before-function-paren': ['warn', {
+        anonymous: 'always',
+        asyncArrow: 'always',
+        named: 'never',
+      }], 'space-before-function-paren': 'off',
+      '@typescript-eslint/type-annotation-spacing': 'warn',
+    },
+  },
+  {
+    files: ['**/*.test.ts'],
+    rules: {
+      'no-unused-expressions': 'off',
+    },
+  },
+  {
     ignores: [
-      'dist/',
-      'dist-ssr/',
-      'coverage/',
-      'lib/',
-      'local/',
-      'output/',
-      'tmp/',
-      '*.min.*',
-      '*.d.ts',
-      'CHANGELOG.md',
-      'LICENSE*',
-      'package-lock.json',
-      'pnpm-lock.yaml',
-      'yarn.lock',
       // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
-      '!.github/',
-      '!.*.cjs',
-      '!.*.mjs',
       '!.vscode',
     ],
     linterOptions: {
@@ -373,5 +556,3 @@ export default [
     },
   },
 ];
-
-export { jsPlugins };
