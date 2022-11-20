@@ -1,5 +1,12 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.5.0
+
+### Minor Changes
+
+- Enforce use of braces for all control statements.
+  Disable no-use-before-define in TypeScript files.
+
 ## 0.4.1
 
 ### Patch Changes
