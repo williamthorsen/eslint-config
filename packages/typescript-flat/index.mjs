@@ -69,6 +69,7 @@ export default [
   // region JavaScript & TypeScript files
   {
     files: [...javaScriptFiles, ...typeScriptFiles],
+    ignores: commonIgnores,
     plugins: {
       'eslint-comments': eslintCommentsPlugin,
       'n': nPlugin,
@@ -181,6 +182,7 @@ export default [
   },
   {
     files: ['**/*.test.js'],
+    ignores: commonIgnores,
     rules: {
       'no-unused-expressions': 'off',
     },
