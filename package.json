@@ -12,10 +12,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@types/node": "^18.11.8",
+    "@types/node": "^18.11.9",
     "@williamthorsen/eslint-config-typescript": "workspace:*",
-    "eslint": "^8.26.0",
-    "typescript": "^4.8.4"
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.3"
   },
-  "packageManager": "pnpm@7.14.1"
+  "packageManager": "pnpm@7.16.1"
 }
