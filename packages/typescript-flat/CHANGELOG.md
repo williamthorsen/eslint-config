@@ -1,5 +1,13 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.3.0
+
+### Minor Changes
+
+- Simplify structure.
+  Make plugins direct dependencies of flat TypeScript config.
+  Remove legacy config.
+
 ## 0.2.0
 
 ### Minor Changes
