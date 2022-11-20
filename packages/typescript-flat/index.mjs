@@ -12,6 +12,7 @@ import jsonParser from 'jsonc-eslint-parser';
 import yamlParser from 'yaml-eslint-parser';
 
 const commonIgnores = [
+  '**/*.md/*.ts', // disabled for now: not correctly recognized by the `include` block in `tsconfig.eslint.json`
   '**/dist/**/*',
   '**/dist-ssr/**/*',
   '**/coverage/**/*',
