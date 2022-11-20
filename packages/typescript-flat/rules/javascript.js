@@ -100,7 +100,7 @@ export default {
   'comma-spacing': ['warn', { before: false, after: true }],
   'comma-style': ['warn', 'last'],
   'computed-property-spacing': ['warn', 'never', { enforceForClassMembers: true }],
-  'curly': ['warn', 'multi-or-nest', 'consistent'],
+  'curly': 'warn',
   'dot-notation': ['warn', { allowKeywords: true }],
   'eol-last': 'warn',
   'func-call-spacing': ['warn', 'never'],
