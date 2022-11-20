@@ -29,6 +29,7 @@ export default {
   }], 'comma-dangle': 'off',
   'keyword-spacing': 'off',
   'no-dupe-class-members': 'off',
+  'no-undef': 'off',
   'no-useless-constructor': 'off',
   'space-before-blocks': 'off',
 
@@ -60,6 +61,7 @@ export default {
   }], 'indent': 'off',
   '@typescript-eslint/lines-between-class-members': ['warn', 'always', {
     exceptAfterOverload: true,
+    ignores: commonIgnores,
     exceptAfterSingleLine: true,
   }], 'lines-between-class-members': 'off',
   '@typescript-eslint/member-delimiter-style': 'warn',
