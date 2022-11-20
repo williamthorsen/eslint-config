@@ -12,6 +12,7 @@ import jsonParser from 'jsonc-eslint-parser';
 import yamlParser from 'yaml-eslint-parser';
 
 const commonIgnores = [
+  '**/*.md/*.ts', // disabled for now: not correctly recognized by the `include` block in `tsconfig.eslint.json`
   '**/dist/**/*',
   '**/dist-ssr/**/*',
   '**/coverage/**/*',
@@ -103,6 +104,7 @@ export default [
     languageOptions: {
       globals: {
         console: 'readonly',
+        process: true,
       },
     },
     plugins: {
@@ -178,7 +180,7 @@ export default [
       'no-extra-parens': 'warn',
       'no-multiple-empty-lines': ['warn', { max: 1, maxBOF: 0, maxEOF: 1 }],
       'no-trailing-spaces': 'warn',
-      'no-underscore-dangle': ['warn', { allowAfterThis: true }],
+      'no-underscore-dangle': ['warn', { allow: ['__dirname', '__filename'], allowAfterThis: true }],
       'no-unused-expressions': ['warn', {
         allowShortCircuit: true,
         allowTernary: true,
@@ -242,6 +244,7 @@ export default [
   // JSON
   {
     files: ['**/*.json', '**/*.json5'],
+    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -264,6 +267,7 @@ export default [
   },
   {
     files: ['**/*.json5'],
+    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -299,6 +303,7 @@ export default [
   // Markdown: Code blocks in Markdown files
   {
     files: ['**/*.md'],
+    ignores: commonIgnores,
     plugins: {
       markdown: markdownPlugin,
     },
@@ -320,6 +325,7 @@ export default [
   // Scripts
   {
     files: ['scripts/**/*.*'],
+    ignores: commonIgnores,
     rules: {
       'no-console': 'off',
     },
@@ -333,6 +339,7 @@ export default [
   // package.json
   {
     files: ['package.json'],
+    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -357,8 +364,8 @@ export default [
             'cpu',
 
             'homepage',
-            'repository',
             'bugs',
+            'repository',
             'funding', // Unlisted
             'license',
 
@@ -435,6 +442,7 @@ export default [
   },
   {
     files: ['**/*.d.ts'],
+    ignores: commonIgnores,
     rules: {
       'import/no-duplicates': 'off',
     },
@@ -445,12 +453,13 @@ export default [
     languageOptions: {
       globals: {
         console: 'readonly',
+        process: true,
       },
       parser: tsParser,
       parserOptions: {
-        module: 'es2020',
+        module: 'es2022',
         parser: '@typescript-eslint/parser',
-        project: ['./tsconfig.eslint.json', './packages/*/tsconfig.eslint.json'],
+        project: ['./tsconfig.json'],
         sourceType: 'module',
       },
     },
@@ -542,17 +551,9 @@ export default [
   },
   {
     files: ['**/*.test.ts'],
+    ignores: commonIgnores,
     rules: {
       'no-unused-expressions': 'off',
-    },
-  },
-  {
-    ignores: [
-      // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
-      '!.vscode',
-    ],
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
     },
   },
 ];
