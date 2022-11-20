@@ -33,7 +33,7 @@ export default [
     rules: {
       // TODO: Replace eslint-config-standard with selected inline rules
       ...Object.fromEntries(
-        Object.entries(standardConfig.rules).filter(([ruleName]) => !ruleName.startsWith('import/'))
+        Object.entries(standardConfig.rules).filter(([ruleName]) => !ruleName.startsWith('import/')),
       ),
       ...eslintCommentsPlugin.configs.recommended.rules,
 
