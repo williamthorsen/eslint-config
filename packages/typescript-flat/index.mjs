@@ -364,8 +364,8 @@ export default [
             'cpu',
 
             'homepage',
-            'repository',
             'bugs',
+            'repository',
             'funding', // Unlisted
             'license',
 
