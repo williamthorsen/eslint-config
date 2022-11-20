@@ -104,6 +104,7 @@ export default [
     languageOptions: {
       globals: {
         console: 'readonly',
+        process: true,
       },
     },
     plugins: {
@@ -179,7 +180,7 @@ export default [
       'no-extra-parens': 'warn',
       'no-multiple-empty-lines': ['warn', { max: 1, maxBOF: 0, maxEOF: 1 }],
       'no-trailing-spaces': 'warn',
-      'no-underscore-dangle': ['warn', { allowAfterThis: true }],
+      'no-underscore-dangle': ['warn', { allow: ['__dirname', '__filename'], allowAfterThis: true }],
       'no-unused-expressions': ['warn', {
         allowShortCircuit: true,
         allowTernary: true,
@@ -452,6 +453,7 @@ export default [
     languageOptions: {
       globals: {
         console: 'readonly',
+        process: true,
       },
       parser: tsParser,
       parserOptions: {
