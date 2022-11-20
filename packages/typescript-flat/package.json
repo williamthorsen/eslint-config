@@ -11,6 +11,8 @@
   "type": "module",
   "main": "index.mjs",
   "files": [
+    "eslint.legacy.config.cjs",
+    "eslint.rules.cjs",
     "index.mjs"
   ],
   "scripts": {
