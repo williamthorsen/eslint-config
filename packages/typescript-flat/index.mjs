@@ -243,6 +243,7 @@ export default [
   // JSON
   {
     files: ['**/*.json', '**/*.json5'],
+    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -265,6 +266,7 @@ export default [
   },
   {
     files: ['**/*.json5'],
+    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -300,6 +302,7 @@ export default [
   // Markdown: Code blocks in Markdown files
   {
     files: ['**/*.md'],
+    ignores: commonIgnores,
     plugins: {
       markdown: markdownPlugin,
     },
@@ -321,6 +324,7 @@ export default [
   // Scripts
   {
     files: ['scripts/**/*.*'],
+    ignores: commonIgnores,
     rules: {
       'no-console': 'off',
     },
@@ -334,6 +338,7 @@ export default [
   // package.json
   {
     files: ['package.json'],
+    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -436,6 +441,7 @@ export default [
   },
   {
     files: ['**/*.d.ts'],
+    ignores: commonIgnores,
     rules: {
       'import/no-duplicates': 'off',
     },
@@ -543,17 +549,9 @@ export default [
   },
   {
     files: ['**/*.test.ts'],
+    ignores: commonIgnores,
     rules: {
       'no-unused-expressions': 'off',
-    },
-  },
-  {
-    ignores: [
-      // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
-      '!.vscode',
-    ],
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
     },
   },
 ];
