@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.4.1
+
+### Patch Changes
+
+- Removed erroneous commonIgnores reference from TS rules.
+
 ## 0.4.0
 
 ### Minor Changes
