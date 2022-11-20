@@ -11,8 +11,13 @@ import yamlPlugin from 'eslint-plugin-yml';
 import jsonParser from 'jsonc-eslint-parser';
 import yamlParser from 'yaml-eslint-parser';
 
-import tsRules from './eslint.rules.cjs';
+import jsRules from './rules/javascript.js';
+import nRules from './rules/n.js';
+import simpleImportSortRules from './rules/simple-import-sort.js';
+import tsRules from './rules/typescript.js';
+import unicornRules from './rules/unicorn.js';
 
+// region Constants
 const commonIgnores = [
   '**/*.md/*.ts', // disabled for now: not correctly recognized by the `include` block in `tsconfig.eslint.json`
   '**/dist/**/*',
@@ -31,73 +36,21 @@ const commonIgnores = [
   'yarn.lock',
 ];
 
-const eslintRecommendedRules = {
-  'constructor-super': 'error',
-  'for-direction': 'error',
-  'getter-return': 'error',
-  'no-async-promise-executor': 'error',
-  'no-case-declarations': 'error',
-  'no-class-assign': 'error',
-  'no-compare-neg-zero': 'error',
-  'no-cond-assign': 'error',
-  'no-const-assign': 'error',
-  'no-constant-condition': 'error',
-  'no-control-regex': 'error',
-  'no-debugger': 'error',
-  'no-delete-var': 'error',
-  'no-dupe-args': 'error',
-  'no-dupe-class-members': 'error',
-  'no-dupe-else-if': 'error',
-  'no-dupe-keys': 'error',
-  'no-duplicate-case': 'error',
-  'no-empty': 'error',
-  'no-empty-character-class': 'error',
-  'no-empty-pattern': 'error',
-  'no-ex-assign': 'error',
-  'no-extra-boolean-cast': 'error',
-  'no-extra-semi': 'error',
-  'no-fallthrough': 'error',
-  'no-func-assign': 'error',
-  'no-global-assign': 'error',
-  'no-import-assign': 'error',
-  'no-inner-declarations': 'error',
-  'no-invalid-regexp': 'error',
-  'no-irregular-whitespace': 'error',
-  'no-loss-of-precision': 'error',
-  'no-misleading-character-class': 'error',
-  'no-mixed-spaces-and-tabs': 'error',
-  'no-new-symbol': 'error',
-  'no-nonoctal-decimal-escape': 'error',
-  'no-obj-calls': 'error',
-  'no-octal': 'error',
-  'no-prototype-builtins': 'error',
-  'no-redeclare': 'error',
-  'no-regex-spaces': 'error',
-  'no-self-assign': 'error',
-  'no-setter-return': 'error',
-  'no-shadow-restricted-names': 'error',
-  'no-sparse-arrays': 'error',
-  'no-this-before-super': 'error',
-  'no-unexpected-multiline': 'error',
-  'no-unreachable': 'error',
-  'no-unsafe-finally': 'error',
-  'no-unsafe-negation': 'error',
-  'no-unsafe-optional-chaining': 'error',
-  'no-unused-labels': 'error',
-  'no-unused-vars': 'error',
-  'no-useless-backreference': 'error',
-  'no-useless-catch': 'error',
-  'no-useless-escape': 'error',
-  'no-with': 'error',
-  'require-yield': 'error',
-  'use-isnan': 'error',
-  'valid-typeof': 'error',
+const javaScriptFiles = ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.jsx'];
+const typeScriptFiles = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+
+const pluginRules = {
+  ...eslintCommentsPlugin.configs.recommended.rules,
+  ...nRules,
+  ...simpleImportSortRules,
+  ...unicornRules,
 };
+// endregion
 
 export default [
-  // JavaScript
+  // region JavaScript files
   {
-    files: ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
+    files: javaScriptFiles,
     ignores: [
       ...commonIgnores,
       '!.*.cjs',
@@ -109,6 +62,13 @@ export default [
         process: true,
       },
     },
+    rules: jsRules,
+  },
+  // endregion
+
+  // region JavaScript & TypeScript files
+  {
+    files: [...javaScriptFiles, ...typeScriptFiles],
     plugins: {
       'eslint-comments': eslintCommentsPlugin,
       'n': nPlugin,
@@ -116,135 +76,11 @@ export default [
       'simple-import-sort': simpleImportSortPlugin,
       'unicorn': unicornPlugin,
     },
-    rules: {
-      ...eslintRecommendedRules,
-      ...eslintCommentsPlugin.configs.recommended.rules,
-
-      // Best practices
-      'consistent-return': 'error',
-      'complexity': ['warn', 11],
-      'eqeqeq': ['error', 'always'],
-      'no-alert': 'error',
-      'no-cond-assign': ['error', 'always'],
-      'no-console': ['error', { allow: ['error', 'info', 'warn'] }],
-      'no-param-reassign': 'off',
-      'no-redeclare': ['error', { builtinGlobals: true }],
-      'no-restricted-syntax': [
-        'error',
-        'DebuggerStatement',
-        'LabeledStatement',
-        'WithStatement',
-      ],
-      'no-return-assign': 'error',
-      'no-return-await': 'off',
-      'no-undef': 'error',
-      'no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
-      'no-var': 'off',
-      'require-await': 'off',
-      'object-shorthand': ['warn', 'always', { avoidQuotes: true, ignoreConstructors: false }],
-      'prefer-const': ['error', { destructuring: 'any', ignoreReadBeforeAssign: true }],
-      'prefer-exponentiation-operator': 'error',
-      'prefer-rest-params': 'error',
-      'prefer-spread': 'error',
-
-      // Stylistic rules
-      'arrow-spacing': ['warn', { before: true, after: true }],
-      'block-spacing': ['warn', 'always'],
-      'brace-style': ['warn', 'stroustrup', { allowSingleLine: true }],
-      'camelcase': 'off',
-      'comma-dangle': ['warn', 'always-multiline'],
-      'comma-spacing': ['warn', { before: false, after: true }],
-      'comma-style': ['warn', 'last'],
-      'computed-property-spacing': ['warn', 'never', { enforceForClassMembers: true }],
-      'curly': ['warn', 'multi-or-nest', 'consistent'],
-      'dot-notation': ['warn', { allowKeywords: true }],
-      'eol-last': 'warn',
-      'func-call-spacing': ['warn', 'never'],
-      'generator-star-spacing': ['warn', { before: true, after: true }],
-      'indent': ['warn', 2, {
-        SwitchCase: 1,
-        VariableDeclarator: 1,
-        outerIIFEBody: 1,
-        MemberExpression: 1,
-        FunctionDeclaration: { parameters: 1, body: 1 },
-        FunctionExpression: { parameters: 1, body: 1 },
-        CallExpression: { arguments: 1 },
-        ArrayExpression: 1,
-        ObjectExpression: 1,
-        ImportDeclaration: 1,
-        flatTernaryExpressions: false,
-        ignoreComments: false,
-        ignoredNodes: ['TemplateLiteral *', 'JSXElement', 'JSXElement > *', 'JSXAttribute', 'JSXIdentifier', 'JSXNamespacedName', 'JSXMemberExpression', 'JSXSpreadAttribute', 'JSXExpressionContainer', 'JSXOpeningElement', 'JSXClosingElement', 'JSXFragment', 'JSXOpeningFragment', 'JSXClosingFragment', 'JSXText', 'JSXEmptyExpression', 'JSXSpreadChild'],
-        offsetTernaryExpressions: true,
-      }],
-      'key-spacing': ['warn', { beforeColon: false, afterColon: true }],
-      'no-constant-condition': ['warn', { checkLoops: false }],
-      'no-extra-parens': 'warn',
-      'no-multiple-empty-lines': ['warn', { max: 1, maxBOF: 0, maxEOF: 1 }],
-      'no-trailing-spaces': 'warn',
-      'no-underscore-dangle': ['warn', { allow: ['__dirname', '__filename'], allowAfterThis: true }],
-      'no-unused-expressions': ['warn', {
-        allowShortCircuit: true,
-        allowTernary: true,
-        allowTaggedTemplates: true,
-      }],
-      'object-curly-newline': ['warn', { consistent: true }],
-      'object-curly-spacing': ['warn', 'always'],
-      'padded-blocks': 'off',
-      'quote-props': ['warn', 'as-needed', { unnecessary: false }],
-      'quotes': ['warn', 'single', { avoidEscape: true }],
-      'semi': ['error', 'always'],
-      'semi-spacing': 'warn',
-      'sort-imports': ['warn', {
-        ignoreCase: false,
-        ignoreDeclarationSort: true,
-        ignoreMemberSort: false,
-        memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
-        allowSeparatedGroups: false,
-      }],
-      'space-before-function-paren': ['error', {
-        anonymous: 'always',
-        asyncArrow: 'always',
-        named: 'never',
-      }],
-
-      // eslint-comments
-      'eslint-comments/disable-enable-pair': ['warn', { allowWholeFile: true }],
-
-      // simple-import-sort
-      'simple-import-sort/exports': 'warn',
-      'simple-import-sort/imports': ['warn', {
-        groups: [
-          ['^node:'], // built-ins
-          ['^@?\\w'], // packages
-          ['^\\u0000"'], // side-effect imports
-          // absolute internal imports
-          // TODO: Inject package aliases via `config.settings`
-          // [`^(${packageAliases.join('|')})(/.*|$)`],
-          // relative internal imports
-          ['^\\.'],
-          ['^\\u0020*(?:\\u0020*import|\\u0020*export)'],
-          ['^[^.]'], // scss imports
-        ],
-      }],
-
-      // unicorn
-      'unicorn/error-message': 'warn', // Pass an error message when throwing errors
-      'unicorn/escape-case': 'error', // Uppercase regex escapes
-      'unicorn/no-instanceof-array': 'error', // Prefer `Array.isArray` over `instanceof`
-      'unicorn/no-new-buffer': 'error', // Prevent deprecated `new Buffer()`
-      'unicorn/no-unsafe-regex': 'warn', // Keep regex literals safe
-      'unicorn/number-literal-case': 'error', // Lowercase number formatting for octal, hex, binary (0x1'error' instead of 0X1'error')
-      'unicorn/prefer-includes': 'warn', // Prefer `includes` over `indexOf` when checking for existence
-      'unicorn/prefer-string-starts-ends-with': 'warn', // Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
-      'unicorn/prefer-text-content': 'warn', // Prefer `textContent` over `innerText`
-      'unicorn/prefer-type-error': 'warn', // Prefer a TypeError when an error is thrown while checking `typeof`
-      'unicorn/throw-new-error': 'error', // Use `new` when throwing an error
-
-      'n/no-callback-literal': 'off',
-    },
+    rules: pluginRules,
   },
-  // JSON
+  // endregion
+
+  // region JSON files
   {
     files: ['**/*.json', '**/*.json5'],
     ignores: commonIgnores,
@@ -268,6 +104,9 @@ export default [
       'quote-props': 'off',
     },
   },
+  // endregion
+
+  // region JSON5 files
   {
     files: ['**/*.json5'],
     ignores: commonIgnores,
@@ -284,6 +123,9 @@ export default [
       'jsonc/comma-style': ['error', 'last'],
     },
   },
+  // endregion
+
+  // region YAML files
   {
     files: ['**/*.yaml', '**/*.yml'],
     ignores: [
@@ -303,7 +145,9 @@ export default [
       'spaced-comment': 'off',
     },
   },
-  // Markdown: Code blocks in Markdown files
+  // endregion
+
+  // region Markdown files
   {
     files: ['**/*.md'],
     ignores: commonIgnores,
@@ -325,7 +169,9 @@ export default [
       '@typescript-eslint/comma-dangle': 'off',
     },
   },
-  // Scripts
+  // endregion
+
+  // region Scripts
   {
     files: ['scripts/**/*.*'],
     ignores: commonIgnores,
@@ -339,7 +185,9 @@ export default [
       'no-unused-expressions': 'off',
     },
   },
-  // package.json
+  // endregion
+
+  // region package.json
   {
     files: ['package.json'],
     ignores: commonIgnores,
@@ -443,6 +291,8 @@ export default [
       ],
     },
   },
+  // endregion
+
   {
     files: ['**/*.d.ts'],
     ignores: commonIgnores,
@@ -450,8 +300,10 @@ export default [
       'import/no-duplicates': 'off',
     },
   },
+
+  // region TypeScript files
   {
-    files: ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
+    files: typeScriptFiles,
     ignores: commonIgnores,
     languageOptions: {
       globals: {
@@ -470,10 +322,14 @@ export default [
       '@typescript-eslint': tsPlugin,
     },
     rules: {
+      ...jsRules,
       ...tsPlugin.configs.recommended.rules,
       ...tsRules,
     },
   },
+  // endregion
+
+  // region Test files
   {
     files: ['**/*.test.ts'],
     ignores: commonIgnores,
@@ -481,4 +337,5 @@ export default [
       'no-unused-expressions': 'off',
     },
   },
+  // endregion
 ];
