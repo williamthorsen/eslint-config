@@ -61,6 +61,7 @@ export default {
   }], 'indent': 'off',
   '@typescript-eslint/lines-between-class-members': ['warn', 'always', {
     exceptAfterOverload: true,
+    ignores: commonIgnores,
     exceptAfterSingleLine: true,
   }], 'lines-between-class-members': 'off',
   '@typescript-eslint/member-delimiter-style': 'warn',

@@ -1,5 +1,12 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.4.0
+
+### Minor Changes
+
+- Combined JS/TS rules now ignore commonly ignored files
+  Disabled `no-undef` rule in TypeScript files
+
 ## 0.3.0
 
 ### Minor Changes
