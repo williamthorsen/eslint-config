@@ -457,7 +457,7 @@ export default [
       },
       parser: tsParser,
       parserOptions: {
-        module: 'es2020',
+        module: 'es2022',
         parser: '@typescript-eslint/parser',
         project: ['./tsconfig.eslint.json', './packages/*/tsconfig.eslint.json'],
         sourceType: 'module',
