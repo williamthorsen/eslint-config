@@ -64,6 +64,23 @@ importers:
       '@types/eslint': 8.4.9
       eslint: 8.26.0
 
+  packages/typescript-flat:
+    specifiers:
+      '@types/eslint': ^8.4.9
+      '@typescript-eslint/eslint-plugin': ^5.41.0
+      '@typescript-eslint/parser': ^5.41.0
+      '@williamthorsen/eslint-config-basic': workspace:*
+      eslint: ^8.26.0
+      typescript: '>=3.9'
+    dependencies:
+      '@typescript-eslint/eslint-plugin': 5.41.0_huremdigmcnkianavgfk3x6iou
+      '@typescript-eslint/parser': 5.41.0_wyqvi574yv7oiwfeinomdzmc3m
+      '@williamthorsen/eslint-config-basic': link:../basic
+      typescript: 4.8.4
+    devDependencies:
+      '@types/eslint': 8.4.9
+      eslint: 8.26.0
+
 packages:
 
   /@babel/code-frame/7.18.6:
