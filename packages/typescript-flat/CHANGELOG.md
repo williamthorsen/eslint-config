@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.2.0
+
+### Minor Changes
+
+- Export a legacy config with same rules as flat config
+
 ## 0.1.7
 
 ### Patch Changes
