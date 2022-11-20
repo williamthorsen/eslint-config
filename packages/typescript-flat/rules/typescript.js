@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   // Best practices
   '@typescript-eslint/ban-types': 'error',
   '@typescript-eslint/ban-ts-comment': ['error', { 'ts-ignore': 'allow-with-description' }],
