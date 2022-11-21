@@ -140,11 +140,11 @@ export default {
   'semi': ['error', 'always'],
   'semi-spacing': 'warn',
   'sort-imports': ['warn', {
-    ignoreCase: false,
+    allowSeparatedGroups: true,
+    ignoreCase: true,
     ignoreDeclarationSort: true,
     ignoreMemberSort: false,
     memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
-    allowSeparatedGroups: false,
   }],
   'space-before-function-paren': ['error', {
     anonymous: 'always',

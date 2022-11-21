@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.6.1
+
+### Patch Changes
+
+- Replace sort-imports with simple-sort-imports
+
 ## 0.6.0
 
 ### Minor Changes
