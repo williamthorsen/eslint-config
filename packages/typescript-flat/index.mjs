@@ -26,6 +26,7 @@ const pluginRules = {
   ...nRules,
   ...simpleImportSortRules,
   ...unicornRules,
+  'sort-imports': 'off',
 };
 // endregion
 
@@ -309,6 +310,7 @@ export default [
       ...jsRules,
       ...tsPlugin.configs.recommended.rules,
       ...tsRules,
+      'sort-imports': 'off',
     },
   },
   // endregion
