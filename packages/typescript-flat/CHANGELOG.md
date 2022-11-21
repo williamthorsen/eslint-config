@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.6.0
+
+### Minor Changes
+
+- Export common ignore patterns
+
 ## 0.5.0
 
 ### Minor Changes
