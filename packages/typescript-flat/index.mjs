@@ -11,30 +11,12 @@ import yamlPlugin from 'eslint-plugin-yml';
 import jsonParser from 'jsonc-eslint-parser';
 import yamlParser from 'yaml-eslint-parser';
 
+import commonIgnores from './ignores/common.js';
 import jsRules from './rules/javascript.js';
 import nRules from './rules/n.js';
 import simpleImportSortRules from './rules/simple-import-sort.js';
 import tsRules from './rules/typescript.js';
 import unicornRules from './rules/unicorn.js';
-
-// region Constants
-const commonIgnores = [
-  '**/*.md/*.ts', // disabled for now: not correctly recognized by the `include` block in `tsconfig.eslint.json`
-  '**/dist/**/*',
-  '**/dist-ssr/**/*',
-  '**/coverage/**/*',
-  '**/lib/**/*',
-  '**/local/**/*',
-  '**/output/**/*',
-  '**/tmp/**/*',
-  '*.min.*',
-  '*.d.ts',
-  'CHANGELOG.md',
-  'LICENSE*',
-  'package-lock.json',
-  'pnpm-lock.yaml',
-  'yarn.lock',
-];
 
 const javaScriptFiles = ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.jsx'];
 const typeScriptFiles = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];

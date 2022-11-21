@@ -12,6 +12,7 @@
   "main": "index.mjs",
   "files": [
     "index.mjs",
+    "ignores/*",
     "rules/*"
   ],
   "scripts": {
