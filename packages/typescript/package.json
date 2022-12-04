@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "0.1.6",
+  "version": "0.7.0",
   "description": "ESLint config for TypeScript, JSON, Markdown & YML",
   "keywords": [
     "eslint-config"
@@ -17,13 +17,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.43.0",
-    "@typescript-eslint/parser": "^5.43.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "@williamthorsen/eslint-config-basic": "workspace:*"
   },
   "devDependencies": {
     "@types/eslint": "^8.4.10",
-    "eslint": "^8.28.0"
+    "eslint": "^8.29.0"
   },
   "peerDependencies": {
     "eslint": ">=8",

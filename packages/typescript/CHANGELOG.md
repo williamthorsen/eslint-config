@@ -1,5 +1,13 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.7.0
+
+### Patch Changes
+
+- Upgrade dependencies
+- Updated dependencies
+  - @williamthorsen/eslint-config-basic@0.7.0
+
 ## 0.1.6
 
 ### Patch Changes

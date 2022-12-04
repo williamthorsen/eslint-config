@@ -6,6 +6,7 @@ export default {
   'unicorn/no-unsafe-regex': 'warn', // Keep regex literals safe
   'unicorn/number-literal-case': 'error', // Lowercase number formatting for octal, hex, binary (0x1'error' instead of 0X1'error')
   'unicorn/prefer-includes': 'warn', // Prefer `includes` over `indexOf` when checking for existence
+  'unicorn/prefer-node-protocol': 'warn', // Prefer `node:`-prefixed modules
   'unicorn/prefer-string-starts-ends-with': 'warn', // Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
   'unicorn/prefer-text-content': 'warn', // Prefer `textContent` over `innerText`
   'unicorn/prefer-type-error': 'warn', // Prefer a TypeError when an error is thrown while checking `typeof`

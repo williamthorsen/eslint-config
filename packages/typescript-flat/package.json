@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript-flat",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Flat ESLint config for TypeScript, JSON, Markdown & YML",
   "keywords": [
     "eslint-config"
@@ -19,8 +19,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.41.0",
-    "@typescript-eslint/parser": "^5.41.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsonc": "^2.5.0",
@@ -28,14 +28,14 @@
     "eslint-plugin-n": "^15.5.1",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-simple-import-sort": "^8.0.0",
-    "eslint-plugin-unicorn": "^44.0.2",
+    "eslint-plugin-unicorn": "^45.0.1",
     "eslint-plugin-yml": "^1.2.0",
     "jsonc-eslint-parser": "^2.1.0",
     "yaml-eslint-parser": "^1.1.0"
   },
   "devDependencies": {
-    "@types/eslint": "^8.4.9",
-    "eslint": "^8.26.0"
+    "@types/eslint": "^8.4.10",
+    "eslint": "^8.29.0"
   },
   "peerDependencies": {
     "eslint": ">=8",
