@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.7.3
+
+### Patch Changes
+
+- Upgrade all dependencies to latest version
+
 ## 0.7.2
 
 ### Patch Changes
