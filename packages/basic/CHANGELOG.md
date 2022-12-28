@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.7.4
+
+### Patch Changes
+
+- Upgrade all dependencies to latest version
+
 ## 0.7.3
 
 ### Patch Changes
