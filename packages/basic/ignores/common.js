@@ -1,0 +1,16 @@
+export default [
+  '**/dist/**',
+  '**/dist-ssr/**',
+  '**/coverage/**',
+  '**/lib/**',
+  '**/local/**',
+  '**/output/**',
+  '**/tmp/**',
+  '*.min.*',
+  '*.d.ts',
+  'CHANGELOG*',
+  'LICENSE*',
+  'package-lock.json',
+  'pnpm-lock.yaml',
+  'yarn.lock',
+];

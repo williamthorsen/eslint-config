@@ -9,10 +9,16 @@
   "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
-  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./ignores": "./ignores/*",
+    "./rules": "./rules/*"
+  },
   "files": [
     "index.mjs",
-    "jsPlugins.mjs"
+    "jsPlugins.mjs",
+    "ignores/*",
+    "rules/*"
   ],
   "scripts": {
     "audit": "pnpm run audit:prod && pnpm run audit:dev",
@@ -23,7 +29,6 @@
     "lint:fix": "pnpm eslint --fix ."
   },
   "dependencies": {
-    "eslint-config-standard": "^17.0.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-jsonc": "^2.5.0",
