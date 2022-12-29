@@ -1,4 +1,4 @@
-# @williamthorsen/eslint-config-typescript-flat
+# @williamthorsen/eslint-config-typescript
 
 ## 0.8.0
 
