@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.9.0
+
+### Minor Changes
+
+- BREAKING CHANGE: Change from ESLint nested config to ESLint flat config.
+
 ## 0.8.0
 
 ### Minor Changes

@@ -1,15 +1,157 @@
 /* eslint-disable object-property-newline */
 
+// This configuration file uses the new flat syntax.
+// See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
+
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import basicConfig, { jsPlugins } from '@williamthorsen/eslint-config-basic';
+import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
+import jsoncPlugin from 'eslint-plugin-jsonc';
+import markdownPlugin from 'eslint-plugin-markdown';
+import nPlugin from 'eslint-plugin-n';
+import promisePlugin from 'eslint-plugin-promise';
+import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
+import unicornPlugin from 'eslint-plugin-unicorn';
+import yamlPlugin from 'eslint-plugin-yml';
+import jsonParser from 'jsonc-eslint-parser';
+import yamlParser from 'yaml-eslint-parser';
+
+import commonIgnores from './ignores/common.js';
+import eslintCommentsRules from './rules/eslint-comments.js';
+import jsRules from './rules/javascript.js';
+import nRules from './rules/n.js';
+import simpleImportSortRules from './rules/simple-import-sort.js';
+import tsRules from './rules/typescript.js';
+import unicornRules from './rules/unicorn.js';
+
+const javaScriptFiles = ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.jsx'];
+const typeScriptFiles = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+
+const pluginRules = {
+  ...eslintCommentsPlugin.configs.recommended.rules,
+  ...nRules,
+  ...simpleImportSortRules,
+  ...unicornRules,
+  'sort-imports': 'off',
+  ...eslintCommentsRules,
+};
 
 export default [
-  ...basicConfig,
+  // region JavaScript files
   {
-    // Code blocks in Markdown files
-    files: ['**/*.md/*.*'],
+    files: javaScriptFiles,
+    ignores: [
+      ...commonIgnores,
+      '!.*.cjs',
+      '!.*.mjs',
+    ],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: true,
+      },
+    },
+    rules: jsRules,
+  },
+  // endregion
+
+  // region JavaScript & TypeScript files
+  {
+    files: [...javaScriptFiles, ...typeScriptFiles],
+    ignores: commonIgnores,
+    plugins: {
+      'eslint-comments': eslintCommentsPlugin,
+      'n': nPlugin,
+      'promise': promisePlugin,
+      'simple-import-sort': simpleImportSortPlugin,
+      'unicorn': unicornPlugin,
+    },
+    rules: pluginRules,
+  },
+  // endregion
+
+  // region JSON files
+  {
+    files: ['**/*.json', '**/*.json5'],
+    ignores: commonIgnores,
+    languageOptions: {
+      parser: jsonParser,
+    },
+    plugins: {
+      jsonc: jsoncPlugin,
+    },
     rules: {
+      ...jsoncPlugin.rules['recommended-with-jsonc'],
+      'jsonc/array-bracket-spacing': ['warn', 'never'],
+      'jsonc/indent': ['warn', 2],
+      'jsonc/key-spacing': ['error', { beforeColon: false, afterColon: true }],
+      'jsonc/no-octal-escape': 'error',
+      'jsonc/object-curly-newline': ['error', { multiline: true, consistent: true }],
+      'jsonc/object-curly-spacing': ['error', 'always'],
+      'jsonc/object-property-newline': ['error', { allowMultiplePropertiesPerLine: true }],
+      'comma-dangle': 'off',
+      'quotes': 'off',
+      'quote-props': 'off',
+    },
+  },
+  // endregion
+
+  // region JSON5 files
+  {
+    files: ['**/*.json5'],
+    ignores: commonIgnores,
+    languageOptions: {
+      parser: jsonParser,
+    },
+    plugins: {
+      jsonc: jsoncPlugin,
+    },
+    rules: {
+      // TODO: Enable these rules
+      // 'plugin:jsonc/recommended-with-jsonc',
+      'jsonc/comma-dangle': ['warn', 'always'],
+      'jsonc/comma-style': ['error', 'last'],
+    },
+  },
+  // endregion
+
+  // region YAML files
+  {
+    files: ['**/*.yaml', '**/*.yml'],
+    ignores: [
+      ...commonIgnores,
+      '!.github/**/*.yml',
+    ],
+    languageOptions: {
+      parser: yamlParser,
+    },
+    plugins: {
+      yml: yamlPlugin,
+    },
+    rules: {
+      ...yamlPlugin.rules.recommended,
+      'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
+      'yml/no-empty-document': 'off',
+      'spaced-comment': 'off',
+    },
+  },
+  // endregion
+
+  // region Markdown files
+  {
+    files: ['**/*.md'],
+    ignores: commonIgnores,
+    plugins: {
+      markdown: markdownPlugin,
+    },
+    processor: 'markdown/markdown',
+    rules: {
+      'no-alert': 'error',
+      'no-console': 'off',
+      'no-restricted-imports': 'off',
+      'no-undef': 'off',
+      'no-unused-vars': 'off',
+
       '@typescript-eslint/no-redeclare': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-use-before-define': 'off',
@@ -17,112 +159,175 @@ export default [
       '@typescript-eslint/comma-dangle': 'off',
     },
   },
+  // endregion
+
+  // region Scripts
   {
-    files: ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
+    files: ['scripts/**/*.*'],
+    ignores: commonIgnores,
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  {
+    files: ['**/*.test.js'],
+    ignores: commonIgnores,
+    rules: {
+      'no-unused-expressions': 'off',
+    },
+  },
+  // endregion
+
+  // region package.json
+  {
+    files: ['package.json'],
+    ignores: commonIgnores,
+    languageOptions: {
+      parser: jsonParser,
+    },
+    plugins: {
+      jsonc: jsoncPlugin,
+    },
+    rules: {
+      'jsonc/sort-keys': [
+        'warn',
+        {
+          pathPattern: '^$',
+          // Standard sort order from https://www.npmjs.com/package/format-package
+          order: [
+            'name',
+            'version',
+            'private',
+            'description',
+            'keywords',
+
+            'engines',
+            'os',
+            'cpu',
+
+            'homepage',
+            'bugs',
+            'repository',
+            'funding', // Unlisted
+            'license',
+
+            'author',
+            'contributors',
+            'publisher', // Unlisted
+
+            'bin',
+            'type',
+            'main',
+            'exports',
+            'types',
+            'typesVersions',
+            'module',
+            'browser',
+            'files',
+            'directories',
+            'workspaces',
+            'config',
+            'scripts',
+
+            // Extension manifest; see https://code.visualstudio.com/api/references/extension-manifest
+            'activationEvents',
+            'badges',
+            'categories',
+            'contributes',
+            'displayName',
+            'extensionDependencies',
+            'extensionKind',
+            'extensionPack',
+            'galleryBanner',
+            'icon',
+            'markdown',
+            'qna',
+            'preview',
+            'sideEffects',
+
+            // Dependencies
+            'dependencies',
+            'devDependencies',
+            'optionalDependencies',
+            'peerDependencies',
+            'peerDependenciesMeta',
+            'overrides',
+            'resolutions',
+
+            // Configurations
+            'eslintConfig',
+            'husky',
+            'jsdelivr',
+            'lint-staged',
+            'man',
+            'packageManager',
+            'pnpm',
+            'publishConfig',
+            'simple-git-hooks',
+            'unpkg',
+          ],
+        },
+        {
+          pathPattern: '^(?:dev|peer|optional|bundled)?[Dd]ependencies$',
+          order: { type: 'asc' },
+        },
+        {
+          pathPattern: '^exports.*$',
+          order: [
+            'types',
+            'require',
+            'import',
+          ],
+        },
+      ],
+    },
+  },
+  // endregion
+
+  {
+    files: ['**/*.d.ts'],
+    ignores: commonIgnores,
+    rules: {
+      'import/no-duplicates': 'off',
+    },
+  },
+
+  // region TypeScript files
+  {
+    files: typeScriptFiles,
+    ignores: commonIgnores,
     languageOptions: {
       globals: {
         console: 'readonly',
+        process: true,
       },
       parser: tsParser,
       parserOptions: {
-        module: 'es2020',
+        module: 'es2022',
         parser: '@typescript-eslint/parser',
-        project: './tsconfig.json',
+        project: ['./tsconfig.json'],
         sourceType: 'module',
       },
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
-      ...jsPlugins,
     },
     rules: {
-      ...basicConfig[3].rules,
+      ...jsRules,
       ...tsPlugin.configs.recommended.rules,
-      // Best practices
-      '@typescript-eslint/ban-types': 'error',
-      '@typescript-eslint/ban-ts-comment': ['error', { 'ts-ignore': 'allow-with-description' }],
-      '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'],
-      '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports', disallowTypeAnnotations: false }],
-      '@typescript-eslint/explicit-module-boundary-types': 'warn',
-      '@typescript-eslint/no-inferrable-types': 'warn',
-      '@typescript-eslint/no-namespace': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', {
-        args: 'all',
-        argsIgnorePattern: '^_',
-        ignoreRestSiblings: true,
-        varsIgnorePattern: '^_',
-      }],
-      '@typescript-eslint/no-useless-constructor': 'warn',
-
-      '@typescript-eslint/brace-style': ['warn', 'stroustrup', { allowSingleLine: true }], 'brace-style': 'off',
-      '@typescript-eslint/comma-dangle': ['warn', {
-        'arrays': 'always-multiline',
-        'exports': 'always-multiline',
-        'functions': 'ignore',
-        'imports': 'always-multiline',
-        'objects': 'always-multiline',
-        // TypeScript only
-        'enums': 'always-multiline',
-        'generics': 'always-multiline',
-        'tuples': 'ignore',
-      }], 'comma-dangle': 'off',
-      'keyword-spacing': 'off',
-      'no-dupe-class-members': 'off',
-      'no-useless-constructor': 'off',
-      'space-before-blocks': 'off',
-
-      '@typescript-eslint/indent': ['warn', 2, {
-        ignoredNodes: [
-          'TemplateLiteral *',
-          'JSXElement',
-          'JSXElement > *',
-          'JSXAttribute',
-          'JSXIdentifier',
-          'JSXNamespacedName',
-          'JSXMemberExpression',
-          'JSXSpreadAttribute',
-          'JSXExpressionContainer',
-          'JSXOpeningElement',
-          'JSXClosingElement',
-          'JSXFragment',
-          'JSXOpeningFragment',
-          'JSXClosingFragment',
-          'JSXText',
-          'JSXEmptyExpression',
-          'JSXSpreadChild',
-          'TSTypeParameterInstantiation',
-          'FunctionExpression > .params[decorators.length > 0]',
-          'FunctionExpression > .params > :matches(Decorator, :not(:first-child))',
-          'ClassBody.body > PropertyDefinition[decorators.length > 0] > .key',
-        ],
-        SwitchCase: 1,
-      }], 'indent': 'off',
-      '@typescript-eslint/lines-between-class-members': ['warn', 'always', {
-        exceptAfterOverload: true,
-        exceptAfterSingleLine: true,
-      }], 'lines-between-class-members': 'off',
-      '@typescript-eslint/member-delimiter-style': 'warn',
-      '@typescript-eslint/no-empty-function': 'off', 'no-empty-function': 'off',
-      '@typescript-eslint/no-empty-interface': 'off',
-      '@typescript-eslint/no-extra-parens': 'warn', 'no-extra-parens': 'off',
-      '@typescript-eslint/no-loss-of-precision': 'error', 'no-loss-of-precision': 'off',
-      '@typescript-eslint/object-curly-spacing': ['warn', 'always'], 'object-curly-spacing': 'off',
-      '@typescript-eslint/quotes': ['warn', 'single', { avoidEscape: true }], 'quotes': 'off',
-      '@typescript-eslint/no-redeclare': ['error', { builtinGlobals: true }], 'no-redeclare': 'off',
-      '@typescript-eslint/semi': ['error', 'always'], 'semi': 'off',
-      '@typescript-eslint/space-before-blocks': ['warn', 'always'],
-      '@typescript-eslint/space-before-function-paren': ['warn', {
-        anonymous: 'always',
-        asyncArrow: 'always',
-        named: 'never',
-      }], 'space-before-function-paren': 'off',
-      '@typescript-eslint/type-annotation-spacing': 'warn',
+      ...tsRules,
+      'sort-imports': 'off',
     },
   },
+  // endregion
+
+  // region Test files
   {
     files: ['**/*.test.ts'],
+    ignores: commonIgnores,
     rules: {
       'no-unused-expressions': 'off',
     },
   },
+  // endregion
 ];
