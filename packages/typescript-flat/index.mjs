@@ -1,3 +1,8 @@
+/* eslint-disable object-property-newline */
+
+// This configuration file uses the new flat syntax.
+// See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
+
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
@@ -12,6 +17,7 @@ import jsonParser from 'jsonc-eslint-parser';
 import yamlParser from 'yaml-eslint-parser';
 
 import commonIgnores from './ignores/common.js';
+import eslintCommentsRules from './rules/eslint-comments.js';
 import jsRules from './rules/javascript.js';
 import nRules from './rules/n.js';
 import simpleImportSortRules from './rules/simple-import-sort.js';
@@ -27,8 +33,8 @@ const pluginRules = {
   ...simpleImportSortRules,
   ...unicornRules,
   'sort-imports': 'off',
+  ...eslintCommentsRules,
 };
-// endregion
 
 export default [
   // region JavaScript files

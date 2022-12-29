@@ -1,5 +1,3 @@
-/* eslint-disable object-property-newline */
-
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import basicConfig, { jsPlugins } from '@williamthorsen/eslint-config-basic';
