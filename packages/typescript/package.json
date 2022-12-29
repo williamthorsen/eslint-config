@@ -14,7 +14,12 @@
     "index.mjs"
   ],
   "scripts": {
-    "lint": "eslint ."
+    "audit": "pnpm run audit:prod && pnpm run audit:dev",
+    "audit:dev": "pnpm audit --dev",
+    "audit:prod": "pnpm audit --audit-level=high --prod",
+    "check": "pnpm run lint && pnpm run audit",
+    "lint": "pnpm eslint .",
+    "lint:fix": "pnpm eslint --fix ."
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.47.1",

@@ -8,7 +8,14 @@
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "scripts": {
+    "audit": "pnpm run audit:prod && pnpm run audit:dev",
+    "audit:dev": "pnpm audit --dev",
+    "audit:prod": "pnpm audit --audit-level=high --prod",
+    "check": "pnpm run lint && pnpm run audit",
     "lint": "pnpm run --recursive lint",
+    "lint:fix": "pnpm run --recursive lint:fix",
+    "outdated": "pnpm outdated --compatible --recursive",
+    "outdated:latest": "pnpm outdated --recursive",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
