@@ -1,5 +1,16 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.8.0
+
+### Minor Changes
+
+- This package is deprecated. Please use v0.9.0 or higher, which uses the ESLint flat config.
+
+### Patch Changes
+
+- Updated dependencies
+  - @williamthorsen/eslint-config-basic@0.8.0
+
 ## 0.7.5
 
 ### Patch Changes

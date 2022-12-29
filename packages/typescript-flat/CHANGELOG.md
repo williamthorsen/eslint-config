@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.8.0
+
+### Minor Changes
+
+- This package is deprecated. Please use @williamthorsen/eslint-config-typescript.
+
 ## 0.7.5
 
 ### Patch Changes
