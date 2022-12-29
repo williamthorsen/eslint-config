@@ -18,12 +18,6 @@ export default [
     },
   },
   {
-    files: ['**/*.d.ts'],
-    rules: {
-      'import/no-duplicates': 'off',
-    },
-  },
-  {
     files: ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
     languageOptions: {
       globals: {

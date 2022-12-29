@@ -1,5 +1,17 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.8.0
+
+### Minor Changes
+
+- This package is deprecated. Please use v0.9.0 or higher, which uses the ESLint flat config.
+
+## 0.7.5
+
+### Patch Changes
+
+- Remove unused import plugin
+
 ## 0.7.4
 
 ### Patch Changes
