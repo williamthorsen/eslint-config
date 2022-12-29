@@ -9,7 +9,7 @@ export default [
   '**/tmp/**',
   '*.min.*',
   '*.d.ts',
-  'CHANGELOG.md',
+  'CHANGELOG*',
   'LICENSE*',
   'package-lock.json',
   'pnpm-lock.yaml',
