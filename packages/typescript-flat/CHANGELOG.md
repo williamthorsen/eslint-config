@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript-flat
 
+## 0.7.5
+
+### Patch Changes
+
+- Remove unused import plugin
+
 ## 0.7.4
 
 ### Patch Changes

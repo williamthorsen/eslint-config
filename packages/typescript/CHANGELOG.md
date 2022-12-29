@@ -1,5 +1,13 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.7.5
+
+### Patch Changes
+
+- Remove unused import plugin
+- Updated dependencies
+  - @williamthorsen/eslint-config-basic@0.7.5
+
 ## 0.7.4
 
 ### Patch Changes
