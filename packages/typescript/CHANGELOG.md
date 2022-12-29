@@ -1,5 +1,12 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.9.0
+
+### Minor Changes
+
+- BREAKING CHANGE: Dropped support for ESLint nested config.
+- BREAKING CHANGE: Renamed `@williamthorsen/eslint-config-typescript-flat` to `@williamthorsen/eslint-config-typescript`
+
 ## 0.8.0
 
 ### Minor Changes
