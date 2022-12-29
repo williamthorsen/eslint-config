@@ -9,7 +9,11 @@
   "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
-  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./ignores": "./ignores/*",
+    "./rules": "./rules/*"
+  },
   "files": [
     "index.mjs",
     "ignores/*",
