@@ -123,7 +123,7 @@ export default {
   }],
   'key-spacing': ['warn', { beforeColon: false, afterColon: true }],
   'no-constant-condition': ['warn', { checkLoops: false }],
-  'no-extra-parens': 'warn',
+  'no-extra-parens': 'off',
   'no-multiple-empty-lines': ['warn', { max: 1, maxBOF: 0, maxEOF: 1 }],
   'no-trailing-spaces': 'warn',
   'no-underscore-dangle': ['warn', { allow: ['__dirname', '__filename'], allowAfterThis: true }],
