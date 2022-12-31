@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.10.0
+
+### Minor Changes
+
+- Disabled no-extra-parens rule
+
 ## 0.9.1
 
 ### Patch Changes
