@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Flat ESLint config for TypeScript, JSON, Markdown & YML",
   "keywords": [
     "eslint-config"
@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@types/eslint": "^8.4.10",
-    "eslint": "^8.30.0"
+    "eslint": "^8.31.0"
   },
   "peerDependencies": {
     "eslint": ">=8",
