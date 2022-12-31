@@ -67,7 +67,7 @@ export default {
   '@typescript-eslint/member-delimiter-style': 'warn',
   '@typescript-eslint/no-empty-function': 'off', 'no-empty-function': 'off',
   '@typescript-eslint/no-empty-interface': 'off',
-  '@typescript-eslint/no-extra-parens': 'warn', 'no-extra-parens': 'off',
+  '@typescript-eslint/no-extra-parens': 'off',
   '@typescript-eslint/no-loss-of-precision': 'error', 'no-loss-of-precision': 'off',
   '@typescript-eslint/object-curly-spacing': ['warn', 'always'], 'object-curly-spacing': 'off',
   '@typescript-eslint/quotes': ['warn', 'single', { avoidEscape: true }], 'quotes': 'off',
