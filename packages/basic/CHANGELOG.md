@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.10.1
+
+### Patch Changes
+
+- Removed unneeded ignores
+
 ## 0.10.0
 
 ### Minor Changes
