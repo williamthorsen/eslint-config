@@ -41,7 +41,6 @@ export default [
   {
     files: javaScriptFiles,
     ignores: [
-      ...commonIgnores,
       '!.*.cjs',
       '!.*.mjs',
     ],
@@ -58,7 +57,6 @@ export default [
   // region JavaScript & TypeScript files
   {
     files: [...javaScriptFiles, ...typeScriptFiles],
-    ignores: commonIgnores,
     plugins: {
       'eslint-comments': eslintCommentsPlugin,
       'n': nPlugin,
@@ -73,7 +71,6 @@ export default [
   // region JSON files
   {
     files: ['**/*.json', '**/*.json5'],
-    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -99,7 +96,6 @@ export default [
   // region JSON5 files
   {
     files: ['**/*.json5'],
-    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -119,7 +115,6 @@ export default [
   {
     files: ['**/*.yaml', '**/*.yml'],
     ignores: [
-      ...commonIgnores,
       '!.github/**/*.yml',
     ],
     languageOptions: {
@@ -140,7 +135,6 @@ export default [
   // region Markdown files
   {
     files: ['**/*.md'],
-    ignores: commonIgnores,
     plugins: {
       markdown: markdownPlugin,
     },
@@ -164,14 +158,12 @@ export default [
   // region Scripts
   {
     files: ['scripts/**/*.*'],
-    ignores: commonIgnores,
     rules: {
       'no-console': 'off',
     },
   },
   {
     files: ['**/*.test.js'],
-    ignores: commonIgnores,
     rules: {
       'no-unused-expressions': 'off',
     },
@@ -181,7 +173,6 @@ export default [
   // region package.json
   {
     files: ['package.json'],
-    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -286,7 +277,6 @@ export default [
 
   {
     files: ['**/*.d.ts'],
-    ignores: commonIgnores,
     rules: {
       'import/no-duplicates': 'off',
     },
@@ -295,7 +285,6 @@ export default [
   // region TypeScript files
   {
     files: typeScriptFiles,
-    ignores: commonIgnores,
     languageOptions: {
       globals: {
         console: 'readonly',
@@ -324,10 +313,22 @@ export default [
   // region Test files
   {
     files: ['**/*.test.ts'],
-    ignores: commonIgnores,
     rules: {
       'no-unused-expressions': 'off',
     },
+  },
+  // endregion
+
+  // region Common ignores
+  {
+    ignores: [
+      ...commonIgnores,
+      // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
+      '!.github/',
+      '!.*.cjs',
+      '!.*.mjs',
+      '!.vscode',
+    ],
   },
   // endregion
 ];

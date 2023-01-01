@@ -36,7 +36,6 @@ export default [
   {
     files: javaScriptFiles,
     ignores: [
-      ...commonIgnores,
       '!.*.cjs',
       '!.*.mjs',
     ],
@@ -63,7 +62,6 @@ export default [
   // region JSON files
   {
     files: ['**/*.json', '**/*.json5'],
-    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -89,7 +87,6 @@ export default [
   // region JSON5 files
   {
     files: ['**/*.json5'],
-    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -109,7 +106,6 @@ export default [
   {
     files: ['**/*.yaml', '**/*.yml'],
     ignores: [
-      ...commonIgnores,
       '!.github/**/*.yml',
     ],
     languageOptions: {
@@ -130,7 +126,6 @@ export default [
   // region Markdown files
   {
     files: ['**/*.md'],
-    ignores: commonIgnores,
     plugins: {
       markdown: markdownPlugin,
     },
@@ -154,14 +149,12 @@ export default [
   // region Scripts
   {
     files: ['scripts/**/*.*'],
-    ignores: commonIgnores,
     rules: {
       'no-console': 'off',
     },
   },
   {
     files: ['**/*.test.js'],
-    ignores: commonIgnores,
     rules: {
       'no-unused-expressions': 'off',
     },
@@ -172,7 +165,6 @@ export default [
   {
     files: ['**/*.yaml', '**/*.yml'],
     ignores: [
-      ...commonIgnores,
       '!.github/**/*.yml',
     ],
     languageOptions: {
@@ -193,7 +185,6 @@ export default [
   // region package.json
   {
     files: ['package.json'],
-    ignores: commonIgnores,
     languageOptions: {
       parser: jsonParser,
     },
@@ -299,7 +290,6 @@ export default [
   // region --- Test files ---
   {
     files: ['**/*.test.js'],
-    ignores: commonIgnores,
     rules: {
       'no-unused-expressions': 'off',
     },
@@ -309,20 +299,7 @@ export default [
   // region --- All files ---
   {
     ignores: [
-      'dist/',
-      'dist-ssr/',
-      'coverage/',
-      'lib/',
-      'local/',
-      'output/',
-      'tmp/',
-      '*.min.*',
-      '*.d.ts',
-      'CHANGELOG.md',
-      'LICENSE*',
-      'package-lock.json',
-      'pnpm-lock.yaml',
-      'yarn.lock',
+      ...commonIgnores,
       // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
       '!.github/',
       '!.*.cjs',

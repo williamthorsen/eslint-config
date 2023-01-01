@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.10.1
+
+### Patch Changes
+
+- Removed unneeded ignores
+
 ## 0.10.0
 
 ### Minor Changes
