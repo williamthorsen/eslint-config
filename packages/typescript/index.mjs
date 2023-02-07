@@ -206,8 +206,8 @@ export default [
             'contributors',
             'publisher', // Unlisted
 
-            'bin',
             'type',
+            'bin',
             'main',
             'exports',
             'types',
