@@ -37,12 +37,12 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-unicorn": "^45.0.2",
-    "eslint-plugin-yml": "^1.4.0",
+    "eslint-plugin-yml": "^1.5.0",
     "jsonc-eslint-parser": "^2.1.0",
     "yaml-eslint-parser": "^1.1.0"
   },
   "devDependencies": {
-    "eslint": "^8.33.0"
+    "eslint": "^8.34.0"
   },
   "peerDependencies": {
     "eslint": ">=8"
