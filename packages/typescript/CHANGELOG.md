@@ -1,5 +1,12 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.10.6
+
+### Patch Changes
+
+- Upgrade dependencies to latest minor version
+- Close vulnerability in yaml by forcing use of ^2.2.2 instead of 2.1.3
+
 ## 0.10.5
 
 ### Patch Changes
