@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.10.8
+
+### Patch Changes
+
+- Upgrade all deps to latest version
+
 ## 0.10.7
 
 ### Patch Changes
