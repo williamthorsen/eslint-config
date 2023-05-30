@@ -14,7 +14,7 @@
     "check": "pnpm run lint && pnpm run audit",
     "lint": "pnpm run --recursive lint",
     "lint:fix": "pnpm run --recursive lint:fix",
-    "ncu": "pnpm --recursive --workspace-concurrency=1 exec ncu",
+    "ncu": "pnpm --include-workspace-root --recursive --workspace-concurrency=1 exec ncu",
     "outdated": "pnpm outdated --compatible --recursive",
     "outdated:latest": "pnpm outdated --recursive",
     "test": "echo \"Error: no test specified\" && exit 1"
