@@ -275,7 +275,7 @@ export default [
   // Disablements of rules must appear after the rules are enabled
   // region Scripts
   {
-    files: ['scripts/**/*.*'],
+    files: ['**/scripts/**/*.*'],
     rules: {
       // This rule must appear after the JS rules, which enable the `no-console` rule.
       'no-console': 'off',

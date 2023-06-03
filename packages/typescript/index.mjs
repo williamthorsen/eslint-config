@@ -297,7 +297,7 @@ export default [
 
   // region Scripts
   {
-    files: ['scripts/**/*.*'],
+    files: ['**/scripts/**/*.*'],
     rules: {
       'no-console': 'off',
     },
