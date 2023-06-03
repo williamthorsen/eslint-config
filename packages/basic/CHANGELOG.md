@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.10.10
+
+### Patch Changes
+
+- Fix skipping of scripts directories
+
 ## 0.10.9
 
 ### Patch Changes
