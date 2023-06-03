@@ -155,21 +155,6 @@ export default [
   },
   // endregion
 
-  // region Scripts
-  {
-    files: ['scripts/**/*.*'],
-    rules: {
-      'no-console': 'off',
-    },
-  },
-  {
-    files: ['**/*.test.js'],
-    rules: {
-      'no-unused-expressions': 'off',
-    },
-  },
-  // endregion
-
   // region package.json
   {
     files: ['package.json'],
@@ -310,11 +295,26 @@ export default [
   },
   // endregion
 
+  // region Scripts
+  {
+    files: ['scripts/**/*.*'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+  // endregion
+
   // region Test files
+  {
+    files: ['**/*.test.js'],
+    rules: {
+      'no-unused-expressions': 'off',
+    },
+  },
   {
     files: ['**/*.test.ts'],
     rules: {
-      'no-unused-expressions': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
   // endregion
