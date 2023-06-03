@@ -146,21 +146,6 @@ export default [
   },
   // endregion
 
-  // region Scripts
-  {
-    files: ['scripts/**/*.*'],
-    rules: {
-      'no-console': 'off',
-    },
-  },
-  {
-    files: ['**/*.test.js'],
-    rules: {
-      'no-unused-expressions': 'off',
-    },
-  },
-  // endregion
-
   // region --- YAML files
   {
     files: ['**/*.yaml', '**/*.yml'],
@@ -283,6 +268,17 @@ export default [
           ],
         },
       ],
+    },
+  },
+  // endregion
+
+  // Disablements of rules must appear after the rules are enabled
+  // region Scripts
+  {
+    files: ['scripts/**/*.*'],
+    rules: {
+      // This rule must appear after the JS rules, which enable the `no-console` rule.
+      'no-console': 'off',
     },
   },
   // endregion
