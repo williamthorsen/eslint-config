@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.10.11
+
+### Patch Changes
+
+- Upgrade all dependencies to latest version
+
 ## 0.10.10
 
 ### Patch Changes
