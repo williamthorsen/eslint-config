@@ -10,6 +10,7 @@
     "sourceMap": false,
   },
   "include": [
+    "scripts/strict-lint.ts",
     "src/index.ts",
   ],
 }
