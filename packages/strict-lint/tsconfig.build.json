@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "es2020",
+    ],
+    "declarationDir": "./dist/types",
+    "noEmit": false,
+    "outDir": "./dist",
+    "sourceMap": false,
+  },
+  "include": [
+    "src/index.ts",
+  ],
+}
