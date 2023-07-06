@@ -1,10 +1,27 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.11.0
+
+### Minor Changes
+
+- Add strict-lint package
+
 ## 0.10.11
 
-### Patch Changes
+### Features
 
-- Upgrade all dependencies to latest version
+- Updated `package.json` ordering rules to align more closely with `json-sort-cli`.
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+- Removed unneeded `typescript` package and TS config
+
+### Tooling
+
+- Added strict linting to code checks
+- Removed the `audit` check, which should now be performed only from the monorepo root
+- Centralized the linter config in the monorepo root
 
 ## 0.10.10
 

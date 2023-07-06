@@ -1,5 +1,17 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.11.0
+
+### Features
+
+- Updated `package.json` ordering rules to align more closely with `json-sort-cli`
+
+### Tooling
+
+- Added strict linting to code checks
+- Removed the `audit` check, which should now be performed only from the monorepo root
+- Centralized the linter config in the monorepo root
+
 ## 0.10.11
 
 ### Patch Changes
