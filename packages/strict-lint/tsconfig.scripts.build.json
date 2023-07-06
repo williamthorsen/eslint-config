@@ -1,15 +1,18 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "baseUrl": "./scripts",
     "lib": [
       "es2020",
     ],
     "noEmit": false,
-    "outDir": "./dist",
+    "outDir": "./dist/bin",
     "sourceMap": false,
   },
   "include": [
-    "./scripts/strict-lint.ts",
-    "./index.ts",
+    "scripts/strict-lint.ts",
+  ],
+  "exclude": [
+    "src/",
   ],
 }

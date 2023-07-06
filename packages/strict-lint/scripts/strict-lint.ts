@@ -1,5 +1,5 @@
 #!/usr/bin/env node --loader @esbuild-kit/esm-loader
 
-import { strictLint } from '../src/strictLint.js';
+import { strictLint } from '../index.js';
 
 await strictLint();
