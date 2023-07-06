@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "0.11.2",
+  "version": "0.11.3",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "license": "UNLICENSED",
@@ -22,7 +22,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm run clean && pnpm tsc --build tsconfig.build.json && mv dist/scripts dist/bin && chmod u+x ./dist/bin/* && rimraf dist/bin/*.d.ts",
+    "build": "pnpm run clean && pnpm tsc --build tsconfig.build.json && mv dist/scripts dist/bin && chmod u+x dist/bin/* && scripts/replace-shebang.ts && rimraf dist/bin/*.d.ts",
     "check": "pnpm run typecheck && pnpm run lint:strict && pnpm test:coverage",
     "clean": "pnpm rimraf dist/*",
     "lint": "pnpm eslint .",
