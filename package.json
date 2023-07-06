@@ -9,8 +9,8 @@
   "type": "module",
   "scripts": {
     "audit": "pnpm run audit:prod && pnpm run audit:dev",
-    "audit:dev": "pnpm audit --audit-level=high --dev",
-    "audit:prod": "pnpm audit --prod",
+    "audit:dev": "pnpm dlx audit-ci@^6 --config .audit-ci/config.dev.json5",
+    "audit:prod": "pnpm dlx audit-ci@^6 --config .audit-ci/config.prod.json5",
     "check": "pnpm run lint && pnpm run audit",
     "lint": "pnpm run --recursive lint",
     "lint:fix": "pnpm run --recursive lint:fix",
