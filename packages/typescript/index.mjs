@@ -36,7 +36,10 @@ const pluginRules = {
   ...eslintCommentsRules,
 };
 
-export default [
+/**
+ * @type {import('eslint').Linter.FlatConfig[]}
+ */
+const config = [
   // region JavaScript files
   {
     files: javaScriptFiles,
@@ -193,11 +196,11 @@ export default [
 
             'type',
             'bin',
-            'main',
             'exports',
+            'main',
+            'module',
             'types',
             'typesVersions',
-            'module',
             'browser',
             'files',
             'directories',
@@ -250,9 +253,9 @@ export default [
         {
           pathPattern: '^exports.*$',
           order: [
+            'import',
             'types',
             'require',
-            'import',
           ],
         },
       ],
@@ -332,3 +335,5 @@ export default [
   },
   // endregion
 ];
+
+export default config;

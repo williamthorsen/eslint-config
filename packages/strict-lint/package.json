@@ -1,0 +1,44 @@
+{
+  "name": "@williamthorsen/strict-lint",
+  "version": "0.10.11",
+  "description": "Strict linting for ESLint projects",
+  "keywords": [],
+  "license": "UNLICENSED",
+  "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "pnpm run clean && pnpm tsc --build tsconfig.build.json",
+    "check": "pnpm run typecheck && pnpm run lint:strict && pnpm test:coverage",
+    "clean": "pnpm rimraf dist/*",
+    "lint": "pnpm eslint .",
+    "lint:fix": "pnpm eslint --fix .",
+    "lint:strict": "scripts/strict-lint.ts",
+    "test": "pnpm vitest",
+    "test:coverage": "pnpm vitest --coverage",
+    "test:watch": "pnpm vitest --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "eslint": "^8.44.0",
+    "typescript": "^5.1.6"
+  },
+  "peerDependencies": {
+    "eslint": ">=8"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  }
+}

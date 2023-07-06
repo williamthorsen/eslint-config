@@ -1,0 +1,13 @@
+{
+  $schema: "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  moderate: true,
+  allowlist: [
+    // Semver Regular Expression Denial of Service
+    // https://github.com/advisories/GHSA-c2qf-rxjj-qqgw
+    "GHSA-c2qf-rxjj-qqgw",
+  ],
+  "extra-args": [
+    "--dev",
+  ],
+  "report-type": "summary",
+}

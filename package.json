@@ -4,26 +4,36 @@
   "private": true,
   "description": "ESLint configs monorepo",
   "keywords": [],
-  "license": "ISC",
+  "license": "UNLICENSED",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "audit": "pnpm run audit:prod && pnpm run audit:dev",
-    "audit:dev": "pnpm audit --audit-level=high --dev",
-    "audit:prod": "pnpm audit --prod",
-    "check": "pnpm run lint && pnpm run audit",
-    "lint": "pnpm run --recursive lint",
-    "lint:fix": "pnpm run --recursive lint:fix",
+    "audit:dev": "pnpm dlx audit-ci@^6 --config .audit-ci/config.dev.json5",
+    "audit:prod": "pnpm dlx audit-ci@^6 --config .audit-ci/config.prod.json5",
+    "check": "pnpm run typecheck && pnpm run lint:strict && pnpm run audit",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "lint:strict": "packages/strict-lint/scripts/strict-lint.ts",
     "ncu": "pnpm --include-workspace-root --recursive --workspace-concurrency=1 exec ncu",
     "outdated": "pnpm outdated --compatible --recursive",
     "outdated:latest": "pnpm outdated --recursive",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
-    "@types/node": "^20.3.3",
+    "@esbuild-kit/esm-loader": "^2.5.5",
+    "@types/eslint": "^8.40.2",
+    "@types/node": "^20.4.0",
+    "@vitest/coverage-v8": "^0.33.0",
     "eslint": "^8.44.0",
-    "typescript": "^5.1.6"
+    "rimraf": "^5.0.1",
+    "typescript": "^5.1.6",
+    "vitest": "^0.33.0"
   },
-  "packageManager": "pnpm@8.6.5"
+  "packageManager": "pnpm@8.6.6"
 }
