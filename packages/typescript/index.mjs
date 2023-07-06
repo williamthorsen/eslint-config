@@ -195,13 +195,13 @@ const config = [
             'publisher', // Unlisted
 
             'type',
-            'bin',
             'exports',
             'main',
             'module',
             'types',
             'typesVersions',
             'browser',
+            'bin',
             'files',
             'directories',
             'workspaces',

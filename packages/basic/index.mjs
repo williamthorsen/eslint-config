@@ -206,7 +206,6 @@ const config  = [
             'contributors',
             'publisher', // Unlisted
 
-            'bin',
             'type',
             'exports',
             'main',
@@ -214,6 +213,7 @@ const config  = [
             'types',
             'typesVersions',
             'browser',
+            'bin',
             'files',
             'directories',
             'workspaces',
