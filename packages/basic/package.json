@@ -21,9 +21,10 @@
     "rules/*"
   ],
   "scripts": {
-    "check": "pnpm run lint",
+    "check": "pnpm run lint:strict",
     "lint": "pnpm eslint .",
-    "lint:fix": "pnpm eslint --fix ."
+    "lint:fix": "pnpm eslint --fix .",
+    "lint:strict": "../strict-lint/scripts/strict-lint.ts"
   },
   "dependencies": {
     "eslint-plugin-eslint-comments": "^3.2.0",

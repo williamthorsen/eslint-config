@@ -20,9 +20,10 @@
     "rules/*"
   ],
   "scripts": {
-    "check": "pnpm run lint",
+    "check": "pnpm run lint:strict",
     "lint": "pnpm eslint .",
-    "lint:fix": "pnpm eslint --fix ."
+    "lint:fix": "pnpm eslint --fix .",
+    "lint:strict": "../strict-lint/scripts/strict-lint.ts"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.61.0",

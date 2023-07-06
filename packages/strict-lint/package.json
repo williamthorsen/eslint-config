@@ -8,9 +8,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "check": "pnpm run typecheck && pnpm run lint && pnpm test:coverage",
+    "check": "pnpm run typecheck && pnpm run lint:strict && pnpm test:coverage",
     "lint": "pnpm eslint .",
     "lint:fix": "pnpm eslint --fix .",
+    "lint:strict": "scripts/strict-lint.ts",
     "test": "pnpm vitest",
     "test:coverage": "pnpm vitest --coverage",
     "test:watch": "pnpm vitest --watch",
