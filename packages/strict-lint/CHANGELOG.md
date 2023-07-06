@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 0.11.1
+
+### Features
+
+- Added the `strict-lint` script to the Node.js package
+
 ## 0.11.0
 
 ### Features
@@ -16,4 +22,3 @@
 - Configured the package for distribution as a Node.js package
 - Removed the `audit` check, which should now be performed only from the monorepo root
 - Centralized the linter config in the monorepo root
-
