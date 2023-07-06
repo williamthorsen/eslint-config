@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 0.11.2
+
+### Patch Changes
+
+- Simplify build config & file structure
+
 ## 0.11.1
 
 ### Features
