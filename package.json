@@ -7,20 +7,25 @@
   "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "audit": "pnpm run audit:prod && pnpm run audit:dev",
     "audit:dev": "pnpm dlx audit-ci@^6 --config .audit-ci/config.dev.json5",
     "audit:prod": "pnpm dlx audit-ci@^6 --config .audit-ci/config.prod.json5",
-    "check": "pnpm run lint && pnpm run audit",
-    "lint": "pnpm run --recursive lint",
-    "lint:fix": "pnpm run --recursive lint:fix",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run audit",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "ncu": "pnpm --include-workspace-root --recursive --workspace-concurrency=1 exec ncu",
     "outdated": "pnpm outdated --compatible --recursive",
     "outdated:latest": "pnpm outdated --recursive",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
+    "@types/eslint": "^8.40.2",
     "@types/node": "^20.4.0",
     "eslint": "^8.44.0",
     "typescript": "^5.1.6"
