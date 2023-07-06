@@ -31,7 +31,10 @@ const pluginRules = {
   'sort-imports': 'off',
 };
 
-export default [
+/**
+ * @type {import('eslint').Linter.FlatConfig[]}
+ */
+const config  = [
   // region JavaScript files
   {
     files: javaScriptFiles,
@@ -309,4 +312,5 @@ export default [
   // endregion - All files
 ];
 
+export default config;
 export { jsPlugins };
