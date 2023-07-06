@@ -208,11 +208,11 @@ const config  = [
 
             'bin',
             'type',
-            'main',
             'exports',
+            'main',
+            'module',
             'types',
             'typesVersions',
-            'module',
             'browser',
             'files',
             'directories',
@@ -265,9 +265,9 @@ const config  = [
         {
           pathPattern: '^exports.*$',
           order: [
+            'import',
             'types',
             'require',
-            'import',
           ],
         },
       ],
