@@ -6,7 +6,7 @@
     "eslint-config"
   ],
   "homepage": "https://github.com/williamthorsen/eslint-config",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "exports": {

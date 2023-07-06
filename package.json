@@ -4,7 +4,7 @@
   "private": true,
   "description": "ESLint configs monorepo",
   "keywords": [],
-  "license": "ISC",
+  "license": "UNLICENSED",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "workspaces": [
