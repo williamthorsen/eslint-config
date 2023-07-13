@@ -19,13 +19,13 @@ export default {
   '@typescript-eslint/comma-dangle': ['warn', {
     'arrays': 'always-multiline',
     'exports': 'always-multiline',
-    'functions': 'ignore',
+    'functions': 'only-multiline',
     'imports': 'always-multiline',
     'objects': 'always-multiline',
     // TypeScript only
     'enums': 'always-multiline',
     'generics': 'always-multiline',
-    'tuples': 'ignore',
+    'tuples': 'only-multiline',
   }], 'comma-dangle': 'off',
   'keyword-spacing': 'off',
   'no-dupe-class-members': 'off',
