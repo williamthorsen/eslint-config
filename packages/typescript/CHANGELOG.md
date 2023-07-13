@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.11.3
+
+### Fixes
+
+- Fixed an issue where the `tuples: "ignore"` setting in the `@typescript-eslint/comma-dangle` rule caused a `ruleListener not found` error when a tuple was encountered. The workaround was to set `tuples: "only-multiline"` in that rule.
+
 ## 0.11.2
 
 ### Patch Changes
