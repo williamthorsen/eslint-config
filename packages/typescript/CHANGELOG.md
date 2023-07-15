@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.12.0
+
+### Features
+
+- Updated `package.json` ordering rules to align more closely with `json-sort-cli`.
+
+### Dependencies
+
+- Upgrade all dependencies to latest version
+
 ## 0.11.3
 
 ### Fixes
@@ -16,7 +26,7 @@
 
 ### Patch Changes
 
-- Aligned package.json linter rules with json-sort-cli
+- Updated `package.json` ordering rules to align more closely with `json-sort-cli`.
 
 ## 0.11.0
 

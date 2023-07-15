@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-monorepo",
-  "version": "0.11.3",
+  "version": "0.12.0",
   "private": true,
   "description": "ESLint configs monorepo",
   "keywords": [],
