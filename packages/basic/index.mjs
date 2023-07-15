@@ -17,6 +17,7 @@ import jsPlugins from './jsPlugins.mjs';
 import eslintCommentsRules from './rules/eslint-comments.js';
 import jsRules from './rules/javascript.js';
 import nRules from './rules/n.js';
+import packageJsonrules from './rules/packageJson.js';
 import simpleImportSortRules from './rules/simple-import-sort.js';
 import unicornRules from './rules/unicorn.js';
 
@@ -179,99 +180,7 @@ const config  = [
     plugins: {
       jsonc: jsoncPlugin,
     },
-    rules: {
-      'jsonc/sort-keys': [
-        'warn',
-        {
-          pathPattern: '^$',
-          // Standard sort order from https://www.npmjs.com/package/format-package
-          order: [
-            'name',
-            'version',
-            'private',
-            'description',
-            'keywords',
-
-            'engines',
-            'os',
-            'cpu',
-
-            'homepage',
-            'bugs',
-            'repository',
-            'funding', // Unlisted
-            'license',
-
-            'author',
-            'contributors',
-            'publisher', // Unlisted
-
-            'type',
-            'exports',
-            'main',
-            'module',
-            'types',
-            'typesVersions',
-            'browser',
-            'bin',
-            'files',
-            'directories',
-            'workspaces',
-            'config',
-            'scripts',
-
-            // Extension manifest; see https://code.visualstudio.com/api/references/extension-manifest
-            'activationEvents',
-            'badges',
-            'categories',
-            'contributes',
-            'displayName',
-            'extensionDependencies',
-            'extensionKind',
-            'extensionPack',
-            'galleryBanner',
-            'icon',
-            'markdown',
-            'qna',
-            'preview',
-            'sideEffects',
-
-            // Dependencies
-            'dependencies',
-            'devDependencies',
-            'optionalDependencies',
-            'peerDependencies',
-            'peerDependenciesMeta',
-            'overrides',
-            'resolutions',
-
-            // Configurations
-            'eslintConfig',
-            'husky',
-            'jsdelivr',
-            'lint-staged',
-            'man',
-            'packageManager',
-            'pnpm',
-            'publishConfig',
-            'simple-git-hooks',
-            'unpkg',
-          ],
-        },
-        {
-          pathPattern: '^(?:dev|peer|optional|bundled)?[Dd]ependencies$',
-          order: { type: 'asc' },
-        },
-        {
-          pathPattern: '^exports.*$',
-          order: [
-            'import',
-            'types',
-            'require',
-          ],
-        },
-      ],
-    },
+    rules: packageJsonrules,
   },
   // endregion
 

@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.12.0
+
+### Features
+
+- Updated `package.json` ordering rules to align more closely with `json-sort-cli`.
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 0.11.1
 
 ### Patch Changes
