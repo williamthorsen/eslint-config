@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.12.1
+
+### Dependencies
+
+- Upgraded all dependencies to latest version.
+
 ## 0.12.0
 
 ### Features
@@ -12,7 +18,7 @@
 
 ## 0.11.1
 
-### Patch Changes
+### Features
 
 - Updated `package.json` ordering rules to align more closely with `json-sort-cli`
 
@@ -30,127 +36,127 @@
 
 ## 0.10.11
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.10.10
 
-### Patch Changes
+### Fixes
 
-- Fix skipping of scripts directories
+- Fixed skipping of scripts directories
 
 ## 0.10.9
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.10.8
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all deps to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.10.7
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest minor version
+- Upgraded all dependencies to latest minor version
 
 ## 0.10.6
 
-### Patch Changes
+### Dependencies
 
-- Upgrade dependencies to latest minor version
-- Close vulnerability in yaml by forcing use of ^2.2.2 instead of 2.1.3
+- Upgraded dependencies to latest minor version
+- Closed vulnerability in `yaml` package by forcing use of ^2.2.2 instead of 2.1.3
 
 ## 0.10.5
 
-### Patch Changes
+### Dependencies
 
 - Upgraded all dependencies to latest version.
 
 ## 0.10.4
 
-### Patch Changes
+### Dependencies
 
 - Upgraded all dependencies & runtimes to latest version.
 
 ## 0.10.3
 
-### Patch Changes
+### Dependencies
 
 - Upgraded all dependencies to latest version
 
 ## 0.10.1
 
-### Patch Changes
+### Tooling
 
 - Removed unneeded ignores
 
 ## 0.10.0
 
-### Minor Changes
+### Features
 
-- Disabled no-extra-parens rule
+- Disabled `no-extra-parens` rule
 
 ## 0.9.1
 
-### Patch Changes
+### Dependencies
 
 - Upgraded all dependencies to latest version
 
 ## 0.9.0
 
-### Minor Changes
+### BREAKING CHANGES
 
-- BREAKING CHANGE: Change from ESLint nested config to ESLint flat config.
+- Changed from ESLint nested config to ESLint flat config.
 
 ## 0.8.0
 
-### Minor Changes
+### Tooling
 
-- This package is deprecated. Please use v0.9.0 or higher, which uses the ESLint flat config.
+- Deprecation notice: Versions below v0.9.0 are deprecated.
 
 ## 0.7.5
 
-### Patch Changes
+### Refactoring
 
-- Remove unused import plugin
+- Removed unused import plugin
 
 ## 0.7.4
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.7.3
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded dependencies
 
 ## 0.7.2
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded dependencies
 
 ## 0.7.1
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies
+- Upgraded dependencies
 
 ## 0.7.0
 
-### Patch Changes
+### Dependencies
 
-- Upgrade dependencies
+- Upgraded dependencies
 
 ## 0.1.6
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded dependencies

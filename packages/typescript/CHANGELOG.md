@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.12.1
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 0.12.0
 
 ### Features
@@ -8,7 +14,7 @@
 
 ### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.11.3
 
@@ -18,19 +24,19 @@
 
 ## 0.11.2
 
-### Patch Changes
+### Dependencies
 
 - Upgraded all dependencies to latest version
 
 ## 0.11.1
 
-### Patch Changes
+### Features
 
 - Updated `package.json` ordering rules to align more closely with `json-sort-cli`.
 
 ## 0.11.0
 
-### Minor Changes
+### Features
 
 - Updated `package.json` ordering rules to align more closely with `json-sort-cli`
 
@@ -53,181 +59,185 @@
 
 ## 0.10.10
 
-### Patch Changes
+### Tooling
 
-- Fix skipping of scripts directories
+- Fixed skipping of scripts directories
 
 ## 0.10.9
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.10.8
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all deps to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.10.7
 
-### Patch Changes
+### Dependencies
 
 - Upgrade all dependencies to latest minor version
 
 ## 0.10.6
 
-### Patch Changes
+### Dependencies
 
-- Upgrade dependencies to latest minor version
-- Close vulnerability in yaml by forcing use of ^2.2.2 instead of 2.1.3
+- Upgraded dependencies to latest minor version
+- Closed vulnerability in `yaml` package by forcing use of ^2.2.2 instead of 2.1.3
 
 ## 0.10.5
 
-### Patch Changes
+### Dependencies
 
-- Upgraded all dependencies to latest version.
+- Upgraded all dependencies to latest version
 
-## 0.10.4
+## Dependencies
 
-### Patch Changes
+### Dependencies
 
-- Upgraded all dependencies & runtimes to latest version.
+- Upgraded all dependencies & runtimes to latest version
 
-## 0.10.3
+## Dependencies
 
-### Patch Changes
+### Dependencies
 
 - Upgraded all dependencies to latest version
 
 ## 0.10.2
 
-### Patch Changes
+### Dependencies
 
 - Upgraded all dependencies to latest version
 
 ## 0.10.1
 
-### Patch Changes
+### Tooling
 
 - Removed unneeded ignores
 
 ## 0.10.0
 
-### Minor Changes
+### Features
 
-- Disabled no-extra-parens rule
+- Disabled `no-extra-parens` rule
 
 ## 0.9.1
 
-### Patch Changes
+### Dependencies
 
 - Upgraded all dependencies to latest version
 
 ## 0.9.0
 
-### Minor Changes
+### BREAKING CHANGES
 
-- BREAKING CHANGE: Dropped support for ESLint nested config.
-- BREAKING CHANGE: Renamed `@williamthorsen/eslint-config-typescript-flat` to `@williamthorsen/eslint-config-typescript`
+- Changed from ESLint nested config to ESLint flat config.
+- Renamed `@williamthorsen/eslint-config-typescript-flat` to `@williamthorsen/eslint-config-typescript`
 
 ## 0.8.0
 
-### Minor Changes
+### Tooling
 
-- This package is deprecated. Please use @williamthorsen/eslint-config-typescript.
+- Deprecation notice: Versions below v0.9.0 are deprecated.
 
 ## 0.7.5
 
-### Patch Changes
+### Refactoring
 
-- Remove unused import plugin
+- Removed unused import plugin
 
 ## 0.7.4
 
-### Patch Changes
+### Dependencies
 
 - Upgrade all dependencies to latest version
 
 ## 0.7.3
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.7.2
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.7.1
 
-### Patch Changes
+### Dependencies
 
-- Upgrade all dependencies
+- Upgraded all dependencies to latest version
 
 ## 0.7.0
 
-### Minor Changes
+### Dependencies
 
-- Upgrade dependencies
+- Upgraded dependencies
 
 ## 0.6.1
 
-### Patch Changes
+### Refactoring
 
-- Replace sort-imports with simple-sort-imports
+- Replaced `sort-imports` with `simple-sort-imports`
 
 ## 0.6.0
 
-### Minor Changes
+### Refactoring
 
-- Export common ignore patterns
+- Exported common ignore patterns
 
 ## 0.5.0
 
-### Minor Changes
+### Features
 
-- Enforce use of braces for all control statements.
-  Disable no-use-before-define in TypeScript files.
+- Enforced use of braces for all control statements
+  Disabled `no-use-before-define` in TypeScript files
 
 ## 0.4.1
 
-### Patch Changes
+### Fixes
 
-- Removed erroneous commonIgnores reference from TS rules.
+- Removed erroneous commonIgnores reference from TS rules
 
 ## 0.4.0
 
-### Minor Changes
+### Features
 
 - Combined JS/TS rules now ignore commonly ignored files
   Disabled `no-undef` rule in TypeScript files
 
 ## 0.3.0
 
-### Minor Changes
+### Features
 
-- Simplify structure.
-  Make plugins direct dependencies of flat TypeScript config.
-  Remove legacy config.
+- BREAKING CHANGE: Removed legacy config.
+
+### Refactoring
+ 
+- Simplified structure
+- Made plugins direct dependencies of the flat TypeScript config
+
+### Features
 
 ## 0.2.0
 
-### Minor Changes
+### Features
 
-- Export a legacy config with same rules as flat config
+- A legacy config with the same rules as the flat config is now exported.
 
 ## 0.1.7
 
-### Patch Changes
+### Fixes
 
-- Fix nonpropagating ignores, Node globals
+- Fixed nonpropagating ignores, Node globals
 
 ## 0.1.6
 
-### Patch Changes
+### Dependencies
 
-- Updated dependencies
-  - @williamthorsen/eslint-config-basic@0.1.6
+- Upgraded dependencies
