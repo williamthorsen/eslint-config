@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.12.2
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 0.12.1
 
 ### Dependencies
@@ -218,7 +224,7 @@
 - BREAKING CHANGE: Removed legacy config.
 
 ### Refactoring
- 
+
 - Simplified structure
 - Made plugins direct dependencies of the flat TypeScript config
 
