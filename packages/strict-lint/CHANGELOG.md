@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 0.11.5
+
+### Dependencies
+
+- Upgrade all dependies & runtimes to latest version
+
 ## 0.11.4
 
 ### Dependencies
