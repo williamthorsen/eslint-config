@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.12.2
+
+### Dependencies
+
+- Upgrade all dependies & runtimes to latest version
+
 ## 0.12.1
 
 ### Dependencies

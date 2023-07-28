@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.12.3
+
+### Dependencies
+
+- Upgrade all dependies & runtimes to latest version
+
 ## 0.12.2
 
 ### Dependencies
