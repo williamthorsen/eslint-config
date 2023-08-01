@@ -1,5 +1,12 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.12.4
+
+### Dependencies
+
+- Upgrade all dependencies to latest version
+- Close vulnerability in the transitive dependency `semver`
+
 ## 0.12.2
 
 ### Dependencies
