@@ -40,7 +40,7 @@
     "yaml-eslint-parser": "^1.2.2"
   },
   "devDependencies": {
-    "@types/eslint": "^8.44.1",
+    "@types/eslint": "^8.44.2",
     "eslint": "^8.46.0"
   },
   "peerDependencies": {
