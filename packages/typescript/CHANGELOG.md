@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.13.0
+
+### Features
+
+Aligned rules with Deno style:
+
+- Changed `comma-brace` style from `stroustrup` to `1tbs`
+- Changed `comma-dangle` style for functions and tuples to `always-multiline`, making it consistent with all other
+  comma-dangle rules
+
 ## 0.12.5
 
 ### Dependencies
