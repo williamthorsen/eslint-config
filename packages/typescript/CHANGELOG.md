@@ -1,17 +1,23 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.12.5
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 0.12.4
 
 ### Dependencies
 
-- Upgrade all dependencies to latest version
-- Close vulnerability in the transitive dependency `semver`
+- Upgraded all dependencies to latest version
+- Closed vulnerability in the transitive dependency `semver`
 
 ## 0.12.3
 
 ### Dependencies
 
-- Upgrade all dependies & runtimes to latest version
+- Upgraded all dependies & runtimes to latest version
 
 ## 0.12.2
 
