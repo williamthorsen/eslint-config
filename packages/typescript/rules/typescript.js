@@ -15,7 +15,7 @@ export default {
   }],
   '@typescript-eslint/no-useless-constructor': 'warn',
 
-  '@typescript-eslint/brace-style': ['warn', 'stroustrup', { allowSingleLine: true }], 'brace-style': 'off',
+  '@typescript-eslint/brace-style': ['warn', '1tbs', { allowSingleLine: true }], 'brace-style': 'off',
   '@typescript-eslint/comma-dangle': ['warn', 'always-multiline'], 'comma-dangle': 'off',
   'keyword-spacing': 'off',
   'no-dupe-class-members': 'off',
