@@ -1,5 +1,13 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.13.0
+
+### Features
+
+Aligned rules with Deno style:
+
+- Changed `comma-brace` style from `stroustrup` to `1tbs`
+
 ## 0.12.5
 
 ### Dependencies

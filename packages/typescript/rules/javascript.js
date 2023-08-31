@@ -94,7 +94,7 @@ export default {
   // Stylistic rules
   'arrow-spacing': ['warn', { before: true, after: true }],
   'block-spacing': ['warn', 'always'],
-  'brace-style': ['warn', 'stroustrup', { allowSingleLine: true }],
+  'brace-style': ['warn', '1tbs', { allowSingleLine: true }],
   'camelcase': 'off',
   'comma-dangle': ['warn', 'always-multiline'],
   'comma-spacing': ['warn', { before: false, after: true }],
