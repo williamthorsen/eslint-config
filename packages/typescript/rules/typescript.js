@@ -16,17 +16,7 @@ export default {
   '@typescript-eslint/no-useless-constructor': 'warn',
 
   '@typescript-eslint/brace-style': ['warn', 'stroustrup', { allowSingleLine: true }], 'brace-style': 'off',
-  '@typescript-eslint/comma-dangle': ['warn', {
-    'arrays': 'always-multiline',
-    'exports': 'always-multiline',
-    'functions': 'only-multiline',
-    'imports': 'always-multiline',
-    'objects': 'always-multiline',
-    // TypeScript only
-    'enums': 'always-multiline',
-    'generics': 'always-multiline',
-    'tuples': 'only-multiline',
-  }], 'comma-dangle': 'off',
+  '@typescript-eslint/comma-dangle': ['warn', 'always-multiline'], 'comma-dangle': 'off',
   'keyword-spacing': 'off',
   'no-dupe-class-members': 'off',
   'no-undef': 'off',
