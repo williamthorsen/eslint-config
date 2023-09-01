@@ -18,7 +18,8 @@
     "index.mjs",
     "jsPlugins.mjs",
     "ignores/*",
-    "rules/*"
+    "rules/*",
+    "utils/*"
   ],
   "scripts": {
     "check": "pnpm run lint:strict",
