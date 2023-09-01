@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.14.1
+
+### Fixes
+
+Fixed the failure to include `relativePathToDir` helper function in the distribution bundle.
+
 ## 0.14.0
 
 ### Features
