@@ -231,7 +231,7 @@ const config = [
   },
   // endregion
 
-  // region Common ignores
+  // region --- All files ---
   {
     ignores: [
       ...commonIgnores,
@@ -241,6 +241,9 @@ const config = [
       '!.*.mjs',
       '!.vscode',
     ],
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
+    },
   },
   // endregion
 ];
