@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.14.0
+
+### Features
+
+Added `relativePathToDir` helper function to assist in writing monorepo configs.
+
 ## 0.13.0
 
 ### Features
