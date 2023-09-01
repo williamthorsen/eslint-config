@@ -223,3 +223,4 @@ const config  = [
 
 export default config;
 export { jsPlugins };
+export { relativePathToDir } from './utils/relativePathToDir.js';
