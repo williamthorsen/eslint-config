@@ -35,7 +35,7 @@ const pluginRules = {
 /**
  * @type {import('eslint').Linter.FlatConfig[]}
  */
-const config  = [
+const config = [
   // region JavaScript files
   {
     files: javaScriptFiles,
@@ -78,9 +78,9 @@ const config  = [
       'jsonc/indent': ['warn', 2],
       'jsonc/key-spacing': ['error', { beforeColon: false, afterColon: true }],
       'jsonc/no-octal-escape': 'error',
-      'jsonc/object-curly-newline': ['error', { multiline: true, consistent: true }],
-      'jsonc/object-curly-spacing': ['error', 'always'],
-      'jsonc/object-property-newline': ['error', { allowMultiplePropertiesPerLine: true }],
+      'jsonc/object-property-newline': ['error', {
+        allowMultiplePropertiesPerLine: true,
+      }],
       'comma-dangle': 'off',
       'quotes': 'off',
       'quote-props': 'off',
@@ -140,12 +140,6 @@ const config  = [
       'no-restricted-imports': 'off',
       'no-undef': 'off',
       'no-unused-vars': 'off',
-
-      '@typescript-eslint/no-redeclare': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/no-use-before-define': 'off',
-      '@typescript-eslint/no-var-requires': 'off',
-      '@typescript-eslint/comma-dangle': 'off',
     },
   },
   // endregion
