@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.15.0
+
+### Minor Changes
+
+- Simplify configs, upgrade dependencies
+
 ## 0.14.2
 
 ### Fixes
