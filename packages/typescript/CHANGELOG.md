@@ -4,7 +4,7 @@
 
 ### Fixes
 
-Fixed the issue that `relativePathToDir` was finding the relative path to the target directory from the location of the  `relativePathToDir.js` file instead of the caller's file.
+Fixed the issue that `relativePathToDir` was finding the relative path to the target directory from the location of the `relativePathToDir.js` file instead of the caller's file.
 The function now accepts a second argument specifying which directory should serve as the base directory.
 
 ## 0.14.1

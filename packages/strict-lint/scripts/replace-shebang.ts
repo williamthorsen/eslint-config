@@ -13,7 +13,7 @@ const directoryPath = path.join(rootPath, binPath);
 
 const fileNames = fs
   .readdirSync(directoryPath)
-  .filter(file => file.endsWith('.js'));
+  .filter((file) => file.endsWith('.js'));
 
 for (const fileName of fileNames) {
   const filePath = path.join(directoryPath, fileName);

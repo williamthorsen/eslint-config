@@ -3,7 +3,7 @@ import { Linter } from 'eslint';
 import FlatConfig = Linter.FlatConfig;
 
 export function convertWarnToError(config: FlatConfig): FlatConfig {
-  if (!config.rules) { return config; }
+  if (!config.rules) return config;
   const ruleEntries = Object.entries(config.rules);
   const errorRuleEntries = ruleEntries.map(([ruleName, ruleValue]) => {
     if (ruleValue === 'warn') {
@@ -19,4 +19,3 @@ export function convertWarnToError(config: FlatConfig): FlatConfig {
     rules: Object.fromEntries(errorRuleEntries),
   };
 }
-
