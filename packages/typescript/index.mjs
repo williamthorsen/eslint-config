@@ -236,17 +236,12 @@ const config = [
 
   // region --- All files ---
   {
-    ignores: [
-      ...commonIgnores,
-      // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
-      '!.github/',
-      '!.*.cjs',
-      '!.*.mjs',
-      '!.vscode',
-    ],
     linterOptions: {
       reportUnusedDisableDirectives: true,
     },
+  },
+  {
+    ignores: commonIgnores,
   },
   // endregion
 ];
