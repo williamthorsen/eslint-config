@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 0.15.1
+
+### Patch Changes
+
+- Upgrade all dependencies to latest version
+
 ## 0.15.0
 
 ### Minor Changes

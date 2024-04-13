@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 0.12.1
+
+### Patch Changes
+
+- Upgrade all dependencies to latest version
+
 ## 0.12.0
 
 ### Minor Changes
