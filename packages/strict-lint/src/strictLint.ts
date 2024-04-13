@@ -8,17 +8,19 @@ import FlatConfig = Linter.FlatConfig;
 // @ts-expect-error - The experimental FlatESLint class is not typed
 const { FlatESLint } = ESLint;
 
-export async function strictLint(baseConfig?: FlatConfig[] | undefined): Promise<string> {
+export async function strictLint(
+  baseConfig?: FlatConfig[] | undefined,
+): Promise<string> {
   const args = process.argv.slice(2);
   return doLint(baseConfig, ...args)
-    .then(resultText => {
+    .then((resultText) => {
       console.info(resultText);
       if (/✖.*problem/.test(resultText)) {
         process.exit(1);
       }
       return resultText;
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(error);
       process.exit(1);
     });
@@ -29,12 +31,15 @@ export async function strictLint(baseConfig?: FlatConfig[] | undefined): Promise
  * TODO: Allow file pattern to be passed in.
  * @link https://eslint.org/docs/latest/integrate/nodejs-api#eslint-class
  */
-async function doLint(baseConfig: FlatConfig[] | undefined, ...args: string[]): Promise<string> {
+async function doLint(
+  baseConfig: FlatConfig[] | undefined,
+  ...args: string[]
+): Promise<string> {
   const config = await (async () => {
     if (baseConfig) {
       return baseConfig;
     }
-    const configFilePath = baseConfig || await findNearestFile('eslint.config.js');
+    const configFilePath = await findNearestFile('eslint.config.js');
     if (!configFilePath) {
       throw new Error('Could not find eslint.config.js');
     }

@@ -1,5 +1,3 @@
-/* eslint-disable object-property-newline */
-
 // This configuration file uses the new flat syntax.
 // See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
 
@@ -87,9 +85,14 @@ const config = [
       'jsonc/indent': ['warn', 2],
       'jsonc/key-spacing': ['error', { beforeColon: false, afterColon: true }],
       'jsonc/no-octal-escape': 'error',
-      'jsonc/object-curly-newline': ['error', { multiline: true, consistent: true }],
+      'jsonc/object-curly-newline': ['error', {
+        multiline: true,
+        consistent: true,
+      }],
       'jsonc/object-curly-spacing': ['error', 'always'],
-      'jsonc/object-property-newline': ['error', { allowMultiplePropertiesPerLine: true }],
+      'jsonc/object-property-newline': ['error', {
+        allowMultiplePropertiesPerLine: true,
+      }],
       'comma-dangle': 'off',
       'quotes': 'off',
       'quote-props': 'off',
@@ -231,16 +234,14 @@ const config = [
   },
   // endregion
 
-  // region Common ignores
+  // region --- All files ---
   {
-    ignores: [
-      ...commonIgnores,
-      // Hidden files and directories are ignored by default, so they need to be explicitly unignored to be linted
-      '!.github/',
-      '!.*.cjs',
-      '!.*.mjs',
-      '!.vscode',
-    ],
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
+    },
+  },
+  {
+    ignores: commonIgnores,
   },
   // endregion
 ];

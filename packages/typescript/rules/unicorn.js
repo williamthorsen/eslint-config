@@ -1,3 +1,4 @@
+// see https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/readme.md
 export default {
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
   'unicorn/escape-case': 'error', // Uppercase regex escapes
@@ -6,6 +7,7 @@ export default {
   'unicorn/no-unsafe-regex': 'warn', // Keep regex literals safe
   'unicorn/number-literal-case': 'error', // Lowercase number formatting for octal, hex, binary (0x1'error' instead of 0X1'error')
   'unicorn/prefer-includes': 'warn', // Prefer `includes` over `indexOf` when checking for existence
+  'unicorn/prefer-module': 'error', // Prefer the JavaScript module format over the legacy CommonJS module format
   'unicorn/prefer-node-protocol': 'warn', // Prefer `node:`-prefixed modules
   'unicorn/prefer-string-starts-ends-with': 'warn', // Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
   'unicorn/prefer-text-content': 'warn', // Prefer `textContent` over `innerText`

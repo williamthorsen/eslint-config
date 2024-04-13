@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 0.12.0
+
+### Minor Changes
+
+- Simplify configs, upgrade dependencies
+
 ## 0.11.6
 
 ### Dependencies
