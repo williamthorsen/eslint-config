@@ -1,5 +1,12 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.16.0
+
+### Dependencies
+
+- Upgraded all dependencies except for `eslint` to latest version
+- Upgraded `eslint` to latest v8.x (for compatibility with `@typescript-eslint` packages)
+
 ## 0.15.1
 
 ### Patch Changes

@@ -68,6 +68,7 @@ export default {
   'consistent-return': 'error',
   'complexity': ['warn', 11],
   'eqeqeq': ['error', 'always'],
+  'guard-for-in': 'error',
   'no-alert': 'error',
   'no-cond-assign': ['error', 'always'],
   'no-console': ['error', { allow: ['error', 'info', 'warn'] }],

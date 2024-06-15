@@ -1,5 +1,14 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 0.16.0
+
+### Dependencies
+
+- Upgraded all dependencies except for `eslint` to latest version
+- Upgraded `eslint` to latest v8.x (for compatibility with `@typescript-eslint` packages)
+- Upgraded Node.js runtime to latest minor version (v20.x)
+- Upgraded `pnpm` runtime to latest version
+
 ## 0.14.0
 
 ### Dependencies
