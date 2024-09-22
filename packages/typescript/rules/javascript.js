@@ -72,8 +72,17 @@ export default {
   'no-alert': 'error',
   'no-cond-assign': ['error', 'always'],
   'no-console': ['error', { allow: ['error', 'info', 'warn'] }],
+  'no-constant-condition': ['warn', { checkLoops: false }],
   'no-param-reassign': 'off',
   'no-redeclare': ['error', { builtinGlobals: true }],
+  'no-restricted-imports': ['error', {
+    patterns: [{
+      group: [
+        'node_modules/*',
+      ],
+      message: 'Should not import from node_modules',
+    }],
+  }],
   'no-restricted-syntax': [
     'error',
     'DebuggerStatement',
@@ -83,6 +92,11 @@ export default {
   'no-return-assign': 'error',
   'no-return-await': 'off',
   'no-undef': 'error',
+  'no-unused-expressions': ['warn', {
+    allowShortCircuit: true,
+    allowTernary: true,
+    allowTaggedTemplates: true,
+  }],
   'no-use-before-define': ['error', {
     functions: false,
     classes: false,
@@ -103,12 +117,6 @@ export default {
   'dot-notation': ['warn', { allowKeywords: true }],
   'eol-last': 'warn',
   'func-call-spacing': ['warn', 'never'],
-  'no-constant-condition': ['warn', { checkLoops: false }],
-  'no-unused-expressions': ['warn', {
-    allowShortCircuit: true,
-    allowTernary: true,
-    allowTaggedTemplates: true,
-  }],
   'quote-props': ['warn', 'as-needed', { unnecessary: false }],
   'sort-imports': ['warn', {
     allowSeparatedGroups: true,

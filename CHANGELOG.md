@@ -1,5 +1,14 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 0.17.0
+
+### Dependencies
+
+- Upgraded PNPM runtime to latest version
+- Upgraded NodeJS runtime to latest LTS version
+- Upgraded all dependencies to latest version
+- Removed unneeed `@types/eslint` dependency (types are now included in `eslint` package)
+
 ## 0.16.0
 
 ### Dependencies

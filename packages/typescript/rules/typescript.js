@@ -1,6 +1,5 @@
 export default {
   // Best practices
-  '@typescript-eslint/ban-types': 'error',
   '@typescript-eslint/ban-ts-comment': ['error', {
     'ts-ignore': 'allow-with-description',
   }],
@@ -32,7 +31,6 @@ export default {
   'no-useless-constructor': 'off',
 
   'lines-between-class-members': 'off',
-  '@typescript-eslint/member-delimiter-style': 'warn',
   '@typescript-eslint/no-empty-function': 'off',
   '@typescript-eslint/no-empty-interface': 'off',
   '@typescript-eslint/no-loss-of-precision': 'error',

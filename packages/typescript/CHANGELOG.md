@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 0.17.0
+
+### Content
+
+- Added `no-constant-condition` and `no-restricted-imports` to the rules for JavaScript files
+
+### Dependencies
+
+- Upgraded dependencies
+
 ## 0.16.0
 
 ### Dependencies
@@ -11,13 +21,13 @@
 
 ### Patch Changes
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.15.0
 
 ### Minor Changes
 
-- Simplify configs, upgrade dependencies
+- Simplified configs, upgraded dependencies
 
 ## 0.14.2
 

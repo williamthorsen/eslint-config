@@ -1,15 +1,12 @@
 {
   "name": "@williamthorsen/eslint-config-monorepo",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "private": true,
   "description": "ESLint configs monorepo",
   "keywords": [],
   "license": "UNLICENSED",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "audit": "pnpm run audit:prod && pnpm run audit:dev",
     "audit:dev": "pnpm dlx audit-ci@^6 --config .audit-ci/config.dev.json5",
@@ -26,15 +23,14 @@
     "update:latest": "pnpm update --latest --recursive"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.5",
+    "@changesets/cli": "^2.27.8",
     "@esbuild-kit/esm-loader": "^2.6.5",
-    "@types/eslint": "^8.56.10",
-    "@types/node": "^20.14.2",
-    "@vitest/coverage-v8": "^1.6.0",
-    "eslint": "^8.57.0",
-    "rimraf": "^5.0.7",
-    "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "@types/node": "^22.5.5",
+    "@vitest/coverage-v8": "^2.1.1",
+    "eslint": "^9.11.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.1"
   },
-  "packageManager": "pnpm@8.7.1"
+  "packageManager": "pnpm@9.11.0"
 }
