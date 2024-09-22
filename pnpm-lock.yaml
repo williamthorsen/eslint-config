@@ -14,9 +14,6 @@ importers:
       '@esbuild-kit/esm-loader':
         specifier: ^2.6.5
         version: 2.6.5
-      '@types/eslint':
-        specifier: ^9.6.1
-        version: 9.6.1
       '@types/node':
         specifier: ^22.5.5
         version: 22.5.5
