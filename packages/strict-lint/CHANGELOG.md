@@ -1,10 +1,21 @@
 # @williamthorsen/strict-lint
 
+## 0.17.0
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
+### Refactoring
+
+- Removed the shims added to support the use of a flat config in `strictLint.ts`.\
+  Because the flat config is now the default, the shims are no longer required.
+
 ## 0.12.1
 
 ### Patch Changes
 
-- Upgrade all dependencies to latest version
+- Upgraded all dependencies to latest version
 
 ## 0.12.0
 
