@@ -7,9 +7,6 @@
   "license": "UNLICENSED",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "audit": "pnpm run audit:prod && pnpm run audit:dev",
     "audit:dev": "pnpm dlx audit-ci@^6 --config .audit-ci/config.dev.json5",
@@ -36,5 +33,5 @@
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   },
-  "packageManager": "pnpm@8.7.1"
+  "packageManager": "pnpm@9.11.0"
 }
