@@ -12,7 +12,8 @@ First stable release.
 
 - Upgraded all dependencies to latest version
 - Replaced `@esbuild-kit/esm-loader` with `tsx`.
-- 
+-
+
 ## 0.17.0
 
 ### Dependencies

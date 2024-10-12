@@ -1,5 +1,7 @@
+import type { Linter } from 'eslint';
+
 // see https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/readme.md
-export default {
+export const unicornRules: Linter.RulesRecord = {
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
   'unicorn/escape-case': 'error', // Uppercase regex escapes
   'unicorn/no-instanceof-array': 'error', // Prefer `Array.isArray` over `instanceof`

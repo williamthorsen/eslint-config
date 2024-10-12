@@ -1,30 +1,35 @@
-// This configuration file uses the new flat syntax.
-// See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
-
-import tsPlugin from '@typescript-eslint/eslint-plugin';
+import rawTsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
+import type { Linter } from 'eslint';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
-import jsoncPlugin from 'eslint-plugin-jsonc';
+import rawJsoncPlugin from 'eslint-plugin-jsonc';
 import markdownPlugin from 'eslint-plugin-markdown';
 import nPlugin from 'eslint-plugin-n';
 import promisePlugin from 'eslint-plugin-promise';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import unicornPlugin from 'eslint-plugin-unicorn';
-import yamlPlugin from 'eslint-plugin-yml';
+import rawYamlPlugin from 'eslint-plugin-yml';
 import jsonParser from 'jsonc-eslint-parser';
 import yamlParser from 'yaml-eslint-parser';
 
-import commonIgnores from './ignores/common.js';
-import eslintCommentsRules from './rules/eslint-comments.js';
-import jsRules from './rules/javascript.js';
-import nRules from './rules/n.js';
-import packageJsonrules from './rules/packageJson.js';
-import simpleImportSortRules from './rules/simple-import-sort.js';
-import tsRules from './rules/typescript.js';
-import unicornRules from './rules/unicorn.js';
+import { commonIgnores } from './ignores/index.js';
+import {
+  eslintCommentsRules,
+  javaScriptRules,
+  nRules,
+  packageJsonRules,
+  simpleImportSortRules,
+  typeScriptRules,
+  unicornRules,
+} from './rules/index.js';
+import { getSafeLinterPlugin } from './utils/isLinterPlugin.js';
 
 const javaScriptFiles = ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.jsx'];
 const typeScriptFiles = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+
+const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
+const tsPlugin = getSafeLinterPlugin(rawTsPlugin);
+const yamlPlugin = getSafeLinterPlugin(rawYamlPlugin);
 
 const pluginRules = {
   ...eslintCommentsPlugin.configs.recommended.rules,
@@ -35,10 +40,7 @@ const pluginRules = {
   ...eslintCommentsRules,
 };
 
-/**
- * @type {import('eslint').Linter.FlatConfig[]}
- */
-const config = [
+const config: Linter.Config[] = [
   // region JavaScript files
   {
     files: javaScriptFiles,
@@ -52,7 +54,7 @@ const config = [
         process: true,
       },
     },
-    rules: jsRules,
+    rules: javaScriptRules,
   },
   // endregion
 
@@ -80,7 +82,7 @@ const config = [
       jsonc: jsoncPlugin,
     },
     rules: {
-      ...jsoncPlugin.rules['recommended-with-jsonc'],
+      ...jsoncPlugin.configs['recommended-with-jsonc']?.rules,
       'jsonc/array-bracket-spacing': ['warn', 'never'],
       'jsonc/indent': ['warn', 2],
       'jsonc/key-spacing': ['error', { beforeColon: false, afterColon: true }],
@@ -131,7 +133,7 @@ const config = [
       yml: yamlPlugin,
     },
     rules: {
-      ...yamlPlugin.rules.recommended,
+      ...yamlPlugin.configs.recommended?.rules,
       'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
       'yml/no-empty-document': 'off',
       'spaced-comment': 'off',
@@ -171,7 +173,7 @@ const config = [
     plugins: {
       jsonc: jsoncPlugin,
     },
-    rules: packageJsonrules,
+    rules: packageJsonRules,
   },
   // endregion
 
@@ -202,9 +204,9 @@ const config = [
       '@typescript-eslint': tsPlugin,
     },
     rules: {
-      ...jsRules,
-      ...tsPlugin.configs.recommended.rules,
-      ...tsRules,
+      ...javaScriptRules,
+      ...tsPlugin.configs.recommended?.rules,
+      ...typeScriptRules,
       'sort-imports': 'off',
     },
   },

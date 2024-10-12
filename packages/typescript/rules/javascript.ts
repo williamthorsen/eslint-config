@@ -1,3 +1,5 @@
+import { Linter } from 'eslint';
+
 const eslintRecommendedRules = {
   'constructor-super': 'error',
   'for-direction': 'error',
@@ -59,9 +61,9 @@ const eslintRecommendedRules = {
   'require-yield': 'error',
   'use-isnan': 'error',
   'valid-typeof': 'error',
-};
+} satisfies Linter.RulesRecord;
 
-export default {
+export const javaScriptRules: Linter.RulesRecord = {
   ...eslintRecommendedRules,
 
   // Best practices

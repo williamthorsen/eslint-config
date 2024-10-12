@@ -89,47 +89,47 @@ importers:
   packages/typescript:
     dependencies:
       '@typescript-eslint/eslint-plugin':
-        specifier: ^8.8.1
+        specifier: 8.8.1
         version: 8.8.1(@typescript-eslint/parser@8.8.1(eslint@9.12.0)(typescript@5.6.3))(eslint@9.12.0)(typescript@5.6.3)
       '@typescript-eslint/parser':
-        specifier: ^8.8.1
+        specifier: 8.8.1
         version: 8.8.1(eslint@9.12.0)(typescript@5.6.3)
       eslint-plugin-eslint-comments:
-        specifier: ^3.2.0
+        specifier: 3.2.0
         version: 3.2.0(eslint@9.12.0)
       eslint-plugin-jsonc:
-        specifier: ^2.16.0
+        specifier: 2.16.0
         version: 2.16.0(eslint@9.12.0)
       eslint-plugin-markdown:
-        specifier: ^5.1.0
+        specifier: 5.1.0
         version: 5.1.0(eslint@9.12.0)
       eslint-plugin-n:
-        specifier: ^17.11.1
+        specifier: 17.11.1
         version: 17.11.1(eslint@9.12.0)
       eslint-plugin-promise:
-        specifier: ^7.1.0
+        specifier: 7.1.0
         version: 7.1.0(eslint@9.12.0)
       eslint-plugin-simple-import-sort:
-        specifier: ^12.1.1
+        specifier: 12.1.1
         version: 12.1.1(eslint@9.12.0)
       eslint-plugin-unicorn:
-        specifier: ^56.0.0
+        specifier: 56.0.0
         version: 56.0.0(eslint@9.12.0)
       eslint-plugin-yml:
-        specifier: ^1.14.0
+        specifier: 1.14.0
         version: 1.14.0(eslint@9.12.0)
       jsonc-eslint-parser:
-        specifier: ^2.4.0
+        specifier: 2.4.0
         version: 2.4.0
       yaml-eslint-parser:
-        specifier: ^1.2.3
+        specifier: 1.2.3
         version: 1.2.3
     devDependencies:
       '@types/eslint':
-        specifier: ^9.6.1
+        specifier: 9.6.1
         version: 9.6.1
       eslint:
-        specifier: ^9.12.0
+        specifier: 9.12.0
         version: 9.12.0
 
 packages:
