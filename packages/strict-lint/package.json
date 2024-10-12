@@ -22,20 +22,23 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm run clean && pnpm tsc --build tsconfig.build.json && mv dist/scripts dist/bin && chmod u+x dist/bin/* && scripts/replace-shebang.ts && rimraf dist/bin/*.d.ts",
+    "build": "pnpm run clean && pnpm tsc --build tsconfig.build.json && mv dist/scripts dist/bin && tsx scripts/replace-shebang.ts && rimraf dist/bin/*.d.ts",
     "check": "pnpm run typecheck && pnpm run lint:strict && pnpm test:coverage",
     "clean": "pnpm rimraf dist/*",
     "lint": "pnpm eslint .",
     "lint:fix": "pnpm eslint --fix .",
-    "lint:strict": "scripts/strict-lint.ts",
+    "lint:strict": "tsx scripts/strict-lint.ts",
     "test": "pnpm vitest",
     "test:coverage": "pnpm vitest --coverage",
     "test:watch": "pnpm vitest --watch",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "tsx": "4.19.1"
+  },
   "devDependencies": {
-    "eslint": "^9.11.0",
-    "typescript": "^5.6.2"
+    "eslint": "9.12.0",
+    "typescript": "5.6.3"
   },
   "peerDependencies": {
     "eslint": ">=9"

@@ -14,7 +14,7 @@
     "check": "pnpm run typecheck && pnpm run lint:strict && pnpm run audit",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "lint:strict": "packages/strict-lint/scripts/strict-lint.ts",
+    "lint:strict": "tsx packages/strict-lint/scripts/strict-lint.ts",
     "outdated": "pnpm outdated --compatible --recursive",
     "outdated:latest": "pnpm outdated --recursive",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,14 +23,14 @@
     "update:latest": "pnpm update --latest --recursive"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.8",
-    "@esbuild-kit/esm-loader": "^2.6.5",
-    "@types/node": "^22.5.5",
-    "@vitest/coverage-v8": "^2.1.1",
-    "eslint": "^9.11.0",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.6.2",
-    "vitest": "^2.1.1"
+    "@changesets/cli": "2.27.9",
+    "@types/node": "20.16.11",
+    "@vitest/coverage-v8": "2.1.2",
+    "eslint": "9.12.0",
+    "rimraf": "6.0.1",
+    "tsx": "4.19.1",
+    "typescript": "5.6.3",
+    "vitest": "2.1.2"
   },
-  "packageManager": "pnpm@9.11.0"
+  "packageManager": "pnpm@9.12.1"
 }

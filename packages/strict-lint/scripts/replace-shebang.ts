@@ -1,5 +1,3 @@
-#!/usr/bin/env node --loader @esbuild-kit/esm-loader
-
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
