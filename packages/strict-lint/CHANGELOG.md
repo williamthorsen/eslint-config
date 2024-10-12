@@ -1,5 +1,18 @@
 # @williamthorsen/strict-lint
 
+## 1.0.0
+
+First stable release.
+
+### Refactoring
+
+- Removed shebangs `@esbuild-kit/esm-loader` shebang from scripts. These are now run by `tsx`.
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+- Replaced `@esbuild-kit/esm-loader` with `tsx`.
+- 
 ## 0.17.0
 
 ### Dependencies

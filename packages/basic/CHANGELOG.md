@@ -1,5 +1,13 @@
 # @williamthorsen/eslint-config-basic
 
+## 1.0.0
+
+First stable release.
+
+### Refactoring
+
+- Upgraded all dependencies to latest version
+
 ## 0.17.0
 
 ### Dependencies
