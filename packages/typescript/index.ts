@@ -23,9 +23,9 @@ import {
 } from './rules/index.js';
 import { getSafeLinterPlugin } from './utils/isLinterPlugin.js';
 
-const javaScriptFiles = ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.jsx'];
-const typeScriptFiles = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
-const jsxFiles = ['**/.jsx', '**/.tsx'];
+const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
+const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];
+const jsxFiles = ['**/.{jsx,tsx}'];
 
 const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
 const yamlPlugin = getSafeLinterPlugin(rawYamlPlugin);
@@ -40,19 +40,18 @@ const pluginRules = {
 };
 
 const config: Config = tseslint.config(
-  eslint.configs.recommended,
   ...tseslint.configs.recommended,
-  /*
   {
     files: javaScriptFiles,
     ignores: [
       '!.*.cjs', // TODO: Review why this is necessary
       '!.*.mjs',
     ],
-    rules: javaScriptRules,
+    rules: {
+      ...eslint.configs.recommended.rules,
+      ...javaScriptRules,
+    },
   },
-   */
-
   // region JavaScript & TypeScript files
   {
     files: [...javaScriptFiles, ...typeScriptFiles],
@@ -69,7 +68,7 @@ const config: Config = tseslint.config(
 
   // region JSON files
   {
-    files: ['**/*.json', '**/*.json5'],
+    files: ['**/*.{json,json5}'],
     languageOptions: {
       parser: jsonParser,
     },
@@ -121,6 +120,11 @@ const config: Config = tseslint.config(
     files: jsxFiles,
     languageOptions: {
       globals: globals.browser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
     },
     rules: {
       // TODO: Add JSX rules
@@ -128,7 +132,7 @@ const config: Config = tseslint.config(
   },
   // region YAML files
   {
-    files: ['**/*.yaml', '**/*.yml'],
+    files: ['**/*.{yaml,yml}'],
     ignores: [
       '!.github/**/*.yml',
     ],
