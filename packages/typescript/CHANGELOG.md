@@ -1,5 +1,29 @@
 # @williamthorsen/eslint-config-typescript
 
+## 2.0.0
+
+### Major Changes
+
+- Added new peer dependency: `typescript-eslint`
+
+### Features
+
+- Modernized ESLint configs and plugins: Rules are now ESLint recommended and Typescript recommended with type-checking
+
+### Refactoring
+
+- Converted all source files to TypeScript
+- Replaced `@typescript-eslint/eslint-plugin` with `typescript-eslint`
+- Replaced rules from `eslint` with rules from `@elint/js`
+
+### Tooling
+
+- Added support for publication to jsr.io
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 1.0.0
 
 First stable release.

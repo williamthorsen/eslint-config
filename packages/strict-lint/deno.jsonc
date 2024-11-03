@@ -18,8 +18,8 @@
       "**/*.json"
     ]
   },
-  "name": "@williamthorsen/eslint-config-typescript",
-  "version": "1.0.0",
+  "name": "@williamthorsen/strict-lint",
+  "version": "1.0.1",
   "description": "Strict linting for ESLint projects",
   "license": "UNLICENSED",
   "exports": {
