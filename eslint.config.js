@@ -1,7 +1,7 @@
 import globals from 'globals';
 
-import config from './packages/typescript/dist/esm/index.mjs';
 import { commonIgnores } from './packages/typescript/dist/esm/ignores/common.js';
+import config from './packages/typescript/dist/esm/index.mjs';
 
 const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
 const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];

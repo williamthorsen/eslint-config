@@ -27,6 +27,7 @@ const config: Config = [
     files: codeFiles,
     extends: [
       configs.eslintComments,
+      configs.n,
       configs.simpleImportSort,
       configs.unicorn,
     ],
