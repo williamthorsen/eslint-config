@@ -1,7 +1,8 @@
 import type { Linter } from 'eslint';
+import { mapPlugins } from '../utils/mapPlugins.js';
 
 // see https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/readme.md
-export const unicornRules: Linter.RulesRecord = {
+const rules: Linter.RulesRecord = {
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
   'unicorn/escape-case': 'error', // Uppercase regex escapes
   'unicorn/no-instanceof-array': 'error', // Prefer `Array.isArray` over `instanceof`
@@ -16,3 +17,8 @@ export const unicornRules: Linter.RulesRecord = {
   'unicorn/prefer-type-error': 'warn', // Prefer a TypeError when an error is thrown while checking `typeof`
   'unicorn/throw-new-error': 'error', // Use `new` when throwing an error
 };
+
+export default {
+  plugins: mapPlugins(['unicorn']),
+  rules,
+}

@@ -1,6 +1,7 @@
 import type { ESLint } from 'eslint';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
+import unicornPlugin from 'eslint-plugin-unicorn';
 type Plugin = ESLint.Plugin;
 
 const mapping = {
@@ -22,7 +23,7 @@ const mapping = {
   // 'sky-pilot': skyPilotPlugin,
   // 'styled-components-a11y': styledComponentsA11yPlugin,
   // 'testing-library': testingLibraryPlugin,
-  // 'unicorn': unicornLibraryPlugin,
+  'unicorn': unicornPlugin,
 };
 
 type PluginName = keyof typeof mapping;

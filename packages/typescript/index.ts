@@ -11,10 +11,6 @@ const typeScriptFiles = ['**/*.{cts,mts,ts}', ...tsxFiles];
 
 const codeFiles = [...javaScriptFiles, ...typeScriptFiles];
 
-// const pluginRules = {
-//   ...unicornRules,
-// };
-
 const config: Config = [
   ...tseslint.config({
     files: typeScriptFiles,
@@ -32,6 +28,7 @@ const config: Config = [
     extends: [
       configs.eslintComments,
       configs.simpleImportSort,
+      configs.unicorn,
     ],
   }),
 ];
