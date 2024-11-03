@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 2.1.1
+
+### Fixes
+
+- Fixed the issue where the distribution paths pointed to TypeScript files instead of transpiled JavaScript files
+
 ## 2.1.0
 
 ### Tooling
