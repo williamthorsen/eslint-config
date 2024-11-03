@@ -1,4 +1,4 @@
-import { Linter } from 'eslint';
+import type { Linter } from 'eslint';
 
 export const packageJsonRules: Linter.RulesRecord = {
   'jsonc/sort-keys': [

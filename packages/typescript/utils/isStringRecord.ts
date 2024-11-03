@@ -6,7 +6,7 @@ function isStringRecord(value: unknown): value is Record<string, string> {
   return Object.values(value).every((v) => typeof v === 'string');
 }
 
-export function assertIsStringRecord(value: any): asserts value is Record<string, string> {
+export function assertIsStringRecord(value: unknown): asserts value is Record<string, string> {
   if (!isStringRecord(value)) {
     throw new Error('Value is not a valid string record');
   }

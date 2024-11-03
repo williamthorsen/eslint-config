@@ -1,8 +1,6 @@
-import { Linter } from 'eslint';
+import type { Linter } from 'eslint';
 
-import FlatConfig = Linter.FlatConfig;
-
-export function convertWarnToError(config: FlatConfig): FlatConfig {
+export function convertWarnToError(config: Linter.Config): Linter.Config {
   if (!config.rules) return config;
   const ruleEntries = Object.entries(config.rules);
   const errorRuleEntries = ruleEntries.map(([ruleName, ruleValue]) => {

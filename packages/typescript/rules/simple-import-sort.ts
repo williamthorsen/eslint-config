@@ -1,4 +1,4 @@
-import { Linter } from 'eslint';
+import type { Linter } from 'eslint';
 
 export const simpleImportSortRules: Linter.RulesRecord = {
   'simple-import-sort/exports': 'warn',
