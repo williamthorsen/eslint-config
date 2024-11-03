@@ -1,5 +1,15 @@
 # @williamthorsen/strict-lint
 
+## 1.0.1
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
+### Refactoring
+
+- Aligned types with upgraded dependencies
+
 ## 1.0.0
 
 First stable release.
@@ -12,7 +22,8 @@ First stable release.
 
 - Upgraded all dependencies to latest version
 - Replaced `@esbuild-kit/esm-loader` with `tsx`.
-- 
+-
+
 ## 0.17.0
 
 ### Dependencies

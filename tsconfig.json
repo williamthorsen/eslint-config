@@ -14,7 +14,7 @@
     // Support importation of CJS modules in ESM.
     "esModuleInterop": true,
     // Report an error when the value `undefined` is given to an optional property that doesn't specify `undefined` as a valid value.
-    "exactOptionalPropertyTypes": true,
+    "exactOptionalPropertyTypes": false,
     "experimentalDecorators": true,
     // Report an error when importing a file using a casing different from the casing on disk.
     "forceConsistentCasingInFileNames": true,
@@ -23,10 +23,10 @@
     "lib": [
       "ES2020",
     ],
-    "module": "ES2022",
+    "module": "NodeNext",
     "moduleDetection": "force",
     // Enable node-style module resolution for things like NPM package imports.
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "noEmit": true,
     // Report errors for fallthrough cases in switch statements.
     "noFallthroughCasesInSwitch": true,

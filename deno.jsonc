@@ -7,15 +7,17 @@
       "**/.changeset/",
       "**/.github/",
       "**/.idea/",
+      "**/deno.jsonc",
+      "**/pnpm-lock.yaml",
       "**/coverage/",
       "**/dist/",
       "**/local/",
       "**/node_modules/",
-      "**/*.json"
+      "**/*.json",
     ],
     "lineWidth": 120,
     "proseWrap": "preserve",
-    "singleQuote": true
+    "singleQuote": true,
   },
   "lint": {
     "exclude": [
@@ -23,11 +25,13 @@
       "**/.changeset/",
       "**/.github/",
       "**/.idea/",
+      "**/deno.jsonc",
+      "**/pnpm-lock.yaml",
       "**/coverage/",
       "**/dist/",
       "**/local/",
       "**/node_modules/",
-      "**/*.json"
-    ]
-  }
+      "**/*.json",
+    ],
+  },
 }

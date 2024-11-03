@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declarationDir": "./dist/types",
+    "lib": [
+      "es2020",
+    ],
+    "outDir": "./dist",
+  },
+  "include": [
+    "index.ts",
+    "types/**/*.d.ts"
+  ],
+}

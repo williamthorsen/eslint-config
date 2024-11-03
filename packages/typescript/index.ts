@@ -1,61 +1,57 @@
-// This configuration file uses the new flat syntax.
-// See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
-
-import tsPlugin from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
+import eslint from '@eslint/js';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
-import jsoncPlugin from 'eslint-plugin-jsonc';
-import markdownPlugin from 'eslint-plugin-markdown';
+import rawJsoncPlugin from 'eslint-plugin-jsonc';
 import nPlugin from 'eslint-plugin-n';
 import promisePlugin from 'eslint-plugin-promise';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import unicornPlugin from 'eslint-plugin-unicorn';
-import yamlPlugin from 'eslint-plugin-yml';
+import rawYamlPlugin from 'eslint-plugin-yml';
+import globals from 'globals';
 import jsonParser from 'jsonc-eslint-parser';
+import tseslint, { type Config } from 'typescript-eslint';
 import yamlParser from 'yaml-eslint-parser';
 
-import commonIgnores from './ignores/common.js';
-import eslintCommentsRules from './rules/eslint-comments.js';
-import jsRules from './rules/javascript.js';
-import nRules from './rules/n.js';
-import packageJsonrules from './rules/packageJson.js';
-import simpleImportSortRules from './rules/simple-import-sort.js';
-import tsRules from './rules/typescript.js';
-import unicornRules from './rules/unicorn.js';
+import { commonIgnores } from './ignores/index.js';
+import {
+  eslintCommentsRules,
+  javaScriptRules,
+  nRules,
+  packageJsonRules,
+  simpleImportSortRules,
+  typeScriptRules,
+  unicornRules,
+} from './rules/index.js';
+import { getSafeLinterPlugin } from './utils/isLinterPlugin.js';
 
-const javaScriptFiles = ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.jsx'];
-const typeScriptFiles = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
+const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];
+const jsxFiles = ['**/.{jsx,tsx}'];
+
+const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
+const yamlPlugin = getSafeLinterPlugin(rawYamlPlugin);
 
 const pluginRules = {
   ...eslintCommentsPlugin.configs.recommended.rules,
   ...nRules,
+  'sort-imports': 'off',
   ...simpleImportSortRules,
   ...unicornRules,
-  'sort-imports': 'off',
   ...eslintCommentsRules,
 };
 
-/**
- * @type {import('eslint').Linter.FlatConfig[]}
- */
-const config = [
-  // region JavaScript files
+const config: Config = tseslint.config(
+  ...tseslint.configs.recommended,
   {
     files: javaScriptFiles,
     ignores: [
-      '!.*.cjs',
+      '!.*.cjs', // TODO: Review why this is necessary
       '!.*.mjs',
     ],
-    languageOptions: {
-      globals: {
-        console: 'readonly',
-        process: true,
-      },
+    rules: {
+      ...eslint.configs.recommended.rules,
+      ...javaScriptRules,
     },
-    rules: jsRules,
   },
-  // endregion
-
   // region JavaScript & TypeScript files
   {
     files: [...javaScriptFiles, ...typeScriptFiles],
@@ -72,7 +68,7 @@ const config = [
 
   // region JSON files
   {
-    files: ['**/*.json', '**/*.json5'],
+    files: ['**/*.{json,json5}'],
     languageOptions: {
       parser: jsonParser,
     },
@@ -80,7 +76,7 @@ const config = [
       jsonc: jsoncPlugin,
     },
     rules: {
-      ...jsoncPlugin.rules['recommended-with-jsonc'],
+      ...jsoncPlugin.configs['recommended-with-jsonc']?.rules,
       'jsonc/array-bracket-spacing': ['warn', 'never'],
       'jsonc/indent': ['warn', 2],
       'jsonc/key-spacing': ['error', { beforeColon: false, afterColon: true }],
@@ -114,13 +110,29 @@ const config = [
       // 'plugin:jsonc/recommended-with-jsonc',
       'jsonc/comma-dangle': ['warn', 'always'],
       'jsonc/comma-style': ['error', 'last'],
+      'jsonc/quote-props': 'off',
     },
   },
   // endregion
 
+  // region JSX files
+  {
+    files: jsxFiles,
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    rules: {
+      // TODO: Add JSX rules
+    },
+  },
   // region YAML files
   {
-    files: ['**/*.yaml', '**/*.yml'],
+    files: ['**/*.{yaml,yml}'],
     ignores: [
       '!.github/**/*.yml',
     ],
@@ -131,33 +143,10 @@ const config = [
       yml: yamlPlugin,
     },
     rules: {
-      ...yamlPlugin.rules.recommended,
+      ...yamlPlugin.configs.recommended?.rules,
       'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
       'yml/no-empty-document': 'off',
       'spaced-comment': 'off',
-    },
-  },
-  // endregion
-
-  // region Markdown files
-  {
-    files: ['**/*.md'],
-    plugins: {
-      markdown: markdownPlugin,
-    },
-    processor: 'markdown/markdown',
-    rules: {
-      'no-alert': 'error',
-      'no-console': 'off',
-      'no-restricted-imports': 'off',
-      'no-undef': 'off',
-      'no-unused-vars': 'off',
-
-      '@typescript-eslint/no-redeclare': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/no-use-before-define': 'off',
-      '@typescript-eslint/no-var-requires': 'off',
-      '@typescript-eslint/comma-dangle': 'off',
     },
   },
   // endregion
@@ -171,7 +160,7 @@ const config = [
     plugins: {
       jsonc: jsoncPlugin,
     },
-    rules: packageJsonrules,
+    rules: packageJsonRules,
   },
   // endregion
 
@@ -181,30 +170,12 @@ const config = [
       'import/no-duplicates': 'off',
     },
   },
-
   // region TypeScript files
   {
     files: typeScriptFiles,
-    languageOptions: {
-      globals: {
-        console: 'readonly',
-        process: true,
-      },
-      parser: tsParser,
-      parserOptions: {
-        module: 'es2022',
-        parser: '@typescript-eslint/parser',
-        project: ['./tsconfig.json'],
-        sourceType: 'module',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-    },
     rules: {
-      ...jsRules,
-      ...tsPlugin.configs.recommended.rules,
-      ...tsRules,
+      ...javaScriptRules,
+      ...typeScriptRules,
       'sort-imports': 'off',
     },
   },
@@ -244,7 +215,7 @@ const config = [
     ignores: commonIgnores,
   },
   // endregion
-];
+);
 
 export default config;
 

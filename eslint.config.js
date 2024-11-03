@@ -1,12 +1,21 @@
-import config from './packages/typescript/index.mjs';
+import globals from 'globals';
 
-/**
- * @type {import('eslint').Linter.FlatConfig[]}
- */
+import tsConfig from './packages/typescript/dist/index.js';
+
+const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
+const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];
+
+/** @type {import('eslint').Linter.Config[]} */
 export default [
-  ...config,
+  ...tsConfig,
   {
-    files: ['**/*.mts', '**/*.ts', '**/*.md/*.ts'],
+    files: [...javaScriptFiles, ...typeScriptFiles],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parserOptions: {
         project: [

@@ -1,4 +1,6 @@
-export default {
+import type { Linter } from 'eslint';
+
+export const packageJsonRules: Linter.RulesRecord = {
   'jsonc/sort-keys': [
     'warn',
     {

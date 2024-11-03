@@ -1,4 +1,6 @@
-export default {
+import type { Linter } from 'eslint';
+
+export const typeScriptRules: Linter.RulesRecord = {
   // Best practices
   '@typescript-eslint/ban-ts-comment': ['error', {
     'ts-ignore': 'allow-with-description',
