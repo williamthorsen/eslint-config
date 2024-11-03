@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 2.2.0
+
+### Feature
+
+- Improved rule priority for TS files
+
+### Dependencies
+
+- Upgraded all runtimes to latest version (Node pinned to v20)
+
 ## 2.1.1
 
 ### Fixes
