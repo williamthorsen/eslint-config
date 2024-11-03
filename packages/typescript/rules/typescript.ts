@@ -26,11 +26,11 @@ export const typeScriptRules: Linter.RulesRecord = {
   '@typescript-eslint/no-useless-constructor': 'warn',
 
   // Disable rules that are covered by TypeScript
-  'no-dupe-class-members': 'off',
-  'no-loss-of-precision': 'off',
-  'no-undef': 'off',
-  'no-use-before-define': 'off',
-  'no-useless-constructor': 'off',
+  // 'no-dupe-class-members': 'off',
+  // 'no-loss-of-precision': 'off',
+  // 'no-undef': 'off',
+  // 'no-use-before-define': 'off',
+  // 'no-useless-constructor': 'off',
 
   'lines-between-class-members': 'off',
   '@typescript-eslint/no-empty-function': 'off',

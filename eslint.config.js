@@ -1,6 +1,6 @@
 import globals from 'globals';
 
-import tsConfig from './packages/typescript/dist/index.mjs';
+import tsConfig from './packages/typescript/dist/esm/index.mjs';
 
 const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
 const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];
