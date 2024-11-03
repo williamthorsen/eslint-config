@@ -40,7 +40,12 @@ const pluginRules = {
 };
 
 const config: Config = tseslint.config(
-  ...tseslint.configs.recommended,
+  {
+    files: [...javaScriptFiles, ...typeScriptFiles],
+    ...eslint.configs.recommended.rules,
+  },
+  // Apply this after eslint recommended rules, because it disables some JS rules in favor of TS rules
+  ...tseslint.configs.recommendedTypeChecked,
   {
     files: javaScriptFiles,
     ignores: [
@@ -48,7 +53,6 @@ const config: Config = tseslint.config(
       '!.*.mjs',
     ],
     rules: {
-      ...eslint.configs.recommended.rules,
       ...javaScriptRules,
     },
   },
