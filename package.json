@@ -11,6 +11,7 @@
     "audit": "pnpm run audit:prod && pnpm run audit:dev",
     "audit:dev": "pnpm dlx audit-ci@^6 --config .audit-ci/config.dev.json5",
     "audit:prod": "pnpm dlx audit-ci@^6 --config .audit-ci/config.prod.json5",
+    "build": "pnpm --recursive run build",
     "check": "pnpm run typecheck && pnpm run lint:strict && pnpm run audit",
     "lint": "eslint .",
     "lint:fix": "deno fmt && eslint --fix .",

@@ -1,13 +1,16 @@
 import globals from 'globals';
 
-import tsConfig from './packages/typescript/dist/esm/index.mjs';
+import config from './packages/typescript/dist/esm/index.mjs';
+import { commonIgnores } from './packages/typescript/dist/esm/ignores/common.js'
 
 const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
 const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];
 
+console.dir(config, { depth: null });
+
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  ...tsConfig,
+  ...config,
   {
     files: [...javaScriptFiles, ...typeScriptFiles],
     languageOptions: {
@@ -25,4 +28,7 @@ export default [
       },
     },
   },
+  {
+    ignores: commonIgnores,
+  }
 ];
