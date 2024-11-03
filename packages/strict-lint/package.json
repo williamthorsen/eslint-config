@@ -34,10 +34,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "tsx": "4.19.1"
+    "tsx": "4.19.2"
   },
   "devDependencies": {
-    "eslint": "9.12.0",
+    "eslint": "9.14.0",
     "typescript": "5.6.3"
   },
   "peerDependencies": {
