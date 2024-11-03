@@ -11,24 +11,25 @@
   "type": "module",
   "exports": {
     ".": {
-      "default": "./index.mjs",
-      "import": "./index.mjs"
+      "default": "./dist/esm/index.mjs",
+      "import": "./dist/esm/index.mjs"
     },
-    "./ignores": "./ignores/*",
-    "./rules": "./rules/*"
+    "./ignores": "./dist/esm/ignores/*",
+    "./rules": "./dist/esm/rules/*"
   },
   "files": [
-    "index.mjs",
-    "ignores/*",
-    "rules/*",
-    "utils/*"
+    "dist/esm/index.mjs",
+    "dist/esm/ignores/*",
+    "dist/esm/rules/*",
+    "dist/esm/utils/*"
   ],
   "scripts": {
-    "build": "tsc --noEmit false && mv dist/index.js dist/index.mjs",
+    "build": "tsc --noEmit false && mv dist/esm/index.js dist/esm/index.mjs",
     "check": "pnpm run lint:strict",
     "lint": "pnpm eslint .",
     "lint:fix": "pnpm eslint --fix .",
     "lint:strict": "../strict-lint/scripts/strict-lint.ts",
+    "prepare": "pnpm run build",
     "publish:github": "pnpm publish",
     "publish:jsr": "npx jsr publish",
     "publish:jsr:dry-run": "npx jsr publish --dry-run"
