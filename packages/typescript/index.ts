@@ -1,15 +1,14 @@
-import rawTsPlugin from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
-import type { Linter } from 'eslint';
+import eslint from '@eslint/js';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
 import rawJsoncPlugin from 'eslint-plugin-jsonc';
-import markdownPlugin from 'eslint-plugin-markdown';
 import nPlugin from 'eslint-plugin-n';
 import promisePlugin from 'eslint-plugin-promise';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import unicornPlugin from 'eslint-plugin-unicorn';
 import rawYamlPlugin from 'eslint-plugin-yml';
+import globals from 'globals';
 import jsonParser from 'jsonc-eslint-parser';
+import tseslint, { type Config } from 'typescript-eslint';
 import yamlParser from 'yaml-eslint-parser';
 
 import { commonIgnores } from './ignores/index.js';
@@ -26,37 +25,33 @@ import { getSafeLinterPlugin } from './utils/isLinterPlugin.js';
 
 const javaScriptFiles = ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.jsx'];
 const typeScriptFiles = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+const jsxFiles = ['**/.jsx', '**/.tsx'];
 
 const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
-const tsPlugin = getSafeLinterPlugin(rawTsPlugin);
 const yamlPlugin = getSafeLinterPlugin(rawYamlPlugin);
 
 const pluginRules = {
   ...eslintCommentsPlugin.configs.recommended.rules,
   ...nRules,
+  'sort-imports': 'off',
   ...simpleImportSortRules,
   ...unicornRules,
-  'sort-imports': 'off',
   ...eslintCommentsRules,
 };
 
-const config: Linter.Config[] = [
-  // region JavaScript files
+const config: Config = tseslint.config(
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  /*
   {
     files: javaScriptFiles,
     ignores: [
-      '!.*.cjs',
+      '!.*.cjs', // TODO: Review why this is necessary
       '!.*.mjs',
     ],
-    languageOptions: {
-      globals: {
-        console: 'readonly',
-        process: true,
-      },
-    },
     rules: javaScriptRules,
   },
-  // endregion
+   */
 
   // region JavaScript & TypeScript files
   {
@@ -116,10 +111,21 @@ const config: Linter.Config[] = [
       // 'plugin:jsonc/recommended-with-jsonc',
       'jsonc/comma-dangle': ['warn', 'always'],
       'jsonc/comma-style': ['error', 'last'],
+      'jsonc/quote-props': 'off',
     },
   },
   // endregion
 
+  // region JSX files
+  {
+    files: jsxFiles,
+    languageOptions: {
+      globals: globals.browser,
+    },
+    rules: {
+      // TODO: Add JSX rules
+    },
+  },
   // region YAML files
   {
     files: ['**/*.yaml', '**/*.yml'],
@@ -137,29 +143,6 @@ const config: Linter.Config[] = [
       'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
       'yml/no-empty-document': 'off',
       'spaced-comment': 'off',
-    },
-  },
-  // endregion
-
-  // region Markdown files
-  {
-    files: ['**/*.md'],
-    plugins: {
-      markdown: markdownPlugin,
-    },
-    processor: 'markdown/markdown',
-    rules: {
-      'no-alert': 'error',
-      'no-console': 'off',
-      'no-restricted-imports': 'off',
-      'no-undef': 'off',
-      'no-unused-vars': 'off',
-
-      '@typescript-eslint/no-redeclare': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/no-use-before-define': 'off',
-      '@typescript-eslint/no-var-requires': 'off',
-      '@typescript-eslint/comma-dangle': 'off',
     },
   },
   // endregion
@@ -183,29 +166,11 @@ const config: Linter.Config[] = [
       'import/no-duplicates': 'off',
     },
   },
-
   // region TypeScript files
   {
     files: typeScriptFiles,
-    languageOptions: {
-      globals: {
-        console: 'readonly',
-        process: true,
-      },
-      parser: tsParser,
-      parserOptions: {
-        module: 'es2022',
-        parser: '@typescript-eslint/parser',
-        project: ['./tsconfig.json'],
-        sourceType: 'module',
-      },
-    },
-    plugins: {
-      '@typescript-eslint': tsPlugin,
-    },
     rules: {
       ...javaScriptRules,
-      ...tsPlugin.configs.recommended?.rules,
       ...typeScriptRules,
       'sort-imports': 'off',
     },
@@ -246,7 +211,7 @@ const config: Linter.Config[] = [
     ignores: commonIgnores,
   },
   // endregion
-];
+);
 
 export default config;
 

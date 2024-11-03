@@ -14,7 +14,7 @@
     "check": "pnpm run typecheck && pnpm run lint:strict && pnpm run audit",
     "lint": "eslint .",
     "lint:fix": "deno fmt && eslint --fix .",
-    "lint:strict": "deno fmt --check && tsx packages/strict-lint/scripts/strict-lint.ts",
+    "lint:strict": "deno fmt --check && pnpm exec tsx packages/strict-lint/scripts/strict-lint.ts",
     "outdated": "pnpm outdated --compatible --recursive",
     "outdated:latest": "pnpm outdated --recursive",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -24,12 +24,15 @@
   },
   "devDependencies": {
     "@changesets/cli": "2.27.9",
+    "@eslint/js": "9.14.0",
     "@types/node": "20.16.11",
     "@vitest/coverage-v8": "2.1.2",
     "eslint": "9.12.0",
+    "globals": "15.11.0",
     "rimraf": "6.0.1",
     "tsx": "4.19.1",
     "typescript": "5.6.3",
+    "typescript-eslint": "8.12.2",
     "vitest": "2.1.2"
   },
   "packageManager": "pnpm@9.12.1"

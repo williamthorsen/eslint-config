@@ -1,17 +1,10 @@
-import config from './packages/typescript/dist/index.js';
+import tsConfig from './packages/typescript/dist/index.js';
 
-/**
- * @type {import('eslint').Linter.FlatConfig[]}
- */
+/** @type {import('eslint').Linter.Config[]} */
 export default [
-  ...config,
+  ...tsConfig,
   {
-    files: [
-      '**/*.mts',
-      '**/*.ts',
-      '**/*.md/*.ts',
-      '!**/*.d.ts',
-    ],
+    files: ['**/*.{js,mjs,cjs,ts}'],
     languageOptions: {
       parserOptions: {
         project: [
