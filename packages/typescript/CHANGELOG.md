@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 2.1.0
+
+### Tooling
+
+- Reconfigure exports to allow use of config file with explicit `.mjs` extension
+
 ## 2.0.0
 
 ### Major Changes
