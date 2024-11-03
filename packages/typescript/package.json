@@ -1,7 +1,7 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "2.0.0",
-  "description": "Flat ESLint config for TypeScript, JSON, Markdown & YML",
+  "version": "2.1.0",
+  "description": "ESLint config for TypeScript, JSON & YML",
   "keywords": [
     "eslint-config"
   ],
@@ -10,18 +10,21 @@
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "exports": {
-    ".": "./index.mjs",
+    ".": {
+      "default": "./index.mjs",
+      "import": "./index.mjs"
+    },
     "./ignores": "./ignores/*",
     "./rules": "./rules/*"
   },
   "files": [
-    "index.js",
+    "index.mjs",
     "ignores/*",
     "rules/*",
     "utils/*"
   ],
   "scripts": {
-    "build": "tsc --noEmit false",
+    "build": "tsc --noEmit false && mv dist/index.js dist/index.mjs",
     "check": "pnpm run lint:strict",
     "lint": "pnpm eslint .",
     "lint:fix": "pnpm eslint --fix .",
