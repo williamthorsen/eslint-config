@@ -1,5 +1,5 @@
 import type { Linter } from 'eslint';
-import { mapPlugins } from '../utils/mapPlugins.js';
+import unicornPlugin from 'eslint-plugin-unicorn';
 
 // see https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/readme.md
 const rules: Linter.RulesRecord = {
@@ -19,6 +19,8 @@ const rules: Linter.RulesRecord = {
 };
 
 export default {
-  plugins: mapPlugins(['unicorn']),
+  plugins: {
+    'unicorn': unicornPlugin,
+  },
   rules,
-}
+};

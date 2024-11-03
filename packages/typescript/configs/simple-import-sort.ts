@@ -1,6 +1,5 @@
 import type { Linter } from 'eslint';
-
-import { mapPlugins } from '../utils/mapPlugins.js';
+import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 
 const rules: Linter.RulesRecord = {
   'simple-import-sort/exports': 'warn',
@@ -21,6 +20,8 @@ const rules: Linter.RulesRecord = {
 };
 
 export default {
-  plugins: mapPlugins(['simple-import-sort']),
+  plugins: {
+    'simple-import-sort': simpleImportSortPlugin,
+  },
   rules,
 };
