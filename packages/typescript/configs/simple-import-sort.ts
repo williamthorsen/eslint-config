@@ -23,4 +23,4 @@ const rules: Linter.RulesRecord = {
 export default {
   plugins: mapPlugins(['simple-import-sort']),
   rules,
-}
+};

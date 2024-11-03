@@ -13,6 +13,7 @@
   "include": [
     "*.ts",
     // These patterns include files not reachable from `index.ts`
+    "configs/",
     "types/",
     "utils/",
     "eslint.config.js",
