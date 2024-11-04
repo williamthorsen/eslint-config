@@ -4,7 +4,7 @@
   "compilerOptions": {
     "declarationDir": "./dist/types",
     "lib": [
-      "es2020",
+      "es2022",
     ],
     "outDir": "./dist/esm",
   },

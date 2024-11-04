@@ -4,20 +4,22 @@ import { findNearestFile } from './common/findNearestFile.js';
 import { convertWarnToError } from './convertWarnToError.js';
 
 export async function strictLint(
-  baseConfig?: Linter.Config[] | undefined,
+  baseConfig?: Linter.Config[],
 ): Promise<string> {
   const args = process.argv.slice(2);
   return doLint(baseConfig, ...args)
     .then((resultText) => {
       console.info(resultText);
       if (/✖.*problem/.test(resultText)) {
-        throw new Error('Linting failed');
+        // eslint-disable-next-line n/no-process-exit
+        process.exit(1);
       }
       return resultText;
     })
-    .catch((error) => {
+    .catch((error: unknown) => {
       console.error(error);
-      throw new Error('Linting failed');
+      // eslint-disable-next-line n/no-process-exit
+      process.exit(1);
     });
 }
 
@@ -30,7 +32,7 @@ async function doLint(
   baseConfig: Linter.Config[] | undefined,
   ...args: string[]
 ): Promise<string> {
-  const config = await (async () => {
+  const config: Linter.Config[] = await (async () => {
     if (baseConfig) {
       return baseConfig;
     }
@@ -38,8 +40,9 @@ async function doLint(
     if (!configFilePath) {
       throw new Error('Could not find eslint.config.js');
     }
-    const { default: config } = await import(configFilePath);
-    return config;
+    const module: unknown = await import(configFilePath);
+    assertIsConfig(module);
+    return module.default;
   })();
 
   const errorizedConfig = config.map(convertWarnToError);
@@ -61,4 +64,23 @@ async function doLint(
   // Format and display the results
   const formatter = await eslint.loadFormatter('stylish');
   return formatter.format(results);
+}
+
+function assertIsConfig(
+  module: unknown,
+): asserts module is { default: Linter.Config[] } {
+  if (typeof module !== 'object' || module === null) {
+    throw new TypeError('Expected module to be an object');
+  }
+  if (!('default' in module)) {
+    throw new TypeError('Expected module to have a default export');
+  }
+  if (!Array.isArray(module.default)) {
+    throw new TypeError('Expected config to be an array');
+  }
+  for (const item of module.default) {
+    if (typeof item !== 'object') {
+      throw new TypeError('Expected config item to be an object');
+    }
+  }
 }

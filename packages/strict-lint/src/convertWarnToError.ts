@@ -7,13 +7,17 @@ export function convertWarnToError(config: Linter.Config): Linter.Config {
     if (ruleValue === 'warn') {
       return [ruleName, 'error'];
     }
-    if (Array.isArray(ruleValue) && ruleValue[0] === 'warn') {
-      return [ruleName, ['error', ...ruleValue.slice(1)]];
+    if (Array.isArray(ruleValue)) {
+      const [severity, ...options] = ruleValue;
+      if (severity === 'warn' || severity === 2) {
+        const resolvedOptions: unknown[] = options;
+        return [ruleName, ['error', ...resolvedOptions]];
+      }
     }
     return [ruleName, ruleValue];
   });
   return {
     ...config,
-    rules: Object.fromEntries(errorRuleEntries),
+    rules: Object.fromEntries(errorRuleEntries) as typeof config.rules,
   };
 }
