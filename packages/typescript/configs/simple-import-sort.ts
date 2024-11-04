@@ -2,6 +2,7 @@ import type { Linter } from 'eslint';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 
 const rules: Linter.RulesRecord = {
+  'sort-imports': 'off',
   'simple-import-sort/exports': 'warn',
   'simple-import-sort/imports': ['warn', {
     groups: [

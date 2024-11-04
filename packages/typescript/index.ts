@@ -20,8 +20,8 @@ const config: Config = [
     ],
   }),
   {
-    files: [...javaScriptFiles],
-    rules: eslint.configs.recommended.rules,
+    files: javaScriptFiles,
+    ...configs.javaScript,
   },
   ...tseslint.config({
     files: codeFiles,
