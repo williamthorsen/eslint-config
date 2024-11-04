@@ -19,8 +19,8 @@
     ]
   },
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "2.2.0",
-  "description": "ESLint config for TypeScript, JSON, Markdown & YML",
+  "version": "3.0.0",
+  "description": "ESLint config for TypeScript, JSON & YML",
   "license": "UNLICENSED",
   "exports": {
     ".": "./index.ts",
