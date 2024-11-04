@@ -10,7 +10,9 @@
   },
   "include": [
     "index.ts",
+    "configs/",
     "ignores/",
+    "utils/",
     "types/**/*.d.ts",
   ],
 }
