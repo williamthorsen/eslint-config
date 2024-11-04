@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "ESLint config for TypeScript, JSON & YML",
   "keywords": [
     "eslint-config"
@@ -16,7 +16,7 @@
     "./utils": "./dist/esm/utils/index.js"
   },
   "files": [
-    "dist/esm/index.mjs",
+    "dist/esm/index.js",
     "dist/esm/configs/*",
     "dist/esm/ignores/*",
     "dist/esm/utils/*",
