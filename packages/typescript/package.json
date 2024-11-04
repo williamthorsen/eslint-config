@@ -15,7 +15,10 @@
     "./ignores": "./dist/esm/ignores/index.js"
   },
   "files": [
-    "dist/esm/index.mjs"
+    "dist/esm/index.js",
+    "dist/esm/configs/*",
+    "dist/esm/ignores/*",
+    "dist/types/*"
   ],
   "scripts": {
     "build": "rimraf dist && tsc --noEmit false",
