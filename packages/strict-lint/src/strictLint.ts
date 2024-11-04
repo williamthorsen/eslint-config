@@ -11,13 +11,13 @@ export async function strictLint(
     .then((resultText) => {
       console.info(resultText);
       if (/✖.*problem/.test(resultText)) {
-        process.exit(1);
+        throw new Error('Linting failed');
       }
       return resultText;
     })
     .catch((error) => {
       console.error(error);
-      process.exit(1);
+      throw new Error('Linting failed');
     });
 }
 

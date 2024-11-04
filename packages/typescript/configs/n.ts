@@ -7,6 +7,9 @@ const rules: Linter.RulesRecord = {
 
 const config = {
   ...nPlugin.configs['flat/recommended-module'],
+  plugins: {
+    n: nPlugin,
+  },
   rules: {
     ...nPlugin.configs['flat/recommended-module'].rules,
     ...rules,

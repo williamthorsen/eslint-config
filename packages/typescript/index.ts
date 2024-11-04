@@ -32,6 +32,7 @@ const config: Config = [
       configs.unicorn,
     ],
   }),
+  configs.packageJson,
 ];
 
 export default config;
