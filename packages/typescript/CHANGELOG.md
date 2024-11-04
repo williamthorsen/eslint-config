@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.0.1
+
+### Fixes
+
+- Fixed the issue that files were missing from the distribution bundle after the reconfiguration of exports.
+
 ## 3.0.0
 
 ### Breaking changes
