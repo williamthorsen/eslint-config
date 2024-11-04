@@ -1,6 +1,8 @@
 import type { Linter } from 'eslint';
+import jsoncPlugin from 'eslint-plugin-jsonc';
+import jsoncParser from 'jsonc-eslint-parser';
 
-export const packageJsonRules: Linter.RulesRecord = {
+const rules: Linter.RulesRecord = {
   'jsonc/sort-keys': [
     'warn',
     {
@@ -93,4 +95,15 @@ export const packageJsonRules: Linter.RulesRecord = {
       ],
     },
   ],
+};
+
+export default {
+  files: ['package.json'],
+  languageOptions: {
+    parser: jsoncParser,
+  },
+  plugins: {
+    'jsonc': jsoncPlugin,
+  },
+  rules,
 };

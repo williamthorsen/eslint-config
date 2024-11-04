@@ -2,7 +2,7 @@ import { Linter } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
 import { convertWarnToError } from '../convertWarnToError.js';
-import FlatConfig = Linter.FlatConfig;
+import Config = Linter.Config;
 
 describe('convertWarnToError()', () => {
   it('if the config has no rules, returns the config', () => {
@@ -20,7 +20,7 @@ describe('convertWarnToError()', () => {
         'other-rule': 'off',
         'warn-rule': 'warn',
       },
-    } satisfies FlatConfig;
+    } satisfies Config;
     const expected = {
       rules: {
         'other-rule': 'off',
@@ -39,7 +39,7 @@ describe('convertWarnToError()', () => {
         'other-rule': 'off',
         'warn-rule': ['warn', { option: 'value' }],
       },
-    } satisfies FlatConfig;
+    } satisfies Config;
     const expected = {
       rules: {
         'other-rule': 'off',
