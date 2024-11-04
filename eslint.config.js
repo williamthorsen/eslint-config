@@ -6,7 +6,7 @@ import nPlugin from 'eslint-plugin-n';
 import globals from 'globals';
 
 import { commonIgnores } from './packages/typescript/dist/esm/ignores/index.js';
-import config from './packages/typescript/dist/esm/index.js';
+import config from './packages/typescript/dist/esm/index.mjs';
 
 const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
 const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];

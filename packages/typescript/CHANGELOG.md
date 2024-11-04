@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.0.2
+
+### Fixes
+
+- Set the `index.js` file extension to `.mjs` in attempt to fix ESLint's failure to find module
+
 ## 3.0.1
 
 ### Fixes
