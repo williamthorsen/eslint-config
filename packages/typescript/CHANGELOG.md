@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.0.3
+
+### Fixes
+
+- Attempted to fix the issue where the exported utility `relativePathToDir` could not be resolved when imported
+
 ## 3.0.2
 
 ### Fixes
