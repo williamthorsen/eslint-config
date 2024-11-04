@@ -16,7 +16,7 @@
     "./utils": "./dist/esm/utils/index.js"
   },
   "files": [
-    "dist/esm/index.mjs",
+    "dist/esm/index.js",
     "dist/esm/configs/*",
     "dist/esm/ignores/*",
     "dist/esm/utils/*",
