@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.0.4
+
+### Fixes
+
+- Fixed the file extension of the primary export in the manifest, where it was wrongly specified to be `.mjs`
+
 ## 3.0.3
 
 ### Fixes
