@@ -16,12 +16,12 @@ export async function findNearestFile(
     const filePath = path.join(currentDir, fileName);
 
     if (fs.existsSync(filePath)) {
-      return filePath;
+      return Promise.resolve(filePath);
     }
 
     // Move one directory up
     currentDir = path.dirname(currentDir);
   }
 
-  return null;
+  return Promise.resolve(null);
 }

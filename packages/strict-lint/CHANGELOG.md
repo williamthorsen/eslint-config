@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 3.0.0
+
+### Refactoring
+
+- Fixed lint identified when strict rules were enabled.
+
 ## 1.0.1
 
 ### Dependencies

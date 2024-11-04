@@ -1,5 +1,20 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.0.0
+
+### Breaking changes
+
+- Changes in export structure may require import adjustments.
+- Strict type-checked TypeScript rules are now enabled. (Previously, only recommended rules were enabled.)
+
+### Features
+
+- Enabled strict, type-checked rules
+
+### Refactoring
+
+- Modernize all configurations and rules
+
 ## 2.2.0
 
 ### Feature

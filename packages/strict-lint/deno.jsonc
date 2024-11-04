@@ -19,11 +19,11 @@
     ]
   },
   "name": "@williamthorsen/strict-lint",
-  "version": "1.0.1",
+  "version": "3.0.0",
   "description": "Strict linting for ESLint projects",
   "license": "UNLICENSED",
   "exports": {
-    ".": "./index.ts",
+    ".": "./index.ts"
   },
   "publish": {
     "include": [

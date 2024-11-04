@@ -21,7 +21,7 @@
     // Enable stricter transpilation for better output.
     "isolatedModules": true,
     "lib": [
-      "ES2020",
+      "ES2022",
     ],
     "module": "NodeNext",
     "moduleDetection": "force",
