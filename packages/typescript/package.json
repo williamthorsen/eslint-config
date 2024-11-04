@@ -10,22 +10,20 @@
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "exports": {
-    ".": {
-      "default": "./dist/esm/index.mjs",
-      "import": "./dist/esm/index.mjs",
-      "types": "./dist/types/index.d.ts"
-    },
+    ".": "./dist/esm/index.js",
     "./configs": "./dist/esm/configs/index.js",
-    "./ignores": "./dist/esm/ignores/index.js"
+    "./ignores": "./dist/esm/ignores/index.js",
+    "./utils": "./dist/esm/utils/index.js"
   },
   "files": [
     "dist/esm/index.mjs",
     "dist/esm/configs/*",
     "dist/esm/ignores/*",
+    "dist/esm/utils/*",
     "dist/types/*"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc --noEmit false && mv dist/esm/index.js dist/esm/index.mjs",
+    "build": "rimraf dist && tsc --noEmit false",
     "check": "pnpm run lint:strict",
     "lint": "pnpm eslint .",
     "lint:fix": "pnpm eslint --fix .",

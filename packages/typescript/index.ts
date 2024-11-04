@@ -56,5 +56,3 @@ const config: Config = [
 ];
 
 export default config;
-
-export { relativePathToDir } from './utils/relativePathToDir.js';
