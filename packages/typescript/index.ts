@@ -16,8 +16,9 @@ const config: Config = [
     files: typeScriptFiles,
     extends: [
       eslint.configs.recommended,
-      ...tseslint.configs.recommended,
+      ...tseslint.configs.strictTypeChecked,
     ],
+    ...configs.typeScript,
   }),
   {
     files: javaScriptFiles,
@@ -33,6 +34,11 @@ const config: Config = [
     ],
   }),
   configs.packageJson,
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
+    },
+  },
 ];
 
 export default config;

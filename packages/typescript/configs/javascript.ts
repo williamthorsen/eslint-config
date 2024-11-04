@@ -70,4 +70,4 @@ export default {
     ...eslint.configs.recommended.rules,
     ...rules,
   },
-}
+};
