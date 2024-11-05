@@ -31,7 +31,8 @@
     "prepare": "pnpm run build",
     "publish:github": "pnpm publish",
     "publish:jsr": "npx jsr publish",
-    "publish:jsr:dry-run": "npx jsr publish --dry-run"
+    "publish:jsr:dry-run": "npx jsr publish --dry-run",
+    "rebuild": "tsc --noEmit false"
   },
   "dependencies": {
     "eslint-plugin-eslint-comments": "3.2.0",

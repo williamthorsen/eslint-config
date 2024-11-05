@@ -24,14 +24,15 @@
   "license": "UNLICENSED",
   "exports": {
     ".": "./index.ts",
+    "./configs": "./configs/index.ts",
     "./ignores": "./ignores/index.ts",
-    "./rules": "./rules/index.ts"
+    "./utils": "./utils/index.ts"
   },
   "publish": {
     "include": [
       "index.ts",
+      "configs/*",
       "ignores/*",
-      "rules/*",
       "utils/*"
     ]
   }

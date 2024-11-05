@@ -98,7 +98,7 @@ const rules: Linter.RulesRecord = {
 };
 
 export default {
-  files: ['package.json'],
+  files: ['**/package.json'],
   languageOptions: {
     parser: jsoncParser,
   },

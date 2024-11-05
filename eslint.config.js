@@ -6,39 +6,24 @@ import nPlugin from 'eslint-plugin-n';
 import globals from 'globals';
 
 import { commonIgnores } from './packages/typescript/dist/esm/ignores/index.js';
-import config from './packages/typescript/dist/esm/index.js';
+import baseConfig from './packages/typescript/dist/esm/index.js';
 
 const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
 const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];
 
 const codeFiles = [...javaScriptFiles, ...typeScriptFiles];
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const packageJsonPath = path.resolve(__dirname, './package.json');
+const thisDirPath = path.dirname(fileURLToPath(import.meta.url));
+const packageJsonPath = path.resolve(thisDirPath, './package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 const devModules = Object.keys(packageJson.devDependencies);
 
-/** @type {import('eslint').Linter.Config[]} */
-export default [
-  ...config,
+/** @type {import('typescript-eslint').Config} */
+const config = [
+  ...baseConfig,
+  // Provide type information for type-checking rules
   {
-    files: codeFiles,
-    languageOptions: {
-      globals: globals.node,
-    },
-  },
-  {
-    files: codeFiles,
-    plugins: {
-      n: nPlugin,
-    },
-    rules: {
-      'n/no-extraneous-import': ['error', { allowModules: devModules }],
-    },
-  },
-  {
-    files: ['**/*.{ts,tsx}'],
+    files: typeScriptFiles,
     languageOptions: {
       parserOptions: {
         project: [
@@ -49,18 +34,24 @@ export default [
     },
   },
   {
-    files: ['**/scripts/**/_._'],
+    files: codeFiles,
+    languageOptions: {
+      globals: globals.node,
+    },
+    plugins: { n: nPlugin },
     rules: {
-      'no-console': 'off',
+      'n/no-extraneous-import': ['error', { allowModules: devModules }],
     },
   },
   {
-    files: ['**/*.test.js'],
+    files: ['**/scripts/**/*'],
     rules: {
-      'no-unused-expressions': 'off',
+      'no-console': 'off',
     },
   },
   {
     ignores: commonIgnores,
   },
 ];
+
+export default config;

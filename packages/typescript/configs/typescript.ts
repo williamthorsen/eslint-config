@@ -21,8 +21,11 @@ const rules: Linter.RulesRecord = {
   // Stylistic: Enabled
   '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'],
   '@typescript-eslint/no-inferrable-types': 'warn',
+  '@typescript-eslint/unbound-method': 'warn',
 };
 
-export default {
+const config: Linter.Config = {
   rules,
 };
+
+export default config;
