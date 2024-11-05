@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "3.0.4",
+  "version": "3.1.0",
   "description": "ESLint config for TypeScript, JSON & YML",
   "keywords": [
     "eslint-config"
@@ -31,7 +31,8 @@
     "prepare": "pnpm run build",
     "publish:github": "pnpm publish",
     "publish:jsr": "npx jsr publish",
-    "publish:jsr:dry-run": "npx jsr publish --dry-run"
+    "publish:jsr:dry-run": "npx jsr publish --dry-run",
+    "rebuild": "tsc --noEmit false"
   },
   "dependencies": {
     "eslint-plugin-eslint-comments": "3.2.0",
@@ -41,14 +42,14 @@
     "eslint-plugin-simple-import-sort": "12.1.1",
     "eslint-plugin-unicorn": "56.0.0",
     "eslint-plugin-yml": "1.15.0",
-    "globals": "15.11.0",
+    "globals": "15.12.0",
     "jsonc-eslint-parser": "2.4.0",
     "yaml-eslint-parser": "1.2.3"
   },
   "devDependencies": {
     "@types/eslint": "9.6.1",
     "eslint": "9.14.0",
-    "typescript-eslint": "8.12.2"
+    "typescript-eslint": "8.13.0"
   },
   "peerDependencies": {
     "eslint": ">=9",

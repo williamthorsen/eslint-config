@@ -1,5 +1,22 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.1.0
+
+### Features
+
+Rule changes:
+
+- Reduced `@typescript-eslint/unbound-method` from `error` to `warn`
+- Loosened `no-unused-vars` (for JavaScript files) to allow `_` prefix (same as corresponding TS rule)
+
+### Refactoring
+
+- Simplified the main configuration
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 3.0.4
 
 ### Fixes

@@ -3,11 +3,9 @@ import tseslint, { type Config } from 'typescript-eslint';
 
 import configs from './configs/index.js';
 
-const jsxFiles = ['**/*.jsx'];
-const javaScriptFiles = ['**/*.{cjs,js,mjs}', ...jsxFiles];
+const javaScriptFiles = ['**/*.{js,cjs,mjs,jsx}'];
 
-const tsxFiles = ['**/*.{cts,mts,ts}'];
-const typeScriptFiles = ['**/*.{cts,mts,ts}', ...tsxFiles];
+const typeScriptFiles = ['**/*.{ts,cts,mts,tsx}'];
 
 const codeFiles = [...javaScriptFiles, ...typeScriptFiles];
 
@@ -17,8 +15,8 @@ const config: Config = [
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.strictTypeChecked,
+      configs.typeScript,
     ],
-    ...configs.typeScript,
   }),
   {
     files: ['**/*.d.ts'],
@@ -26,10 +24,12 @@ const config: Config = [
       'import/no-duplicates': 'off',
     },
   },
-  {
+  ...tseslint.config({
     files: javaScriptFiles,
-    ...configs.javaScript,
-  },
+    extends: [
+      configs.javaScript,
+    ],
+  }),
   ...tseslint.config({
     files: codeFiles,
     extends: [
@@ -40,19 +40,9 @@ const config: Config = [
     ],
   }),
   configs.json,
-  configs.json5, // Apply this after the `json` config, because it overwrites some rules
+  configs.json5, // Apply this after the `json` config, because it replaces some general JSON rules with JSON5 rules!
   configs.packageJson,
-  {
-    ...configs.yaml,
-    ignores: [
-      '!.github/**/*.yml',
-    ],
-  },
-  {
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
-    },
-  },
+  configs.yaml,
 ];
 
 export default config;

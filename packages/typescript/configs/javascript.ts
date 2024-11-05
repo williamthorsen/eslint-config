@@ -35,6 +35,12 @@ const rules: Linter.RulesRecord = {
     allowTernary: true,
     allowTaggedTemplates: true,
   }],
+  'no-unused-vars': ['error', {
+    args: 'all',
+    argsIgnorePattern: '^_',
+    ignoreRestSiblings: true,
+    varsIgnorePattern: '^_',
+  }],
   'no-use-before-define': ['error', {
     functions: false,
     classes: false,
