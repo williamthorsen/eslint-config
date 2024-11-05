@@ -3,9 +3,9 @@ import tseslint, { type Config } from 'typescript-eslint';
 
 import configs from './configs/index.js';
 
-const javaScriptFiles = ['**/*.{js,cjs,mjs}'];
+const javaScriptFiles = ['**/*.{js,cjs,mjs,jsx}'];
 
-const typeScriptFiles = ['**/*.{ts,cts,mts}'];
+const typeScriptFiles = ['**/*.{ts,cts,mts,tsx}'];
 
 const codeFiles = [...javaScriptFiles, ...typeScriptFiles];
 
