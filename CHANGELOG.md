@@ -1,5 +1,17 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 3.1.0
+
+### Features
+
+### Tooling
+
+- Simplified the ESLint config
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 0.17.0
 
 ### Dependencies
