@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 3.1.1
+
+### Dependencies
+
+- Upgraded all dependencies to latest minor version
+
 ## 3.0.0
 
 ### Refactoring
