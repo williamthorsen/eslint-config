@@ -110,8 +110,6 @@ const config = [
     rules: {
       // TODO: Enable these rules
       // 'plugin:jsonc/recommended-with-jsonc',
-      'jsonc/comma-dangle': ['warn', 'always'],
-      'jsonc/comma-style': ['error', 'last'],
     },
   },
   // endregion
