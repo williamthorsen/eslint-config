@@ -84,6 +84,7 @@ export default {
     },
     {
       pathPattern: '^exports.*$',
+      // prettier-ignore
       order: [
         'import',
         'types',

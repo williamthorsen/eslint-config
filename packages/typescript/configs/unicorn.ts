@@ -20,7 +20,7 @@ const rules: Linter.RulesRecord = {
 
 export default {
   plugins: {
-    'unicorn': unicornPlugin,
+    unicorn: unicornPlugin,
   },
   rules,
 };

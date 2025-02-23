@@ -5,6 +5,7 @@
     "noEmit": true, // ensure that nobody can accidentally use this config for a build
   },
   "exclude": [],
+  // prettier-ignore
   "include": [
     "scripts/",
     "src/",

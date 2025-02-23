@@ -26,6 +26,7 @@ const config = [
     files: typeScriptFiles,
     languageOptions: {
       parserOptions: {
+        // prettier-ignore
         project: [
           './tsconfig.eslint.json',
           './packages/*/tsconfig.eslint.json',

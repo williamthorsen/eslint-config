@@ -3,11 +3,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declarationDir": "./dist/types",
+    // prettier-ignore
     "lib": [
       "es2022",
     ],
     "outDir": "./dist/esm",
   },
+  // prettier-ignore
   "include": [
     "index.ts",
     "configs/",

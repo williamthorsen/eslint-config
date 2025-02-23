@@ -88,6 +88,7 @@ const rules: Linter.RulesRecord = {
     },
     {
       pathPattern: '^exports.*$',
+      // prettier-ignore
       order: [
         'import',
         'types',
@@ -103,7 +104,7 @@ export default {
     parser: jsoncParser,
   },
   plugins: {
-    'jsonc': jsoncPlugin,
+    jsonc: jsoncPlugin,
   },
   rules,
 };

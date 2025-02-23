@@ -13,6 +13,7 @@ const codeFiles = [...javaScriptFiles, ...typeScriptFiles];
 const config: Config = [
   ...tseslint.config({
     files: typeScriptFiles,
+    // prettier-ignore
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.strictTypeChecked,
@@ -27,12 +28,14 @@ const config: Config = [
   },
   ...tseslint.config({
     files: javaScriptFiles,
+    // prettier-ignore
     extends: [
       configs.javaScript,
     ],
   }),
   ...tseslint.config({
     files: codeFiles,
+    // prettier-ignore
     extends: [
       configs.eslintComments,
       configs.n,

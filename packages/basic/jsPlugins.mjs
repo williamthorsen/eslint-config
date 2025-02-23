@@ -6,8 +6,8 @@ import unicornPlugin from 'eslint-plugin-unicorn';
 
 export default {
   'eslint-comments': eslintCommentsPlugin,
-  'n': nPlugin,
-  'promise': promisePlugin,
+  n: nPlugin,
+  promise: promisePlugin,
   'simple-import-sort': simpleImportSortPlugin,
-  'unicorn': unicornPlugin,
+  unicorn: unicornPlugin,
 };
