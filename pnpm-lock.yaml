@@ -29,6 +29,9 @@ importers:
       globals:
         specifier: 15.14.0
         version: 15.14.0
+      prettier:
+        specifier: 3.5.2
+        version: 3.5.2
       rimraf:
         specifier: 6.0.1
         version: 6.0.1
@@ -1661,6 +1664,11 @@ packages:
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
+    hasBin: true
+
+  prettier@3.5.2:
+    resolution: {integrity: sha512-lc6npv5PH7hVqozBR7lkBNOGXV9vMwROAPlumdBkX0wTbbzPu/U1hk5yL8p2pt4Xoc+2mkT8t/sow2YrV/M5qg==}
+    engines: {node: '>=14'}
     hasBin: true
 
   punycode@2.3.1:
@@ -3568,6 +3576,8 @@ snapshots:
   prelude-ls@1.2.1: {}
 
   prettier@2.8.8: {}
+
+  prettier@3.5.2: {}
 
   punycode@2.3.1: {}
 
