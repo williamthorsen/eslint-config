@@ -28,20 +28,20 @@
     "lint:strict": "../strict-lint/scripts/strict-lint.ts"
   },
   "dependencies": {
-    "eslint-plugin-eslint-comments": "^3.2.0",
-    "eslint-plugin-html": "^8.1.2",
-    "eslint-plugin-jsonc": "^2.18.2",
-    "eslint-plugin-markdown": "^5.1.0",
-    "eslint-plugin-n": "^17.15.1",
-    "eslint-plugin-promise": "^7.2.1",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "eslint-plugin-unicorn": "^56.0.1",
-    "eslint-plugin-yml": "^1.16.0",
-    "jsonc-eslint-parser": "^2.4.0",
-    "yaml-eslint-parser": "^1.2.3"
+    "eslint-plugin-eslint-comments": "3.2.0",
+    "eslint-plugin-html": "8.1.2",
+    "eslint-plugin-jsonc": "2.19.1",
+    "eslint-plugin-markdown": "5.1.0",
+    "eslint-plugin-n": "17.15.1",
+    "eslint-plugin-promise": "7.2.1",
+    "eslint-plugin-simple-import-sort": "12.1.1",
+    "eslint-plugin-unicorn": "56.0.1",
+    "eslint-plugin-yml": "1.17.0",
+    "jsonc-eslint-parser": "2.4.0",
+    "yaml-eslint-parser": "1.2.3"
   },
   "devDependencies": {
-    "eslint": "^9.17.0"
+    "eslint": "9.21.0"
   },
   "peerDependencies": {
     "eslint": ">=9"
