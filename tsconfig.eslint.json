@@ -10,9 +10,10 @@
     "noEmit": true, // ensure that nobody can accidentally use this config for a build
   },
   // These files will be linted
+  // prettier-ignore
   "include": [
     "eslint.config.js",
     "*.json",
-    "*.ts"
+    "*.ts",
   ],
 }

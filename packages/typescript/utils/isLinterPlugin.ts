@@ -17,9 +17,5 @@ export function getSafeLinterPlugin<T>(plugin: T): Omit<T, 'configs'> & ESLintPl
 }
 
 function isLinterPlugin(plugin: unknown): plugin is ESLintPluginWithRules {
-  return (
-    !!plugin &&
-    typeof plugin === 'object' &&
-    'configs' in plugin
-  );
+  return !!plugin && typeof plugin === 'object' && 'configs' in plugin;
 }

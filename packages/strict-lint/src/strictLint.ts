@@ -3,9 +3,7 @@ import { ESLint, type Linter } from 'eslint';
 import { findNearestFile } from './common/findNearestFile.js';
 import { convertWarnToError } from './convertWarnToError.js';
 
-export async function strictLint(
-  baseConfig?: Linter.Config[],
-): Promise<string> {
+export async function strictLint(baseConfig?: Linter.Config[]): Promise<string> {
   const args = process.argv.slice(2);
   return doLint(baseConfig, ...args)
     .then((resultText) => {
@@ -28,10 +26,7 @@ export async function strictLint(
  * TODO: Allow file pattern to be passed in.
  * @link https://eslint.org/docs/latest/integrate/nodejs-api#eslint-class
  */
-async function doLint(
-  baseConfig: Linter.Config[] | undefined,
-  ...args: string[]
-): Promise<string> {
+async function doLint(baseConfig: Linter.Config[] | undefined, ...args: string[]): Promise<string> {
   const config: Linter.Config[] = await (async () => {
     if (baseConfig) {
       return baseConfig;
@@ -54,9 +49,7 @@ async function doLint(
     overrideConfig: errorizedConfig,
   });
 
-  const results = await eslint.lintFiles([
-    '.',
-  ]);
+  const results = await eslint.lintFiles(['.']);
 
   // Writes fixes to files
   await ESLint.outputFixes(results);
@@ -66,9 +59,7 @@ async function doLint(
   return formatter.format(results);
 }
 
-function assertIsConfig(
-  module: unknown,
-): asserts module is { default: Linter.Config[] } {
+function assertIsConfig(module: unknown): asserts module is { default: Linter.Config[] } {
   if (typeof module !== 'object' || module === null) {
     throw new TypeError('Expected module to be an object');
   }

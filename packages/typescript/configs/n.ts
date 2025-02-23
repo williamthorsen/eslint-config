@@ -3,6 +3,11 @@ import nPlugin from 'eslint-plugin-n';
 
 const rules: Linter.RulesRecord = {
   'n/no-callback-literal': 'off',
+  'n/no-extraneous-import': 'off',
+  'n/no-missing-import': 'off',
+  'n/no-unpublished-import': 'off',
+  // TODO: Enable this rule only in Node.js environments. See TOOLCHAIN-5.
+  'n/no-unsupported-features/node-builtins': 'off',
 };
 
 const config = {

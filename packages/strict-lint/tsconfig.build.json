@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    // prettier-ignore
     "lib": [
       "es2020",
     ],
@@ -8,6 +9,7 @@
     "outDir": "./dist",
     "sourceMap": false,
   },
+  // prettier-ignore
   "include": [
     "./scripts/strict-lint.ts",
     "./index.ts",

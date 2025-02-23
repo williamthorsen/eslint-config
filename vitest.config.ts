@@ -13,6 +13,7 @@ export const baseConfig = defineConfig({
       '~api': path.resolve(__dirname, 'packages/api/src'),
     },
   },
+  // prettier-ignore
   test: {
     coverage: {
       all: true, // include untested files in the report
@@ -35,6 +36,7 @@ export const baseConfig = defineConfig({
 // Narrow `UserConfigExport` to exclude `UserConfigFn`, which is not accepted by `mergeConfig()`.
 assert.ok(typeof baseConfig !== 'function');
 export default mergeConfig(baseConfig, {
+  // prettier-ignore
   test: {
     include: [
       path.resolve(__dirname, 'packages/*/src/**/*.test.ts'),

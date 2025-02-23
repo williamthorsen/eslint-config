@@ -6,10 +6,7 @@ import path from 'node:path';
  * Returns the path to the file or null if the file was not found.
  * TODO: Allow use of a file pattern instead of a single file name.
  */
-export async function findNearestFile(
-  fileName: string,
-  startDir = process.cwd(),
-): Promise<string | null> {
+export async function findNearestFile(fileName: string, startDir = process.cwd()): Promise<string | null> {
   let currentDir = startDir;
 
   while (currentDir !== '/') {

@@ -9,6 +9,7 @@ const rootPath = path.join(__dirname, '..');
 const binPath = 'dist/bin';
 const directoryPath = path.join(rootPath, binPath);
 
+// prettier-ignore
 const fileNames = fs
   .readdirSync(directoryPath)
   .filter((file) => file.endsWith('.js'));

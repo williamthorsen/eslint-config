@@ -21,6 +21,7 @@
     // Enable stricter transpilation for better output.
     "isolatedModules": true,
     "jsx": "react-jsx", // Modern transformation by React 17+
+    // prettier-ignore
     "lib": [
       "ES2022",
     ],
@@ -64,6 +65,7 @@
     "target": "ES2022",
     // "useDefineForClassFields": true, // implied by target >= ES2022 (including ESNext)
   },
+  // prettier-ignore
   "exclude": [
     "node_modules",
   ],

@@ -21,7 +21,13 @@ import packageJsonrules from './rules/packageJson.js';
 import simpleImportSortRules from './rules/simple-import-sort.js';
 import unicornRules from './rules/unicorn.js';
 
-const javaScriptFiles = ['**/*.cjs', '**/*.mjs', '**/*.js', '**/*.jsx'];
+// prettier-ignore
+const javaScriptFiles = [
+  '**/*.cjs',
+  '**/*.mjs',
+  '**/*.js',
+  '**/*.jsx',
+];
 
 const pluginRules = {
   ...eslintCommentsPlugin.configs.recommended.rules,
@@ -39,6 +45,7 @@ const config = [
   // region JavaScript files
   {
     files: javaScriptFiles,
+    // prettier-ignore
     ignores: [
       '!.*.cjs',
       '!.*.mjs',
@@ -51,10 +58,10 @@ const config = [
     },
     plugins: {
       'eslint-comments': eslintCommentsPlugin,
-      'n': nPlugin,
-      'promise': promisePlugin,
+      n: nPlugin,
+      promise: promisePlugin,
       'simple-import-sort': simpleImportSortPlugin,
-      'unicorn': unicornPlugin,
+      unicorn: unicornPlugin,
     },
     rules: {
       ...jsRules,
@@ -78,11 +85,14 @@ const config = [
       'jsonc/indent': ['warn', 2],
       'jsonc/key-spacing': ['error', { beforeColon: false, afterColon: true }],
       'jsonc/no-octal-escape': 'error',
-      'jsonc/object-property-newline': ['error', {
-        allowMultiplePropertiesPerLine: true,
-      }],
+      'jsonc/object-property-newline': [
+        'error',
+        {
+          allowMultiplePropertiesPerLine: true,
+        },
+      ],
       'comma-dangle': 'off',
-      'quotes': 'off',
+      quotes: 'off',
       'quote-props': 'off',
     },
   },
@@ -100,8 +110,6 @@ const config = [
     rules: {
       // TODO: Enable these rules
       // 'plugin:jsonc/recommended-with-jsonc',
-      'jsonc/comma-dangle': ['warn', 'always'],
-      'jsonc/comma-style': ['error', 'last'],
     },
   },
   // endregion
@@ -109,9 +117,7 @@ const config = [
   // region YAML files
   {
     files: ['**/*.yaml', '**/*.yml'],
-    ignores: [
-      '!.github/**/*.yml',
-    ],
+    ignores: ['!.github/**/*.yml'],
     languageOptions: {
       parser: yamlParser,
     },
@@ -147,9 +153,7 @@ const config = [
   // region --- YAML files
   {
     files: ['**/*.yaml', '**/*.yml'],
-    ignores: [
-      '!.github/**/*.yml',
-    ],
+    ignores: ['!.github/**/*.yml'],
     languageOptions: {
       parser: yamlParser,
     },

@@ -2,6 +2,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./scripts",
+    // prettier-ignore
     "lib": [
       "es2020",
     ],
@@ -9,9 +10,11 @@
     "outDir": "./dist/bin",
     "sourceMap": false,
   },
+  // prettier-ignore
   "include": [
     "scripts/strict-lint.ts",
   ],
+  // prettier-ignore
   "exclude": [
     "src/",
   ],

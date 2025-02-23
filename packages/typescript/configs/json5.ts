@@ -7,9 +7,13 @@ import { getSafeLinterPlugin } from '../utils/isLinterPlugin.js';
 const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
 
 const rules: Linter.RulesRecord = {
-  'jsonc/comma-dangle': ['warn', 'always'],
-  'jsonc/comma-style': ['error', 'last'],
+  // These are disabled because Prettier handles formatting.
+  'jsonc/array-element-newline': 'off',
+  'jsonc/comma-dangle': 'off',
+  'jsonc/no-missing-comma': 'off',
+  'jsonc/object-curly-newline': 'off',
   'jsonc/quote-props': 'off',
+  'jsonc/quotes': 'off',
 };
 
 // Use this config after the `json` config, because it overwrites some rules
