@@ -1,4 +1,5 @@
 import eslint from '@eslint/js';
+import globals from 'globals';
 import tseslint, { type Config } from 'typescript-eslint';
 
 import configs from './configs/index.js';
@@ -39,6 +40,12 @@ const config: Config = [
       configs.unicorn,
     ],
   }),
+  {
+    files: ['**/*.cjs'],
+    languageOptions: {
+      globals: globals.commonjs,
+    },
+  },
   configs.json,
   configs.json5, // Apply this after the `json` config, because it replaces some general JSON rules with JSON5 rules!
   configs.packageJson,
