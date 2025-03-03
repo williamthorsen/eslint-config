@@ -1,5 +1,16 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 3.2.1
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+- Upgraded all runtimes to latest version
+
+### Security
+
+- Removed `esbuild` vulnerability GHSA-67mh-4wv8-2f99 from audit ignorelist
+
 ## 3.1.0
 
 ### Features
