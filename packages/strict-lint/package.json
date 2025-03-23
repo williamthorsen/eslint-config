@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "license": "UNLICENSED",
@@ -37,7 +37,7 @@
     "tsx": "4.19.3"
   },
   "devDependencies": {
-    "eslint": "9.21.0",
+    "eslint": "9.23.0",
     "typescript": "5.8.2"
   },
   "peerDependencies": {
