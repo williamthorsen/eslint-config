@@ -7,6 +7,17 @@
 - Upgraded all dependencies to latest version
 - Upgraded all runtimes to latest version
 
+## 3.3.0
+
+### Features
+
+- Added SkyPilot custom plugin and linting rules to TypeScript config
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+- Upgraded pnpm runtime to latest version (10.6.5 → 10.7.1)
+
 ## 3.2.1
 
 ### Dependencies
