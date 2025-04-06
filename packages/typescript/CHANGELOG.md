@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.3.1
+
+### Fixes
+
+- SkyPilot plugin files are not included in distribution bundle
+
 ## 3.3.0
 
 ### Features
