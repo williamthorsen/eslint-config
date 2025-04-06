@@ -3,6 +3,7 @@ import globals from 'globals';
 import tseslint, { type Config } from 'typescript-eslint';
 
 import configs from './configs/index.js';
+import skyPilot from './plugins/eslint-plugin-sky-pilot.js';
 
 const javaScriptFiles = ['**/*.{js,cjs,mjs,jsx}'];
 
@@ -18,6 +19,7 @@ const config: Config = [
       eslint.configs.recommended,
       ...tseslint.configs.strictTypeChecked,
       configs.typeScript,
+      skyPilot.configs.recommended,
     ],
   }),
   {
