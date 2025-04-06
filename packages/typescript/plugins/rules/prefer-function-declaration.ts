@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
-function create(context: TSESLint.RuleContext<'preferDeclaration', unknown[]>) {
+const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<'preferDeclaration', unknown[]>) => {
   return {
     VariableDeclarator(node: TSESTree.VariableDeclarator) {
       if (
@@ -23,7 +23,7 @@ function create(context: TSESLint.RuleContext<'preferDeclaration', unknown[]>) {
       }
     },
   };
-}
+};
 
 function containsThisExpression(root: TSESTree.Node): boolean {
   const stack: TSESTree.Node[] = [root];

@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
-const create = (context: TSESLint.RuleContext<'avoidUndefined', unknown[]>) => {
+const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<'avoidUndefined', unknown[]>) => {
   const parserServices = ESLintUtils.getParserServices(context);
   const checker = parserServices.program.getTypeChecker();
   return {

@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
-function create(context: TSESLint.RuleContext<'unusedMap', unknown[]>) {
+const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<'unusedMap', unknown[]>) => {
   function isMapCall(node: TSESTree.CallExpression) {
     return (
       node.callee.type === AST_NODE_TYPES.MemberExpression &&
@@ -39,7 +39,7 @@ function create(context: TSESLint.RuleContext<'unusedMap', unknown[]>) {
       }
     },
   };
-}
+};
 
 const ruleDefinition: TSESLint.LooseRuleDefinition = {
   meta: {
