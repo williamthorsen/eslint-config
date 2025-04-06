@@ -38,10 +38,17 @@ const config = [
     files: codeFiles,
     languageOptions: {
       globals: globals.node,
+      parserOptions: {
+        ecmaVersion: 2022,
+      },
     },
     plugins: { n: nPlugin },
     rules: {
       'n/no-extraneous-import': ['error', { allowModules: devModules }],
+      'n/no-unsupported-features/es-syntax': ['error', { 
+        version: '>=18.19.0',
+        ignores: []
+      }],
     },
   },
   {

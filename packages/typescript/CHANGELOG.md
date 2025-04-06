@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.3.0
+
+### Features
+
+- Added SkyPilot custom plugin and linting rules to the standard cofing.
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 3.2.2
 
 ### Dependencies
