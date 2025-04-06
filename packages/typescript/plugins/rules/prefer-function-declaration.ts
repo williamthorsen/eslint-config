@@ -25,7 +25,6 @@ function create(context: TSESLint.RuleContext<'preferDeclaration', unknown[]>) {
   };
 }
 
-// eslint-disable-next-line complexity
 function containsThisExpression(root: TSESTree.Node): boolean {
   const stack: TSESTree.Node[] = [root];
   const visited = new Set<TSESTree.Node>();
@@ -43,15 +42,17 @@ function containsThisExpression(root: TSESTree.Node): boolean {
     }
 
     for (const key in node) {
-      if (Object.hasOwnProperty.call(node, key)) {
+      if (Object.hasOwn(node, key)) {
         const child = node[key as keyof TSESTree.Node];
 
         if (Array.isArray(child)) {
           for (const c of child) {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (typeof c === 'object' && c !== null) {
               stack.push(c as TSESTree.Node);
             }
           }
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         } else if (typeof child === 'object' && child !== null) {
           stack.push(child as TSESTree.Node);
         }
