@@ -15,6 +15,7 @@
     // These patterns include files not reachable from `index.ts`
     "configs/",
     "ignores/",
+    "plugins/",
     "rules/",
     "types/",
     "utils/",

@@ -14,6 +14,7 @@
     "index.ts",
     "configs/",
     "ignores/",
+    "plugins/",
     "utils/",
     "types/**/*.d.ts",
   ],
