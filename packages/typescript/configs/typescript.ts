@@ -29,6 +29,7 @@ const rules: Linter.RulesRecord = {
   ],
 
   // Optional: Enabled
+  '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
   '@typescript-eslint/consistent-type-imports': [
     'warn',
     {

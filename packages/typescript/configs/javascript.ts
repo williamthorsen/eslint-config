@@ -1,5 +1,6 @@
 import eslint from '@eslint/js';
 import type { Linter } from 'eslint';
+import tseslint from 'typescript-eslint';
 
 const rules: Linter.RulesRecord = {
   // Best practices
@@ -96,9 +97,9 @@ const rules: Linter.RulesRecord = {
   ],
 };
 
-export default {
-  rules: {
-    ...eslint.configs.recommended.rules,
-    ...rules,
-  },
-};
+const config = tseslint.config({
+  extends: [eslint.configs.recommended],
+  rules,
+});
+
+export default config;

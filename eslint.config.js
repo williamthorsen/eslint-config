@@ -15,7 +15,7 @@ const codeFiles = [...javaScriptFiles, ...typeScriptFiles];
 
 const thisDirPath = path.dirname(fileURLToPath(import.meta.url));
 const packageJsonPath = path.resolve(thisDirPath, './package.json');
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const devModules = Object.keys(packageJson.devDependencies);
 
 /** @type {import('typescript-eslint').Config} */
@@ -45,10 +45,13 @@ const config = [
     plugins: { n: nPlugin },
     rules: {
       'n/no-extraneous-import': ['error', { allowModules: devModules }],
-      'n/no-unsupported-features/es-syntax': ['error', { 
-        version: '>=18.19.0',
-        ignores: []
-      }],
+      'n/no-unsupported-features/es-syntax': [
+        'error',
+        {
+          version: '>=18.19.0',
+          ignores: [],
+        },
+      ],
     },
   },
   {
