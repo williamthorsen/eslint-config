@@ -9,8 +9,8 @@ const rules: Linter.RulesRecord = {
     {
       groups: [
         ['^node:'], // built-ins
-        ['^@?\\w'], // packages
-        ['^\\u0000"'], // side-effect imports
+        [String.raw`^@?\w`], // packages
+        [String.raw`^\u0000"`], // side-effect imports
 
         // absolute internal imports
         // Common aliases
@@ -20,8 +20,8 @@ const rules: Linter.RulesRecord = {
         // [`^(${packageAliases.join('|')})(/.*|$)`],
 
         // relative internal imports
-        ['^\\.'],
-        ['^\\u0020*(?:\\u0020*import|\\u0020*export)'],
+        [String.raw`^\.`],
+        [String.raw`^\u0020*(?:\u0020*import|\u0020*export)`],
         ['^[^.]'], // scss imports
       ],
     },

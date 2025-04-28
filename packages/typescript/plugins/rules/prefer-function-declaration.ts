@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
 const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<'preferDeclaration', unknown[]>) => {
@@ -8,12 +9,10 @@ const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<
         [AST_NODE_TYPES.ArrowFunctionExpression, AST_NODE_TYPES.FunctionExpression].includes(node.init.type) &&
         !node.id.typeAnnotation // Preserves exception for typed functions
       ) {
-        if (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression) {
-          // Check if the arrow function uses 'this'
-          if (containsThisExpression(node.init.body)) {
-            // Do not report if 'this' is used within this function
-            return;
-          }
+        // If the function is an arrow funcition and uses 'this', then a function declaration might not be possible,
+        // so do not report it as a rule violation.
+        if (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression && containsThisExpression(node.init.body)) {
+          return;
         }
 
         context.report({

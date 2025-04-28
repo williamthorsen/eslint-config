@@ -13,7 +13,6 @@ import jsonParser from 'jsonc-eslint-parser';
 import yamlParser from 'yaml-eslint-parser';
 
 import commonIgnores from './ignores/common.js';
-import jsPlugins from './jsPlugins.mjs';
 import eslintCommentsRules from './rules/eslint-comments.js';
 import jsRules from './rules/javascript.js';
 import nRules from './rules/n.js';
@@ -220,5 +219,5 @@ const config = [
 ];
 
 export default config;
-export { jsPlugins };
+export { jsPlugins } from './jsPlugins.mjs';
 export { relativePathToDir } from './utils/relativePathToDir.js';

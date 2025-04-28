@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
+
 import type { Linter } from 'eslint';
 
 export function convertWarnToError(config: Linter.Config): Linter.Config {

@@ -9,14 +9,14 @@ export async function strictLint(baseConfig?: Linter.Config[]): Promise<string> 
     .then((resultText) => {
       console.info(resultText);
       if (/✖.*problem/.test(resultText)) {
-        // eslint-disable-next-line n/no-process-exit
+        // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
         process.exit(1);
       }
       return resultText;
     })
     .catch((error: unknown) => {
       console.error(error);
-      // eslint-disable-next-line n/no-process-exit
+      // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
       process.exit(1);
     });
 }
@@ -31,7 +31,7 @@ async function doLint(baseConfig: Linter.Config[] | undefined, ...args: string[]
     if (baseConfig) {
       return baseConfig;
     }
-    const configFilePath = await findNearestFile('eslint.config.js');
+    const configFilePath = findNearestFile('eslint.config.js');
     if (!configFilePath) {
       throw new Error('Could not find eslint.config.js');
     }
