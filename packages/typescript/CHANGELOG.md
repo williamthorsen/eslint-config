@@ -1,5 +1,20 @@
 # @williamthorsen/eslint-config-typescript
 
+## 3.4.0
+
+### Features
+
+- Added configs for Next.js, React, and React Testing Library
+- Enabled recommended Unicorn rules by default
+
+### Refactoring
+
+- Modernized some configurations to use `tseslint.configure` instead of manually constructing a config object
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 3.3.1
 
 ### Fixes
