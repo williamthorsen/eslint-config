@@ -4,6 +4,7 @@ import json from './json.js';
 import json5 from './json5.js';
 import n from './n.js';
 import packageJson from './package-json.js';
+import react from './react.js';
 import simpleImportSort from './simple-import-sort.js';
 import typeScript from './typescript.js';
 import unicorn from './unicorn.js';
@@ -15,6 +16,7 @@ export default {
   json,
   json5,
   packageJson,
+  react,
   simpleImportSort,
   n,
   typeScript,
