@@ -11,9 +11,14 @@ const rules: Linter.RulesRecord = {
         ['^node:'], // built-ins
         ['^@?\\w'], // packages
         ['^\\u0000"'], // side-effect imports
+
         // absolute internal imports
+        // Common aliases
+        ['^@/'],
+        ['^~'],
         // TODO: Inject package aliases via `config.settings`
         // [`^(${packageAliases.join('|')})(/.*|$)`],
+
         // relative internal imports
         ['^\\.'],
         ['^\\u0020*(?:\\u0020*import|\\u0020*export)'],
