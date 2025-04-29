@@ -1,4 +1,5 @@
 /* eslint n/no-process-exit: off */
+/* eslint unicorn/no-process-exit: off */
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import process from 'node:process';
@@ -74,7 +75,7 @@ function getOverrideScript(scriptName: string): string | undefined {
  */
 function getPackageJson() {
   const packageJsonPath = fs.realpathSync(process.cwd() + '/package.json');
-  const content: unknown = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+  const content: unknown = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
   try {
     assertIsPackageJson(content);
   } catch (error) {
@@ -89,7 +90,7 @@ function getScripts(useIntTests = false): Record<string, string | []> {
   const commonScripts: Record<string, string | string[]> = {
     check: ['typecheck', 'fmt:check', 'lint:check', 'test'],
     'check:strict': ['typecheck', 'fmt:check', 'lint:strict', 'test:coverage'],
-    fmt: 'pnpm exec prettier --list-different --write .',
+    fmt: 'pnpm exec prettier --write .',
     'fmt:check': 'pnpm exec prettier --check .',
     lint: 'pnpm exec eslint --fix .',
     'lint:check': 'pnpm exec eslint .',
@@ -134,11 +135,7 @@ function describeScript(script: string | string[] | undefined): string {
   if (!script) {
     return '';
   }
-  if (typeof script === 'string') {
-    return script;
-  } else {
-    return `pnpm run [${script.join(', ')}]`;
-  }
+  return typeof script === 'string' ? script : `pnpm run [${script.join(', ')}]`;
 }
 
 function showHelp(code: number): never {

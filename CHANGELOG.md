@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 5.1.0
+
+### Tooling
+
+- Extended linter coverage to non-package files
+
+### Docs
+
+- Added Junie AI guidelines
+
 ## 5.0.2
 
 ### Tooling

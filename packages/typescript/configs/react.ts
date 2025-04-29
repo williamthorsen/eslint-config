@@ -1,11 +1,11 @@
 import tseslint, { type ConfigArray } from 'typescript-eslint';
 
 async function createConfig(): Promise<ConfigArray> {
-  const reactPlugin = await import('eslint-plugin-react');
-  const reactHooksPlugin = await import('eslint-plugin-react-hooks');
+  const { default: reactPlugin } = await import('eslint-plugin-react');
+  const { default: reactHooksPlugin } = await import('eslint-plugin-react-hooks');
 
   return tseslint.config({
-    extends: [reactPlugin.default.configs.flat.recommended, reactHooksPlugin.default.configs['recommended-latest']],
+    extends: [reactPlugin.configs.flat.recommended, reactHooksPlugin.configs['recommended-latest']],
     rules: {
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
