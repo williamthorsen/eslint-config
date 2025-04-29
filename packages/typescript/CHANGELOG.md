@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.0.1
+
+### Dependencies
+
+- Remove optional peer dependencies to avoid install warnings
+
 ## 5.0.0
 
 ### Breaking changes
