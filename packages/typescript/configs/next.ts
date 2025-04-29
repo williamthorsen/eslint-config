@@ -1,5 +1,8 @@
-import nextEslintPlugin from '@next/eslint-plugin-next';
+import type { Linter } from 'eslint';
 
-const config = nextEslintPlugin.flatConfig.coreWebVitals;
+async function createConfig(): Promise<Linter.Config> {
+  const { default: nextEslintPlugin } = await import('@next/eslint-plugin-next');
 
-export default config;
+  return nextEslintPlugin.flatConfig.coreWebVitals;
+}
+export default createConfig;

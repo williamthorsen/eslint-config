@@ -1,17 +1,20 @@
-import jestDomPlugin from 'eslint-plugin-jest-dom';
-import testingLibraryPlugin from 'eslint-plugin-testing-library';
-import tseslint from 'typescript-eslint';
+import tseslint, { type ConfigArray } from 'typescript-eslint';
 
-export const reactTestingLibrary = tseslint.config({
-  extends: [
-    jestDomPlugin.configs['flat/all'], //
-    testingLibraryPlugin.configs['flat/react'],
-  ],
-});
+export async function createReactTestingLibraryConfig(): Promise<ConfigArray> {
+  const { default: jestDomPlugin } = await import('eslint-plugin-jest-dom');
+  const { default: testingLibraryPlugin } = await import('eslint-plugin-testing-library');
+
+  return tseslint.config({
+    extends: [
+      jestDomPlugin.configs['flat/all'], //
+      testingLibraryPlugin.configs['flat/react'],
+    ],
+  });
+}
 
 // Add other configs as needed.
 const configs = {
-  react: reactTestingLibrary,
+  react: createReactTestingLibraryConfig,
 };
 
 export default configs;

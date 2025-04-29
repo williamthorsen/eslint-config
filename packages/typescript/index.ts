@@ -57,6 +57,6 @@ const patterns = {
   typeScriptFiles,
 };
 
-export { default as configs, optionalConfigs } from './configs/index.js';
+export { default as configs, createConfig } from './configs/index.js';
 export { patterns };
 export default config;
