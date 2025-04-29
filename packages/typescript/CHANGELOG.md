@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.0.2
+
+### Fixes
+
+- Fixed the issue that all plugins were required as peer dependencies, even if they were not used in the configuration
+
+### Tooling
+
+- Replaced custom workspace scripts with the generic `run-workspace-script` script runner
+
 ## 5.0.1
 
 ### Dependencies
