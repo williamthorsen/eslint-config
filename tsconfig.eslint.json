@@ -12,8 +12,11 @@
   // These files will be linted
   // prettier-ignore
   "include": [
+    "./",
+    "!packages/",
     "eslint.config.js",
     "*.json",
+    "*.mjs",
     "*.ts",
   ],
 }
