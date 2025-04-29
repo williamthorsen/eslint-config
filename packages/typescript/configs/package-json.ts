@@ -1,6 +1,10 @@
 import type { Linter } from 'eslint';
-import jsoncPlugin from 'eslint-plugin-jsonc';
+import rawJsoncPlugin from 'eslint-plugin-jsonc';
 import jsoncParser from 'jsonc-eslint-parser';
+
+import { getSafeLinterPlugin } from '../utils/isLinterPlugin.js';
+
+const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
 
 const rules: Linter.RulesRecord = {
   'jsonc/sort-keys': [
@@ -98,7 +102,7 @@ const rules: Linter.RulesRecord = {
   ],
 };
 
-export default {
+const config = {
   files: ['**/package.json'],
   languageOptions: {
     parser: jsoncParser,
@@ -107,4 +111,6 @@ export default {
     jsonc: jsoncPlugin,
   },
   rules,
-};
+} satisfies Linter.Config;
+
+export default config;

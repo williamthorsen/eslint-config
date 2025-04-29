@@ -8,4 +8,4 @@ declare module 'eslint-plugin-sky-pilot' {
     };
   };
   export default skyPilotPlugin;
-} 
+}
