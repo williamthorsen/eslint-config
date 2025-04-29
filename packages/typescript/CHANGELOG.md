@@ -1,5 +1,17 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.0.0
+
+### Breaking changes
+
+The API for optional configurations has been restored to its v3.4.0 state.
+Optional configurations are again exported as `ConfigArray` or `Linter.Config` objects.
+
+### Features
+
+- Added an optional Vitest configuration
+- Added Jest DOM rules to the React Testing Library config
+
 ## 4.0.1
 
 ### Dependencies
