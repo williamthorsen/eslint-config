@@ -1,7 +1,6 @@
 import type { Linter } from 'eslint';
 import type { ConfigArray } from 'typescript-eslint';
 
-import type { OptionalConfig } from '../utils/resolveOptionalConfigs.js';
 import eslintComments from './eslint-comments.js';
 import javaScript from './javascript.js';
 import json from './json.js';
@@ -14,6 +13,7 @@ import simpleImportSort from './simple-import-sort.js';
 import { reactTestingLibrary } from './testing-library.js';
 import typeScript from './typescript.js';
 import unicorn from './unicorn.js';
+import vitest from './vitest.js';
 import yaml from './yaml.js';
 
 export const configs = {
@@ -33,6 +33,7 @@ export const optionalConfigs = {
   next,
   react,
   reactTestingLibrary,
-} satisfies Record<string, OptionalConfig>;
+  vitest,
+} satisfies Record<string, ConfigArray | Linter.Config>;
 
 export default configs;

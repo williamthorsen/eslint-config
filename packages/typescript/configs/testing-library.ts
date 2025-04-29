@@ -1,15 +1,17 @@
+import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
+import tseslint from 'typescript-eslint';
 
-import type { OptionalConfig } from '../utils/resolveOptionalConfigs.js';
-
-const config = testingLibraryPlugin.configs['flat/react'];
-
-const dependencies = ['eslint-plugin-testing-library'];
-
-const reactTestingLibrary = {
-  config,
-  dependencies,
-} satisfies OptionalConfig;
+export const reactTestingLibrary = tseslint.config({
+  extends: [
+    jestDomPlugin.configs['flat/all'], //
+    testingLibraryPlugin.configs['flat/react'],
+  ],
+});
 
 // Add other configs as needed.
-export { reactTestingLibrary };
+const configs = {
+  react: reactTestingLibrary,
+};
+
+export default configs;

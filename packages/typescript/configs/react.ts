@@ -2,8 +2,6 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
-import type { OptionalConfig } from '../utils/resolveOptionalConfigs.js';
-
 export const config = tseslint.config({
   extends: [reactPlugin.configs.flat.recommended, reactHooksPlugin.configs['recommended-latest']],
   rules: {
@@ -18,9 +16,4 @@ export const config = tseslint.config({
   },
 });
 
-export const dependencies = ['eslint-plugin-react', 'eslint-plugin-react-hooks'];
-
-export default {
-  config,
-  dependencies,
-} satisfies OptionalConfig;
+export default config;
