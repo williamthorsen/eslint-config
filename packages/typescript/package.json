@@ -56,14 +56,16 @@
     "eslint": "9.25.1",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "5.2.0",
-    "eslint-plugin-testing-library": "7.1.1"
+    "eslint-plugin-testing-library": "7.1.1",
+    "eslint-plugin-vitest": "0.5.4"
   },
   "peerDependencies": {
     "@next/eslint-plugin-next": ">=15.3",
     "eslint": ">=9",
     "eslint-plugin-react": ">=7.37",
     "eslint-plugin-react-hooks": ">=5.2",
-    "eslint-plugin-testing-library": ">=7.1"
+    "eslint-plugin-testing-library": ">=7.1",
+    "eslint-plugin-vitest": ">=0.5.4"
   },
   "peerDependenciesMeta": {
     "@next/eslint-plugin-next": {
@@ -76,6 +78,9 @@
       "optional": true
     },
     "eslint-plugin-testing-library": {
+      "optional": true
+    },
+    "eslint-plugin-vitest": {
       "optional": true
     }
   },
