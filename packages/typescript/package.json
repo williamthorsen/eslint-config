@@ -26,15 +26,12 @@
   ],
   "scripts": {
     "build": "rimraf dist && tsc --noEmit false",
-    "check": "pnpm run lint:strict",
-    "lint": "pnpm eslint .",
-    "lint:fix": "pnpm eslint --fix .",
-    "lint:strict": "../strict-lint/scripts/strict-lint.ts",
     "prepare": "pnpm run build",
     "publish:github": "pnpm publish",
     "publish:jsr": "npx jsr publish",
     "publish:jsr:dry-run": "npx jsr publish --dry-run",
-    "rebuild": "tsc --noEmit false"
+    "rebuild": "tsc --noEmit false",
+    "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
     "eslint-plugin-eslint-comments": "3.2.0",
