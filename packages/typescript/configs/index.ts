@@ -13,6 +13,7 @@ import simpleImportSort from './simple-import-sort.js';
 import { reactTestingLibrary } from './testing-library.js';
 import typeScript from './typescript.js';
 import unicorn from './unicorn.js';
+import vitest from './vitest.js';
 import yaml from './yaml.js';
 
 export const configs = {
@@ -32,6 +33,7 @@ export const optionalConfigs = {
   next,
   react,
   reactTestingLibrary,
+  vitest,
 } satisfies Record<string, ConfigArray | Linter.Config>;
 
 export default configs;
