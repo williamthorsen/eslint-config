@@ -5,6 +5,7 @@ import eslintComments from './eslint-comments.js';
 import javaScript from './javascript.js';
 import json from './json.js';
 import json5 from './json5.js';
+import createJsxA11y from './jsx-a11y.js';
 import n from './n.js';
 import createNext from './next.js';
 import packageJson from './package-json.js';
@@ -30,6 +31,7 @@ export const configs = {
 } satisfies Record<string, Linter.Config | ConfigArray>;
 
 export const createConfig = {
+  jsxA11y: createJsxA11y,
   next: createNext,
   react: createReact,
   reactTestingLibrary: createTestingLibrary.react,
