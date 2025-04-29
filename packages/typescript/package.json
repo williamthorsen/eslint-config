@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "ESLint config for TypeScript, JSON & YML",
   "keywords": [
     "eslint-config"
@@ -61,29 +61,7 @@
     "eslint-plugin-testing-library": "7.1.1"
   },
   "peerDependencies": {
-    "@next/eslint-plugin-next": ">=15.3",
-    "@vitest/eslint-plugin": ">=0.5.4",
-    "eslint": ">=9",
-    "eslint-plugin-react": ">=7.37",
-    "eslint-plugin-react-hooks": ">=5.2",
-    "eslint-plugin-testing-library": ">=7.1"
-  },
-  "peerDependenciesMeta": {
-    "@next/eslint-plugin-next": {
-      "optional": true
-    },
-    "@vitest/eslint-plugin": {
-      "optional": true
-    },
-    "eslint-plugin-react": {
-      "optional": true
-    },
-    "eslint-plugin-react-hooks": {
-      "optional": true
-    },
-    "eslint-plugin-testing-library": {
-      "optional": true
-    }
+    "eslint": ">=9"
   },
   "engines": {
     "node": ">=18"
