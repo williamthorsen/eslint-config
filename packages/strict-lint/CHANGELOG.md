@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 4.0.0
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 3.4.0
 
 ### Dependencies

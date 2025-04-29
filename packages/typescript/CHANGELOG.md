@@ -1,5 +1,52 @@
 # @williamthorsen/eslint-config-typescript
 
+## 4.0.0
+
+### Breaking changes
+
+Optional configurations are now exported as `OptionalConfiguration` objects instead of directly as arrays of rules.
+This breaks imports of the Next, React, and React Testing Library configs.
+
+#### Migration
+
+If the base configuration is being used, remove the optional configs.
+They will be included automatically if the plugins are installed.
+
+```diff
+  const config = [
+    // ...
+-   ...tseslint.config({
+-     extends: [
+-       configs.next, //
+-       configs.react,
+-       configs.reactTestingLibrary,
+-     ],
+    }),
+  ];
+```
+
+If the configs are used manually, make the following change:
+
+```diff
+- import configs from '@williamthorsen/eslint-config-typescript/configs';
++ import configs, { optionalConfigs } from '@williamthorsen/eslint-config-typescript/configs';
+```
+
+and replace the configs as follows:
+
+- `configs.next` -> `optionalConfigs.next.config`
+- `configs.react` -> `optionalConfigs.react.config`
+- `configs.reactTestingLibrary` -> `optionalConfigs.reactTestingLibrary.config`
+
+### Features
+
+- Optional configurations are now enabled automatically if the corresponding plugins are installed.
+- Useful file patterns are now exported.
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 3.4.0
 
 ### Features
