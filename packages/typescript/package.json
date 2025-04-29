@@ -53,22 +53,26 @@
     "@next/eslint-plugin-next": "15.3.1",
     "@types/eslint": "9.6.1",
     "@typescript-eslint/utils": "8.31.1",
+    "@vitest/eslint-plugin": "1.1.43",
     "eslint": "9.25.1",
+    "eslint-plugin-jest-dom": "5.5.0",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "5.2.0",
-    "eslint-plugin-testing-library": "7.1.1",
-    "eslint-plugin-vitest": "0.5.4"
+    "eslint-plugin-testing-library": "7.1.1"
   },
   "peerDependencies": {
     "@next/eslint-plugin-next": ">=15.3",
+    "@vitest/eslint-plugin": ">=0.5.4",
     "eslint": ">=9",
     "eslint-plugin-react": ">=7.37",
     "eslint-plugin-react-hooks": ">=5.2",
-    "eslint-plugin-testing-library": ">=7.1",
-    "eslint-plugin-vitest": ">=0.5.4"
+    "eslint-plugin-testing-library": ">=7.1"
   },
   "peerDependenciesMeta": {
     "@next/eslint-plugin-next": {
+      "optional": true
+    },
+    "@vitest/eslint-plugin": {
       "optional": true
     },
     "eslint-plugin-react": {
@@ -78,9 +82,6 @@
       "optional": true
     },
     "eslint-plugin-testing-library": {
-      "optional": true
-    },
-    "eslint-plugin-vitest": {
       "optional": true
     }
   },
