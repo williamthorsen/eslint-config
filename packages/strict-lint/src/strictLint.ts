@@ -35,9 +35,9 @@ async function doLint(baseConfig: Linter.Config[] | undefined, ...args: string[]
     if (!configFilePath) {
       throw new Error('Could not find eslint.config.js');
     }
-    const module: unknown = await import(configFilePath);
-    assertIsConfig(module);
-    return module.default;
+    const mod: unknown = await import(configFilePath);
+    assertIsConfig(mod);
+    return mod.default;
   })();
 
   const errorizedConfig = config.map(convertWarnToError);
@@ -59,17 +59,17 @@ async function doLint(baseConfig: Linter.Config[] | undefined, ...args: string[]
   return formatter.format(results);
 }
 
-function assertIsConfig(module: unknown): asserts module is { default: Linter.Config[] } {
-  if (typeof module !== 'object' || module === null) {
+function assertIsConfig(mod: unknown): asserts mod is { default: Linter.Config[] } {
+  if (typeof mod !== 'object' || mod === null) {
     throw new TypeError('Expected module to be an object');
   }
-  if (!('default' in module)) {
+  if (!('default' in mod)) {
     throw new TypeError('Expected module to have a default export');
   }
-  if (!Array.isArray(module.default)) {
+  if (!Array.isArray(mod.default)) {
     throw new TypeError('Expected config to be an array');
   }
-  for (const item of module.default) {
+  for (const item of mod.default) {
     if (typeof item !== 'object') {
       throw new TypeError('Expected config item to be an object');
     }
