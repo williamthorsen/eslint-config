@@ -1,5 +1,19 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.1.0
+
+### Features
+
+- Added JSX A11y Lint configuration
+- Added TypeScript support to the Vitest configuration
+- Disabled some Vitest rules:
+  - `vitest/no-hooks`
+  - `vitest/prefer-expect-assertions`
+
+### Refactoring
+
+- Improved handling of imports in React configuration
+
 ## 5.0.2
 
 ### Fixes
