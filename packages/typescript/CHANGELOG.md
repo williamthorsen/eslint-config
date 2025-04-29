@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-typescript
 
+## 4.0.1
+
+### Dependencies
+
+- Removed optional plugins from dev dependencies because they are not needed by this project.
+
 ## 4.0.0
 
 ### Breaking changes
