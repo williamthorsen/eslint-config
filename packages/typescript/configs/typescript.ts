@@ -1,4 +1,7 @@
 import type { Linter } from 'eslint';
+import tseslint from 'typescript-eslint';
+
+import skyPilot from '../plugins/eslint-plugin-sky-pilot.js';
 
 const rules: Linter.RulesRecord = {
   // Strict: Modified
@@ -46,8 +49,12 @@ const rules: Linter.RulesRecord = {
   '@typescript-eslint/unbound-method': 'warn',
 };
 
-const config: Linter.Config = {
+const config = tseslint.config({
+  extends: [
+    ...tseslint.configs.strictTypeChecked, //
+    skyPilot.configs.recommended,
+  ],
   rules,
-};
+});
 
 export default config;

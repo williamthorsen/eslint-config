@@ -1,25 +1,24 @@
 import eslint from '@eslint/js';
 import globals from 'globals';
-import tseslint, { type Config } from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 
-import configs from './configs/index.js';
-import skyPilot from './plugins/eslint-plugin-sky-pilot.js';
+import configs, { optionalConfigs } from './configs/index.js';
+import { resolveOptionalConfigs } from './utils/resolveOptionalConfigs.js';
 
-const javaScriptFiles = ['**/*.{js,cjs,mjs,jsx}'];
+const javaScriptExtensions = ['*.{js,cjs,mjs,jsx}'];
+const typeScriptExtensions = ['*.{ts,cts,mts,tsx}'];
+const codeExtensions = [...javaScriptExtensions, ...typeScriptExtensions];
 
-const typeScriptFiles = ['**/*.{ts,cts,mts,tsx}'];
+const javaScriptFiles = javaScriptExtensions.map((ext) => `**/${ext}`);
+const typeScriptFiles = typeScriptExtensions.map((ext) => `**/${ext}`);
+const codeFiles = codeExtensions.map((ext) => `**/${ext}`);
 
-const codeFiles = [...javaScriptFiles, ...typeScriptFiles];
-
-const config: Config = [
+const config = [
   ...tseslint.config({
     files: typeScriptFiles,
-    // prettier-ignore
     extends: [
-      eslint.configs.recommended,
-      ...tseslint.configs.strictTypeChecked,
+      eslint.configs.recommended, //
       configs.typeScript,
-      skyPilot.configs.recommended,
     ],
   }),
   {
@@ -30,19 +29,22 @@ const config: Config = [
   },
   ...tseslint.config({
     files: javaScriptFiles,
-    // prettier-ignore
     extends: [
-      configs.javaScript,
+      configs.javaScript, //
     ],
   }),
   ...tseslint.config({
     files: codeFiles,
-    // prettier-ignore
     extends: [
       configs.eslintComments,
       configs.n,
       configs.simpleImportSort,
       configs.unicorn,
+      ...(await resolveOptionalConfigs([
+        optionalConfigs.next,
+        optionalConfigs.react,
+        optionalConfigs.reactTestingLibrary,
+      ])),
     ],
   }),
   {
@@ -57,4 +59,15 @@ const config: Config = [
   configs.yaml,
 ];
 
+const patterns = {
+  codeExtensions,
+  codeFiles,
+  javaScriptExtensions,
+  javaScriptFiles,
+  typeScriptExtensions,
+  typeScriptFiles,
+};
+
+export { default as configs } from './configs/index.js';
+export { patterns };
 export default config;

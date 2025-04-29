@@ -1,3 +1,7 @@
+import type { Linter } from 'eslint';
+import type { ConfigArray } from 'typescript-eslint';
+
+import type { OptionalConfig } from '../utils/resolveOptionalConfigs.js';
 import eslintComments from './eslint-comments.js';
 import javaScript from './javascript.js';
 import json from './json.js';
@@ -12,18 +16,23 @@ import typeScript from './typescript.js';
 import unicorn from './unicorn.js';
 import yaml from './yaml.js';
 
-export default {
+export const configs = {
   eslintComments,
   javaScript,
   json,
   json5,
   packageJson,
-  next,
-  react,
-  reactTestingLibrary,
   simpleImportSort,
   n,
   typeScript,
   unicorn,
   yaml,
-};
+} satisfies Record<string, Linter.Config | ConfigArray>;
+
+export const optionalConfigs = {
+  next,
+  react,
+  reactTestingLibrary,
+} satisfies Record<string, OptionalConfig>;
+
+export default configs;
