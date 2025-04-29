@@ -1,7 +1,6 @@
 import type { Linter } from 'eslint';
 import type { ConfigArray } from 'typescript-eslint';
 
-import type { OptionalConfig } from '../utils/resolveOptionalConfigs.js';
 import eslintComments from './eslint-comments.js';
 import javaScript from './javascript.js';
 import json from './json.js';
@@ -33,6 +32,6 @@ export const optionalConfigs = {
   next,
   react,
   reactTestingLibrary,
-} satisfies Record<string, OptionalConfig>;
+} satisfies Record<string, ConfigArray | Linter.Config>;
 
 export default configs;

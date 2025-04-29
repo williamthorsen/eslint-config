@@ -2,8 +2,7 @@ import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-import configs, { optionalConfigs } from './configs/index.js';
-import { resolveOptionalConfigs } from './utils/resolveOptionalConfigs.js';
+import configs from './configs/index.js';
 
 const javaScriptExtensions = ['*.{js,cjs,mjs,jsx}'];
 const typeScriptExtensions = ['*.{ts,cts,mts,tsx}'];
@@ -35,17 +34,7 @@ const config = [
   }),
   ...tseslint.config({
     files: codeFiles,
-    extends: [
-      configs.eslintComments,
-      configs.n,
-      configs.simpleImportSort,
-      configs.unicorn,
-      ...(await resolveOptionalConfigs([
-        optionalConfigs.next,
-        optionalConfigs.react,
-        optionalConfigs.reactTestingLibrary,
-      ])),
-    ],
+    extends: [configs.eslintComments, configs.n, configs.simpleImportSort, configs.unicorn],
   }),
   {
     files: ['**/*.cjs'],
@@ -68,6 +57,6 @@ const patterns = {
   typeScriptFiles,
 };
 
-export { default as configs } from './configs/index.js';
+export { default as configs, optionalConfigs } from './configs/index.js';
 export { patterns };
 export default config;
