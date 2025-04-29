@@ -1,5 +1,9 @@
-import vitestPlugin from '@vitest/eslint-plugin';
+import type { Linter } from 'eslint';
 
-const config = vitestPlugin.configs.all;
+async function createConfig(): Promise<Linter.Config> {
+  const { default: vitestPlugin } = await import('@vitest/eslint-plugin');
 
-export default config;
+  return vitestPlugin.configs.all;
+}
+
+export default createConfig;

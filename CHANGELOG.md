@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 5.0.2
+
+### Tooling
+
+- Replaced custom workspace scripts with the generic `run-workspace-script` script runner
+
+### Dependencies
+
+- Added `@williamthorsen/toolbelt.objects` to dev dependencies to support the generic script runner
+
 ## 4.0.0
 
 ### Dependencies

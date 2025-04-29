@@ -14,6 +14,7 @@ const rules: Linter.RulesRecord = {
     },
   ],
   // '@typescript-eslint/no-namespace': 'off',
+  '@typescript-eslint/no-unnecessary-type-arguments': 'warn', // downgraded from error
   '@typescript-eslint/no-unused-vars': [
     'error',
     {

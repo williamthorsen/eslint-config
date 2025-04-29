@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "4.0.0",
+  "version": "5.0.2",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "license": "UNLICENSED",
@@ -23,15 +23,9 @@
   ],
   "scripts": {
     "build": "pnpm run clean && pnpm tsc --build tsconfig.build.json && mv dist/scripts dist/bin && tsx scripts/replace-shebang.ts && rimraf dist/bin/*.d.ts",
-    "check": "pnpm run typecheck && pnpm run lint:strict && pnpm test:coverage",
     "clean": "pnpm rimraf dist/*",
-    "lint": "pnpm eslint .",
-    "lint:fix": "pnpm eslint --fix .",
     "lint:strict": "tsx scripts/strict-lint.ts",
-    "test": "pnpm vitest",
-    "test:coverage": "pnpm vitest --coverage",
-    "test:watch": "pnpm vitest --watch",
-    "typecheck": "tsc --noEmit"
+    "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
     "tsx": "4.19.3"
