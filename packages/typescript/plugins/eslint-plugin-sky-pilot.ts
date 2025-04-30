@@ -23,6 +23,16 @@ const configs = {
       'sky-pilot/prefer-function-declaration': 'warn',
     },
   },
+  strict: {
+    plugins: {
+      'sky-pilot': skyPilotPlugin,
+    },
+    rules: {
+      'sky-pilot/no-undefined-with-number': 'error',
+      'sky-pilot/no-unused-map': 'error',
+      'sky-pilot/prefer-function-declaration': 'error',
+    },
+  },
 } as const;
 
 // Export the plugin
