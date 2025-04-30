@@ -28,7 +28,7 @@
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
-    "tsx": "4.19.3"
+    "tsx": "4.19.4"
   },
   "devDependencies": {
     "eslint": "9.25.1",
