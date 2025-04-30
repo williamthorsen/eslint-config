@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.2.0
+
+### Features
+
+- Enabled full n plugin configuration
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+- 
 ## 5.1.0
 
 ### Features
