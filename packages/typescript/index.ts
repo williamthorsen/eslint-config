@@ -34,7 +34,13 @@ const config = [
   }),
   ...tseslint.config({
     files: codeFiles,
-    extends: [configs.eslintComments, configs.n, configs.simpleImportSort, configs.unicorn],
+    extends: [
+      configs.eslintComments, //
+      configs.import,
+      configs.n,
+      configs.simpleImportSort,
+      configs.unicorn,
+    ],
   }),
   {
     files: ['**/*.cjs'],
