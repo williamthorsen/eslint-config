@@ -2,6 +2,7 @@ import type { Linter } from 'eslint';
 import type { ConfigArray } from 'typescript-eslint';
 
 import eslintComments from './eslint-comments.js';
+import importConfig from './import.js';
 import javaScript from './javascript.js';
 import json from './json.js';
 import json5 from './json5.js';
@@ -19,6 +20,7 @@ import yaml from './yaml.js';
 
 export const configs = {
   eslintComments,
+  import: importConfig,
   javaScript,
   json,
   json5,
