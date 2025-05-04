@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 5.3.0
+
+### Minor Changes
+
+- Upgrade all deps to latest version
+
 ## 5.2.0
 
 ### Dependencies
