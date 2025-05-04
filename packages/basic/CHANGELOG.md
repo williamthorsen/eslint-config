@@ -1,5 +1,11 @@
 # @williamthorsen/eslint-config-basic
 
+## 5.3.0
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 3.4.0
 
 ### Dependencies

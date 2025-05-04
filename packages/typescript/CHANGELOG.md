@@ -1,5 +1,22 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.3.0
+
+### Features
+
+- Added ESLint configuration for the `import` plugin
+- Modified the default TypeScript config:
+  - Explicit file extensions are now required by the `import/extensions` rule
+  - The `unicorn/switch-case-braces` has been relaxed so that braces are avoided when unneeded 
+
+### Tooling
+
+- Fixed the issue where Prettier was formatting the `packages/typescript/dist` directory
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 5.2.0
 
 ### Features
@@ -9,7 +26,8 @@
 ### Dependencies
 
 - Upgraded all dependencies to latest version
-- 
+-
+
 ## 5.1.0
 
 ### Features

@@ -25,6 +25,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-node-protocol': 'warn', // Prefer `node:`-prefixed modules
   'unicorn/prefer-string-starts-ends-with': 'warn', // Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
   'unicorn/prefer-type-error': 'warn', // Prefer a TypeError when an error is thrown while checking `typeof`
+  'unicorn/switch-case-braces': ['error', 'avoid'], // Avoid braces in switch cases unless scope is needed.
   'unicorn/text-encoding-identifier-case': 'warn',
 };
 
