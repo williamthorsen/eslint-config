@@ -6,7 +6,7 @@ import skyPilot from '../plugins/eslint-plugin-sky-pilot.js';
 const rules: Linter.RulesRecord = {
   // Strict: Modified
   '@typescript-eslint/no-confusing-void-expression': [
-    'warn',
+    'warn', // 🔴🟠
     {
       ignoreArrowShorthand: true,
       ignoreVoidOperator: true,
@@ -14,7 +14,8 @@ const rules: Linter.RulesRecord = {
     },
   ],
   // '@typescript-eslint/no-namespace': 'off',
-  '@typescript-eslint/no-unnecessary-type-arguments': 'warn', // downgraded from error
+  '@typescript-eslint/unbound-method': 'warn', // 🔴🟠
+  '@typescript-eslint/no-unnecessary-type-arguments': 'warn', // 🔴🟠
   '@typescript-eslint/no-unused-vars': [
     'error',
     {
@@ -33,21 +34,23 @@ const rules: Linter.RulesRecord = {
   ],
 
   // Optional: Enabled
-  '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+  '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }], // ⚫🔴
   '@typescript-eslint/consistent-type-imports': [
-    'warn',
+    'warn', // ⚫🟠
     {
       prefer: 'type-imports',
       disallowTypeAnnotations: false,
     },
   ],
-  '@typescript-eslint/explicit-module-boundary-types': 'warn', // all
-  '@typescript-eslint/no-redeclare': ['error', { builtinGlobals: true }],
+  '@typescript-eslint/explicit-module-boundary-types': 'warn', // ⚫🟠
+  '@typescript-eslint/no-redeclare': [
+    'error', // ⚫🔴
+    { builtinGlobals: true }, // modification
+  ],
 
   // Stylistic: Enabled
-  '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'],
-  '@typescript-eslint/no-inferrable-types': 'warn',
-  '@typescript-eslint/unbound-method': 'warn',
+  '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'], // ⚫🟠
+  '@typescript-eslint/no-inferrable-types': 'warn', // ⚫🟠
 };
 
 const config = tseslint.config({
