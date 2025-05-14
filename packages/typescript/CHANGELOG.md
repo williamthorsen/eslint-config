@@ -1,5 +1,17 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.5.0
+
+### Features
+
+- Enabled custom JavaScript rules
+- Disabled rules inapplicable to test files
+- Aligned `unicorn/number-literal-case` rule with Prettier
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 5.4.0
 
 ### Features

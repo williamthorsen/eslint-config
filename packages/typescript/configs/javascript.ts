@@ -52,14 +52,6 @@ const rules: Linter.RulesRecord = {
       varsIgnorePattern: '^_',
     },
   ],
-  'no-use-before-define': [
-    'error',
-    {
-      functions: false,
-      classes: false,
-      variables: true,
-    },
-  ],
   'no-var': 'off',
   'require-await': 'off',
   'prefer-const': [

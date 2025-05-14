@@ -1,22 +1,22 @@
-import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 import configs from './configs/index.js';
 
-const javaScriptExtensions = ['*.{js,cjs,mjs,jsx}'];
-const typeScriptExtensions = ['*.{ts,cts,mts,tsx}'];
+const javaScriptExtensions = ['{js,cjs,mjs,jsx}'];
+const typeScriptExtensions = ['{ts,cts,mts,tsx}'];
 const codeExtensions = [...javaScriptExtensions, ...typeScriptExtensions];
 
-const javaScriptFiles = javaScriptExtensions.map((ext) => `**/${ext}`);
-const typeScriptFiles = typeScriptExtensions.map((ext) => `**/${ext}`);
-const codeFiles = codeExtensions.map((ext) => `**/${ext}`);
+const javaScriptFiles = javaScriptExtensions.map((ext) => `**/*.${ext}`);
+const typeScriptFiles = typeScriptExtensions.map((ext) => `**/*.${ext}`);
+const codeFiles = codeExtensions.map((ext) => `**/*.${ext}`);
 
 const config = [
   ...tseslint.config({
     files: typeScriptFiles,
     extends: [
-      eslint.configs.recommended, //
+      configs.javaScript, //
+      tseslint.configs.eslintRecommended,
       configs.typeScript,
     ],
   }),
@@ -46,6 +46,15 @@ const config = [
     files: ['**/*.cjs'],
     languageOptions: {
       globals: globals.commonjs,
+    },
+  },
+  {
+    files: codeExtensions.map((ext) => `**/*.{spec,test}.${ext}`),
+    rules: {
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      'sky-pilot/prefer-function-declaration': 'off',
+      'unicorn/consistent-function-scoping': 'off',
+      'unicorn/no-null': 'off',
     },
   },
   configs.json,

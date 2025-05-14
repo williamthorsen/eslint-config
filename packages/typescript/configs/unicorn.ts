@@ -24,6 +24,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-negated-condition': 'warn',
   'unicorn/no-nested-ternary': 'warn',
   'unicorn/no-null': 'warn', // Prefer `undefined` over `null`
+  'unicorn/number-literal-case': ['warn', { hexadecimalValue: 'lowercase' }], // to align with Prettier
   'unicorn/prevent-abbreviations': 'off',
   'unicorn/prefer-dom-node-text-content': 'warn', // Prefer `textContent` over `innerText`
   'unicorn/prefer-includes': 'warn', // Prefer `includes` over `indexOf` when checking for existence
