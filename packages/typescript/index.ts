@@ -46,7 +46,16 @@ const config = [
     files: ['**/*.cjs'],
     languageOptions: {
       globals: globals.commonjs,
+    },
   },
+  {
+    files: codeExtensions.map((ext) => `**/*.{spec,test}.${ext}`),
+    rules: {
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      'sky-pilot/prefer-function-declaration': 'off',
+      'unicorn/consistent-function-scoping': 'off',
+      'unicorn/no-null': 'off',
+    },
   },
   configs.json,
   configs.json5, // Apply this after the `json` config, because it replaces some general JSON rules with JSON5 rules!
