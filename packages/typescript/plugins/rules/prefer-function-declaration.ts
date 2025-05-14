@@ -24,6 +24,7 @@ const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<
   };
 };
 
+// eslint-disable-next-line complexity
 function containsThisExpression(root: TSESTree.Node): boolean {
   const stack: TSESTree.Node[] = [root];
   const visited = new Set<TSESTree.Node>();
