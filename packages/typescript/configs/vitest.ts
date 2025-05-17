@@ -3,8 +3,12 @@ import tseslint, { type ConfigArray } from 'typescript-eslint';
 
 // Modifications of rules that are not in the "recommended" config.
 const modifiedStrictRules: Linter.RulesRecord = {
-  'vitest/no-hooks': 'off', // default: 'error'
-  'vitest/prefer-expect-assertions': 'off', // default: 'error'
+  'vitest/max-expects': 'off', // 🟠⚫
+  'vitest/no-hooks': 'off', // 🔴⚫
+  'vitest/padding-around-all': 'off', // 🟠⚫
+  'vitest/padding-around-expect-groups': 'off', // 🟠⚫
+  'vitest/prefer-expect-assertions': 'off', // 🟠⚫
+  'vitest/prefer-lowercase-title': 'off', // 🟠⚫
 };
 
 async function createConfig(): Promise<ConfigArray> {

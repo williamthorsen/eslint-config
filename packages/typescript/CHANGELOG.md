@@ -1,5 +1,16 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.6.0
+
+### Features
+
+- Disabled rules inappropriate for test files
+- Disabled some overly proscriptive rules from the Unicorn and Vitest plugins
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 5.5.0
 
 ### Features

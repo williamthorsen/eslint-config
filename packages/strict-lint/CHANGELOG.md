@@ -1,10 +1,16 @@
 # @williamthorsen/strict-lint
 
+## 5.4.1
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 5.3.0
 
-### Minor Changes
+### Dependencies
 
-- Upgrade all deps to latest version
+- Upgraded all dependencies to latest version
 
 ## 5.2.0
 
@@ -133,7 +139,7 @@ First stable release.
 
 ## 0.11.2
 
-### Patch Changes
+### Tooling
 
 - Simplify build config & file structure
 

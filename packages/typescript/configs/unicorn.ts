@@ -16,23 +16,23 @@ const rules: Linter.RulesRecord = {
 
   // Downgrade or disable overly prescriptive rules
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
-  'unicorn/filename-case': 'off',
+  'unicorn/filename-case': 'off', // 🔴⚫
   'unicorn/import-style': ['warn', { extendDefaultStyles: false }],
-  'unicorn/no-array-callback-reference': 'off',
-  'unicorn/no-await-expression-member': 'off',
-  'unicorn/no-lonely-if': 'warn',
-  'unicorn/no-negated-condition': 'warn',
-  'unicorn/no-nested-ternary': 'warn',
-  'unicorn/no-null': 'warn', // Prefer `undefined` over `null`
+  'unicorn/no-array-callback-reference': 'off', // 🔴⚫
+  'unicorn/no-await-expression-member': 'off', // 🔴⚫
+  'unicorn/no-lonely-if': 'warn', // 🔴🟠
+  'unicorn/no-negated-condition': 'warn', // 🔴🟠
+  'unicorn/no-nested-ternary': 'warn', // 🔴🟠
+  'unicorn/no-null': 'off', // 🔴⚫ Prefer `undefined` over `null`
   'unicorn/number-literal-case': ['warn', { hexadecimalValue: 'lowercase' }], // to align with Prettier
-  'unicorn/prevent-abbreviations': 'off',
-  'unicorn/prefer-dom-node-text-content': 'warn', // Prefer `textContent` over `innerText`
-  'unicorn/prefer-includes': 'warn', // Prefer `includes` over `indexOf` when checking for existence
-  'unicorn/prefer-node-protocol': 'warn', // Prefer `node:`-prefixed modules
-  'unicorn/prefer-string-starts-ends-with': 'warn', // Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
-  'unicorn/prefer-type-error': 'warn', // Prefer a TypeError when an error is thrown while checking `typeof`
+  'unicorn/prevent-abbreviations': 'off', // 🔴⚫
+  'unicorn/prefer-dom-node-text-content': 'warn', // 🔴🟠 Prefer `textContent` over `innerText`
+  'unicorn/prefer-includes': 'warn', // 🔴🟠 Prefer `includes` over `indexOf` when checking for existence
+  'unicorn/prefer-node-protocol': 'warn', // 🔴🟠 Prefer `node:`-prefixed modules
+  'unicorn/prefer-string-starts-ends-with': 'warn', // 🔴🟠 Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
+  'unicorn/prefer-type-error': 'warn', // 🔴🟠 Prefer a TypeError when an error is thrown while checking `typeof`
   'unicorn/switch-case-braces': ['error', 'avoid'], // Avoid braces in switch cases unless scope is needed.
-  'unicorn/text-encoding-identifier-case': 'warn',
+  'unicorn/text-encoding-identifier-case': 'warn', // 🔴🟠
 };
 
 const config = tseslint.config({

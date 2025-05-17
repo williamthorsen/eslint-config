@@ -16,7 +16,6 @@ const config = [
     files: typeScriptFiles,
     extends: [
       configs.javaScript, //
-      tseslint.configs.eslintRecommended,
       configs.typeScript,
     ],
   }),
@@ -48,13 +47,16 @@ const config = [
       globals: globals.commonjs,
     },
   },
+  // Test files
   {
     files: codeExtensions.map((ext) => `**/*.{spec,test}.${ext}`),
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
       'sky-pilot/prefer-function-declaration': 'off',
       'unicorn/consistent-function-scoping': 'off',
-      'unicorn/no-null': 'off',
+      'unicorn/no-thenable': 'off',
+      'unicorn/no-useless-undefined': 'off',
     },
   },
   configs.json,

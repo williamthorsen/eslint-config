@@ -4,6 +4,9 @@ import tseslint from 'typescript-eslint';
 import skyPilot from '../plugins/eslint-plugin-sky-pilot.js';
 
 const rules: Linter.RulesRecord = {
+  // Disable rules inappropriate for TypeScript
+  'consistent-return': 'off',
+
   // Strict: Modified
   '@typescript-eslint/no-confusing-void-expression': [
     'warn', // 🔴🟠
