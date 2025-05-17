@@ -40,9 +40,6 @@
     "jsonc-eslint-parser": "2.4.0",
     "yaml-eslint-parser": "1.3.0"
   },
-  "devDependencies": {
-    "eslint": "9.27.0"
-  },
   "peerDependencies": {
     "eslint": ">=9"
   },
