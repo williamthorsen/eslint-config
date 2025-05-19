@@ -53,6 +53,7 @@ const config = [
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/unbound-method': 'off',
       'sky-pilot/prefer-function-declaration': 'off',
       'unicorn/consistent-function-scoping': 'off',
       'unicorn/no-thenable': 'off',

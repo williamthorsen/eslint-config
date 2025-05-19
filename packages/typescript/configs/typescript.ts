@@ -17,7 +17,7 @@ const rules: Linter.RulesRecord = {
     },
   ],
   // '@typescript-eslint/no-namespace': 'off',
-  '@typescript-eslint/unbound-method': 'warn', // 🔴🟠
+  '@typescript-eslint/no-misused-promises': ['warn', { checksVoidReturn: false }],
   '@typescript-eslint/no-unnecessary-type-arguments': 'warn', // 🔴🟠
   '@typescript-eslint/no-unused-vars': [
     'error',
@@ -35,6 +35,7 @@ const rules: Linter.RulesRecord = {
       allowNumber: true,
     },
   ],
+  '@typescript-eslint/unbound-method': 'warn', // 🔴🟠
 
   // Optional: Enabled
   '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }], // ⚫🔴
