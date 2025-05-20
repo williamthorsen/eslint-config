@@ -1,5 +1,18 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.7.0
+
+### Features
+
+- Relaxed some TypeScript rules:
+  - Disabled the `@typescript-eslint/unbound-method` rule for test files
+  - Changed the severity of `@typescript-eslint/unbound-method` from `error` to `warn` for other files
+  - Relaxed the `@typescript-eslint/no-misused-promises` rule to skip checking void return types
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 5.6.0
 
 ### Features
