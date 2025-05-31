@@ -1,4 +1,5 @@
-import { hasOwnProperty, isPlainObject } from '@williamthorsen/toolbelt.objects';
+import { isPlainObject } from '@williamthorsen/toolbelt.objects';
+import { hasOwnProperty } from '@williamthorsen/toolbelt.objects/candidate';
 
 /**
  * Throws an error if the `scripts` field of the object does not conform to the `PackageJson` interface.
