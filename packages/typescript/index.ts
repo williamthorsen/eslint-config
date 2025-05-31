@@ -51,6 +51,8 @@ const config = [
   {
     files: codeExtensions.map((ext) => `**/*.{spec,test}.${ext}`),
     rules: {
+      '@typescript-eslint/no-confusing-void-expression': 'off',
+      '@typescript-eslint/no-extraneous-class': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/unbound-method': 'off',
