@@ -28,7 +28,7 @@
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
-    "tsx": "4.19.4"
+    "tsx": "4.20.3"
   },
   "peerDependencies": {
     "eslint": ">=9"

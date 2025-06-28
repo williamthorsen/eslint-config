@@ -10,6 +10,7 @@
     // Report an error for unused labels instead of just a warning.
     "allowUnusedLabels": false,
     // "alwaysStrict": true, // implied by "strict"
+    "baseUrl": ".",
     "declaration": true,
     "emitDeclarationOnly": true,
     "emitDecoratorMetadata": true,
