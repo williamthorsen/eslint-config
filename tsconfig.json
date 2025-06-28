@@ -11,6 +11,7 @@
     "allowUnusedLabels": false,
     // "alwaysStrict": true, // implied by "strict"
     "declaration": true,
+    "emitDeclarationOnly": true,
     "emitDecoratorMetadata": true,
     // Support importation of CJS modules in ESM.
     "esModuleInterop": true,
