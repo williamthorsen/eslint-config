@@ -88,16 +88,20 @@ function getPackageJson() {
 
 function getScripts(useIntTests = false): Record<string, string | []> {
   const commonScripts: Record<string, string | string[]> = {
+    build: ['compile', 'generate-typings'],
     check: ['typecheck', 'fmt:check', 'lint:check', 'test'],
     'check:strict': ['typecheck', 'fmt:check', 'lint:strict', 'test:coverage'],
-    fmt: 'pnpm exec prettier --write .',
-    'fmt:check': 'pnpm exec prettier --check .',
-    lint: 'pnpm exec eslint --fix .',
-    'lint:check': 'pnpm exec eslint .',
-    'lint:strict': 'pnpm exec strict-lint',
-    test: 'pnpm exec vitest',
-    'test:coverage': 'pnpm exec vitest --coverage',
-    'test:watch': 'pnpm exec vitest --watch',
+    clean: 'pnpm exec rimraf dist/*',
+    compile: 'tsx ../../config/build.ts',
+    fmt: 'prettier --list-different --write .',
+    'fmt:check': 'prettier --check .',
+    'generate-typings': 'tsc --project tsconfig.generate-typings.json',
+    lint: 'eslint --fix .',
+    'lint:check': 'eslint .',
+    'lint:strict': 'strict-lint',
+    test: 'vitest',
+    'test:coverage': 'vitest --coverage',
+    'test:watch': 'vitest --watch',
     typecheck: 'tsc --noEmit',
     'view-coverage': 'open coverage/index.html',
   };
@@ -143,7 +147,7 @@ function showHelp(code: number): never {
   console.info('Available scripts:');
 
   for (const [key, value] of Object.entries(scripts)) {
-    console.log(`  ${key.padEnd(15)} ${describeScript(value)}`);
+    console.info(`  ${key.padEnd(15)} ${describeScript(value)}`);
   }
   process.exit(code);
 }

@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.7.1
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
+### Tooling
+
+- Modernized build toolchain to support `.ts` extension and use flexible build script
+
 ## 5.7.0
 
 ### Features
