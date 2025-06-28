@@ -4,6 +4,7 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "allowJs": false,
+    "allowImportingTsExtensions": true,
     // Report an error for unreachable code instead of just a warning.
     "allowUnreachableCode": false,
     // Report an error for unused labels instead of just a warning.

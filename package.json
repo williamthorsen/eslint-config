@@ -21,6 +21,7 @@
     "outdated": "pnpm outdated --compatible --recursive",
     "outdated:latest": "pnpm outdated --recursive",
     "rebuild": "pnpm --prefix packages/typescript run rebuild",
+    "root:test": "vitest --config ./vitest.root.config.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typecheck": "tsc --noEmit",
     "update": "pnpm update --recursive",
