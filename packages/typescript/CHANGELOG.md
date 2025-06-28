@@ -1,5 +1,13 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.8.0
+
+### Features
+
+- Disabled poorly behaved new Vitest rules:
+  - `vitest/prefer-called-once`, which conflicts with `vitest/prefer-called-times`
+  - `vitest/prefer-importing-vitest-globals`, which doesn't recognized imported functions sharing the same name as Vitest globals
+
 ## 5.7.1
 
 ### Dependencies
