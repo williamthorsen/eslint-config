@@ -27,8 +27,8 @@ importers:
         specifier: 3.2.4
         version: 3.2.4(vitest@3.2.4(@types/node@22.15.34)(tsx@4.20.3)(yaml@2.8.0))
       '@williamthorsen/toolbelt.objects':
-        specifier: 3.0.2
-        version: 3.0.2
+        specifier: 3.1.0
+        version: 3.1.0
       esbuild:
         specifier: 0.25.5
         version: 0.25.5
@@ -789,8 +789,8 @@ packages:
   '@vitest/utils@3.2.4':
     resolution: {integrity: sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA==}
 
-  '@williamthorsen/toolbelt.objects@3.0.2':
-    resolution: {integrity: sha512-DHOjZcgnlLSg3UBz3HYmxjwrlmrGQQQe5hxirdcfsNozFDKkfvqwOsOX/Ue3G+9GMScMHfciWPXFGbbjQeA0aw==, tarball: https://npm.pkg.github.com/download/@williamthorsen/toolbelt.objects/3.0.2/468b63d1eab7efbb400119f4a586b4c18c2da7cb}
+  '@williamthorsen/toolbelt.objects@3.1.0':
+    resolution: {integrity: sha512-GHk4+xoaPAy7dXUylbyElILUj+5JB6cT0fQOUKgBI44AfpY/GsX8h7Cw8U0XPqk5E+aat4e5TnTMjQoS3/LgOA==, tarball: https://npm.pkg.github.com/download/@williamthorsen/toolbelt.objects/3.1.0/c60f959e429c16adf9f703ee1461ebb709dd87f6}
     engines: {node: '>=18.17.0'}
 
   acorn-jsx@5.3.2:
@@ -3175,7 +3175,7 @@ snapshots:
       loupe: 3.1.4
       tinyrainbow: 2.0.0
 
-  '@williamthorsen/toolbelt.objects@3.0.2': {}
+  '@williamthorsen/toolbelt.objects@3.1.0': {}
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
