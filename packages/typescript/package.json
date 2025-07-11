@@ -56,7 +56,8 @@
     "eslint-plugin-testing-library": "7.5.4"
   },
   "peerDependencies": {
-    "eslint": ">=9"
+    "eslint": ">=9",
+    "typescript": ">=5"
   },
   "engines": {
     "node": ">=18"

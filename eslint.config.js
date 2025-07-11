@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import nPlugin from 'eslint-plugin-n';
 import globals from 'globals';
 
 import { commonIgnores } from './packages/typescript/dist/esm/ignores/index.js';
@@ -42,7 +41,6 @@ const config = [
         ecmaVersion: 2022,
       },
     },
-    plugins: { n: nPlugin },
     rules: {
       'n/no-extraneous-import': ['error', { allowModules: devModules }],
       'n/no-unsupported-features/es-syntax': [
