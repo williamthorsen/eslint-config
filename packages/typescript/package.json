@@ -28,7 +28,7 @@
     "publish:github": "pnpm publish",
     "publish:jsr": "npx jsr publish",
     "publish:jsr:dry-run": "npx jsr publish --dry-run",
-    "rebuild": "tsc --noEmit false",
+    "rebuild": "pnpm run ws build",
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
