@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "5.8.0",
+  "version": "5.9.0",
   "description": "ESLint config for TypeScript, JSON & YML",
   "keywords": [
     "eslint-config"
@@ -28,7 +28,7 @@
     "publish:github": "pnpm publish",
     "publish:jsr": "npx jsr publish",
     "publish:jsr:dry-run": "npx jsr publish --dry-run",
-    "rebuild": "tsc --noEmit false",
+    "rebuild": "pnpm run ws build",
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
@@ -56,7 +56,8 @@
     "eslint-plugin-testing-library": "7.5.4"
   },
   "peerDependencies": {
-    "eslint": ">=9"
+    "eslint": ">=9",
+    "typescript": ">=5"
   },
   "engines": {
     "node": ">=18"

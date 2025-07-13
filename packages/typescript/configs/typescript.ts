@@ -1,4 +1,5 @@
 import type { Linter } from 'eslint';
+import promisePlugin from 'eslint-plugin-promise';
 import tseslint from 'typescript-eslint';
 
 import skyPilot from '../plugins/eslint-plugin-sky-pilot.js';
@@ -47,10 +48,6 @@ const rules: Linter.RulesRecord = {
     },
   ],
   '@typescript-eslint/explicit-module-boundary-types': 'warn', // ⚫🟠
-  '@typescript-eslint/no-redeclare': [
-    'error', // ⚫🔴
-    { builtinGlobals: true }, // modification
-  ],
 
   // Stylistic: Enabled
   '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'], // ⚫🟠
@@ -60,6 +57,7 @@ const rules: Linter.RulesRecord = {
 const config = tseslint.config({
   extends: [
     ...tseslint.configs.strictTypeChecked, //
+    promisePlugin.configs['flat/recommended'],
     skyPilot.configs.recommended,
   ],
   rules,

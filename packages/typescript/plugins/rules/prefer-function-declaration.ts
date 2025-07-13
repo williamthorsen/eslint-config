@@ -9,7 +9,7 @@ const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<
         [AST_NODE_TYPES.ArrowFunctionExpression, AST_NODE_TYPES.FunctionExpression].includes(node.init.type) &&
         !node.id.typeAnnotation // Preserves exception for typed functions
       ) {
-        // If the function is an arrow funcition and uses 'this', then a function declaration might not be possible,
+        // If the function is an arrow function and uses 'this', then a function declaration might not be possible,
         // so do not report it as a rule violation.
         if (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression && containsThisExpression(node.init.body)) {
           return;
@@ -63,6 +63,7 @@ function containsThisExpression(root: TSESTree.Node): boolean {
 }
 
 const ruleDefinition: TSESLint.LooseRuleDefinition = {
+  create,
   meta: {
     type: 'problem',
     docs: {
@@ -74,7 +75,6 @@ const ruleDefinition: TSESLint.LooseRuleDefinition = {
       preferDeclaration: 'Prefer function declarations over function expressions.',
     },
   },
-  create,
 };
 
 export default ruleDefinition;

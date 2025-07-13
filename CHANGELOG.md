@@ -1,5 +1,12 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 5.9.0
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+- Updated all runtimes to latest version
+
 ## 5.7.1
 
 ### Dependencies
