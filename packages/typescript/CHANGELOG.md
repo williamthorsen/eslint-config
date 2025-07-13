@@ -1,5 +1,16 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.9.0
+
+### Features
+
+- Added a custom ESLint rule to enforce memoization of functions returned from a custom hook
+- Downgraded the severity of overly prescriptive Unicorn rules
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 5.8.0
 
 ### Features
