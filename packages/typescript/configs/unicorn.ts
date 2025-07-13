@@ -15,22 +15,36 @@ const rules: Linter.RulesRecord = {
    */
 
   // Downgrade or disable overly prescriptive rules
+  'unicorn/catch-error-name': 'warn', // 🔴🟠
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
+  'unicorn/explicit-length-check': 'warn', // 🔴🟠
   'unicorn/filename-case': 'off', // 🔴⚫
   'unicorn/import-style': ['warn', { extendDefaultStyles: false }],
   'unicorn/no-array-callback-reference': 'off', // 🔴⚫
+  'unicorn/no-array-for-each': 'off', // 🔴⚫
+  'unicorn/no-array-reduce': 'warn', // 🔴🟠
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
   'unicorn/no-lonely-if': 'warn', // 🔴🟠
   'unicorn/no-negated-condition': 'warn', // 🔴🟠
   'unicorn/no-nested-ternary': 'warn', // 🔴🟠
   'unicorn/no-null': 'off', // 🔴⚫ Prefer `undefined` over `null`
+  'unicorn/no-useless-undefined': 'warn', // 🔴🟠
   'unicorn/number-literal-case': ['warn', { hexadecimalValue: 'lowercase' }], // to align with Prettier
-  'unicorn/prevent-abbreviations': 'off', // 🔴⚫
+  'unicorn/numeric-separators-style': 'warn', // 🔴🟠
+  'unicorn/prefer-global-this': 'warn', // 🔴🟠
   'unicorn/prefer-dom-node-text-content': 'warn', // 🔴🟠 Prefer `textContent` over `innerText`
   'unicorn/prefer-includes': 'warn', // 🔴🟠 Prefer `includes` over `indexOf` when checking for existence
   'unicorn/prefer-node-protocol': 'warn', // 🔴🟠 Prefer `node:`-prefixed modules
+  'unicorn/prefer-number-properties': 'warn', // 🔴🟠
+  'unicorn/prefer-query-selector': 'warn', // 🔴🟠
+  'unicorn/prefer-string-raw': 'warn', // 🔴🟠
+  'unicorn/prefer-string-replace-all': 'warn', // 🔴🟠
+  'unicorn/prefer-string-slice': 'warn', // 🔴🟠
   'unicorn/prefer-string-starts-ends-with': 'warn', // 🔴🟠 Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
+  'unicorn/prefer-ternary': 'warn', // 🔴🟠
+  'unicorn/prefer-top-level-await': 'warn', // 🔴🟠
   'unicorn/prefer-type-error': 'warn', // 🔴🟠 Prefer a TypeError when an error is thrown while checking `typeof`
+  'unicorn/prevent-abbreviations': 'off', // 🔴⚫
   'unicorn/switch-case-braces': ['error', 'avoid'], // Avoid braces in switch cases unless scope is needed.
   'unicorn/text-encoding-identifier-case': 'warn', // 🔴🟠
 };
