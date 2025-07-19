@@ -22,6 +22,7 @@
     "lint:strict": "tsx packages/strict-lint/scripts/strict-lint.ts",
     "outdated": "pnpm outdated --compatible --recursive",
     "outdated:latest": "pnpm outdated --recursive",
+    "postinstall": "tsx scripts/report-overrides.ts",
     "rebuild": "pnpm --prefix packages/typescript run rebuild",
     "root:test": "vitest --config ./vitest.root.config.ts",
     "test": "pnpm run root:test",
@@ -53,6 +54,11 @@
     "vitest": "3.2.4"
   },
   "packageManager": "pnpm@10.13.1",
+  "pnpm": {
+    "overrides": {
+      "eslint-plugin-unicorn>@eslint/plugin-kit": "0.3.3"
+    }
+  },
   "engines": {
     "node": ">=18"
   }
