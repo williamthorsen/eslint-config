@@ -7,6 +7,8 @@ import skyPilot from '../plugins/eslint-plugin-sky-pilot.js';
 const rules: Linter.RulesRecord = {
   // Disable rules inappropriate for TypeScript
   'consistent-return': 'off',
+  'no-redeclare': 'off',
+  'no-unused-vars': 'off',
 
   // Strict: Modified
   '@typescript-eslint/no-confusing-void-expression': [

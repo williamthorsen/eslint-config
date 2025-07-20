@@ -37,6 +37,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-node-protocol': 'warn', // 🔴🟠 Prefer `node:`-prefixed modules
   'unicorn/prefer-number-properties': 'warn', // 🔴🟠
   'unicorn/prefer-query-selector': 'warn', // 🔴🟠
+  'unicorn/prefer-spread': 'off', // 🔴⚫ Prefer spread operator over Array.from, Array#concat, Array#{slice,toSpliced} and String#split
   'unicorn/prefer-string-raw': 'warn', // 🔴🟠
   'unicorn/prefer-string-replace-all': 'warn', // 🔴🟠
   'unicorn/prefer-string-slice': 'warn', // 🔴🟠

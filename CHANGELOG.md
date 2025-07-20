@@ -1,5 +1,16 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 5.10.0
+
+### Dependencies
+
+- Patched vulnerability in transitive dependency `@eslint/plugin-kit` by forcing use of v3.3.0
+- Upgraded all dependencies to latest version
+
+### Tooling
+
+- Added a `postinstall` script to display a warning when overrides are set
+
 ## 5.9.0
 
 ### Dependencies
