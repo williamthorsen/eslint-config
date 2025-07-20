@@ -1,5 +1,16 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.10.0
+
+### Features
+
+- Disabled `unicorn/prefer-spread` as overly prescriptive
+
+### Dependencies
+
+- Patched vulnerability in transitive dependency `@eslint/plugin-kit` by forcing use of v3.3.0
+- Upgraded all dependencies to latest version
+
 ## 5.9.0
 
 ### Features
