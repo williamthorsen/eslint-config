@@ -1,5 +1,15 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.11.0
+
+### Features
+
+- Enabled the `unicorn/no-array-callback-reference` after fix to its handling of optional chaining expressions
+
+### Dependencies
+
+- Upgraded all dependencies to latest version
+
 ## 5.10.0
 
 ### Features
