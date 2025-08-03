@@ -20,7 +20,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/explicit-length-check': 'warn', // 🔴🟠
   'unicorn/filename-case': 'off', // 🔴⚫
   'unicorn/import-style': ['warn', { extendDefaultStyles: false }],
-  'unicorn/no-array-callback-reference': 'off', // 🔴⚫
+  'unicorn/no-array-callback-reference': 'warn', // 🔴🟠
   'unicorn/no-array-for-each': 'off', // 🔴⚫
   'unicorn/no-array-reduce': 'warn', // 🔴🟠
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
