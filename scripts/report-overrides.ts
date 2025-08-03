@@ -5,12 +5,23 @@ import { isObject } from '@williamthorsen/toolbelt.objects';
 
 import packageJson from '../package.json' with { type: 'json' };
 
+type PackageJson = typeof packageJson & {
+  pnpm?: { overrides: Record<string, string> };
+};
+
 function isStringRecord(value: unknown): value is Record<string, string> {
   return isObject(value) && Object.values(value).every((v) => typeof v === 'string');
 }
 
-const overrides =
-  isObject(packageJson.pnpm) && isStringRecord(packageJson.pnpm.overrides) ? packageJson.pnpm.overrides : {};
+function hasPnpmWithOverrides(pkg: PackageJson): pkg is typeof packageJson & {
+  pnpm: {
+    overrides: Record<string, string>;
+  };
+} {
+  return isObject(pkg.pnpm) && isStringRecord(pkg.pnpm.overrides);
+}
+
+const overrides = hasPnpmWithOverrides(packageJson) ? packageJson.pnpm.overrides : {};
 
 if (Object.keys(overrides).length === 0) {
   process.exit(0);

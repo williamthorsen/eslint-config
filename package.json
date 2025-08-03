@@ -54,9 +54,6 @@
     "vitest": "3.2.4"
   },
   "packageManager": "pnpm@10.14.0",
-  "pnpm": {
-    "overrides": {}
-  },
   "engines": {
     "node": ">=18"
   }
