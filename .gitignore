@@ -38,6 +38,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Shared files (symlinks)
+.agents/shared
+.claude/settings.local.json
+
 # Testing
 coverage/
 .vitest-result.json
