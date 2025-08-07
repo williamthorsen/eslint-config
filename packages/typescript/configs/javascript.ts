@@ -10,7 +10,7 @@ const rules: Linter.RulesRecord = {
   'guard-for-in': 'error',
   'no-alert': 'error',
   'no-cond-assign': ['error', 'always'],
-  'no-console': ['error', { allow: ['error', 'info', 'warn'] }],
+  'no-console': ['error', { allow: ['debug', 'error', 'info', 'warn'] }],
   'no-constant-condition': ['warn', { checkLoops: false }],
   'no-param-reassign': 'off',
   'no-redeclare': ['error', { builtinGlobals: true }],

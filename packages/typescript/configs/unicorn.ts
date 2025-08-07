@@ -20,7 +20,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/explicit-length-check': 'warn', // 🔴🟠
   'unicorn/filename-case': 'off', // 🔴⚫
   'unicorn/import-style': ['warn', { extendDefaultStyles: false }],
-  'unicorn/no-array-callback-reference': 'warn', // 🔴🟠
+  'unicorn/no-array-callback-reference': 'off', // 🔴⚫ Overly prescriptive
   'unicorn/no-array-for-each': 'off', // 🔴⚫
   'unicorn/no-array-reduce': 'warn', // 🔴🟠
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
@@ -39,7 +39,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-query-selector': 'warn', // 🔴🟠
   'unicorn/prefer-spread': 'off', // 🔴⚫ Prefer spread operator over Array.from, Array#concat, Array#{slice,toSpliced} and String#split
   'unicorn/prefer-string-raw': 'warn', // 🔴🟠
-  'unicorn/prefer-string-replace-all': 'warn', // 🔴🟠
+  'unicorn/prefer-string-replace-all': 'off', // 🔴⚫ Not sure whether I can trust this rule's auto-fixes.
   'unicorn/prefer-string-slice': 'warn', // 🔴🟠
   'unicorn/prefer-string-starts-ends-with': 'warn', // 🔴🟠 Prefer `String#startsWith` & `String#endsWith` over more complex alternatives
   'unicorn/prefer-ternary': 'warn', // 🔴🟠
