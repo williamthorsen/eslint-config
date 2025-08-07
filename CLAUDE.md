@@ -2,12 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Important:** Read and follow the instructions in `.agents/shared/startup.md`.
-Be aware that `.agents/shared` is a symlink.
-
-When done, acknowledge that you have read them by reporting: "I have read the shared rules"
-(without summarizing what you read).
-
 ## Project Overview
 
 This is a monorepo for ESLint configurations published by William Thorsen. It contains three main packages:
