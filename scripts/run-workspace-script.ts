@@ -95,14 +95,14 @@ function getScripts(useIntTests = false): Record<string, string | []> {
     compile: 'tsx ../../config/build.ts',
     fmt: 'prettier --list-different --write .',
     'fmt:check': 'prettier --check .',
-    'generate-typings': 'tsc --project tsconfig.generate-typings.json',
+    'generate-typings': 'tsgo --project tsconfig.generate-typings.json',
     lint: 'eslint --fix .',
     'lint:check': 'eslint .',
     'lint:strict': 'strict-lint',
     test: 'vitest',
     'test:coverage': 'vitest --coverage',
     'test:watch': 'vitest --watch',
-    typecheck: 'tsc --noEmit',
+    typecheck: 'tsgo --noEmit',
     'view-coverage': 'open coverage/index.html',
   };
 

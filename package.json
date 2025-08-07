@@ -27,7 +27,7 @@
     "root:test": "vitest --config ./vitest.root.config.ts",
     "test": "pnpm run root:test",
     "test:coverage": "pnpm --recursive run ws test:coverage",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsgo --noEmit",
     "update": "pnpm update --recursive",
     "update:latest": "pnpm update --latest --recursive"
   },
