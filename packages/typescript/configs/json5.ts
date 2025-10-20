@@ -18,7 +18,7 @@ const rules: Linter.RulesRecord = {
 
 // Use this config after the `json` config, because it overwrites some rules
 
-const config = {
+const config: Linter.Config = {
   files: ['**/*.json5'],
   languageOptions: {
     parser: jsonParser,

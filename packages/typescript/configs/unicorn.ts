@@ -1,6 +1,6 @@
 import type { Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import unicornPlugin from 'eslint-plugin-unicorn';
-import tseslint from 'typescript-eslint';
 
 // see https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/readme.md
 const rules: Linter.RulesRecord = {
@@ -50,7 +50,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/text-encoding-identifier-case': 'warn', // 🔴🟠
 };
 
-const config = tseslint.config({
+const config = defineConfig({
   extends: [unicornPlugin.configs.recommended],
   rules,
 });

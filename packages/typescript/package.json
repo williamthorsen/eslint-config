@@ -24,7 +24,7 @@
     "dist/esm/utils/*"
   ],
   "scripts": {
-    "prepare": "pnpm run ws build",
+    "--ignore--preprepare": "pnpm run ws build",
     "publish:github": "GH_PACKAGES_TOKEN=$GITHUB_TOKEN pnpm publish",
     "publish:jsr": "npx jsr publish",
     "publish:jsr:dry-run": "npx jsr publish --dry-run",

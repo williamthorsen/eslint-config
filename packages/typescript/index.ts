@@ -1,3 +1,4 @@
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -12,7 +13,7 @@ const typeScriptFiles = typeScriptExtensions.map((ext) => `**/*.${ext}`);
 const codeFiles = codeExtensions.map((ext) => `**/*.${ext}`);
 
 const config = [
-  ...tseslint.config({
+  ...defineConfig({
     files: typeScriptFiles,
     extends: [
       configs.javaScript, //

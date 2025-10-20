@@ -1,4 +1,5 @@
 import type { Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import promisePlugin from 'eslint-plugin-promise';
 import tseslint from 'typescript-eslint';
 
@@ -61,7 +62,7 @@ const rules: Linter.RulesRecord = {
   '@typescript-eslint/no-inferrable-types': 'warn', // ⚫🟠
 };
 
-const config = tseslint.config({
+const config = defineConfig({
   extends: [
     ...tseslint.configs.strictTypeChecked, //
     promisePlugin.configs['flat/recommended'],
