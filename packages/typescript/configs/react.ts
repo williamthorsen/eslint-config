@@ -1,7 +1,8 @@
 import { defineConfig } from 'eslint/config';
 import { type ConfigArray } from 'typescript-eslint';
 
-import skyPilotReact from '../plugins/eslint-plugin-sky-pilot-react.js';
+import skyPilotReactPlugin from '../plugins/eslint-plugin-sky-pilot-react.js';
+import { ensureExtendsElement } from '../utils/ensureExtendsElement.js';
 
 async function createConfig(): Promise<ConfigArray> {
   const { default: reactPlugin } = await import('eslint-plugin-react');
@@ -11,7 +12,7 @@ async function createConfig(): Promise<ConfigArray> {
     extends: [
       reactPlugin.configs.flat.recommended, //
       reactHooksPlugin.configs['recommended-latest'],
-      skyPilotReact.configs.recommended,
+      ensureExtendsElement(skyPilotReactPlugin.configs.recommended),
     ],
     rules: {
       'react/prop-types': 'off',

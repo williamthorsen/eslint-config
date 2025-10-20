@@ -44,14 +44,14 @@ function isResultUsed(node: TSESTree.Node): boolean {
 
 // endregion | Helper functions
 
-const ruleDefinition: TSESLint.LooseRuleDefinition = {
+const ruleDefinition = {
   meta: {
     type: 'problem',
     schema: [],
     messages: {
       unusedMap: 'Unused result of Array#map. Consider using Array#forEach instead.',
     },
-  } as const,
+  },
   create,
 };
 

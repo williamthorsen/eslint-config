@@ -2,9 +2,7 @@
 
 import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
-const create: TSESLint.LooseRuleCreateFunction = (
-  context: TSESLint.RuleContext<'memoizedFunctionsReturnedByHook', unknown[]>,
-) => {
+const create: TSESLint.RuleCreateFunction<'memoizedFunctionsReturnedByHook'> = (context) => {
   return {
     FunctionDeclaration(node: TSESTree.FunctionDeclaration) {
       if (!isCustomHook(node)) return;
@@ -229,7 +227,7 @@ function getReturnedObjectProperties(
 }
 // endregion | Helper Functions
 
-const ruleDefinition: TSESLint.LooseRuleDefinition = {
+const ruleDefinition = {
   create,
   meta: {
     type: 'problem',
@@ -241,6 +239,6 @@ const ruleDefinition: TSESLint.LooseRuleDefinition = {
       memoizedFunctionsReturnedByHook: 'Functions returned by hooks must be memoized with useCallback or useMemo.',
     },
   },
-};
+} as const;
 
 export default ruleDefinition;

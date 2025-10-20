@@ -1,4 +1,5 @@
 import type { Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import rawYamlPlugin from 'eslint-plugin-yml';
 import yamlParser from 'yaml-eslint-parser';
 
@@ -12,7 +13,7 @@ const rules: Linter.RulesRecord = {
   'spaced-comment': 'off',
 };
 
-const config: Linter.Config = {
+const config = defineConfig({
   files: ['**/*.{yaml,yml}'],
   languageOptions: {
     parser: yamlParser,
@@ -24,6 +25,6 @@ const config: Linter.Config = {
     ...yamlPlugin.configs.recommended?.rules,
     ...rules,
   },
-};
+});
 
 export default config;

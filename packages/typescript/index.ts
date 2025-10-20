@@ -1,6 +1,5 @@
-import { defineConfig } from 'eslint/config';
+import { type Config, defineConfig } from 'eslint/config';
 import globals from 'globals';
-import tseslint from 'typescript-eslint';
 
 import configs from './configs/index.js';
 
@@ -12,7 +11,7 @@ const javaScriptFiles = javaScriptExtensions.map((ext) => `**/*.${ext}`);
 const typeScriptFiles = typeScriptExtensions.map((ext) => `**/*.${ext}`);
 const codeFiles = codeExtensions.map((ext) => `**/*.${ext}`);
 
-const config = [
+const config: Config[] = [
   ...defineConfig({
     files: typeScriptFiles,
     extends: [
@@ -26,13 +25,13 @@ const config = [
       'import/no-duplicates': 'off',
     },
   },
-  ...tseslint.config({
+  ...defineConfig({
     files: javaScriptFiles,
     extends: [
       configs.javaScript, //
     ],
   }),
-  ...tseslint.config({
+  ...defineConfig({
     files: codeFiles,
     extends: [
       configs.eslintComments, //
@@ -64,10 +63,10 @@ const config = [
       'unicorn/no-useless-undefined': 'off',
     },
   },
-  configs.json,
-  configs.json5, // Apply this after the `json` config, because it replaces some general JSON rules with JSON5 rules!
-  configs.packageJson,
-  configs.yaml,
+  ...configs.json,
+  ...configs.json5, // Apply this after the `json` config, because it replaces some general JSON rules with JSON5 rules!
+  ...configs.packageJson,
+  ...configs.yaml,
 ];
 
 const patterns = {

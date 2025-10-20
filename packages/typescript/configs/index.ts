@@ -1,5 +1,4 @@
-import type { Linter } from 'eslint';
-import type { ConfigArray } from 'typescript-eslint';
+import type { Config } from 'eslint/config';
 
 import eslintComments from './eslint-comments.js';
 import importConfig from './import.js';
@@ -30,7 +29,7 @@ export const configs = {
   typeScript,
   unicorn,
   yaml,
-} satisfies Record<string, Linter.Config | ConfigArray>;
+} satisfies Record<string, Config[]>;
 
 export const createConfig = {
   jsxA11y: createJsxA11y,
@@ -38,6 +37,6 @@ export const createConfig = {
   react: createReact,
   reactTestingLibrary: createTestingLibrary.react,
   vitest: createVitest,
-} satisfies Record<string, () => Promise<ConfigArray | Linter.Config>>;
+};
 
 export default configs;
