@@ -1,7 +1,7 @@
 import { type Config, defineConfig } from 'eslint/config';
 import globals from 'globals';
 
-import configs from './configs/index.js';
+import configs from './configs/index.ts';
 
 const javaScriptExtensions = ['{js,cjs,mjs,jsx}'];
 const typeScriptExtensions = ['{ts,cts,mts,tsx}'];
@@ -78,6 +78,6 @@ const patterns = {
   typeScriptFiles,
 };
 
-export { default as configs, createConfig } from './configs/index.js';
+export { default as configs, createConfig } from './configs/index.ts';
 export { patterns };
 export default config;

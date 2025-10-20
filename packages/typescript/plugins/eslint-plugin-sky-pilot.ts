@@ -1,8 +1,8 @@
 import type { TSESLint } from '@typescript-eslint/utils';
 
-import noUndefinedWithNumberRule from './rules/no-undefined-with-number.js';
-import noUnusedMapRule from './rules/no-unused-map.js';
-import preferFunctionDeclarationRule from './rules/prefer-function-declaration.js';
+import noUndefinedWithNumberRule from './rules/no-undefined-with-number.ts';
+import noUnusedMapRule from './rules/no-unused-map.ts';
+import preferFunctionDeclarationRule from './rules/prefer-function-declaration.ts';
 
 // Define the plugin
 const skyPilotPlugin: TSESLint.FlatConfig.Plugin = {

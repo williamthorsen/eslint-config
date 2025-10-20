@@ -1,1 +1,1 @@
-export { strictLint } from './strictLint.js';
+export { strictLint } from './strictLint.ts';

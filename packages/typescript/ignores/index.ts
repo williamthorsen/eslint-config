@@ -1,1 +1,1 @@
-export { commonIgnores } from './common.js';
+export { commonIgnores } from './common.ts';
