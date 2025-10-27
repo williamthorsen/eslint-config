@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 5.3.5
+
+### Fixes
+
+Compiled `src/` files are missing from distribution.
+
 ## 5.3.4
 
 ### Fixes
