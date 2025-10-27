@@ -29,6 +29,8 @@
     "publish:jsr": "npx jsr publish",
     "publish:jsr:dry-run": "npx jsr publish --dry-run",
     "rebuild": "pnpm run ws build",
+    "test": "echo 'No tests defined for typescript package.'",
+    "test:coverage": "echo 'No tests defined for typescript package.'",
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {

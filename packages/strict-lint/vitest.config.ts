@@ -2,7 +2,7 @@ import assert from 'node:assert';
 
 import { defineConfig, mergeConfig } from 'vitest/config';
 
-import { baseConfig } from '../../vitest.config.js';
+import { baseConfig } from '../../config/vitest.config.ts';
 
 const config = defineConfig({
   // prettier-ignore

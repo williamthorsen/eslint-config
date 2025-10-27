@@ -25,7 +25,7 @@
     "postinstall": "tsx scripts/sync-pnpm-version .ts && tsx scripts/report-overrides.ts",
     "rebuild": "pnpm --prefix packages/typescript run rebuild",
     "root:test": "vitest --config ./vitest.root.config.ts",
-    "test": "pnpm run root:test",
+    "test": "pnpm run root:test && pnpm --recursive run ws test",
     "test:coverage": "pnpm --recursive run ws test:coverage",
     "typecheck": "tsgo --noEmit",
     "update": "pnpm update --recursive",
@@ -52,6 +52,7 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.46.1",
     "vite": "7.1.10",
+    "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4",
     "zod": "4.1.12"
   },

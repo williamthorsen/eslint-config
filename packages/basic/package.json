@@ -25,7 +25,9 @@
     "check": "pnpm run lint:strict",
     "lint": "pnpm eslint .",
     "lint:fix": "pnpm eslint --fix .",
-    "lint:strict": "../strict-lint/scripts/strict-lint.ts"
+    "lint:strict": "../strict-lint/scripts/strict-lint.ts",
+    "test": "echo 'No tests defined for basic package.'",
+    "test:coverage": "echo 'No tests defined for basic package.'"
   },
   "dependencies": {
     "eslint-plugin-eslint-comments": "3.2.0",

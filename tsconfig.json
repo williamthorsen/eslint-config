@@ -47,7 +47,7 @@
     // Report an error when a variable is declared but never used.
     "noUnusedLocals": true,
     "paths": {
-      "~api/*": ["./packages/api/src/*"],
+      "~/*": ["./*"],
     },
     "removeComments": true,
 
