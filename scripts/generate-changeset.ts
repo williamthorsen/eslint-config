@@ -3,6 +3,7 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { categorizeChanges, type Commit, generateChangelogContent } from './helpers/changeset-generator.js';
+import { generateReleaseNotes } from './helpers/release-notes-generator.js';
 
 /**
  * Generate automated changeset from commit messages since last release
@@ -88,6 +89,18 @@ function main(): void {
   console.log(content);
   console.log('='.repeat(50));
   console.log(`\nChangeset saved to: ${changesetPath}`);
+
+  // Generate release notes for preview
+  const releaseNotes = generateReleaseNotes(changes, 'X.X.X');
+  if (releaseNotes.length > 0) {
+    console.log('\nRelease notes preview:');
+    console.log('='.repeat(50));
+    releaseNotes.forEach((notes) => {
+      console.log(`\n## ${notes.packageName}\n`);
+      console.log(notes.content);
+    });
+    console.log('='.repeat(50));
+  }
   console.log('\nNext steps:');
   console.log('1. Review the generated changeset');
   console.log('2. Edit if necessary');

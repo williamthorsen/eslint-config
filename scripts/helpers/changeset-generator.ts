@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process';
 
+import { workspaceToAliasLookup } from '../changeset.config.ts';
 import { isKeyOf } from './isKeyOf.ts';
 
 /**
@@ -81,6 +82,15 @@ export function parseCommitMessage(message: string): ParsedCommit | null {
   };
 }
 
+function getWorkspaceFromFilePath(filePath: string): string {
+  const packageMatch = filePath.match(/^packages\/([^/]+)\//);
+  if (packageMatch?.[1]) {
+    const workspace = packageMatch[1];
+    return workspaceToAliasLookup[workspace] || workspace;
+  }
+  return 'root';
+}
+
 export function getAffectedWorkspaces(commit: Commit, parsedCommit: ParsedCommit): string[] {
   if (parsedCommit.workspace !== '*') {
     return [parsedCommit.workspace];
@@ -91,10 +101,7 @@ export function getAffectedWorkspaces(commit: Commit, parsedCommit: ParsedCommit
   const workspaces = new Set<string>();
 
   changedFiles.split('\n').forEach((file) => {
-    if (file.startsWith('packages/typescript/')) workspaces.add('ts');
-    else if (file.startsWith('packages/basic/')) workspaces.add('basic');
-    else if (file.startsWith('packages/strict-lint/')) workspaces.add('strict-lint');
-    else workspaces.add('root');
+    workspaces.add(getWorkspaceFromFilePath(file));
   });
 
   return Array.from(workspaces);

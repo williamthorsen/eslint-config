@@ -68,7 +68,7 @@ Generated changelogs organize changes into these sections:
 
 ### Automated workflow
 
-1. **Generate changeset**: `pnpm changeset:auto` - Analyzes commits since last release and generates changelog entries
+1. **Generate changeset**: `pnpm run changeset:auto` - Analyzes commits since last release and generates changelog entries
 2. **Review changes**: Examine generated changelog and release notes
 3. **Commit changes**: Commit the changeset and updated documentation
 4. **Version packages**: `pnpm changeset version` - Apply version bumps and finalize changelogs
