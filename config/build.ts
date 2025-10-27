@@ -13,7 +13,7 @@ const platform: Platform = 'node';
 const target = 'es2022';
 
 const aliases = {
-  // '~src/': 'src/',
+  '~/src/': 'src/',
 };
 const dependencies = ['package.json', 'build.config.ts'];
 const outputConfig = { format, platform, target: [target] };
