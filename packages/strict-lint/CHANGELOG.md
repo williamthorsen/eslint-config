@@ -1,10 +1,18 @@
 # @williamthorsen/strict-lint
 
+## 5.3.6
+
+### Patch Changes
+
+Fixes the issue where all files other than `index.js` were missing from the distribution because they did not match any pattern in the `files` array of `package.json`.
+
 ## 5.3.5
 
 ### Fixes
 
 Compiled `src/` files are missing from distribution.
+
+Fixes the issue where `src/` source files were not being compiled to the `dist/esm/` directory because they did not match a pattern all files other than `index.js` were missing from the distribution because they did not match any pattern in the build config.
 
 ## 5.3.4
 

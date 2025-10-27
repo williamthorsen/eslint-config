@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "5.3.5",
+  "version": "5.3.6",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "license": "UNLICENSED",
@@ -13,7 +13,8 @@
     "strict-lint": "./dist/esm/bin/strict-lint.js"
   },
   "files": [
-    "dist/esm/index.js"
+    "dist/esm/**/*.js",
+    "dist/esm/**/*.ts"
   ],
   "scripts": {
     "build": "pnpm run ws clean && pnpm run ws compile && pnpm run ws generate-typings && mv dist/esm/scripts dist/esm/bin && tsx scripts/replace-shebang.ts && rimraf dist/esm/bin/*.d.ts",
