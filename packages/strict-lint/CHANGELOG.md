@@ -1,5 +1,11 @@
 # @williamthorsen/strict-lint
 
+## 5.3.4
+
+### Fixes
+
+The `strict-lint` command is not found after build-step modernization.
+
 ## 5.3.3
 
 ### Refactoring

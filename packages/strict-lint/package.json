@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "5.3.3",
+  "version": "5.3.4",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "license": "UNLICENSED",
@@ -10,13 +10,13 @@
     ".": "./dist/esm/index.js"
   },
   "bin": {
-    "strict-lint": "./dist/bin/strict-lint.js"
+    "strict-lint": "./dist/esm/bin/strict-lint.js"
   },
   "files": [
     "dist/esm/index.js"
   ],
   "scripts": {
-    "build": "pnpm run ws clean && pnpm run ws compile && pnpm run ws generate-typings && mv dist/esm/scripts dist/bin && tsx scripts/replace-shebang.ts && rimraf dist/bin/*.d.ts",
+    "build": "pnpm run ws clean && pnpm run ws compile && pnpm run ws generate-typings && mv dist/esm/scripts dist/esm/bin && tsx scripts/replace-shebang.ts && rimraf dist/esm/bin/*.d.ts",
     "clean": "pnpm rimraf dist/*",
     "lint:strict": "tsx scripts/strict-lint.ts",
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
