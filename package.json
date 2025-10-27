@@ -22,7 +22,7 @@
     "lint:strict": "tsx packages/strict-lint/scripts/strict-lint.ts",
     "outdated": "pnpm outdated --compatible --recursive",
     "outdated:latest": "pnpm outdated --recursive",
-    "postinstall": "tsx scripts/report-overrides.ts",
+    "postinstall": "tsx scripts/sync-pnpm-version .ts && tsx scripts/report-overrides.ts",
     "rebuild": "pnpm --prefix packages/typescript run rebuild",
     "root:test": "vitest --config ./vitest.root.config.ts",
     "test": "pnpm run root:test",
