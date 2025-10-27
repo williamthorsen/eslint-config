@@ -36,8 +36,8 @@
     "@eslint/js": "9.38.0",
     "@types/eslint": "9.6.1",
     "@types/js-yaml": "4.0.9",
-    "@types/node": "22.15.34",
-    "@typescript/native-preview": "7.0.0-dev.20251019.1",
+    "@types/node": "22.18.12",
+    "@typescript/native-preview": "7.0.0-dev.20251026.1",
     "@vitest/coverage-v8": "3.2.4",
     "@williamthorsen/toolbelt.objects": "3.2.1",
     "esbuild": "0.25.11",
@@ -50,13 +50,13 @@
     "rimraf": "6.0.1",
     "tsx": "4.20.6",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.46.1",
-    "vite": "7.1.10",
+    "typescript-eslint": "8.46.2",
+    "vite": "7.1.12",
     "vite-tsconfig-paths": "5.1.4",
     "vitest": "3.2.4",
     "zod": "4.1.12"
   },
-  "packageManager": "pnpm@10.18.3",
+  "packageManager": "pnpm@10.19.0",
   "engines": {
     "node": ">=18"
   }
