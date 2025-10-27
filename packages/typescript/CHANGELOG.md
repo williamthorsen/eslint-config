@@ -1,5 +1,27 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.12.0
+
+### Features
+
+Refine linting rules.
+
+### Refactoring
+
+Use explicit .ts extension.
+
+Adapt syntax and type annotations to satisfy stricter typing.
+
+Modernize plugin syntax.
+
+### Dependencies
+
+Upgrade all deps to latest minor version.
+
+Add `@eslint/config-helpers` to dev deps.
+
+Downgrade ESLint plugins with bad typings.
+
 ## 5.11.0
 
 ### Features

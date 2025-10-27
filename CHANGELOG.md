@@ -1,5 +1,17 @@
 # @williamthorsen/eslint-config-monorepo
 
+## 5.12.0
+
+### Dependencies
+
+Upgraded all dependencies to latest version.
+
+Added to dev dependencies:
+
+- `@typescript/native-preview`
+- `vite-tsconfig-paths`
+- `zod`
+
 ## 5.10.0
 
 ### Dependencies
