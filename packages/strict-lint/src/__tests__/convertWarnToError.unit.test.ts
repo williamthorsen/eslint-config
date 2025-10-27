@@ -1,7 +1,7 @@
 import { Linter } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
-import { convertWarnToError } from '../convertWarnToError.js';
+import { convertWarnToError } from '../convertWarnToError.ts';
 import Config = Linter.Config;
 
 describe('convertWarnToError()', () => {

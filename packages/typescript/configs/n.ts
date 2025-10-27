@@ -1,6 +1,6 @@
 import type { Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import nPlugin from 'eslint-plugin-n';
-import tseslint from 'typescript-eslint';
 
 const modifiedRules: Linter.RulesRecord = {
   'n/no-callback-literal': 'off', // Enforces Node.js-style callback pattern
@@ -11,7 +11,7 @@ const modifiedRules: Linter.RulesRecord = {
   'n/no-unsupported-features/node-builtins': 'off',
 };
 
-const config = tseslint.config({
+const config = defineConfig({
   extends: [nPlugin.configs['flat/recommended']],
   rules: modifiedRules,
 });

@@ -1,4 +1,5 @@
 import type { Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import importPlugin from 'eslint-plugin-import';
 
 const rules: Linter.RulesRecord = {
@@ -14,11 +15,11 @@ const rules: Linter.RulesRecord = {
   ],
 };
 
-const config: Linter.Config = {
+const config = defineConfig({
   plugins: {
     import: importPlugin,
   },
   rules,
-};
+});
 
 export default config;

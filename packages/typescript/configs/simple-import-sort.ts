@@ -1,4 +1,5 @@
 import type { Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 
 const rules: Linter.RulesRecord = {
@@ -28,9 +29,11 @@ const rules: Linter.RulesRecord = {
   ],
 };
 
-export default {
+const config = defineConfig({
   plugins: {
     'simple-import-sort': simpleImportSortPlugin,
   },
   rules,
-};
+});
+
+export default config;

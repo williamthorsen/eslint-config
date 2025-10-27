@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
-const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<'preferDeclaration', unknown[]>) => {
+const create: TSESLint.RuleCreateFunction<'preferDeclaration'> = (context) => {
   return {
     VariableDeclarator(node: TSESTree.VariableDeclarator) {
       if (
@@ -62,7 +62,7 @@ function containsThisExpression(root: TSESTree.Node): boolean {
   return false;
 }
 
-const ruleDefinition: TSESLint.LooseRuleDefinition = {
+const ruleDefinition = {
   create,
   meta: {
     type: 'problem',

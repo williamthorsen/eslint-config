@@ -1,8 +1,10 @@
 import type { Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import promisePlugin from 'eslint-plugin-promise';
 import tseslint from 'typescript-eslint';
 
-import skyPilot from '../plugins/eslint-plugin-sky-pilot.js';
+import skyPilotPlugin from '../plugins/eslint-plugin-sky-pilot.ts';
+import { ensureExtendsElement } from '../utils/ensureExtendsElement.ts';
 
 const rules: Linter.RulesRecord = {
   // Disable rules inappropriate for TypeScript
@@ -18,6 +20,11 @@ const rules: Linter.RulesRecord = {
       ignoreVoidOperator: true,
       ignoreVoidReturningFunctions: true,
     },
+  ],
+  '@typescript-eslint/no-invalid-void-type': [
+    'error',
+    // Allow `fn(this: void)`, the canonical way to express that a function doesn't use `this`.
+    { allowAsThisParameter: true },
   ],
   // '@typescript-eslint/no-namespace': 'off',
   '@typescript-eslint/no-misused-promises': ['warn', { checksVoidReturn: false }],
@@ -56,11 +63,11 @@ const rules: Linter.RulesRecord = {
   '@typescript-eslint/no-inferrable-types': 'warn', // ⚫🟠
 };
 
-const config = tseslint.config({
+const config = defineConfig({
   extends: [
     ...tseslint.configs.strictTypeChecked, //
     promisePlugin.configs['flat/recommended'],
-    skyPilot.configs.recommended,
+    ensureExtendsElement(skyPilotPlugin.configs.recommended),
   ],
   rules,
 });

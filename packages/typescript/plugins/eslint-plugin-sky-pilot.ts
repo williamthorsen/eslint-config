@@ -1,9 +1,14 @@
-import noUndefinedWithNumberRule from './rules/no-undefined-with-number.js';
-import noUnusedMapRule from './rules/no-unused-map.js';
-import preferFunctionDeclarationRule from './rules/prefer-function-declaration.js';
+import type { TSESLint } from '@typescript-eslint/utils';
+
+import noUndefinedWithNumberRule from './rules/no-undefined-with-number.ts';
+import noUnusedMapRule from './rules/no-unused-map.ts';
+import preferFunctionDeclarationRule from './rules/prefer-function-declaration.ts';
 
 // Define the plugin
-const skyPilotPlugin = {
+const skyPilotPlugin: TSESLint.FlatConfig.Plugin = {
+  meta: {
+    name: 'eslint-plugin-sky-pilot',
+  },
   rules: {
     'no-undefined-with-number': noUndefinedWithNumberRule,
     'no-unused-map': noUnusedMapRule,
@@ -33,7 +38,7 @@ const configs = {
       'sky-pilot/prefer-function-declaration': 'error',
     },
   },
-} as const;
+} satisfies Record<string, TSESLint.FlatConfig.Config>;
 
 // Export the plugin
 export default { configs };

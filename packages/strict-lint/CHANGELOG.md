@@ -1,5 +1,15 @@
 # @williamthorsen/strict-lint
 
+## 5.3.3
+
+### Refactoring
+
+Replace all `.js` extensions with actual `.ts` extensions.
+
+### Dependencies
+
+Upgrade all dependencies to latest minor version.
+
 ## 5.3.2
 
 ### Dependencies

@@ -1,34 +1,28 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "5.3.2",
+  "version": "5.3.3",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "license": "UNLICENSED",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
+    ".": "./dist/esm/index.js"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "bin": {
     "strict-lint": "./dist/bin/strict-lint.js"
   },
   "files": [
-    "dist"
+    "dist/esm/index.js"
   ],
   "scripts": {
-    "build": "pnpm run clean && pnpm tsc --build tsconfig.build.json && mv dist/scripts dist/bin && tsx scripts/replace-shebang.ts && rimraf dist/bin/*.d.ts",
+    "build": "pnpm run ws clean && pnpm run ws compile && pnpm run ws generate-typings && mv dist/esm/scripts dist/bin && tsx scripts/replace-shebang.ts && rimraf dist/bin/*.d.ts",
     "clean": "pnpm rimraf dist/*",
     "lint:strict": "tsx scripts/strict-lint.ts",
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
-    "tsx": "4.20.3"
+    "tsx": "4.20.6"
   },
   "peerDependencies": {
     "eslint": ">=9"

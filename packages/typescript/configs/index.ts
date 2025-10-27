@@ -1,22 +1,21 @@
-import type { Linter } from 'eslint';
-import type { ConfigArray } from 'typescript-eslint';
+import type { Config } from 'eslint/config';
 
-import eslintComments from './eslint-comments.js';
-import importConfig from './import.js';
-import javaScript from './javascript.js';
-import json from './json.js';
-import json5 from './json5.js';
-import createJsxA11y from './jsx-a11y.js';
-import n from './n.js';
-import createNext from './next.js';
-import packageJson from './package-json.js';
-import createReact from './react.js';
-import simpleImportSort from './simple-import-sort.js';
-import createTestingLibrary from './testing-library.js';
-import typeScript from './typescript.js';
-import unicorn from './unicorn.js';
-import createVitest from './vitest.js';
-import yaml from './yaml.js';
+import eslintComments from './eslint-comments.ts';
+import importConfig from './import.ts';
+import javaScript from './javascript.ts';
+import json from './json.ts';
+import json5 from './json5.ts';
+import createJsxA11y from './jsx-a11y.ts';
+import n from './n.ts';
+import createNext from './next.ts';
+import packageJson from './package-json.ts';
+import createReact from './react.ts';
+import simpleImportSort from './simple-import-sort.ts';
+import createTestingLibrary from './testing-library.ts';
+import typeScript from './typescript.ts';
+import unicorn from './unicorn.ts';
+import createVitest from './vitest.ts';
+import yaml from './yaml.ts';
 
 export const configs = {
   eslintComments,
@@ -30,7 +29,7 @@ export const configs = {
   typeScript,
   unicorn,
   yaml,
-} satisfies Record<string, Linter.Config | ConfigArray>;
+} satisfies Record<string, Config[]>;
 
 export const createConfig = {
   jsxA11y: createJsxA11y,
@@ -38,6 +37,6 @@ export const createConfig = {
   react: createReact,
   reactTestingLibrary: createTestingLibrary.react,
   vitest: createVitest,
-} satisfies Record<string, () => Promise<ConfigArray | Linter.Config>>;
+};
 
 export default configs;

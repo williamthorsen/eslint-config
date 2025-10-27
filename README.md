@@ -2,6 +2,10 @@
 
 ESLint configurations for my projects.
 
+## Documentation
+
+- [Versioning and changelog system](docs/versioning-and-changelog.md) - Commit message format, changelog generation, and release process
+
 ## Usage
 
 ### JavaScript projects

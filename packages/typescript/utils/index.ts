@@ -1,1 +1,1 @@
-export { relativePathToDir } from './relativePathToDir.js';
+export { relativePathToDir } from './relativePathToDir.ts';

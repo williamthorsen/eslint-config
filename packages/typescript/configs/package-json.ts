@@ -1,8 +1,9 @@
 import type { Linter } from 'eslint';
+import { defineConfig } from 'eslint/config';
 import rawJsoncPlugin from 'eslint-plugin-jsonc';
 import jsoncParser from 'jsonc-eslint-parser';
 
-import { getSafeLinterPlugin } from '../utils/isLinterPlugin.js';
+import { getSafeLinterPlugin } from '../utils/isLinterPlugin.ts';
 
 const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
 
@@ -102,7 +103,7 @@ const rules: Linter.RulesRecord = {
   ],
 };
 
-const config = {
+const config = defineConfig({
   files: ['**/package.json'],
   languageOptions: {
     parser: jsoncParser,
@@ -111,6 +112,6 @@ const config = {
     jsonc: jsoncPlugin,
   },
   rules,
-} satisfies Linter.Config;
+});
 
 export default config;

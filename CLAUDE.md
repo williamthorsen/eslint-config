@@ -2,12 +2,6 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Important:** Read and follow the instructions in `.agents/shared/startup.md`.
-Be aware that `.agents/shared` is a symlink.
-
-When done, acknowledge that you have read them by reporting: "I have read the shared rules"
-(without summarizing what you read).
-
 ## Project Overview
 
 This is a monorepo for ESLint configurations published by William Thorsen. It contains three main packages:
@@ -46,27 +40,27 @@ This is a monorepo for ESLint configurations published by William Thorsen. It co
 ### Building
 
 ```bash
-pnpm build                    # Build all packages
+pnpm run build               # Build all packages
 pnpm --prefix packages/typescript run rebuild  # Rebuild TypeScript package specifically
 ```
 
 ### Linting & Type Checking
 
 ```bash
-pnpm check                    # Run typecheck, format check, lint check, and tests
-pnpm check:strict             # Strict checks including coverage, audit, and strict lint
-pnpm typecheck                # TypeScript type checking
-pnpm lint                     # ESLint with auto-fix
-pnpm lint:check               # ESLint check without fixing
-pnpm lint:strict              # Run strict-lint (warnings as errors)
+pnpm run check               # Run typecheck, format check, lint check, and tests
+pnpm run check:strict        # Strict checks including coverage, audit, and strict lint
+pnpm run typecheck           # TypeScript type checking
+pnpm run lint                # ESLint with auto-fix
+pnpm run lint:check          # ESLint check without fixing
+pnpm run lint:strict         # Run strict-lint (warnings as errors)
 ```
 
 ### Testing
 
 ```bash
-pnpm test                     # Run root-level tests
-pnpm test:coverage            # Run tests with coverage across all workspaces
-pnpm root:test                # Run tests using vitest.root.config.ts
+pnpm run test                # Run root-level tests
+pnpm run test:coverage       # Run tests with coverage across all workspaces
+pnpm run root:test           # Run tests using vitest.root.config.ts
 ```
 
 ### Package Management

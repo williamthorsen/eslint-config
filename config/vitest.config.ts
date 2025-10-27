@@ -1,17 +1,8 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const thisFilePath = fileURLToPath(import.meta.url);
-const thisDirPath = path.dirname(thisFilePath);
-
+import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 export const baseConfig = defineConfig({
-  resolve: {
-    alias: {
-      '@monorepo/api': path.resolve(thisDirPath, 'packages/api/src'),
-    },
-  },
+  plugins: [tsconfigPaths()],
   test: {
     coverage: {
       all: true, // include untested files in the report

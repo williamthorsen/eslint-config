@@ -1,7 +1,9 @@
-import memoizedFunctionsReturnedByHookRule from './rules/memoized-functions-returned-by-hook.js';
+import type { TSESLint } from '@typescript-eslint/utils';
+
+import memoizedFunctionsReturnedByHookRule from './rules/memoized-functions-returned-by-hook.ts';
 
 // Define the plugin
-const skyPilotReactPlugin = {
+const skyPilotReactPlugin: TSESLint.FlatConfig.Plugin = {
   rules: {
     'memoized-functions-returned-by-hook': memoizedFunctionsReturnedByHookRule,
   },

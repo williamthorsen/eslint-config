@@ -1,5 +1,5 @@
 /**
- * Build configuration for @eslint-config/typescript
+ * Build configuration for the `typescript` package.
  *
  * This file specifies which TypeScript files should be compiled.
  * Patterns match the include section in tsconfig.json.

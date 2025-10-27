@@ -1,7 +1,7 @@
 import { ESLint, type Linter } from 'eslint';
 
-import { findNearestFile } from './common/findNearestFile.js';
-import { convertWarnToError } from './convertWarnToError.js';
+import { findNearestFile } from './common/findNearestFile.ts';
+import { convertWarnToError } from './convertWarnToError.ts';
 
 export async function strictLint(baseConfig?: Linter.Config[]): Promise<string> {
   const args = process.argv.slice(2);

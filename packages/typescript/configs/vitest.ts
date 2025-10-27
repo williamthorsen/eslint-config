@@ -1,5 +1,5 @@
 import type { Linter } from 'eslint';
-import tseslint, { type ConfigArray } from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 
 // Modifications of rules that are not in the "recommended" config.
 const modifiedStrictRules: Linter.RulesRecord = {
@@ -13,10 +13,10 @@ const modifiedStrictRules: Linter.RulesRecord = {
   'vitest/prefer-lowercase-title': 'off', // 🟠⚫
 };
 
-async function createConfig(): Promise<ConfigArray> {
+async function createConfig(): Promise<Linter.Config[]> {
   const { default: vitestPlugin } = await import('@vitest/eslint-plugin');
 
-  return tseslint.config({
+  return defineConfig({
     extends: [vitestPlugin.configs.all],
     rules: {
       ...modifiedStrictRules,
