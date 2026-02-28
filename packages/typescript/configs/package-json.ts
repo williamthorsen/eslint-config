@@ -1,7 +1,7 @@
 import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
 import rawJsoncPlugin from 'eslint-plugin-jsonc';
-import jsoncParser from 'jsonc-eslint-parser';
+import * as jsoncParser from 'jsonc-eslint-parser';
 
 import { getSafeLinterPlugin } from '../utils/isLinterPlugin.ts';
 
