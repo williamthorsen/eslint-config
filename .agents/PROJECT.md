@@ -1,8 +1,6 @@
-# CLAUDE.md
+# Project summary
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Project Overview
+## Project overview
 
 This is a monorepo for ESLint configurations published by William Thorsen. It contains three main packages:
 
@@ -12,13 +10,13 @@ This is a monorepo for ESLint configurations published by William Thorsen. It co
 
 ## Architecture
 
-### Monorepo Structure
+### Monorepo structure
 
 - Uses pnpm workspaces with packages in `/packages/*`
 - Root package.json contains scripts that run across all workspaces
 - Each package has its own build/test/lint configuration
 
-### Package Architecture
+### Package architecture
 
 - **basic/**: Simple JavaScript ESLint config with plugins for common use cases
 - **typescript/**: Complex TypeScript config with modular architecture:
@@ -28,14 +26,14 @@ This is a monorepo for ESLint configurations published by William Thorsen. It co
   - `utils/` - Helper utilities for config resolution
 - **strict-lint/**: Standalone tool that processes ESLint output to convert warnings to errors
 
-### Key Design Patterns
+### Key design patterns
 
 - Flat ESLint config format (ESLint 9+)
 - TypeScript configs are built and distributed as compiled JavaScript
 - Modular configuration approach allowing selective inclusion of rule sets
 - Custom ESLint plugins for organization-specific rules
 
-## Development Commands
+## Development commands
 
 ### Building
 
@@ -44,7 +42,7 @@ pnpm run build               # Build all packages
 pnpm --prefix packages/typescript run rebuild  # Rebuild TypeScript package specifically
 ```
 
-### Linting & Type Checking
+### Linting & type checking
 
 ```bash
 pnpm run check               # Run typecheck, format check, lint check, and tests
