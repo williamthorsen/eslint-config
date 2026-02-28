@@ -1,16 +1,16 @@
 // This configuration file uses the new flat syntax.
 // See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
 
+import markdownPlugin from '@eslint/markdown';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
 import jsoncPlugin from 'eslint-plugin-jsonc';
-import markdownPlugin from 'eslint-plugin-markdown';
 import nPlugin from 'eslint-plugin-n';
 import promisePlugin from 'eslint-plugin-promise';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import unicornPlugin from 'eslint-plugin-unicorn';
 import yamlPlugin from 'eslint-plugin-yml';
-import jsonParser from 'jsonc-eslint-parser';
-import yamlParser from 'yaml-eslint-parser';
+import * as jsonParser from 'jsonc-eslint-parser';
+import * as yamlParser from 'yaml-eslint-parser';
 
 import commonIgnores from './ignores/common.js';
 import eslintCommentsRules from './rules/eslint-comments.js';
