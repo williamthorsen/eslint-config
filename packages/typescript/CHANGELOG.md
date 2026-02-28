@@ -1,5 +1,26 @@
 # @williamthorsen/eslint-config-typescript
 
+## 5.12.1
+
+### Patch Changes
+
+- ## @williamthorsen/eslint-config-typescript
+
+  ### Features
+  - Relax the complexity threshold from 11 to default
+
+  ### Refactoring
+  - Use explicit .ts extension
+  - Adapt syntax and type annotations to satisfy stricter typing
+  - Modernize plugin syntax
+
+  ### Dependencies
+  - Upgrade all deps to latest version
+  - Add @eslint/config-helpers to dev deps
+
+  ### Tooling
+  - Remove fragile automatic compilation
+
 ## 5.12.0
 
 ### Features

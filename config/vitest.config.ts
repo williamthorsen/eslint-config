@@ -5,7 +5,6 @@ export const baseConfig = defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     coverage: {
-      all: true, // include untested files in the report
       enabled: false, // don't check coverage unless the `--coverage` flag is passed
       exclude: ['**/__tests__/*', '**/index.ts', '**/*.d.ts', '**/*.types.ts'],
       include: ['**/src/**/*.{ts,tsx}'],

@@ -1,7 +1,7 @@
 import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
 import rawYamlPlugin from 'eslint-plugin-yml';
-import yamlParser from 'yaml-eslint-parser';
+import * as yamlParser from 'yaml-eslint-parser';
 
 import { getSafeLinterPlugin } from '../utils/isLinterPlugin.ts';
 

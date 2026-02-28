@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "5.3.6",
+  "version": "5.3.7",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "license": "UNLICENSED",
@@ -23,7 +23,7 @@
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
-    "tsx": "4.20.6"
+    "tsx": "4.21.0"
   },
   "peerDependencies": {
     "eslint": ">=9"
