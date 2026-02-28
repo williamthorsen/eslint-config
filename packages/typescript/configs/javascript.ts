@@ -5,7 +5,7 @@ import { defineConfig } from 'eslint/config';
 const rules: Linter.RulesRecord = {
   // Best practices
   'consistent-return': 'error',
-  complexity: ['warn', 11],
+  complexity: 'warn',
   eqeqeq: ['error', 'always'],
   'guard-for-in': 'error',
   'no-alert': 'error',

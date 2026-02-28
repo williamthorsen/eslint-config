@@ -66,7 +66,7 @@ export default {
 
   // Best practices
   'consistent-return': 'error',
-  complexity: ['warn', 11],
+  complexity: 'warn',
   eqeqeq: ['error', 'always'],
   'guard-for-in': 'error',
   'no-alert': 'error',
