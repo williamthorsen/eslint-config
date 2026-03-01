@@ -1,5 +1,32 @@
 # @williamthorsen/strict-lint
 
+## 5.3.8
+
+### Patch Changes
+
+- ## @williamthorsen/eslint-config-typescript
+
+  ### Features
+  - Relax the complexity threshold from 11 to default
+  - Refine linting rules
+
+  ### Refactoring
+  - Use explicit .ts extension
+  - Adapt syntax and type annotations to satisfy stricter typing
+  - Modernize plugin syntax
+
+  ### Dependencies
+  - Upgrade all deps to latest minor version
+  - Upgrade all deps to latest version
+  - Upgrade all deps to latest minor version
+  - Add @eslint/config-helpers to dev deps
+  - Downgrade ESLint plugins with bad typings
+  - Upgrade all deps to latest version
+  - Upgrade all deps to latest version
+
+  ### Tooling
+  - Remove fragile automatic compilation
+
 ## 5.3.7
 
 ### Patch Changes
