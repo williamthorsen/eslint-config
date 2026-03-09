@@ -5,6 +5,7 @@ import markdownPlugin from '@eslint/markdown';
 import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
 import jsoncPlugin from 'eslint-plugin-jsonc';
 import nPlugin from 'eslint-plugin-n';
+import packageJsonPlugin from 'eslint-plugin-package-json';
 import promisePlugin from 'eslint-plugin-promise';
 import simpleImportSortPlugin from 'eslint-plugin-simple-import-sort';
 import unicornPlugin from 'eslint-plugin-unicorn';
@@ -16,7 +17,6 @@ import commonIgnores from './ignores/common.js';
 import eslintCommentsRules from './rules/eslint-comments.js';
 import jsRules from './rules/javascript.js';
 import nRules from './rules/n.js';
-import packageJsonrules from './rules/packageJson.js';
 import simpleImportSortRules from './rules/simple-import-sort.js';
 import unicornRules from './rules/unicorn.js';
 
@@ -72,6 +72,7 @@ const config = [
   // region JSON files
   {
     files: ['**/*.json', '**/*.json5'],
+    ignores: ['**/package.json'],
     languageOptions: {
       parser: jsonParser,
     },
@@ -149,35 +150,21 @@ const config = [
   },
   // endregion
 
-  // region --- YAML files
-  {
-    files: ['**/*.yaml', '**/*.yml'],
-    ignores: ['!.github/**/*.yml'],
-    languageOptions: {
-      parser: yamlParser,
-    },
-    plugins: {
-      yml: yamlPlugin,
-    },
-    rules: {
-      ...yamlPlugin.rules.recommended,
-      'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
-      'yml/no-empty-document': 'off',
-      'spaced-comment': 'off',
-    },
-  },
-  // endregion - YAML files
-
   // region package.json
+  packageJsonPlugin.configs.recommended,
+  packageJsonPlugin.configs.stylistic,
   {
-    files: ['package.json'],
-    languageOptions: {
-      parser: jsonParser,
+    files: ['**/package.json'],
+    rules: {
+      // Empty `keywords` arrays are used as intentional placeholders
+      'package-json/no-empty-fields': 'off',
+      // Not all packages in the monorepo require a repository field
+      'package-json/require-repository': 'off',
+      // sideEffects is not needed for ESLint config packages
+      'package-json/require-sideEffects': 'off',
+      // Peer dependencies need not be duplicated in devDependencies
+      'package-json/specify-peers-locally': 'off',
     },
-    plugins: {
-      jsonc: jsoncPlugin,
-    },
-    rules: packageJsonrules,
   },
   // endregion
 

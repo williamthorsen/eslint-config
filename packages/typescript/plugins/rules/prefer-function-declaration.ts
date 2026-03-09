@@ -24,7 +24,6 @@ const create: TSESLint.RuleCreateFunction<'preferDeclaration'> = (context) => {
   };
 };
 
-// eslint-disable-next-line complexity
 function containsThisExpression(root: TSESTree.Node): boolean {
   const stack: TSESTree.Node[] = [root];
   const visited = new Set<TSESTree.Node>();

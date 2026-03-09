@@ -95,6 +95,9 @@ importers:
       eslint-plugin-n:
         specifier: 17.24.0
         version: 17.24.0(eslint@9.39.3)(typescript@5.9.3)
+      eslint-plugin-package-json:
+        specifier: 0.89.4
+        version: 0.89.4(@types/estree@1.0.8)(eslint@9.39.3)(jsonc-eslint-parser@3.1.0)
       eslint-plugin-promise:
         specifier: 7.2.1
         version: 7.2.1(eslint@9.39.3)
@@ -131,6 +134,9 @@ importers:
       eslint-plugin-n:
         specifier: 17.24.0
         version: 17.24.0(eslint@9.39.3)(typescript@5.9.3)
+      eslint-plugin-package-json:
+        specifier: 0.89.4
+        version: 0.89.4(@types/estree@1.0.8)(eslint@9.39.3)(jsonc-eslint-parser@3.1.0)
       eslint-plugin-promise:
         specifier: 7.2.1
         version: 7.2.1(eslint@9.39.3)
@@ -188,6 +194,9 @@ importers:
         version: 7.16.0(eslint@9.39.3)(typescript@5.9.3)
 
 packages:
+
+  '@altano/repository-tools@2.0.1':
+    resolution: {integrity: sha512-YE/52CkFtb+YtHPgbWPai7oo5N9AKnMuP5LM+i2AG7G1H2jdYBCO1iDnkDE3dZ3C1MIgckaF+d5PNRulgt0bdw==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -1165,6 +1174,14 @@ packages:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
     engines: {node: '>=8'}
 
+  detect-indent@7.0.2:
+    resolution: {integrity: sha512-y+8xyqdGLL+6sh0tVeHcfP/QDd8gUgbasolJJpY7NgeQGSZ739bDtSiaiDgtoicy+mtYB81dKLxO9xRhCyIB3A==}
+    engines: {node: '>=12.20'}
+
+  detect-newline@4.0.1:
+    resolution: {integrity: sha512-qE3Veg1YXzGHQhlA6jzebZN2qVf6NX+A7m7qlhCGG30dJixrAQhYOsJjsnBjJkCSmuOPpCk30145fr8FV0bzog==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
 
@@ -1281,6 +1298,16 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
+  eslint-fix-utils@0.4.2:
+    resolution: {integrity: sha512-n7ZTcwwkP5scedlhvWMcqxED+O1NzXcj5Rxn/0kJQMP88k02vRcBfQ1qsk/JHb6Aw8bajFoetFCCBiNIcNCsvA==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+    peerDependencies:
+      '@types/estree': '>=1'
+      eslint: '>=8'
+    peerDependenciesMeta:
+      '@types/estree':
+        optional: true
+
   eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
 
@@ -1369,6 +1396,13 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: '>=8.23.0'
+
+  eslint-plugin-package-json@0.89.4:
+    resolution: {integrity: sha512-UyY8HVtsW4AljFVimnWKn04WI7JDBO7d9RIxSWpqwi/i0/1v001OkZhEZutkAATaewBt4l4aL9/EzJTpKWi0MA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    peerDependencies:
+      eslint: '>=8.0.0'
+      jsonc-eslint-parser: '>=2.0.0'
 
   eslint-plugin-promise@7.2.1:
     resolution: {integrity: sha512-SWKjd+EuvWkYaS+uN2csvj0KoP43YTu7+phKQ5v+xw6+A0gutVX2yqCeCkC3uLCJFiPfR2dD8Es5L7yUsmvEaA==}
@@ -1581,6 +1615,9 @@ packages:
   get-tsconfig@4.10.1:
     resolution: {integrity: sha512-auHyJ4AgMz7vgS8Hp3N6HXSmlMdUyhSUrfBF16w153rxtLIEOE+HGqaBppczZvnHLqQJfiHotCYpNhl0lUROFQ==}
 
+  git-hooks-list@4.2.1:
+    resolution: {integrity: sha512-WNvqJjOxxs/8ZP9+DWdwWJ7cDsd60NHf39XnD82pDVrKO5q7xfPqpkK6hwEAmBa/ZSEE4IOoR75EzbbIuwGlMw==}
+
   github-slugger@2.0.0:
     resolution: {integrity: sha512-IaOQ9puYtjrkq7Y0Ygl9KDZnrf/aiUJYUpVf89y8kyaxbRG7Y1SrX/jaumrv81vc61+kiMempujsM3Yw7w5qcw==}
 
@@ -1768,6 +1805,10 @@ packages:
   is-number@7.0.0:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
+
+  is-plain-obj@4.1.0:
+    resolution: {integrity: sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==}
+    engines: {node: '>=12'}
 
   is-regex@1.2.1:
     resolution: {integrity: sha512-MjYsKHO5O7mCsmRGxWcLWheFqN9DJ/2TmngvjKXihe6efViPqc274+Fx/4fYj/r03+ESvBdTXK0V6tA3rgez1g==}
@@ -2182,6 +2223,10 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
+  package-json-validator@1.2.0:
+    resolution: {integrity: sha512-Cy1rFwcTuuO3NxZ3Q6QZ8zZfYyRYs3BskcOuYqsiq3ZsHkAPhNNCvhAtb1JJX63Dmp9fzd7oCqiR1fOtuK8XDQ==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+
   package-manager-detector@0.2.11:
     resolution: {integrity: sha512-BEnLolu+yuz22S56CU1SUKq3XC3PkwD5wv4ikR4MfGvnRVcmzXR9DwSlW2fEamyTPyXHomBJRzgapeuBvRNzJQ==}
 
@@ -2400,12 +2445,32 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
 
+  sort-object-keys@2.1.0:
+    resolution: {integrity: sha512-SOiEnthkJKPv2L6ec6HMwhUcN0/lppkeYuN1x63PbyPRrgSPIuBJCiYxYyvWRTtjMlOi14vQUCGUJqS6PLVm8g==}
+
+  sort-package-json@3.6.1:
+    resolution: {integrity: sha512-Chgejw1+10p2D0U2tB7au1lHtz6TkFnxmvZktyBCRyV0GgmF6nl1IxXxAsPtJVsUyg/fo+BfCMAVVFUVRkAHrQ==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
   spawndamnit@3.0.1:
     resolution: {integrity: sha512-MmnduQUuHCoFckZoWnXsTg7JaiLBJrKFj9UI2MbRPGaJeVpsLcVBu6P/IGZovziM/YBsellCmsprgNA+w0CzVg==}
+
+  spdx-correct@3.2.0:
+    resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}
+
+  spdx-exceptions@2.5.0:
+    resolution: {integrity: sha512-PiU42r+xO4UbUS1buo3LPJkjlO7430Xn5SVAhdpzzsPHsjbYVflnnFdATgabnLude+Cqu25p6N+g2lw/PFsa4w==}
+
+  spdx-expression-parse@3.0.1:
+    resolution: {integrity: sha512-cbqHunsQWnJNE6KhVSMsMeH5H/L9EpymbzqTQ3uLwNCLZ1Q481oWaofqH7nO6V07xlXwY6PhQdQ2IedWx/ZK4Q==}
+
+  spdx-license-ids@3.0.23:
+    resolution: {integrity: sha512-CWLcCCH7VLu13TgOH+r8p1O/Znwhqv/dbb6lqWy67G+pT1kHmeD/+V36AVb/vq8QMIQwVShJ6Ssl5FPh0fuSdw==}
 
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
@@ -2591,6 +2656,13 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
+  validate-npm-package-license@3.0.4:
+    resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
+
+  validate-npm-package-name@7.0.2:
+    resolution: {integrity: sha512-hVDIBwsRruT73PbK7uP5ebUt+ezEtCmzZz3F59BSr2F6OVFnJ/6h8liuvdLrQ88Xmnk6/+xGGuq+pG9WwTuy3A==}
+    engines: {node: ^20.17.0 || >=22.9.0}
+
   vite-tsconfig-paths@6.1.1:
     resolution: {integrity: sha512-2cihq7zliibCCZ8P9cKJrQBkfgdvcFkOOc3Y02o3GWUDLgqjWsZudaoiuOwO/gzTzy17cS5F7ZPo4bsnS4DGkg==}
     peerDependencies:
@@ -2729,6 +2801,8 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  '@altano/repository-tools@2.0.1': {}
 
   '@babel/code-frame@7.27.1':
     dependencies:
@@ -3756,6 +3830,10 @@ snapshots:
 
   detect-indent@6.1.0: {}
 
+  detect-indent@7.0.2: {}
+
+  detect-newline@4.0.1: {}
+
   devlop@1.1.0:
     dependencies:
       dequal: 2.0.3
@@ -3957,6 +4035,12 @@ snapshots:
       eslint: 9.39.3
       semver: 7.7.3
 
+  eslint-fix-utils@0.4.2(@types/estree@1.0.8)(eslint@9.39.3):
+    dependencies:
+      eslint: 9.39.3
+    optionalDependencies:
+      '@types/estree': 1.0.8
+
   eslint-import-resolver-node@0.3.9:
     dependencies:
       debug: 3.2.7
@@ -4078,6 +4162,23 @@ snapshots:
       ts-declaration-location: 1.0.7(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
+
+  eslint-plugin-package-json@0.89.4(@types/estree@1.0.8)(eslint@9.39.3)(jsonc-eslint-parser@3.1.0):
+    dependencies:
+      '@altano/repository-tools': 2.0.1
+      change-case: 5.4.4
+      detect-indent: 7.0.2
+      detect-newline: 4.0.1
+      eslint: 9.39.3
+      eslint-fix-utils: 0.4.2(@types/estree@1.0.8)(eslint@9.39.3)
+      jsonc-eslint-parser: 3.1.0
+      package-json-validator: 1.2.0
+      semver: 7.7.3
+      sort-object-keys: 2.1.0
+      sort-package-json: 3.6.1
+      validate-npm-package-name: 7.0.2
+    transitivePeerDependencies:
+      - '@types/estree'
 
   eslint-plugin-promise@7.2.1(eslint@9.39.3):
     dependencies:
@@ -4367,6 +4468,8 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
+  git-hooks-list@4.2.1: {}
+
   github-slugger@2.0.0: {}
 
   glob-parent@5.1.2:
@@ -4544,6 +4647,8 @@ snapshots:
       has-tostringtag: 1.0.2
 
   is-number@7.0.0: {}
+
+  is-plain-obj@4.1.0: {}
 
   is-regex@1.2.1:
     dependencies:
@@ -5144,6 +5249,12 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
+  package-json-validator@1.2.0:
+    dependencies:
+      semver: 7.7.3
+      validate-npm-package-license: 3.0.4
+      validate-npm-package-name: 7.0.2
+
   package-manager-detector@0.2.11:
     dependencies:
       quansync: 0.2.10
@@ -5382,12 +5493,38 @@ snapshots:
 
   slash@3.0.0: {}
 
+  sort-object-keys@2.1.0: {}
+
+  sort-package-json@3.6.1:
+    dependencies:
+      detect-indent: 7.0.2
+      detect-newline: 4.0.1
+      git-hooks-list: 4.2.1
+      is-plain-obj: 4.1.0
+      semver: 7.7.3
+      sort-object-keys: 2.1.0
+      tinyglobby: 0.2.15
+
   source-map-js@1.2.1: {}
 
   spawndamnit@3.0.1:
     dependencies:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
+
+  spdx-correct@3.2.0:
+    dependencies:
+      spdx-expression-parse: 3.0.1
+      spdx-license-ids: 3.0.23
+
+  spdx-exceptions@2.5.0: {}
+
+  spdx-expression-parse@3.0.1:
+    dependencies:
+      spdx-exceptions: 2.5.0
+      spdx-license-ids: 3.0.23
+
+  spdx-license-ids@3.0.23: {}
 
   sprintf-js@1.0.3: {}
 
@@ -5605,6 +5742,13 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  validate-npm-package-license@3.0.4:
+    dependencies:
+      spdx-correct: 3.2.0
+      spdx-expression-parse: 3.0.1
+
+  validate-npm-package-name@7.0.2: {}
 
   vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.2)(tsx@4.21.0)(yaml@2.8.0)):
     dependencies:

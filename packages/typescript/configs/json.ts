@@ -33,6 +33,7 @@ const rules: Linter.RulesRecord = {
 
 const config = defineConfig({
   files: ['**/*.{json,json5}'],
+  ignores: ['**/package.json'],
   languageOptions: {
     parser: jsonParser,
   },
