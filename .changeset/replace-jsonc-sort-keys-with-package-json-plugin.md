@@ -1,6 +1,6 @@
 ---
-"@williamthorsen/eslint-config-typescript": minor
-"@williamthorsen/eslint-config-basic": minor
+'@williamthorsen/eslint-config-typescript': minor
+'@williamthorsen/eslint-config-basic': minor
 ---
 
 Replace `jsonc/sort-keys` with `eslint-plugin-package-json` for package.json linting.

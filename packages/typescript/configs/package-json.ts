@@ -1,11 +1,9 @@
 import type { Config } from 'eslint/config';
 import packageJsonPlugin from 'eslint-plugin-package-json';
 
-const { recommended, stylistic } = packageJsonPlugin.configs;
-
 const config: Config[] = [
-  recommended,
-  stylistic,
+  packageJsonPlugin.configs.recommended,
+  packageJsonPlugin.configs.stylistic,
   {
     files: ['**/package.json'],
     rules: {

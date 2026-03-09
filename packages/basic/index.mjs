@@ -149,25 +149,6 @@ const config = [
   },
   // endregion
 
-  // region --- YAML files
-  {
-    files: ['**/*.yaml', '**/*.yml'],
-    ignores: ['!.github/**/*.yml'],
-    languageOptions: {
-      parser: yamlParser,
-    },
-    plugins: {
-      yml: yamlPlugin,
-    },
-    rules: {
-      ...yamlPlugin.rules.recommended,
-      'yml/quotes': ['error', { prefer: 'single', avoidEscape: true }],
-      'yml/no-empty-document': 'off',
-      'spaced-comment': 'off',
-    },
-  },
-  // endregion - YAML files
-
   // region package.json
   packageJsonPlugin.configs.recommended,
   packageJsonPlugin.configs.stylistic,
