@@ -20,7 +20,6 @@ jobs:
   code-quality:
     uses: williamthorsen/.github/.github/workflows/code-quality-pnpm.yaml@v1
     secrets:
-      GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN || secrets.GITHUB_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     with:
       node-version: '22.14.0'
