@@ -72,6 +72,7 @@ const config = [
   // region JSON files
   {
     files: ['**/*.json', '**/*.json5'],
+    ignores: ['**/package.json'],
     languageOptions: {
       parser: jsonParser,
     },
