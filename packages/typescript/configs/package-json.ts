@@ -1,117 +1,24 @@
-import type { Linter } from 'eslint';
-import { defineConfig } from 'eslint/config';
-import rawJsoncPlugin from 'eslint-plugin-jsonc';
-import * as jsoncParser from 'jsonc-eslint-parser';
+import type { Config } from 'eslint/config';
+import packageJsonPlugin from 'eslint-plugin-package-json';
 
-import { getSafeLinterPlugin } from '../utils/isLinterPlugin.ts';
+const { recommended, stylistic } = packageJsonPlugin.configs;
 
-const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
-
-const rules: Linter.RulesRecord = {
-  'jsonc/sort-keys': [
-    'warn',
-    {
-      pathPattern: '^$',
-      // Standard sort order from https://www.npmjs.com/package/format-package
-      order: [
-        'name',
-        'version',
-        'private',
-        'description',
-        'keywords',
-
-        'homepage',
-        'bugs',
-        'repository',
-        'funding', // Unlisted
-        'license',
-
-        'author',
-        'contributors',
-        'publisher', // Unlisted
-
-        'type',
-        'exports',
-        'main',
-        'unpkg',
-        'module',
-        'browser',
-        'types',
-        'typesVersions',
-        'bin',
-        'directories',
-        'files',
-        'workspaces',
-        'scripts',
-        'simple-git-hooks',
-        'config',
-
-        // Extension manifest; see https://code.visualstudio.com/api/references/extension-manifest
-        'activationEvents',
-        'badges',
-        'categories',
-        'contributes',
-        'displayName',
-        'extensionDependencies',
-        'extensionKind',
-        'extensionPack',
-        'galleryBanner',
-        'icon',
-        'markdown',
-        'qna',
-        'preview',
-        'sideEffects',
-
-        // Dependencies
-        'dependencies',
-        'devDependencies',
-        'optionalDependencies',
-        'peerDependencies',
-        'peerDependenciesMeta',
-        'overrides',
-        'resolutions',
-
-        // Configurations
-        'eslintConfig',
-        'husky',
-        'jsdelivr',
-        'lint-staged',
-        'man',
-        'packageManager',
-        'pnpm',
-
-        'engines',
-        'os',
-        'cpu',
-
-        'publishConfig',
-      ],
+const config: Config[] = [
+  recommended,
+  stylistic,
+  {
+    files: ['**/package.json'],
+    rules: {
+      // Empty `keywords` arrays are used as intentional placeholders
+      'package-json/no-empty-fields': 'off',
+      // Not all packages in the monorepo require a repository field
+      'package-json/require-repository': 'off',
+      // sideEffects is not needed for ESLint config packages
+      'package-json/require-sideEffects': 'off',
+      // Peer dependencies need not be duplicated in devDependencies
+      'package-json/specify-peers-locally': 'off',
     },
-    {
-      pathPattern: '^(?:dev|peer|optional|bundled)?[Dd]ependencies$',
-      order: { type: 'asc' },
-    },
-    {
-      pathPattern: '^exports.*$',
-      // prettier-ignore
-      order: [
-        'import',
-        'types',
-        'require',
-      ],
-    },
-  ],
-};
-
-const config = defineConfig({
-  files: ['**/package.json'],
-  languageOptions: {
-    parser: jsoncParser,
   },
-  plugins: {
-    jsonc: jsoncPlugin,
-  },
-  rules,
-});
+];
 
 export default config;
