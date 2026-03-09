@@ -1,9 +1,9 @@
 import type { MonorepoReleaseConfig } from '@williamthorsen/release-kit';
 import { DEFAULT_WORK_TYPES } from '@williamthorsen/release-kit';
 
-function component(dir: string) {
+function component(tagName: string, dir: string) {
   return {
-    tagPrefix: `${dir}-v`,
+    tagPrefix: `${tagName}-v`,
     packageFiles: [`packages/${dir}/package.json`],
     changelogPaths: [`packages/${dir}`],
     paths: [`packages/${dir}/**`],
@@ -11,7 +11,11 @@ function component(dir: string) {
 }
 
 export const config: MonorepoReleaseConfig = {
-  components: [component('eslint-config-basic'), component('eslint-config-typescript'), component('strict-lint')],
+  components: [
+    component('eslint-config-basic', 'basic'),
+    component('eslint-config-typescript', 'typescript'),
+    component('strict-lint', 'strict-lint'),
+  ],
   workTypes: [...DEFAULT_WORK_TYPES],
   formatCommand: 'pnpm run fmt',
 };
