@@ -1,3 +1,6 @@
+packageConfigs:
+  '@williamthorsen/*':
+    registry: https://npm.pkg.github.com/
 packages:
   - packages/*
 onlyBuiltDependencies:
