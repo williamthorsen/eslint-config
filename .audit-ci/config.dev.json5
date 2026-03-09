@@ -20,11 +20,6 @@
     // https://github.com/advisories/GHSA-mw96-cpmx-2vgc
     "GHSA-mw96-cpmx-2vgc",
 
-    // ajv ReDoS when using $data option (transitive: eslint → @eslint/eslintrc → ajv)
-    // Patched in >=6.14.0; eslintrc allows ^6.12.4 but pnpm lockfile pins 6.12.6
-    // https://github.com/advisories/GHSA-2g4f-4pwh-qvx6
-    "GHSA-2g4f-4pwh-qvx6",
-
     // js-yaml prototype pollution in merge (transitive: @changesets/cli → @manypkg/get-packages → read-yaml-file → js-yaml)
     // Patched in >=3.14.2; read-yaml-file allows ^3.13.0 but pnpm lockfile pins 3.14.1
     // https://github.com/advisories/GHSA-mh29-5h37-fv8m
