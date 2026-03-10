@@ -1,251 +1,166 @@
-# @williamthorsen/strict-lint
+# Changelog
 
-## 5.3.8
+All notable changes to this project will be documented in this file.
 
-### Patch Changes
+## [strict-lint-v5.3.9] - 2026-03-10
 
-- ## @williamthorsen/eslint-config-typescript
+### Bug fixes
 
-  ### Features
-  - Relax the complexity threshold from 11 to default
-  - Refine linting rules
+- Fix: strict-lint command not found after build-step modernization
+- Strict|fix: src files are missing from distribution
+- Strict|fix: Most files are missing from distribution
 
-  ### Refactoring
-  - Use explicit .ts extension
-  - Adapt syntax and type annotations to satisfy stricter typing
-  - Modernize plugin syntax
+### Dependencies
 
-  ### Dependencies
-  - Upgrade all deps to latest minor version
-  - Upgrade all deps to latest version
-  - Upgrade all deps to latest minor version
-  - Add @eslint/config-helpers to dev deps
-  - Downgrade ESLint plugins with bad typings
-  - Upgrade all deps to latest version
-  - Upgrade all deps to latest version
-
-  ### Tooling
-  - Remove fragile automatic compilation
-
-## 5.3.7
-
-### Patch Changes
-
-- ## @williamthorsen/eslint-config-typescript
-
-  ### Features
-  - Relax the complexity threshold from 11 to default
-
-  ### Refactoring
-  - Use explicit .ts extension
-  - Adapt syntax and type annotations to satisfy stricter typing
-  - Modernize plugin syntax
-
-  ### Dependencies
-  - Upgrade all deps to latest version
-  - Add @eslint/config-helpers to dev deps
-
-  ### Tooling
-  - Remove fragile automatic compilation
-
-## 5.3.6
-
-### Patch Changes
-
-Fixes the issue where all files other than `index.js` were missing from the distribution because they did not match any pattern in the `files` array of `package.json`.
-
-## 5.3.5
-
-### Fixes
-
-Compiled `src/` files are missing from distribution.
-
-Fixes the issue where `src/` source files were not being compiled to the `dist/esm/` directory because they did not match a pattern all files other than `index.js` were missing from the distribution because they did not match any pattern in the build config.
-
-## 5.3.4
-
-### Fixes
-
-The `strict-lint` command is not found after build-step modernization.
-
-## 5.3.3
+- \*|deps: Upgrade all deps to latest version
+- \*|deps: Upgrade all deps to latest minor version
 
 ### Refactoring
 
-Replace all `.js` extensions with actual `.ts` extensions.
-
-### Dependencies
-
-Upgrade all dependencies to latest minor version.
-
-## 5.3.2
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 5.4.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 5.3.0
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 5.2.0
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 5.0.2
+- \*|refactor: Use explicit .ts extension
 
 ### Tooling
 
-- Replaced custom workspace scripts with the generic `run-workspace-script` script runner
+- Root|tooling: Simplify Vitest config
+- Strict|tooling: Modernize build step
+- \*|tooling: Change package registry to from github to npmjs
 
-## 4.0.0
+Publish `strict-lint` and `eslint-config-typescript` packages to npmjs.org. Consume `release-kit` and `toolbelt.objects` from npmjs.org.
 
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.4.0
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.3.0
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.2.2
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.2.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.1.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest minor version
-
-## 3.0.0
-
-### Refactoring
-
-- Fixed lint identified when strict rules were enabled.
-
-## 1.0.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-### Refactoring
-
-- Aligned types with upgraded dependencies
-
-## 1.0.0
-
-First stable release.
-
-### Refactoring
-
-- Removed shebangs `@esbuild-kit/esm-loader` shebang from scripts. These are now run by `tsx`.
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-- Replaced `@esbuild-kit/esm-loader` with `tsx`.
--
-
-## 0.17.0
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-### Refactoring
-
-- Removed the shims added to support the use of a flat config in `strictLint.ts`.\
-  Because the flat config is now the default, the shims are no longer required.
-
-## 0.12.1
-
-### Patch Changes
-
-- Upgraded all dependencies to latest version
-
-## 0.12.0
-
-### Minor Changes
-
-- Simplify configs, upgrade dependencies
-
-## 0.11.6
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.11.5
-
-### Dependencies
-
-- Upgrade all dependies & runtimes to latest version
-
-## 0.11.4
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.11.3
-
-### Patch Changes
-
-- Removed the unneeded ESM loader from strict-lint script. The loader is needed to run TypeScript files but not to run the transpiled JavaScript script.
-
-## 0.11.2
+## [5.7.1] - 2025-06-28
 
 ### Tooling
 
-- Simplify build config & file structure
+- \*|tooling: Modernize build toolchain
 
-## 0.11.1
+## [5.6.0] - 2025-05-17
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+- \*|deps: Reduce duplication of dependencies
+
+## [5.3.0] - 2025-05-04
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+## [5.2.0] - 2025-04-30
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+## [5.0.2] - 2025-04-29
+
+### Tooling
+
+- \*|tooling: Use generic workspace script runner
+
+## [4.0.0] - 2025-04-29
+
+### Refactoring
+
+- Strict-lint|refactor: Fix lint
+
+## [3.4.0] - 2025-04-28
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+### Refactoring
+
+- \*|refactor: Fix lint
+
+## [3.3.0] - 2025-04-06
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+## [3.2.2] - 2025-03-23
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+## [3.2.1] - 2025-03-03
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+## [3.2.0] - 2025-02-23
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest minor version
+
+### Formatting
+
+- \*|fmt: Autoformat
+
+### Tooling
+
+- \*|tooling: Remove Deno
+
+## [3.1.1] - 2025-01-04
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+## [3.0.0] - 2024-11-04
 
 ### Features
 
-- Added the `strict-lint` script to the Node.js package
+- Ts|feat: Modernize configs
 
-## 0.11.0
-
-### Features
-
-- Added `strict-lint` workspace to the monorepo
-- Added the `strictLint` function, which wraps ESLint and treats all warnings as errors
+## [2.0.0] - 2024-11-03
 
 ### Dependencies
 
-- Added `eslint` and `typescript` as dev dependencies
+- \*|deps: Upgrade all deps to latest minor version
+
+### Features
+
+- Ts|feat: Convert source files to TypeScript
+- Ts|feat: Convert source files to TypeScript (2)
+
+## [1.0.0] - 2024-10-12
+
+### Dependencies
+
+- Deps: Upgrade all deps to latest version
+- \*|deps: Upgrade all deps & runtimes to latest version
+- \*|deps: Upgrade all deps to latest version
+- \*|deps: Upgrade all deps to latest version
+- - | deps: Upgrade all deps to latest minor version
+- - | deps: Upgrade all deps to latest major version
+- - | deps: Require v9 or better for ESLint as peer dep
+- \*|deps: Upgrade all deps to latest version
+
+Also replaced `@esbuild-kit/esm-loader` with `tsx.
+
+### Documentation
+
+- Docs: Mark all packages as UNLICENSED
+- \*|docs: Update all licenses
+
+### Features
+
+- Feat: Add strict-lint script to the Node.js package
+
+### Refactoring
+
+- Strict-lint | refactor: Align with new API
+
+Removed the shims previously needed to support the flat config; that config is now the default.
 
 ### Tooling
 
-- Configured the package for distribution as a Node.js package
-- Removed the `audit` check, which should now be performed only from the monorepo root
-- Centralized the linter config in the monorepo root
+- Tooling: Enable strict linting in monorepo root & workspaces
+
+<!-- generated by git-cliff -->

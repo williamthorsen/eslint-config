@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "5.3.8",
+  "version": "5.3.9",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "license": "UNLICENSED",

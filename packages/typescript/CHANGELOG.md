@@ -1,774 +1,606 @@
-# @williamthorsen/eslint-config-typescript
+# Changelog
 
-## 5.12.2
+All notable changes to this project will be documented in this file.
 
-### Patch Changes
-
-- ## @williamthorsen/eslint-config-typescript
-
-  ### Features
-  - Relax the complexity threshold from 11 to default
-  - Refine linting rules
-
-  ### Refactoring
-  - Use explicit .ts extension
-  - Adapt syntax and type annotations to satisfy stricter typing
-  - Modernize plugin syntax
-
-  ### Dependencies
-  - Upgrade all deps to latest minor version
-  - Upgrade all deps to latest version
-  - Upgrade all deps to latest minor version
-  - Add @eslint/config-helpers to dev deps
-  - Downgrade ESLint plugins with bad typings
-  - Upgrade all deps to latest version
-  - Upgrade all deps to latest version
-
-  ### Tooling
-  - Remove fragile automatic compilation
-
-## 5.12.1
-
-### Patch Changes
-
-- ## @williamthorsen/eslint-config-typescript
-
-  ### Features
-  - Relax the complexity threshold from 11 to default
-
-  ### Refactoring
-  - Use explicit .ts extension
-  - Adapt syntax and type annotations to satisfy stricter typing
-  - Modernize plugin syntax
-
-  ### Dependencies
-  - Upgrade all deps to latest version
-  - Add @eslint/config-helpers to dev deps
-
-  ### Tooling
-  - Remove fragile automatic compilation
-
-## 5.12.0
-
-### Features
-
-Refine linting rules.
-
-### Refactoring
-
-Use explicit .ts extension.
-
-Adapt syntax and type annotations to satisfy stricter typing.
-
-Modernize plugin syntax.
+## [eslint-config-typescript-v5.12.3] - 2026-03-10
 
 ### Dependencies
 
-Upgrade all deps to latest minor version.
-
-Add `@eslint/config-helpers` to dev deps.
-
-Downgrade ESLint plugins with bad typings.
-
-## 5.11.0
-
-### Features
-
-- Enabled the `unicorn/no-array-callback-reference` after fix to its handling of optional chaining expressions
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 5.10.0
-
-### Features
-
-- Disabled `unicorn/prefer-spread` as overly prescriptive
-
-### Dependencies
-
-- Patched vulnerability in transitive dependency `@eslint/plugin-kit` by forcing use of v3.3.0
-- Upgraded all dependencies to latest version
-
-## 5.9.0
-
-### Features
-
-- Added a custom ESLint rule to enforce memoization of functions returned from a custom hook
-- Downgraded the severity of overly prescriptive Unicorn rules
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 5.8.0
-
-### Features
-
-- Disabled poorly behaved new Vitest rules:
-  - `vitest/prefer-called-once`, which conflicts with `vitest/prefer-called-times`
-  - `vitest/prefer-importing-vitest-globals`, which doesn't recognized imported functions sharing the same name as Vitest globals
-
-## 5.7.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
+- Ts|deps: Upgrade all deps to latest minor version
 
 ### Tooling
 
-- Modernized build toolchain to support `.ts` extension and use flexible build script
+- \*|tooling: Change package registry to from github to npmjs
 
-## 5.7.0
+Publish `strict-lint` and `eslint-config-typescript` packages to npmjs.org. Consume `release-kit` and `toolbelt.objects` from npmjs.org.
 
-### Features
+## [strict-lint-v5.3.8] - 2026-03-09
 
-- Relaxed some TypeScript rules:
-  - Disabled the `@typescript-eslint/unbound-method` rule for test files
-  - Changed the severity of `@typescript-eslint/unbound-method` from `error` to `warn` for other files
-  - Relaxed the `@typescript-eslint/no-misused-promises` rule to skip checking void return types
+### Bug fixes
 
-### Dependencies
+- Ts|fix: Widen ensureExtendsElement to accept plugin configs with string[] plugins
 
-- Upgraded all dependencies to latest version
-
-## 5.6.0
-
-### Features
-
-- Disabled rules inappropriate for test files
-- Disabled some overly proscriptive rules from the Unicorn and Vitest plugins
+`eslint-plugin-react-hooks` types its config with `plugins: string[]`, which is incompatible with both `TSESLint.FlatConfig.Config` and `ExtendsElement`. Widening the parameter to `Record<string, unknown>` lets the function serve its purpose as a type bridge.
 
 ### Dependencies
 
-- Upgraded all dependencies to latest version
+- Ts|deps: Upgrade all deps to latest version
+- \*|deps: Upgrade all deps to latest version
+- Ts|deps: Downgrade ESLint plugins with bad typings
 
-## 5.5.0
+Reverted `eslint-plugin-react-hooks` from v7.0.0 to v5.2.0.
+Downgraded `@vitest/eslint-plugin` from v1.3.23 to v1.3.10.
+
+- Ts|deps: Add @eslint/config-helpers to dev deps
+
+Allow use of `ExtendsElement` type to address the misalignment of `typescript-eslint` and `eslint` types.
+
+- Ts|deps: Upgrade all deps to latest minor version
+- \*|deps: Upgrade all deps to latest version
+- \*|deps: Upgrade all deps to latest minor version
+- #32 deps: Upgrade all deps to latest compatible version (#33)
+
+Upgrades all dependencies to the latest compatible version across the monorepo. Includes 8 major version bumps, a deprecated package migration, parser import adaptations for breaking ESM changes, a pre-existing tsconfig bug fix, and audit-ci allowlist entries for transitive dev-only vulnerabilities.
+
+Major upgrades:
+
+- @types/node 22 → 25
+- globals 16 → 17
+- eslint-plugin-unicorn 62 → 63
+- eslint-plugin-jsonc 2 → 3, jsonc-eslint-parser 2 → 3
+- eslint-plugin-yml 1 → 3, yaml-eslint-parser 1 → 2
+- glob 11 → 13
+- vite-tsconfig-paths 5 → 6
+
+Replaced deprecated eslint-plugin-markdown with @eslint/markdown.
+
+Adapted parser imports to namespace imports (`import * as`) required by jsonc-eslint-parser v3 and yaml-eslint-parser v2, which dropped default exports.
+
+Fixed pre-existing bug in tsconfig.eslint.json where `include` patterns failed to resolve linted files, causing 27 parserOptions errors.
+
+Deduplicated lockfile and added audit-ci allowlist entries for 6 transitive dev-only vulnerabilities (3 × minimatch via ESLint 9, rollup via vite, ajv via eslint, js-yaml via changesets).
 
 ### Features
 
-- Enabled custom JavaScript rules
-- Disabled rules inapplicable to test files
-- Aligned `unicorn/number-literal-case` rule with Prettier
+- Ts|feat: Refine linting rules
+- Ts|feat: Relax the complexity threshold from 11 to default
+- #34 feat: Replace jsonc/sort-keys with eslint-plugin-package-json (#37)
 
-### Dependencies
+Replaces the hand-maintained `jsonc/sort-keys` package.json ordering configuration with `eslint-plugin-package-json`'s `recommended` and `stylistic` configs in both the `basic` and `typescript` ESLint config packages. This eliminates ~190 lines of manually maintained key-order rules and delegates to `sort-package-json`'s canonical ordering.
 
-- Upgraded all dependencies to latest version
+### Refactoring
 
-## 5.4.0
-
-### Features
-
-- Refined linting rules to align with usual settings
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 5.3.0
-
-### Features
-
-- Added ESLint configuration for the `import` plugin
-- Modified the default TypeScript config:
-  - Explicit file extensions are now required by the `import/extensions` rule
-  - The `unicorn/switch-case-braces` has been relaxed so that braces are avoided when unneeded
+- Ts|refactor: Modernize plugin syntax
+- Ts|refactor: Adapt syntax and type annotations to satisfy stricter typing
+- \*|refactor: Use explicit .ts extension
 
 ### Tooling
 
-- Fixed the issue where Prettier was formatting the `packages/typescript/dist` directory
+- Root|tooling: Simplify Vitest config
+- Ts|tooling: Remove fragile automatic compilation
+
+## [5.11.0] - 2025-08-03
 
 ### Dependencies
 
-- Upgraded all dependencies to latest version
+- \*|deps: Upgrade all deps to latest version
 
-## 5.2.0
+Also removed `@eslint/plugin-kit` patch.
 
 ### Features
 
-- Enabled full n plugin configuration
+- Ts|feat: Enable improved no-array-callback-reference rule
+
+Enabled the `unicorn/no-array-callback-reference` rule after improvements made in `eslint-plugin-unicorn` v60.
+
+## [5.10.0] - 2025-07-20
 
 ### Dependencies
 
-- Upgraded all dependencies to latest version
--
-
-## 5.1.0
+- Ts|deps: Upgrade all deps to latest version
 
 ### Features
 
-- Added JSX A11y Lint configuration
-- Added TypeScript support to the Vitest configuration
-- Disabled some Vitest rules:
-  - `vitest/no-hooks`
-  - `vitest/prefer-expect-assertions`
-
-### Refactoring
-
-- Improved handling of imports in React configuration
-
-## 5.0.2
-
-### Fixes
-
-- Fixed the issue that all plugins were required as peer dependencies, even if they were not used in the configuration
+- Ts|feat: Disable no-redeclare in TypeScript projects
+- Ts|feat: Refine rules
 
 ### Tooling
 
-- Replaced custom workspace scripts with the generic `run-workspace-script` script runner
+- Ts|tooling: Use full-permission token when publishing
 
-## 5.0.1
+## [5.9.0] - 2025-07-13
+
+### Bug fixes
+
+- Ts|fix: Adapt to new deps
+- Ts|fix: Build step generates unwanted files
 
 ### Dependencies
 
-- Remove optional peer dependencies to avoid install warnings
-
-## 5.0.0
-
-### Breaking changes
-
-The API for optional configurations has been restored to its v3.4.0 state.
-Optional configurations are again exported as `ConfigArray` or `Linter.Config` objects.
+- Root|deps: Upgrade all deps to latest version
 
 ### Features
 
-- Added an optional Vitest configuration
-- Added Jest DOM rules to the React Testing Library config
+- Ts|feat: Add hook-function memoization rule
 
-## 4.0.1
+Added a new `sky-pilot-react` plugin with `sky-pilot-react/hook-returns-memoized-functions` rule.
 
-### Dependencies
+Moved React rules to a React configuration.
 
-- Removed optional plugins from dev dependencies because they are not needed by this project.
+- Ts|feat: Decrease severity of some unicorn rules
 
-## 4.0.0
-
-### Breaking changes
-
-Optional configurations are now exported as `OptionalConfiguration` objects instead of directly as arrays of rules.
-This breaks imports of the Next, React, and React Testing Library configs.
-
-#### Migration
-
-If the base configuration is being used, remove the optional configs.
-They will be included automatically if the plugins are installed.
-
-```diff
-  const config = [
-    // ...
--   ...tseslint.config({
--     extends: [
--       configs.next, //
--       configs.react,
--       configs.reactTestingLibrary,
--     ],
-    }),
-  ];
-```
-
-If the configs are used manually, make the following change:
-
-```diff
-- import configs from '@williamthorsen/eslint-config-typescript/configs';
-+ import configs, { optionalConfigs } from '@williamthorsen/eslint-config-typescript/configs';
-```
-
-and replace the configs as follows:
-
-- `configs.next` -> `optionalConfigs.next.config`
-- `configs.react` -> `optionalConfigs.react.config`
-- `configs.reactTestingLibrary` -> `optionalConfigs.reactTestingLibrary.config`
+## [5.8.0] - 2025-06-28
 
 ### Features
 
-- Optional configurations are now enabled automatically if the corresponding plugins are installed.
-- Useful file patterns are now exported.
+- Ts|feat: Disable poorly behaved new linting rules
 
-### Dependencies
+Disabled `vitest/prefer-called-once`, which conflicts with `vitest/prefer-called-times`.
+Disabled `vitest/prefer-importing-vitest-globals`, which doesn't recognize imported functions sharing the same name as Vitest globals.
 
-- Upgraded all dependencies to latest version
-
-## 3.4.0
-
-### Features
-
-- Added configs for Next.js, React, and React Testing Library
-- Enabled recommended Unicorn rules by default
-
-### Refactoring
-
-- Modernized some configurations to use `tseslint.configure` instead of manually constructing a config object
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.3.1
-
-### Fixes
-
-- SkyPilot plugin files are not included in distribution bundle
-
-## 3.3.0
-
-### Features
-
-- Added SkyPilot custom plugin and linting rules to the standard cofing.
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.2.2
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.2.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.1.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest minor version
-
-## 3.1.0
-
-### Features
-
-Rule changes:
-
-- Reduced `@typescript-eslint/unbound-method` from `error` to `warn`
-- Loosened `no-unused-vars` (for JavaScript files) to allow `_` prefix (same as corresponding TS rule)
-
-### Refactoring
-
-- Simplified the main configuration
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 3.0.4
-
-### Fixes
-
-- Fixed the file extension of the primary export in the manifest, where it was wrongly specified to be `.mjs`
-
-## 3.0.3
-
-### Fixes
-
-- Attempted to fix the issue where the exported utility `relativePathToDir` could not be resolved when imported
-
-## 3.0.2
-
-### Fixes
-
-- Set the `index.js` file extension to `.mjs` in attempt to fix ESLint's failure to find module
-
-## 3.0.1
-
-### Fixes
-
-- Fixed the issue that files were missing from the distribution bundle after the reconfiguration of exports.
-
-## 3.0.0
-
-### Breaking changes
-
-- Changes in export structure may require import adjustments.
-- Strict type-checked TypeScript rules are now enabled. (Previously, only recommended rules were enabled.)
-
-### Features
-
-- Enabled strict, type-checked rules
-
-### Refactoring
-
-- Modernize all configurations and rules
-
-## 2.2.0
-
-### Feature
-
-- Improved rule priority for TS files
-
-### Dependencies
-
-- Upgraded all runtimes to latest version (Node pinned to v20)
-
-## 2.1.1
-
-### Fixes
-
-- Fixed the issue where the distribution paths pointed to TypeScript files instead of transpiled JavaScript files
-
-## 2.1.0
+## [5.7.1] - 2025-06-28
 
 ### Tooling
 
-- Reconfigure exports to allow use of config file with explicit `.mjs` extension
+- \*|tooling: Modernize build toolchain
 
-## 2.0.0
+## [5.7.0] - 2025-05-31
 
-### Major Changes
+### Dependencies
 
-- Added new peer dependency: `typescript-eslint`
+- Ts|deps: Upgrade all deps to latest version
+- Ts|deps: Upgrade all deps to latest version
 
 ### Features
 
-- Modernized ESLint configs and plugins: Rules are now ESLint recommended and Typescript recommended with type-checking
+- Ts|feat: Relax unbound-method & promises rules
+- Ts|feat: Disable void-expression and extraneous-class rules in test files
 
-### Refactoring
+## [5.6.0] - 2025-05-17
 
-- Converted all source files to TypeScript
-- Replaced `@typescript-eslint/eslint-plugin` with `typescript-eslint`
-- Replaced rules from `eslint` with rules from `@elint/js`
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+- \*|deps: Reduce duplication of dependencies
+
+### Features
+
+- Feat: Disable some rules
+
+Disabled some overly proscriptive rules.
+Disabled rules inappropriate for test files.
+
+## [5.5.0] - 2025-05-14
+
+### Dependencies
+
+- Deps: Upgrade all deps to latest version
+
+### Features
+
+- Ts|feat: Enable custom JS rules
+- Ts|feat: Disable rules inappropriate for tests
+- Ts|feat: Align hexadecimal casing with Prettier
+
+## [5.4.0] - 2025-05-09
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+### Features
+
+- Ts|feat: Refine rules
+
+## [5.3.0] - 2025-05-04
+
+### Dependencies
+
+- Ts|deps: Add eslint-plugin-import to dev deps
+- \*|deps: Upgrade all deps to latest version
+
+### Features
+
+- Ts|feat: Add import ESLint config
+- Ts|feat: Require file extensions in default TS config
+- Ts|feat: Avoid unneeded braces in switch-case
 
 ### Tooling
 
-- Added support for publication to jsr.io
+- Ts|tooling: Fix: Prettier formats dist folder when run from workspace
+
+## [5.2.0] - 2025-04-30
+
+### Features
+
+- Ts|feat: Use full n configuration instead of rules only
+- Ts|feat: Add strict skypilot config
+
+## [5.1.0] - 2025-04-29
 
 ### Dependencies
 
-- Upgraded all dependencies to latest version
+- Ts|deps: Add JSX A11y ESLint plugin to dev deps
 
-## 1.0.0
+### Features
 
-First stable release.
+- Ts|feat: Add typechecking to Vitest config
+- Ts|feat: Disable vitest/no-hooks rule
+- Ts|feat: Add JSX A11y config
 
 ### Refactoring
 
-- Upgraded all dependencies to latest version
+- Ts|refactor: Improve naming & docs in eslint-comments config
+- Ts|refactor: Improve imports from React plugins
 
-## 0.17.0
+## [5.0.2] - 2025-04-29
 
-### Content
+### Bug fixes
 
-- Added `no-constant-condition` and `no-restricted-imports` to the rules for JavaScript files
+- Ts|fix: Optional plugins are required for unused configs
 
-### Dependencies
-
-- Upgraded dependencies
-
-## 0.16.0
-
-### Dependencies
-
-- Upgraded all dependencies except for `eslint` to latest version
-- Upgraded `eslint` to latest v8.x (for compatibility with `@typescript-eslint` packages)
-
-## 0.15.1
-
-### Patch Changes
-
-- Upgraded all dependencies to latest version
-
-## 0.15.0
-
-### Minor Changes
-
-- Simplified configs, upgraded dependencies
-
-## 0.14.2
-
-### Fixes
-
-Fixed the issue that `relativePathToDir` was finding the relative path to the target directory from the location of the `relativePathToDir.js` file instead of the caller's file.
-The function now accepts a second argument specifying which directory should serve as the base directory.
-
-## 0.14.1
-
-### Fixes
-
-Fixed the failure to include `relativePathToDir` helper function in the distribution bundle.
-
-## 0.14.0
-
-### Features
-
-Added `relativePathToDir` helper function to assist in writing monorepo configs.
-
-## 0.13.0
-
-### Features
-
-Aligned rules with Deno style:
-
-- Changed `comma-brace` style from `stroustrup` to `1tbs`
-- Changed `comma-dangle` style for functions and tuples to `always-multiline`, making it consistent with all other
-  comma-dangle rules
-
-## 0.12.5
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.12.4
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-- Closed vulnerability in the transitive dependency `semver`
-
-## 0.12.3
-
-### Dependencies
-
-- Upgraded all dependies & runtimes to latest version
-
-## 0.12.2
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.12.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.12.0
-
-### Features
-
-- Updated `package.json` ordering rules to align more closely with `json-sort-cli`.
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.11.3
-
-### Fixes
-
-- Fixed an issue where the `tuples: "ignore"` setting in the `@typescript-eslint/comma-dangle` rule caused a `ruleListener not found` error when a tuple was encountered. The workaround was to set `tuples: "only-multiline"` in that rule.
-
-## 0.11.2
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.11.1
-
-### Features
-
-- Updated `package.json` ordering rules to align more closely with `json-sort-cli`.
-
-## 0.11.0
-
-### Features
-
-- Updated `package.json` ordering rules to align more closely with `json-sort-cli`
-
-## 0.10.11
-
-### Features
-
-- Updated `package.json` ordering rules to align more closely with `json-sort-cli`.
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-- Removed unneeded `typescript` package and TS config
+Fixed the issue that all plugins were required to build the linter config, even if they weren't used by the consumer.
 
 ### Tooling
 
-- Added strict linting to code checks
-- Removed the `audit` check, which should now be performed only from the monorepo root
-- Centralized the linter config in the monorepo root
+- \*|tooling: Use generic workspace script runner
 
-## 0.10.10
+## [5.0.1] - 2025-04-29
+
+### Dependencies
+
+- Ts|deps: Remove optional peer dependencies to avoid install warnings
+
+## [5.0.0] - 2025-04-29
+
+### Dependencies
+
+- Ts|deps: Dependencies maybe unavailable when auto-install-peers=false
+- Ts|deps: Add Vitest ESLint plugin to dev & peer deps
+- Ts|deps: Upgrade Vitest ESLint plugin to latest version
+
+### Features
+
+- Ts|feat: Add optional Vitest ESLint config
+- Ts|feat: Add Jest DOM rules to Testing Library config
+
+### Refactoring
+
+- Ts|refactor: Revert configs API to v3.4.0
+
+## [4.0.1] - 2025-04-29
+
+### Dependencies
+
+- Ts|deps: Remove optional plugins from dev dependencies
+
+## [4.0.0] - 2025-04-29
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+### Features
+
+- Ts|feat: Use optional configs when plugins are available
 
 ### Tooling
 
-- Fixed skipping of scripts directories
+- Ts|tooling: Add optional plugins to manifest
 
-## 0.10.9
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.10.8
+## [3.4.0] - 2025-04-28
 
 ### Dependencies
 
-- Upgraded all dependencies to latest version
+- Ts|deps: Add Testing Library ESLint plugin to dev deps
+- Ts|deps: Add Next.js ESLint plugin to dev deps
+- \*|deps: Upgrade all deps to latest version
 
-## 0.10.7
+### Features
 
-### Dependencies
+- Ts|feat: Add React config
+- Ts|feat: Refine rules
+- Ts|feat: Enable recommended Unicorn rules by default
+- Ts|feat: Add React Testing Library config
+- Ts|feat: Add Next.js ESLint configuration
 
-- Upgrade all dependencies to latest minor version
+### Refactoring
 
-## 0.10.6
+- Ts|refactor: Modernize JavaScript config
+- \*|refactor: Fix lint
 
-### Dependencies
+## [3.3.1] - 2025-04-06
 
-- Upgraded dependencies to latest minor version
-- Closed vulnerability in `yaml` package by forcing use of ^2.2.2 instead of 2.1.3
+### Bug fixes
 
-## 0.10.5
+- Ts|fix: SkyPilot plugin files are not included in distribution bundle
 
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## Dependencies
-
-### Dependencies
-
-- Upgraded all dependencies & runtimes to latest version
-
-## Dependencies
+## [3.3.0] - 2025-04-06
 
 ### Dependencies
 
-- Upgraded all dependencies to latest version
+- Ts|deps: Add @typescript-eslint/utils to dev deps
+- \*|deps: Upgrade all deps to latest version
 
-## 0.10.2
+### Features
 
-### Dependencies
+- Ts|feat: Include SkyPilot plugin in TS config
 
-- Upgraded all dependencies to latest version
+### Refactoring
 
-## 0.10.1
+- Ts|refactor: Fix lint
 
 ### Tooling
 
-- Removed unneeded ignores
+- \*|tooling: Set Node 18 as minimum version
 
-## 0.10.0
-
-### Features
-
-- Disabled `no-extra-parens` rule
-
-## 0.9.1
+## [3.2.2] - 2025-03-23
 
 ### Dependencies
 
-- Upgraded all dependencies to latest version
+- \*|deps: Upgrade all deps to latest version
 
-## 0.9.0
+## [3.2.1] - 2025-03-03
 
-### BREAKING CHANGES
+### Dependencies
 
-- Changed from ESLint nested config to ESLint flat config.
-- Renamed `@williamthorsen/eslint-config-typescript-flat` to `@williamthorsen/eslint-config-typescript`
+- \*|deps: Upgrade all deps to latest version
 
-## 0.8.0
+## [3.2.0] - 2025-02-23
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest minor version
+- \*|deps: Upgrade all deps to latest version
+
+### Features
+
+- Ts|feat: Allow CommonJS globals in CJS files
+- Ts|feat: Loosen strict void & template expression rules
+- Ts|feat: Disable some troublesome rules from the n plugin
+- \*|feat: Disable JSONC formatting rules
+
+Prettier handles formatting
+
+### Formatting
+
+- \*|fmt: Autoformat
 
 ### Tooling
 
-- Deprecation notice: Versions below v0.9.0 are deprecated.
+- \*|tooling: Remove Deno
 
-## 0.7.5
+## [3.1.1] - 2025-01-04
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+## [3.1.0] - 2024-11-05
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest version
+
+### Features
+
+- Ts|feat: Rationalize configs
+- Ts|feat: Support JSX
+
+## [3.0.4] - 2024-11-04
+
+### Bug fixes
+
+- Ts|fix: Wrong file extension for primary export
+
+## [3.0.3] - 2024-11-04
+
+### Bug fixes
+
+- Ts|fix: Export of relativePathToDir utility is not resolved correctly
+
+## [3.0.2] - 2024-11-04
+
+### Bug fixes
+
+- Ts|fix: ESLint cannot import module
+
+## [3.0.1] - 2024-11-04
+
+### Bug fixes
+
+- Ts|fix: Files are excluded from distribution bundle
+
+## [3.0.0] - 2024-11-04
+
+### Features
+
+- Ts|feat: Modernize configs
+
+## [2.2.0] - 2024-11-03
+
+### Features
+
+- Ts|feat: Improve rule priority for TS files
+
+## [2.1.1] - 2024-11-03
+
+### Bug fixes
+
+- Ts|fix: Distribution contain source files instead of transpiled files
+
+## [2.1.0] - 2024-11-03
+
+### Tooling
+
+- Ts|tooling: Explicitly export an MJS file
+
+To allow use by a project that does not assume ESM.
+
+## [2.0.0] - 2024-11-03
+
+### Dependencies
+
+- \*|deps: Upgrade all deps to latest minor version
+
+### Features
+
+- Ts|feat: Convert source files to TypeScript
+- Ts|feat: Convert source files to TypeScript (2)
+
+### Tooling
+
+- \*|tooling: Modernize ESLint configs
+- Root|tooling: Configure lint rules for project
+
+## [1.0.0] - 2024-10-12
+
+### Bug fixes
+
+- \*|fix: Helper function is not included in distribution bundle
+
+Added `utils/` to filepaths to allow inclusion of `relativePathToDir` helper function.
+
+- Multi|fix: relativePathToDir resolves target relative to code file
+
+Fixed the issue that `relativePathToDir` finds the relative path from the location of the `relativePathToDir.js` file instead of the caller's file. The function now accepts a second argument specifying which directory should serve as the base directory.
+
+### Dependencies
+
+- Deps: Upgrade all deps to latest version
+- Deps: Upgrade all deps to latest version
+- Deps: Upgrade all deps to latest version
+- Deps: Upgrade all deps to latest version
+- Deps: Upgrade all deps to latest version
+- Deps: Upgrade all deps to latest version
+- \*|deps: Upgrade all deps & runtimes to latest version
+- \*|deps: Upgrade all deps & runtimes to latest version
+- \*|deps: Upgrade all deps & runtimes to latest version
+
+Closes security vulnerability in `semver`
+
+- \*|deps: Upgrade all deps to latest version
+- \*|deps: Upgrade all deps to latest version
+- \*|deps: Upgrade all deps to latest version
+- - | deps: Upgrade all deps to latest minor version
+- - | deps: Upgrade most deps to latest major version
+
+Upgraded all deps to latest major version except for `eslint`, which is pinned at v8.x for compatibility with `@teypescript-eslint` deps.
+
+- - | deps: Upgrade all deps to latest minor version
+- - | deps: Upgrade all deps to latest major version
+- - | deps: Require v9 or better for ESLint as peer dep
+- \*|deps: Upgrade all deps to latest version
+
+Also replaced `@esbuild-kit/esm-loader` with `tsx.
+
+### Documentation
+
+- Docs: Mark all packages as UNLICENSED
+- \*|docs: Update all licenses
+
+### Features
+
+- Feat: Align package.json rules with sortjson sorting
+- Ts|feat: Enforce multiline commas to align with Deno style
+- Ts|feat: Adopt 1TBS braces to align with Deno style
+- \*|feat: Add helper function to get relative path
+
+The JS and TS modules now export a helper function, `relativePathToDir`, to facilitate flat configs in monorepos
+
+- Ts|feat: Report unused directives
+- - | feat: Enable guard-for-in rule
 
 ### Refactoring
 
-- Removed unused import plugin
+- Refactor: Add type annotation to linter configs
 
-## 0.7.4
+### Tooling
 
-### Dependencies
+- Tooling: Use audit-ci to wrap package audits
 
-- Upgrade all dependencies to latest version
+Allows some vulnerabilities to be ignored
 
-## 0.7.3
+- Tooling: Rationalize linter configuration
 
-### Dependencies
+Moved base configuration to monorepo root.
+Removed unneeded `typescript` package and TS config from `typescript` workspace, which has no TypeScript files.
+Added typechecking to root level checks.
 
-- Upgraded all dependencies to latest version
+- Tooling: Enable strict linting in monorepo root & workspaces
+- \*|tooling: Add Deno config, remove formatting rules
+- Ts|tooling: Fix broken ignores
 
-## 0.7.2
+## [0.10.0] - 2022-12-31
 
-### Dependencies
+### Features
 
-- Upgraded all dependencies to latest version
+- Feat: Disable no-extra-parens rule
 
-## 0.7.1
-
-### Dependencies
-
-- Upgraded all dependencies to latest version
-
-## 0.7.0
+## [0.9.1] - 2022-12-31
 
 ### Dependencies
 
-- Upgraded dependencies
+- Deps: Upgrade all dependencies to latest
 
-## 0.6.1
+## [0.9.0] - 2022-12-29
 
 ### Refactoring
 
-- Replaced `sort-imports` with `simple-sort-imports`
+- Refactor: Remove unneeded import rule
 
-## 0.6.0
+`eslint-plugin-import` is not used in these configs
 
-### Refactoring
+### Tooling
 
-- Exported common ignore patterns
+- Tooling: Add code-quality scripts to package files
 
-## 0.5.0
-
-### Features
-
-- Enforced use of braces for all control statements
-  Disabled `no-use-before-define` in TypeScript files
-
-## 0.4.1
-
-### Fixes
-
-- Removed erroneous commonIgnores reference from TS rules
-
-## 0.4.0
-
-### Features
-
-- Combined JS/TS rules now ignore commonly ignored files
-  Disabled `no-undef` rule in TypeScript files
-
-## 0.3.0
-
-### Features
-
-- BREAKING CHANGE: Removed legacy config.
-
-### Refactoring
-
-- Simplified structure
-- Made plugins direct dependencies of the flat TypeScript config
-
-### Features
-
-## 0.2.0
-
-### Features
-
-- A legacy config with the same rules as the flat config is now exported.
-
-## 0.1.7
-
-### Fixes
-
-- Fixed nonpropagating ignores, Node globals
-
-## 0.1.6
+## [0.7.4] - 2022-12-28
 
 ### Dependencies
 
-- Upgraded dependencies
+- Deps: Upgrade all dependencies to latest
+
+deps: Upgrade all dependencies to latest version
+
+## [0.7.3] - 2022-12-17
+
+### Dependencies
+
+- Deps: Upgrade all dependencies to latest version
+- Deps: Upgrade all dependencies to latest version
+
+## [0.7.1] - 2022-12-05
+
+### Dependencies
+
+- Deps: Upgrade all dependencies
+
+## [0.7.0] - 2022-12-04
+
+### Bug fixes
+
+- Fix: Stop some JS rules from applying to JSON files
+
+### Dependencies
+
+- Deps: Upgrade all dependencies to latest
+- Deps: Upgrade all dependencies to latest version
+- Dep: Upgrade all dependencies
+
+### Documentation
+
+- Docs: Add LICENSE file to each package
+
+### Features
+
+- Feat: Add JS and TS configs
+- Feature: Refine TypeScript rules
+- Feature: Refine TypeScript rules
+- Feat: Separate JS from TS rules in merged config
+
+### Refactoring
+
+- Refactor: Convert configs to flat syntax
+
+<!-- generated by git-cliff -->
