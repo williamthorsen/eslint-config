@@ -1,6 +1,10 @@
 packageConfigs:
   '@williamthorsen/*':
     registry: https://npm.pkg.github.com/
+  '@williamthorsen/release-kit':
+    registry: https://registry.npmjs.org/
+  '@williamthorsen/toolbelt.objects':
+    registry: https://registry.npmjs.org/
 packages:
   - packages/*
 onlyBuiltDependencies:
