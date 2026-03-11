@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [eslint-config-typescript-v5.15.0] - 2026-03-11
+
+### Bug fixes
+
+- Strict-lint|typescript|fix: Add prepublishOnly hook to prevent stale builds
+
+v6.1.1 shipped with an unrebuilt dist, so the exit-code fix from #44
+never actually reached consumers. Adding prepublishOnly ensures
+`pnpm run build` always runs before publish.
+
 ## [typescript-v5.13.0] - 2026-03-11
 
 ### Features
