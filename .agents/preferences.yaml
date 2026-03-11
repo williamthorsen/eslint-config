@@ -7,7 +7,7 @@ integrations:
     enabled: false
 project:
   slug: eslint-config
-  ticket_prefix: ''
+  ticket_prefix: '#'
 repository:
   default_remote:
     - name: origin
