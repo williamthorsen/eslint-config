@@ -2,7 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
-## [strict-lint-v6.0.0] - 2026-03-11
+## [strict-lint-v6.1.0] - 2026-03-11
+
+### Features
+
+- Ts|feat: Downgrade no-deprecated and tune unicorn and n rule severities
+
+Downgrades `no-deprecated` to warn in eslint-config-typescript so strict-lint's
+`maxSeverity` guard can prevent escalation.
+
+Disables overly prescriptive `unicorn` and `n` rules (`no-process-exit`, `no-for-loop`, `prefer-default-parameters`, `prefer-math-min-max`). Downgrades `consistent-function-scoping` to warn.
+
+Adds warn-level `unicorn` rules to the strict-lint `defaultMaxSeverity` map.
+
+- Strict-lint|feat: Prevent escalation of downgraded linting rules
+
+## [typescript-v5.12.4] - 2026-03-11
 
 ### Features
 
