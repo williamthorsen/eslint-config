@@ -11,12 +11,12 @@ import type { MaxSeverityMap, StrictLintOptions } from './types.ts';
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
   const args = process.argv.slice(2);
   return doLint(options, ...args)
-    .then((resultText) => {
-      console.info(resultText);
-      if (/✖.*problem/.test(resultText)) {
+    .then(({ text, errorCount }) => {
+      console.info(text);
+      if (errorCount > 0) {
         process.exit(1);
       }
-      return resultText;
+      return text;
     })
     .catch((error: unknown) => {
       console.error(error);
@@ -29,7 +29,10 @@ export async function strictLint(options?: StrictLintOptions): Promise<string> {
  * TODO: Allow file pattern to be passed in.
  * @link https://eslint.org/docs/latest/integrate/nodejs-api#eslint-class
  */
-async function doLint(options: StrictLintOptions | undefined, ...args: string[]): Promise<string> {
+async function doLint(
+  options: StrictLintOptions | undefined,
+  ...args: string[]
+): Promise<{ text: string; errorCount: number }> {
   let eslintConfigDir: string | undefined;
 
   const config: Linter.Config[] = await (async () => {
@@ -69,9 +72,12 @@ async function doLint(options: StrictLintOptions | undefined, ...args: string[])
   // Writes fixes to files
   await ESLint.outputFixes(results);
 
+  const errorCount = results.reduce((sum, r) => sum + r.errorCount, 0);
+
   // Format and display the results
   const formatter = await eslint.loadFormatter('stylish');
-  return formatter.format(results);
+  const text = await formatter.format(results);
+  return { text, errorCount };
 }
 
 function assertIsConfig(mod: unknown): asserts mod is { default: Linter.Config[] } {
