@@ -2,10 +2,15 @@
 
 import type { Linter } from 'eslint';
 
-export function convertWarnToError(config: Linter.Config): Linter.Config {
+import type { MaxSeverityMap } from './types.ts';
+
+export function convertWarnToError(config: Linter.Config, maxSeverity?: MaxSeverityMap): Linter.Config {
   if (!config.rules) return config;
   const ruleEntries = Object.entries(config.rules);
   const errorRuleEntries = ruleEntries.map(([ruleName, ruleValue]) => {
+    if (maxSeverity?.[ruleName] === 'warn') {
+      return [ruleName, ruleValue];
+    }
     if (ruleValue === 'warn') {
       return [ruleName, 'error'];
     }

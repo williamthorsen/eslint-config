@@ -51,4 +51,95 @@ describe('convertWarnToError()', () => {
 
     expect(actual).toEqual(expected);
   });
+
+  it('if maxSeverity maps a rule to "warn", skips escalation for string-form warn', () => {
+    const config = {
+      rules: {
+        'keep-warn': 'warn',
+        'escalate-rule': 'warn',
+      },
+    } satisfies Config;
+    const maxSeverity = { 'keep-warn': 'warn' } as const;
+    const expected = {
+      rules: {
+        'keep-warn': 'warn',
+        'escalate-rule': 'error',
+      },
+    };
+
+    const actual = convertWarnToError(config, maxSeverity);
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('if maxSeverity maps a rule to "warn", skips escalation for array-form warn', () => {
+    const config = {
+      rules: {
+        'keep-warn': ['warn', { option: 'value' }],
+      },
+    } satisfies Config;
+    const maxSeverity = { 'keep-warn': 'warn' } as const;
+    const expected = {
+      rules: {
+        'keep-warn': ['warn', { option: 'value' }],
+      },
+    };
+
+    const actual = convertWarnToError(config, maxSeverity);
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('if maxSeverity maps a rule to "error", escalation proceeds normally', () => {
+    const config = {
+      rules: {
+        'escalate-rule': 'warn',
+      },
+    } satisfies Config;
+    const maxSeverity = { 'escalate-rule': 'error' } as const;
+    const expected = {
+      rules: {
+        'escalate-rule': 'error',
+      },
+    };
+
+    const actual = convertWarnToError(config, maxSeverity);
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('if maxSeverity maps a rule to "warn" and the rule is already "error", keeps it as "error"', () => {
+    const config = {
+      rules: {
+        'already-error': 'error',
+      },
+    } satisfies Config;
+    const maxSeverity = { 'already-error': 'warn' } as const;
+    const expected = {
+      rules: {
+        'already-error': 'error',
+      },
+    };
+
+    const actual = convertWarnToError(config, maxSeverity);
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('if maxSeverity is not provided, all warn rules are escalated', () => {
+    const config = {
+      rules: {
+        'warn-rule': 'warn',
+      },
+    } satisfies Config;
+    const expected = {
+      rules: {
+        'warn-rule': 'error',
+      },
+    };
+
+    const actual = convertWarnToError(config);
+
+    expect(actual).toEqual(expected);
+  });
 });
