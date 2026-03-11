@@ -16,6 +16,7 @@ const rules: Linter.RulesRecord = {
 
   // Downgrade or disable overly prescriptive rules
   'unicorn/catch-error-name': 'warn', // 🔴🟠
+  'unicorn/consistent-function-scoping': 'warn', // 🔴🟠 Legitimate to co-locate helpers
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
   'unicorn/explicit-length-check': 'warn', // 🔴🟠
   'unicorn/filename-case': 'off', // 🔴⚫
@@ -27,13 +28,17 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-lonely-if': 'warn', // 🔴🟠
   'unicorn/no-negated-condition': 'warn', // 🔴🟠
   'unicorn/no-nested-ternary': 'warn', // 🔴🟠
+  'unicorn/no-for-loop': 'off', // 🔴⚫ Traditional for loops are sometimes clearer
   'unicorn/no-null': 'off', // 🔴⚫ Prefer `undefined` over `null`
+  'unicorn/no-process-exit': 'off', // 🔴⚫ Needed in CLI tools and scripts
   'unicorn/no-useless-undefined': 'warn', // 🔴🟠
   'unicorn/number-literal-case': ['warn', { hexadecimalValue: 'lowercase' }], // to align with Prettier
   'unicorn/numeric-separators-style': 'warn', // 🔴🟠
   'unicorn/prefer-global-this': 'warn', // 🔴🟠
+  'unicorn/prefer-default-parameters': 'off', // 🔴⚫ Incorrectly handles `null`
   'unicorn/prefer-dom-node-text-content': 'warn', // 🔴🟠 Prefer `textContent` over `innerText`
   'unicorn/prefer-includes': 'warn', // 🔴🟠 Prefer `includes` over `indexOf` when checking for existence
+  'unicorn/prefer-math-min-max': 'off', // 🔴⚫ Ternary is often more readable than Math.min/Math.max
   'unicorn/prefer-node-protocol': 'warn', // 🔴🟠 Prefer `node:`-prefixed modules
   'unicorn/prefer-number-properties': 'warn', // 🔴🟠
   'unicorn/prefer-query-selector': 'warn', // 🔴🟠

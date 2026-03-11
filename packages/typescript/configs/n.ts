@@ -4,6 +4,7 @@ import nPlugin from 'eslint-plugin-n';
 
 const modifiedRules: Linter.RulesRecord = {
   'n/no-callback-literal': 'off', // Enforces Node.js-style callback pattern
+  'n/no-process-exit': 'off', // 🔴⚫ Needed in CLI tools and scripts
   'n/no-extraneous-import': 'warn', // 🔴🟠
   'n/no-missing-import': 'warn', // 🔴🟠
   'n/no-unpublished-import': 'warn',

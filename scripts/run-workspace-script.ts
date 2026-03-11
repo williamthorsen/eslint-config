@@ -1,5 +1,3 @@
-/* eslint n/no-process-exit: off */
-/* eslint unicorn/no-process-exit: off */
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import process from 'node:process';

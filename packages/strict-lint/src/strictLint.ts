@@ -14,14 +14,12 @@ export async function strictLint(options?: StrictLintOptions): Promise<string> {
     .then((resultText) => {
       console.info(resultText);
       if (/✖.*problem/.test(resultText)) {
-        // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
         process.exit(1);
       }
       return resultText;
     })
     .catch((error: unknown) => {
       console.error(error);
-      // eslint-disable-next-line n/no-process-exit,unicorn/no-process-exit
       process.exit(1);
     });
 }

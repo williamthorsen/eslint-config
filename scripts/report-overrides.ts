@@ -1,6 +1,3 @@
-/* eslint n/no-process-exit: off */
-/* eslint unicorn/no-process-exit: off */
-
 import { isObject } from '@williamthorsen/toolbelt.objects';
 
 import packageJson from '../package.json' with { type: 'json' };
