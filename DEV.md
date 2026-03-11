@@ -2,14 +2,9 @@
 
 ## Versioning
 
-1. Create a changeset:
+Generate CHANGELOGs and bump versions using `release-kit`:
 
 ```bash
-pnpm changeset
-```
-
-2. Generate CHANGELOGs and bump version:
-
-```bash
-pnpm changeset version
+pnpm run release:prepare           # Analyze commits, generate CHANGELOGs, bump versions
+pnpm run release:prepare:dry       # Dry run to preview changes
 ```

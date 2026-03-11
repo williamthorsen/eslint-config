@@ -70,11 +70,11 @@ pnpm run update                   # Update dependencies
 pnpm run audit                    # Security audit
 ```
 
-### Versioning (Changesets)
+### Versioning (release-kit)
 
 ```bash
-pnpm changeset                # Create a changeset
-pnpm changeset version        # Generate CHANGELOGs and bump versions
+pnpm run release:prepare           # Analyze commits, generate CHANGELOGs, bump versions
+pnpm run release:prepare:dry       # Dry run to preview changes
 ```
 
 ## TypeScript Configuration

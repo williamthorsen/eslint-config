@@ -68,18 +68,15 @@ Generated changelogs organize changes into these sections:
 
 ### Automated workflow
 
-1. **Generate changeset**: `pnpm run changeset:auto` - Analyzes commits since last release and generates changelog entries
-2. **Review changes**: Examine generated changelog and release notes
-3. **Commit changes**: Commit the changeset and updated documentation
-4. **Version packages**: `pnpm changeset version` - Apply version bumps and finalize changelogs
-5. **Publish**: `pnpm changeset publish` - Publish with generated release notes
+1. **Prepare release**: `pnpm run release:prepare` — Analyzes commits since last release, generates CHANGELOGs, and bumps versions
+2. **Review changes**: Examine generated changelog and version bumps
+3. **Commit and publish**: Commit the updated CHANGELOGs and package versions
 
-### Manual override
+### Dry run
 
-Standard changeset commands remain available:
+Preview what `release:prepare` would do without making changes:
 
-- `pnpm changeset` - Create changeset manually
-- `pnpm changeset version` - Apply version bumps
+- `pnpm run release:prepare:dry`
 
 ## Release notes
 
@@ -90,7 +87,7 @@ Release notes automatically generated for published packages include only consum
 
 ## Versioning strategy
 
-- **Packages**: Use semantic versioning with changeset-managed bumps
+- **Packages**: Use semantic versioning with release-kit-managed bumps
 - **Monorepo root**: Version matches the highest published package version
 - **Published packages**: `@williamthorsen/eslint-config-typescript` and `@williamthorsen/strict-lint`
 
