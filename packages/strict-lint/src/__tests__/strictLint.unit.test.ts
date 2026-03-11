@@ -156,7 +156,6 @@ describe('strictLint() exit code', () => {
 
   it('exits 0 when no problems are reported', async () => {
     mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 0 }]);
-    mockFormat.mockResolvedValueOnce('');
 
     await strictLint({ baseConfig: [{ rules: {} }] });
 
@@ -165,7 +164,6 @@ describe('strictLint() exit code', () => {
 
   it('exits 0 when only warnings are reported', async () => {
     mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
-    mockFormat.mockResolvedValueOnce('\n\u2716 3 problems (0 errors, 3 warnings)\n');
 
     await strictLint({ baseConfig: [{ rules: {} }] });
 
@@ -177,7 +175,14 @@ describe('strictLint() exit code', () => {
       { errorCount: 2, warningCount: 1 },
       { errorCount: 1, warningCount: 0 },
     ]);
-    mockFormat.mockResolvedValueOnce('\n\u2716 4 problems (3 errors, 1 warning)\n');
+
+    await strictLint({ baseConfig: [{ rules: {} }] });
+
+    expect(process.exit).toHaveBeenCalledWith(1);
+  });
+
+  it('exits 1 when doLint throws an error', async () => {
+    mockLintFiles.mockRejectedValueOnce(new Error('lint failure'));
 
     await strictLint({ baseConfig: [{ rules: {} }] });
 

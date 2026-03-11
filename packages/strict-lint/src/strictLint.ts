@@ -10,18 +10,17 @@ import type { MaxSeverityMap, StrictLintOptions } from './types.ts';
 
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
   const args = process.argv.slice(2);
-  return doLint(options, ...args)
-    .then(({ text, errorCount }) => {
-      console.info(text);
-      if (errorCount > 0) {
-        process.exit(1);
-      }
-      return text;
-    })
-    .catch((error: unknown) => {
-      console.error(error);
+  try {
+    const { text, errorCount } = await doLint(options, ...args);
+    console.info(text);
+    if (errorCount > 0) {
       process.exit(1);
-    });
+    }
+    return text;
+  } catch (error: unknown) {
+    console.error(error);
+    process.exit(1);
+  }
 }
 
 /**
