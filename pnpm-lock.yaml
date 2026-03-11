@@ -27,8 +27,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@24.12.0)(tsx@4.21.0)(yaml@2.8.0))
       '@williamthorsen/release-kit':
-        specifier: 0.2.2
-        version: 0.2.2
+        specifier: 0.2.3
+        version: 0.2.3
       '@williamthorsen/toolbelt.objects':
         specifier: 3.2.3
         version: 3.2.3
@@ -935,9 +935,10 @@ packages:
   '@vitest/utils@4.0.18':
     resolution: {integrity: sha512-msMRKLMVLWygpK3u2Hybgi4MNjcYJvwTb0Ru09+fOyCXIgT5raYP041DRRdiJiI3k/2U6SEbAETB3YtBrUkCFA==}
 
-  '@williamthorsen/release-kit@0.2.2':
-    resolution: {integrity: sha512-gcDRFdMuyCddWzvMOtvFomUZM2guA0L5iGXbCoqCh6ycGNUDe+Lw0WZSEOlAsYOwarLynUw4niJZEnNp0sPXzw==}
+  '@williamthorsen/release-kit@0.2.3':
+    resolution: {integrity: sha512-EL9IiIwEZ90kGmhQb63vZBIIxH7BeP6edMT1Do6+727c0Uwltvv5lhWXlgR0TIQbQ8OBDyzxmLnrvOMg9uV37g==}
     engines: {node: '>=18.17.0'}
+    hasBin: true
 
   '@williamthorsen/toolbelt.objects@3.2.3':
     resolution: {integrity: sha512-zppXOzgB0eOTzDUAtt9VO4lJceTKesujsRBMKiMG0H03WpR54FTGYsAicI+e3LTpDtQEvcdy4eWoLCM2oN+S/w==}
@@ -3502,7 +3503,7 @@ snapshots:
       '@vitest/pretty-format': 4.0.18
       tinyrainbow: 3.0.3
 
-  '@williamthorsen/release-kit@0.2.2': {}
+  '@williamthorsen/release-kit@0.2.3': {}
 
   '@williamthorsen/toolbelt.objects@3.2.3': {}
 
