@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [strict-lint-v6.1.0] - 2026-03-11
+## [strict-lint-v6.1.1] - 2026-03-11
+
+### Bug fixes
+
+- #43 strict-lint|fix: Exit 0 when only warnings are reported (#44)
+
+Replaced the regex-based exit logic in `strictLint()` with an `errorCount` check on ESLint's `LintResult[]` objects. `doLint()` now returns `{ text, errorCount }` and `strictLint()` exits 1 only when `errorCount > 0`. Also refactored `strictLint()` from `.then()/.catch()` promise chaining to `async/await` with `try/catch`.
+
+## [typescript-v5.13.0] - 2026-03-11
 
 ### Features
 
