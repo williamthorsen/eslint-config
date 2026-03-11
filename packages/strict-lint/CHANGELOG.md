@@ -2,7 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
-## [strict-lint-v5.3.9] - 2026-03-10
+## [strict-lint-v6.0.0] - 2026-03-11
+
+### Features
+
+- #40 strict-lint|feat!: Add maxSeverity support to exclude rules from escalation (#42)
+
+Add a three-layer `maxSeverity` merge system that controls which rules are excluded from warn-to-error escalation.
+
+Built-in defaults ship with `@typescript-eslint/no-deprecated` set to 'warn'.
+
+A project-level `.config/strict-lint.config.ts` file can override defaults, and programmatic options passed to `strictLint()` take highest precedence.
+
+The `strictLint()` signature changes from positional `baseConfig` to an options object (`StrictLintOptions`).
+
+The `convertWarnToError` function accepts an optional `MaxSeverityMap` that skips escalation for rules mapped to 'warn'.
+
+A new `loadStrictLintConfig` loader uses tsx's `tsImport` to dynamically load TypeScript config files with shape validation.
+
+## [typescript-v5.12.3] - 2026-03-10
 
 ### Bug fixes
 

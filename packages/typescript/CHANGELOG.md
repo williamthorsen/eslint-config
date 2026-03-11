@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [eslint-config-typescript-v5.12.3] - 2026-03-10
+## [typescript-v5.12.3] - 2026-03-10
 
 ### Dependencies
 
