@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [eslint-config-typescript-v5.15.0] - 2026-03-11
+## [typescript-v5.15.0] - 2026-03-11
 
 ### Bug fixes
 
