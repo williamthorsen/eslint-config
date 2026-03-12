@@ -27,8 +27,8 @@ importers:
         specifier: 4.0.18
         version: 4.0.18(vitest@4.0.18(@types/node@24.12.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.0))
       '@williamthorsen/release-kit':
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: 1.0.1
+        version: 1.0.1
       '@williamthorsen/toolbelt.objects':
         specifier: 3.2.3
         version: 3.2.3
@@ -935,8 +935,8 @@ packages:
   '@vitest/utils@4.0.18':
     resolution: {integrity: sha512-msMRKLMVLWygpK3u2Hybgi4MNjcYJvwTb0Ru09+fOyCXIgT5raYP041DRRdiJiI3k/2U6SEbAETB3YtBrUkCFA==}
 
-  '@williamthorsen/release-kit@1.0.0':
-    resolution: {integrity: sha512-UMpPoL9NFHc7BYvegUsHKK/hWiNCNx53j4tdpThvl0s2Tw1Ofp7nIxXqj/mE1azuZioTarGj0Np74kUyh/5SmA==}
+  '@williamthorsen/release-kit@1.0.1':
+    resolution: {integrity: sha512-ZF1ik6MK/6xqOO5OCxgQuGYQrLIMR8xpuayGfAEkEQkFdDaKhgUFGT3fsycPDvXVEln75y5A2I+2mvoyZtHmwA==}
     engines: {node: '>=18.17.0'}
     hasBin: true
 
@@ -3507,7 +3507,7 @@ snapshots:
       '@vitest/pretty-format': 4.0.18
       tinyrainbow: 3.0.3
 
-  '@williamthorsen/release-kit@1.0.0':
+  '@williamthorsen/release-kit@1.0.1':
     dependencies:
       glob: 13.0.6
       jiti: 2.6.1

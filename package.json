@@ -46,7 +46,7 @@
     "@types/node": "24.12.0",
     "@typescript/native-preview": "7.0.0-dev.20260309.1",
     "@vitest/coverage-v8": "4.0.18",
-    "@williamthorsen/release-kit": "1.0.0",
+    "@williamthorsen/release-kit": "1.0.1",
     "@williamthorsen/toolbelt.objects": "3.2.3",
     "esbuild": "0.27.3",
     "eslint": "9.39.4",
