@@ -2,7 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## [strict-lint-v6.1.1] - 2026-03-11
+## [strict-lint-v6.1.2] - 2026-03-12
+
+### Bug fixes
+
+- Strict-lint|typescript|fix: Add prepublishOnly hook to prevent stale builds
+
+v6.1.1 shipped with an unrebuilt dist, so the exit-code fix from #44
+never actually reached consumers. Adding prepublishOnly ensures
+`pnpm run build` always runs before publish.
+
+### Tooling
+
+- #45 root|tooling: Migrate to release-kit v1.0.0 CLI (#47)
+
+Upgrade `@williamthorsen/release-kit` from v0.2.3 to v1.0.0 and migrate from the script-based release preparation to the CLI-driven approach. The CLI auto-discovers workspaces from `pnpm-workspace.yaml`, replacing the manually maintained component list and custom scripts.
+
+## [typescript-v5.14.0] - 2026-03-11
 
 ### Bug fixes
 

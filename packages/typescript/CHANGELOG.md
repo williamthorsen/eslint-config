@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [typescript-v5.16.1] - 2026-03-12
+
+### Dependencies
+
+- Ts|deps: Upgrade all deps to latest minor version
+
 ## [typescript-v5.15.0] - 2026-03-11
 
 ### Bug fixes
@@ -37,7 +43,7 @@ Adds warn-level `unicorn` rules to the strict-lint `defaultMaxSeverity` map.
 
 Publish `strict-lint` and `eslint-config-typescript` packages to npmjs.org. Consume `release-kit` and `toolbelt.objects` from npmjs.org.
 
-## [strict-lint-v5.3.8] - 2026-03-09
+## [typescript-v5.12.2] - 2026-03-09
 
 ### Bug fixes
 

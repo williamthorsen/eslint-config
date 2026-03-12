@@ -2,13 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [basic-v5.11.8] - 2026-03-12
+
+### Dependencies
+
+- Ts|deps: Upgrade all deps to latest minor version
+
 ## [typescript-v5.12.3] - 2026-03-10
 
 ### Dependencies
 
 - Ts|deps: Upgrade all deps to latest minor version
 
-## [strict-lint-v5.3.8] - 2026-03-09
+## [typescript-v5.12.2] - 2026-03-09
 
 ### Dependencies
 
