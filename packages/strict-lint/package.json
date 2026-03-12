@@ -18,9 +18,9 @@
   ],
   "scripts": {
     "build": "pnpm run ws clean && pnpm run ws compile && pnpm run ws generate-typings && mv dist/esm/scripts dist/esm/bin && tsx scripts/replace-shebang.ts && rimraf dist/esm/bin/*.d.ts",
-    "prepublishOnly": "pnpm run build",
     "clean": "pnpm rimraf dist/*",
     "lint:strict": "tsx scripts/strict-lint.ts",
+    "prepublishOnly": "pnpm run build",
     "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
   },
   "dependencies": {
