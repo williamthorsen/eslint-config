@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [basic-v5.11.8] - 2026-03-12
+## [basic-v5.11.9] - 2026-03-14
+
+### Dependencies
+
+- Root|deps: Upgrade all deps to latest minor version
+
+## [typescript-v5.16.1] - 2026-03-12
 
 ### Dependencies
 
