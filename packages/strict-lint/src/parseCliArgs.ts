@@ -56,7 +56,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
   }
 
   if (values['fix-type']) {
-    eslintOptions.fixTypes = values['fix-type'] as ESLint.Options['fixTypes'];
+    eslintOptions.fixTypes = values['fix-type'].map(toFixType);
   }
 
   if (values['ignore-pattern']) {
@@ -88,7 +88,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
   }
 
   if (values['cache-strategy'] !== undefined) {
-    eslintOptions.cacheStrategy = values['cache-strategy'] as ESLint.Options['cacheStrategy'];
+    eslintOptions.cacheStrategy = toCacheStrategy(values['cache-strategy']);
   }
 
   if (values['warn-ignored'] !== undefined) {
@@ -138,11 +138,41 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
 
 /** Parse and validate the `--max-warnings` string value as an integer. */
 function parseMaxWarnings(value: string): number {
-  const parsed = parseInt(value, 10);
+  const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed) || String(parsed) !== value) {
     throw new Error(`Invalid --max-warnings value "${value}". Expected an integer.`);
   }
   return parsed;
+}
+
+const FIX_TYPES: Record<string, ESLint.FixType> = {
+  directive: 'directive',
+  problem: 'problem',
+  suggestion: 'suggestion',
+  layout: 'layout',
+};
+
+/** Validate a --fix-type value against ESLint's accepted fix types. */
+function toFixType(value: string): ESLint.FixType {
+  const fixType = FIX_TYPES[value];
+  if (fixType === undefined) {
+    throw new Error(`Invalid --fix-type value "${value}". Expected "directive", "problem", "suggestion", or "layout".`);
+  }
+  return fixType;
+}
+
+const CACHE_STRATEGIES: Record<string, ESLint.CacheStrategy> = {
+  content: 'content',
+  metadata: 'metadata',
+};
+
+/** Validate a --cache-strategy value against ESLint's accepted strategies. */
+function toCacheStrategy(value: string): ESLint.CacheStrategy {
+  const strategy = CACHE_STRATEGIES[value];
+  if (strategy === undefined) {
+    throw new Error(`Invalid --cache-strategy value "${value}". Expected "content" or "metadata".`);
+  }
+  return strategy;
 }
 
 /** Convert a concurrency string to the appropriate typed value. */
@@ -150,7 +180,7 @@ function parseConcurrency(value: string): number | 'auto' | 'off' {
   if (value === 'auto' || value === 'off') {
     return value;
   }
-  const parsed = parseInt(value, 10);
+  const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed) || String(parsed) !== value) {
     throw new Error(`Invalid --concurrency value "${value}". Expected an integer, "auto", or "off".`);
   }
