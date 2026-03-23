@@ -46,8 +46,8 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     },
   });
 
-  const fixDryRun = values['fix-dry-run'] ?? false;
-  const shouldFix = (values.fix ?? false) || fixDryRun;
+  const fixDryRun = values['fix-dry-run'];
+  const shouldFix = values.fix || fixDryRun;
 
   const eslintOptions: Partial<ESLint.Options> = {};
 
@@ -128,9 +128,9 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     eslintOptions,
     ruleOverrides,
     fixDryRun,
-    format: values.format ?? 'stylish',
-    quiet: values.quiet ?? false,
-    maxWarnings: parseMaxWarnings(values['max-warnings'] ?? '-1'),
+    format: values.format,
+    quiet: values.quiet,
+    maxWarnings: parseMaxWarnings(values['max-warnings']),
     outputFile: values['output-file'],
     configPath: values.config,
   };

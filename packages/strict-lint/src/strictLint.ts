@@ -58,12 +58,14 @@ async function doLint(
   });
 
   // Determine file patterns: CLI positionals > programmatic patterns > default
-  const patterns =
-    parsed.patterns.length > 0
-      ? parsed.patterns
-      : options?.patterns && options.patterns.length > 0
-        ? options.patterns
-        : ['.'];
+  let patterns: string[];
+  if (parsed.patterns.length > 0) {
+    patterns = parsed.patterns;
+  } else if (options?.patterns?.length) {
+    patterns = options.patterns;
+  } else {
+    patterns = ['.'];
+  }
 
   const results = await eslint.lintFiles(patterns);
 
