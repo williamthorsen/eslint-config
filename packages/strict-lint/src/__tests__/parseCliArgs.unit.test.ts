@@ -150,7 +150,13 @@ describe(parseCliArgs, () => {
     });
   });
 
-  it('throws on --rule without colon-space separator', () => {
+  it('parses --rule with colon but no space separator', () => {
+    const result = parseCliArgs(['--rule', 'no-console:error']);
+
+    expect(result.ruleOverrides).toEqual({ 'no-console': 'error' });
+  });
+
+  it('throws on --rule without colon separator', () => {
     expect(() => parseCliArgs(['--rule', 'no-console'])).toThrow('Invalid --rule value');
   });
 

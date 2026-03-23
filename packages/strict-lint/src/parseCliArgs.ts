@@ -110,12 +110,12 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
   const ruleOverrides: Record<string, string> = {};
   if (values.rule) {
     for (const entry of values.rule) {
-      const colonIndex = entry.indexOf(': ');
+      const colonIndex = entry.indexOf(':');
       if (colonIndex === -1) {
         throw new Error(`Invalid --rule value "${entry}". Expected format: "rule-name: severity"`);
       }
       const ruleName = entry.slice(0, colonIndex);
-      const severity = entry.slice(colonIndex + 2).trim();
+      const severity = entry.slice(colonIndex + 1).trim();
       if (severity === '') {
         throw new Error(`Invalid --rule value "${entry}". Missing severity after colon.`);
       }

@@ -4,6 +4,7 @@ const {
   mockedConvertWarnToError,
   mockedFindNearestFile,
   mockedLoadStrictLintConfig,
+  mockedWriteFile,
   mockFormat,
   mockGetErrorResults,
   mockLintFiles,
@@ -13,6 +14,7 @@ const {
   mockedConvertWarnToError: vi.fn((config: Record<string, unknown>) => config),
   mockedFindNearestFile: vi.fn<(fileName: string) => string | undefined>(),
   mockedLoadStrictLintConfig: vi.fn(),
+  mockedWriteFile: vi.fn().mockResolvedValue(undefined),
   mockFormat: vi.fn().mockResolvedValue(''),
   mockGetErrorResults: vi.fn((results: unknown[]) => results),
   mockLintFiles: vi.fn().mockResolvedValue([]),
@@ -30,6 +32,10 @@ vi.mock('../common/findNearestFile.ts', () => ({
 
 vi.mock('../loadStrictLintConfig.ts', () => ({
   loadStrictLintConfig: mockedLoadStrictLintConfig,
+}));
+
+vi.mock('node:fs/promises', () => ({
+  default: { writeFile: mockedWriteFile },
 }));
 
 vi.mock('eslint', () => {
@@ -316,5 +322,22 @@ describe('strictLint() CLI behavior', () => {
     await strictLint({ baseConfig: [{ rules: {} }] });
 
     expect(mockLoadFormatter).toHaveBeenCalledWith('json');
+  });
+
+  it('writes formatted output to file when --output-file is specified', async () => {
+    process.argv = ['node', 'strict-lint', '--output-file', 'results.txt'];
+    mockFormat.mockResolvedValueOnce('formatted output');
+
+    await strictLint({ baseConfig: [{ rules: {} }] });
+
+    expect(mockedWriteFile).toHaveBeenCalledWith('results.txt', 'formatted output', 'utf8');
+  });
+
+  it('exits 1 when --rule specifies an invalid severity', async () => {
+    process.argv = ['node', 'strict-lint', '--rule', 'no-console: typo'];
+
+    await strictLint({ baseConfig: [{ rules: {} }] });
+
+    expect(process.exit).toHaveBeenCalledWith(1);
   });
 });
