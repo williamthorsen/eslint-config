@@ -9,4 +9,6 @@ export interface StrictLintConfig {
 export interface StrictLintOptions {
   baseConfig?: Linter.Config[];
   maxSeverity?: MaxSeverityMap;
+  patterns?: string[];
+  ruleOverrides?: Record<string, Linter.RuleSeverity>;
 }
