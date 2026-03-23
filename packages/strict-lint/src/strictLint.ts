@@ -76,7 +76,8 @@ async function doLint(
   const filteredResults = parsed.quiet ? ESLint.getErrorResults(results) : results;
 
   const errorCount = filteredResults.reduce((sum, r) => sum + r.errorCount, 0);
-  const warningCount = filteredResults.reduce((sum, r) => sum + r.warningCount, 0);
+  // Compute warning count from unfiltered results so --max-warnings works with --quiet
+  const warningCount = results.reduce((sum, r) => sum + r.warningCount, 0);
 
   // Format results
   const formatter = await eslint.loadFormatter(parsed.format);

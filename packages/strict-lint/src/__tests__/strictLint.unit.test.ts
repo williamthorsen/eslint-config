@@ -274,6 +274,18 @@ describe('strictLint() CLI behavior', () => {
     expect(mockGetErrorResults).toHaveBeenCalledWith(results);
   });
 
+  it('evaluates --max-warnings against unfiltered results even when --quiet is active', async () => {
+    process.argv = ['node', 'strict-lint', '--quiet', '--max-warnings', '2'];
+    const results = [{ errorCount: 0, warningCount: 5 }];
+    mockLintFiles.mockResolvedValueOnce(results);
+    // getErrorResults strips warnings, so filtered warningCount would be 0
+    mockGetErrorResults.mockReturnValueOnce([{ errorCount: 0, warningCount: 0 }]);
+
+    await strictLint({ baseConfig: [{ rules: {} }] });
+
+    expect(process.exit).toHaveBeenCalledWith(1);
+  });
+
   it('does not filter through getErrorResults when --quiet is not specified', async () => {
     await strictLint({ baseConfig: [{ rules: {} }] });
 
