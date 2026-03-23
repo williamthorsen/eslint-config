@@ -13,7 +13,6 @@ describe(parseCliArgs, () => {
     expect(result.format).toBe('stylish');
     expect(result.quiet).toBe(false);
     expect(result.maxWarnings).toBe(-1);
-    expect(result.color).toBeUndefined();
     expect(result.outputFile).toBeUndefined();
     expect(result.configPath).toBeUndefined();
   });
@@ -132,6 +131,10 @@ describe(parseCliArgs, () => {
     expect(() => parseCliArgs(['--concurrency', 'banana'])).toThrow('Invalid --concurrency value');
   });
 
+  it('throws on non-integer --concurrency value', () => {
+    expect(() => parseCliArgs(['--concurrency', '4.5'])).toThrow('Invalid --concurrency value');
+  });
+
   it('parses --rule into ruleOverrides using colon-split', () => {
     const result = parseCliArgs(['--rule', 'no-console: error']);
 
@@ -175,16 +178,16 @@ describe(parseCliArgs, () => {
     expect(result.format).toBe('compact');
   });
 
-  it('returns --color flag', () => {
-    const result = parseCliArgs(['--color']);
-
-    expect(result.color).toBe(true);
+  it('throws on non-numeric --max-warnings value', () => {
+    expect(() => parseCliArgs(['--max-warnings', 'banana'])).toThrow('Invalid --max-warnings value');
   });
 
-  it('returns --no-color flag', () => {
-    const result = parseCliArgs(['--no-color']);
+  it('throws on non-integer --max-warnings value', () => {
+    expect(() => parseCliArgs(['--max-warnings', '4.5'])).toThrow('Invalid --max-warnings value');
+  });
 
-    expect(result.color).toBe(false);
+  it('throws on --rule with empty severity after colon', () => {
+    expect(() => parseCliArgs(['--rule', 'no-console: '])).toThrow('Missing severity after colon');
   });
 
   it('returns --output-file value', () => {

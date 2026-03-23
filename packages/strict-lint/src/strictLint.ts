@@ -36,10 +36,9 @@ async function doLint(
 ): Promise<{ text: string; errorCount: number }> {
   const parsed = parseCliArgs(args);
 
-  const config: Linter.Config[] = await resolveConfig(options, parsed.configPath);
-  const eslintConfigDir = await resolveConfigDir(options, parsed.configPath);
+  const { config, configDir } = await resolveConfigAndDir(options, parsed.configPath);
 
-  const strictLintConfig = eslintConfigDir ? await loadStrictLintConfig(eslintConfigDir) : undefined;
+  const strictLintConfig = configDir ? await loadStrictLintConfig(configDir) : undefined;
 
   const resolvedMaxSeverity: MaxSeverityMap = {
     ...defaultMaxSeverity,
@@ -97,13 +96,13 @@ async function doLint(
   return { text, errorCount };
 }
 
-/** Resolve the ESLint config array from programmatic options, --config flag, or file discovery. */
-async function resolveConfig(
+/** Resolve the ESLint config array and config directory from programmatic options, --config flag, or file discovery. */
+async function resolveConfigAndDir(
   options: StrictLintOptions | undefined,
   configPath: string | undefined,
-): Promise<Linter.Config[]> {
+): Promise<{ config: Linter.Config[]; configDir: string | undefined }> {
   if (options?.baseConfig) {
-    return options.baseConfig;
+    return { config: options.baseConfig, configDir: process.cwd() };
   }
 
   const filePath = configPath ?? findNearestFile('eslint.config.js');
@@ -114,24 +113,7 @@ async function resolveConfig(
   const resolvedPath = path.resolve(filePath);
   const mod: unknown = await import(resolvedPath);
   assertIsConfig(mod);
-  return mod.default;
-}
-
-/** Resolve the config directory for loading strict-lint config. */
-async function resolveConfigDir(
-  options: StrictLintOptions | undefined,
-  configPath: string | undefined,
-): Promise<string | undefined> {
-  if (options?.baseConfig) {
-    return process.cwd();
-  }
-
-  const filePath = configPath ?? findNearestFile('eslint.config.js');
-  if (!filePath) {
-    return undefined;
-  }
-
-  return path.dirname(path.resolve(filePath));
+  return { config: mod.default, configDir: path.dirname(resolvedPath) };
 }
 
 /** Build the override config array from errorized config and rule overrides. */
@@ -144,9 +126,7 @@ function buildOverrideConfig(
 
   // Programmatic rule overrides (applied first, lower precedence)
   if (programmaticOverrides && Object.keys(programmaticOverrides).length > 0) {
-    configs.push({
-      rules: Object.fromEntries(Object.entries(programmaticOverrides).map(([name, severity]) => [name, severity])),
-    });
+    configs.push({ rules: { ...programmaticOverrides } });
   }
 
   // CLI rule overrides (applied last, highest precedence)

@@ -11,7 +11,6 @@ export interface ParsedCliArgs {
   format: string;
   quiet: boolean;
   maxWarnings: number;
-  color: boolean | undefined;
   outputFile: string | undefined;
   configPath: string | undefined;
 }
@@ -43,7 +42,6 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
       quiet: { type: 'boolean', default: false },
       'max-warnings': { type: 'string', default: '-1' },
       format: { type: 'string', short: 'f', default: 'stylish' },
-      color: { type: 'boolean' },
       'output-file': { type: 'string', short: 'o' },
     },
   });
@@ -117,7 +115,10 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
         throw new Error(`Invalid --rule value "${entry}". Expected format: "rule-name: severity"`);
       }
       const ruleName = entry.slice(0, colonIndex);
-      const severity = entry.slice(colonIndex + 2);
+      const severity = entry.slice(colonIndex + 2).trim();
+      if (severity === '') {
+        throw new Error(`Invalid --rule value "${entry}". Missing severity after colon.`);
+      }
       ruleOverrides[ruleName] = severity;
     }
   }
@@ -129,11 +130,19 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     fixDryRun,
     format: values.format ?? 'stylish',
     quiet: values.quiet ?? false,
-    maxWarnings: parseInt(values['max-warnings'] ?? '-1', 10),
-    color: values.color,
+    maxWarnings: parseMaxWarnings(values['max-warnings'] ?? '-1'),
     outputFile: values['output-file'],
     configPath: values.config,
   };
+}
+
+/** Parse and validate the `--max-warnings` string value as an integer. */
+function parseMaxWarnings(value: string): number {
+  const parsed = parseInt(value, 10);
+  if (Number.isNaN(parsed) || String(parsed) !== value) {
+    throw new Error(`Invalid --max-warnings value "${value}". Expected an integer.`);
+  }
+  return parsed;
 }
 
 /** Convert a concurrency string to the appropriate typed value. */
@@ -142,8 +151,8 @@ function parseConcurrency(value: string): number | 'auto' | 'off' {
     return value;
   }
   const parsed = parseInt(value, 10);
-  if (Number.isNaN(parsed)) {
-    throw new Error(`Invalid --concurrency value "${value}". Expected a number, "auto", or "off".`);
+  if (Number.isNaN(parsed) || String(parsed) !== value) {
+    throw new Error(`Invalid --concurrency value "${value}". Expected an integer, "auto", or "off".`);
   }
   return parsed;
 }
