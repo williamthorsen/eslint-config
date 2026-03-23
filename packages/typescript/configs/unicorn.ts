@@ -26,7 +26,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-array-reduce': 'warn', // 🔴🟠
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
   'unicorn/no-lonely-if': 'warn', // 🔴🟠
-  'unicorn/no-negated-condition': 'warn', // 🔴🟠
+  'unicorn/no-negated-condition': 'off', // 🔴⚫ Too prescriptive
   'unicorn/no-nested-ternary': 'warn', // 🔴🟠
   'unicorn/no-for-loop': 'off', // 🔴⚫ Traditional for loops are sometimes clearer
   'unicorn/no-null': 'off', // 🔴⚫ Prefer `undefined` over `null`
