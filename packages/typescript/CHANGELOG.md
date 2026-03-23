@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [typescript-v5.17.0] - 2026-03-23
+
+### Dependencies
+
+- Ts|deps: Upgrade all deps to latest minor version
+
+### Features
+
+- Strict-lint|feat: Limit severity of stylistic rules
+
 ## [typescript-v5.16.2] - 2026-03-14
 
 ### Dependencies

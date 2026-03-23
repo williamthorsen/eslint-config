@@ -2,7 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [strict-lint-v6.1.2] - 2026-03-12
+## [strict-lint-v6.2.0] - 2026-03-23
+
+### Features
+
+- Strict-lint|feat: Limit severity of stylistic rules
+- #48 strict-lint|feat: Modify strict-lint to accept ESLint CLI arguments (#49)
+
+Adds full ESLint CLI argument support to `strict-lint`. A new `parseCliArgs` module parses `process.argv` using `node:util` `parseArgs` and maps flags to ESLint constructor options, file patterns, rule overrides, and output-control flags. The programmatic API gains `patterns` and `ruleOverrides` fields for parity.
+
+## [typescript-v5.16.1] - 2026-03-12
 
 ### Bug fixes
 
