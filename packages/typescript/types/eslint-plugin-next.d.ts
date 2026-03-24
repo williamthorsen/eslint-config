@@ -2,8 +2,8 @@
 declare module '@next/eslint-plugin-next' {
   import type { Linter } from 'eslint';
   const nextPlugin: {
-    flatConfig: {
-      coreWebVitals: Linter.Config;
+    configs: {
+      'core-web-vitals': Linter.Config;
       recommended: Linter.Config;
     };
   };
