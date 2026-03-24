@@ -11,12 +11,12 @@ export function convertWarnToError(config: Linter.Config, maxSeverity?: MaxSever
     if (maxSeverity?.[ruleName] === 'warn') {
       return [ruleName, ruleValue];
     }
-    if (ruleValue === 'warn') {
+    if (ruleValue === 'warn' || ruleValue === 1) {
       return [ruleName, 'error'];
     }
     if (Array.isArray(ruleValue)) {
       const [severity, ...options] = ruleValue;
-      if (severity === 'warn' || severity === 2) {
+      if (severity === 'warn' || severity === 1) {
         const resolvedOptions: unknown[] = options;
         return [ruleName, ['error', ...resolvedOptions]];
       }
