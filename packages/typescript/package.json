@@ -13,7 +13,7 @@
     ".": "./dist/esm/index.js",
     "./configs": "./dist/esm/configs/index.js",
     "./ignores": "./dist/esm/ignores/index.js",
-    "./plugins": "./dist/esm/configs/index.js",
+    "./plugins": "./dist/esm/plugins/index.js",
     "./utils": "./dist/esm/utils/index.js"
   },
   "files": [
