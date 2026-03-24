@@ -52,6 +52,98 @@ describe('convertWarnToError()', () => {
     expect(actual).toEqual(expected);
   });
 
+  it('if a rule has a bare numeric severity of 1, replaces it with "error"', () => {
+    const config = {
+      rules: {
+        'other-rule': 'off',
+        'warn-rule': 1,
+      },
+    } satisfies Config;
+    const expected = {
+      rules: {
+        'other-rule': 'off',
+        'warn-rule': 'error',
+      },
+    };
+
+    const actual = convertWarnToError(config);
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('if a rule has an array-form numeric severity of 1, replaces it with "error" and preserves options', () => {
+    const config = {
+      rules: {
+        'other-rule': 'off',
+        'warn-rule': [1, { option: 'value' }],
+      },
+    } satisfies Config;
+    const expected = {
+      rules: {
+        'other-rule': 'off',
+        'warn-rule': ['error', { option: 'value' }],
+      },
+    };
+
+    const actual = convertWarnToError(config);
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('if a rule has a bare numeric severity of 2, leaves it unchanged', () => {
+    const config = {
+      rules: {
+        'error-rule': 2,
+      },
+    } satisfies Config;
+    const expected = {
+      rules: {
+        'error-rule': 2,
+      },
+    };
+
+    const actual = convertWarnToError(config);
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('if a rule has an array-form numeric severity of 2, leaves it unchanged', () => {
+    const config = {
+      rules: {
+        'error-rule': [2, { option: 'value' }],
+      },
+    } satisfies Config;
+    const expected = {
+      rules: {
+        'error-rule': [2, { option: 'value' }],
+      },
+    };
+
+    const actual = convertWarnToError(config);
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('if maxSeverity maps a rule to "warn", skips escalation for numeric 1', () => {
+    const config = {
+      rules: {
+        'keep-warn': 1,
+        'escalate-rule': 1,
+      },
+    } satisfies Config;
+    const maxSeverity = { 'keep-warn': 'warn' } as const;
+    const expected = {
+      rules: {
+        'keep-warn': 1,
+        'escalate-rule': 'error',
+      },
+    };
+
+    const actual = convertWarnToError(config, maxSeverity);
+
+    expect(actual).toEqual(expected);
+  });
+
   it('if maxSeverity maps a rule to "warn", skips escalation for string-form warn', () => {
     const config = {
       rules: {
