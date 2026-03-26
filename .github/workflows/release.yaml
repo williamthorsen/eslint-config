@@ -28,6 +28,6 @@ jobs:
     with:
       # TODO: Set the Node.js and pnpm versions for your project
       node-version: '24.14.0'
-      pnpm-version: '10.32.1'
+      pnpm-version: '10.33.0'
       only: ${{ inputs.only }}
       bump: ${{ inputs.bump }}
