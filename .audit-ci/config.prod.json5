@@ -3,11 +3,9 @@
   "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
   "low": true,
   "allowlist": [
-    // Example:
-    // Package: semver
-    // Semver Regular Expression Denial of Service
-    // https://github.com/advisories/GHSA-c2qf-rxjj-qqgw
-    // "GHSA-c2qf-rxjj-qqgw",
+    // brace-expansion
+    // https://github.com/advisories/GHSA-f886-m6hf-6m8v
+    "GHSA-f886-m6hf-6m8v",
   ],
   "report-type": "summary",
   "skip-dev": true,
