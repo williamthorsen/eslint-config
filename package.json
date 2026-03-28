@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "ci": "nmr ci",
-    "postinstall": "nmr report-overrides --quiet && nmr sync-pnpm-version",
+    "postinstall": "nmr report-overrides --quiet; nmr sync-pnpm-version",
     "prepare": "lefthook install"
   },
   "devDependencies": {

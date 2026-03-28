@@ -24,6 +24,7 @@
     "dist/esm/utils/*"
   ],
   "scripts": {
+    "build": "nmr clean && nmr compile && nmr generate-typings",
     "prepublishOnly": "nmr build",
     "publish:github": "GH_PACKAGES_TOKEN=$GITHUB_TOKEN pnpm publish",
     "publish:jsr": "npx jsr publish",
