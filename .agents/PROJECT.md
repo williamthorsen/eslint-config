@@ -35,39 +35,47 @@ This is a monorepo for ESLint configurations published by William Thorsen. It co
 
 ## Development commands
 
+This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamthorsen/nmr) as its script runner. All standard scripts are provided by nmr's built-in registries; repo-level overrides live in `.config/nmr.config.ts`.
+
 ### Building
 
 ```bash
-pnpm run build               # Build all packages
-pnpm --prefix packages/typescript run rebuild  # Rebuild TypeScript package specifically
+nmr build                    # Build all packages (from root) or current package (from workspace)
+nmr clean                    # Remove dist artifacts
 ```
 
 ### Linting & type checking
 
 ```bash
-pnpm run check               # Run typecheck, format check, lint check, and tests
-pnpm run check:strict        # Strict checks including coverage, audit, and strict lint
-pnpm run typecheck           # TypeScript type checking
-pnpm run lint                # ESLint with auto-fix
-pnpm run lint:check          # ESLint check without fixing
-pnpm run lint:strict         # Run strict-lint (warnings as errors)
+nmr check                    # Run typecheck, format check, lint check, and tests
+nmr check:strict             # Strict checks including coverage, audit, and strict lint
+nmr typecheck                # TypeScript type checking
+nmr lint                     # ESLint with auto-fix
+nmr lint:check               # ESLint check without fixing
+nmr lint:strict              # Run strict-lint (warnings as errors)
 ```
 
 ### Testing
 
 ```bash
-pnpm run test                # Run root-level tests
-pnpm run test:coverage       # Run tests with coverage across all workspaces
-pnpm run root:test           # Run tests using vitest.root.config.ts
+nmr test                     # Run tests
+nmr test:coverage            # Run tests with coverage
+nmr root:test                # Run root-level tests only
 ```
 
-### Package Management
+### CI
 
 ```bash
-pnpm run outdated                 # Check for compatible updates
-pnpm run outdated:latest          # Check for all updates
-pnpm run update                   # Update dependencies
-pnpm run audit                    # Security audit
+nmr ci                       # Build all packages, then run check:strict
+```
+
+### Package management
+
+```bash
+nmr outdated                 # Check for compatible updates
+nmr outdated:latest          # Check for all updates
+nmr update                   # Update dependencies
+nmr audit                    # Security audit
 ```
 
 ### Versioning (release-kit)
@@ -107,4 +115,4 @@ The typescript package includes custom rules in `plugins/rules/`:
 - `pnpm-workspace.yaml` - Workspace configuration
 - `eslint.config.js` - Root ESLint configuration that uses the typescript package
 - `vitest.root.config.ts` - Root test configuration
-- `scripts/report-overrides.ts` - Reports package override usage (runs on postinstall)
+- `.config/nmr.config.ts` - nmr script runner configuration (overrides `ci` ordering)

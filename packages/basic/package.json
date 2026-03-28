@@ -22,10 +22,10 @@
     "utils/*"
   ],
   "scripts": {
-    "check": "pnpm run lint:strict",
-    "lint": "pnpm eslint .",
-    "lint:fix": "pnpm eslint --fix .",
-    "lint:strict": "../strict-lint/scripts/strict-lint.ts",
+    "build": "echo 'No build step for basic package.'",
+    "check": "nmr lint:strict",
+    "lint": "eslint --fix .",
+    "lint:check": "eslint .",
     "test": "echo 'No tests defined for basic package.'",
     "test:coverage": "echo 'No tests defined for basic package.'"
   },
