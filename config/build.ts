@@ -7,6 +7,8 @@ import { isObject } from '@williamthorsen/toolbelt.objects';
 import { build, type Format, type Platform, type Plugin } from 'esbuild';
 import { glob } from 'glob';
 
+import { resolveAliasImports, rewriteTsImportExtensions } from './build-utils.ts';
+
 const CACHE_FILE = 'dist/esm/.cache';
 const format: Format = 'esm';
 const platform: Platform = 'node';
@@ -114,32 +116,4 @@ function rewriteTsExtensions(): Plugin {
   };
 }
 
-/**
- * Rewrites alias import paths to relative filesystem paths from the importing file.
- *
- * @param code - The TypeScript source code.
- * @param fileDir - The absolute path to the importing file's directory.
- * @param aliasMap - A map of alias prefixes (e.g. '@/') to base paths (e.g. 'src/').
- */
-function resolveAliasImports(code: string, fileDir: string, aliasMap: Record<string, string> = {}): string {
-  for (const [alias, targetDir] of Object.entries(aliasMap)) {
-    const escaped = alias.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`); // escape regex
-    const regex = new RegExp(String.raw`(?<=from\s+['"])${escaped}([^'"]+)(?=['"])`, 'g');
-
-    code = code.replace(regex, (_, subpath: string) => {
-      const absolute = path.resolve(targetDir, subpath);
-      const relative = path.relative(fileDir, absolute);
-      return relative.startsWith('.') ? relative : `./${relative}`;
-    });
-  }
-
-  return code;
-}
-
-/**
- * Rewrites relative imports ending in `.ts` to `.js` to match compiled output.
- */
-function rewriteTsImportExtensions(code: string): string {
-  return code.replaceAll(/(?<=from\s+['"])(\.{1,2}\/[^'"]+)\.ts(?=['"])/g, '$1.js');
-}
 // endregion | Helper functions
