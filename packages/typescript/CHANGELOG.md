@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [typescript-v5.17.1] - 2026-03-28
+
+### Bug fixes
+
+- #51 ts|fix: Fix broken next config with @next/eslint-plugin-next 16.x (#53)
+
+Update `configs/next.ts` and its ambient type declaration to use the `@next/eslint-plugin-next` 16.x API, which moved flat config exports from `flatConfig` to `configs` with kebab-case keys.
+
+### Dependencies
+
+- Ts|deps: Upgrade all deps to latest minor version
+
+### Refactoring
+
+- #52 ts|refactor: Defer loading of optional config modules (#54)
+
+Replaces static imports of the 5 optional config modules (`jsx-a11y`, `next`, `react`, `testing-library`, `vitest`) with inline dynamic `import()` wrappers in `createConfig`. Fixes the `./plugins` export path, which incorrectly pointed to `configs/index.js` instead of `plugins/index.js`.
+
 ## [typescript-v5.17.0] - 2026-03-23
 
 ### Dependencies

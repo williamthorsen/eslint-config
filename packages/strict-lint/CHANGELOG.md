@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [strict-lint-v6.2.0] - 2026-03-23
+## [strict-lint-v6.2.1] - 2026-03-28
+
+### Bug fixes
+
+- #41 strict-lint|fix: Handle numeric severity 1 in convertWarnToError (#50)
+
+`convertWarnToError` now handles ESLint's numeric severity `1` in both bare and array forms. The array-form branch no longer incorrectly targets numeric `2` (which was a no-op converting error to error).
+
+## [typescript-v5.17.0] - 2026-03-23
 
 ### Features
 
