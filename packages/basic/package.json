@@ -22,12 +22,12 @@
     "utils/*"
   ],
   "scripts": {
-    "build": "echo 'No build step for basic package.'",
+    "build": ":",
     "check": "nmr lint:strict",
     "lint": "eslint --fix .",
     "lint:check": "eslint .",
-    "test": "echo 'No tests defined for basic package.'",
-    "test:coverage": "echo 'No tests defined for basic package.'"
+    "test": ":",
+    "test:coverage": ":"
   },
   "dependencies": {
     "@eslint/markdown": "7.5.1",
