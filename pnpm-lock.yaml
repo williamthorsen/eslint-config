@@ -27,8 +27,8 @@ importers:
         specifier: 4.1.2
         version: 4.1.2(vitest@4.1.2(@types/node@24.12.0)(vite@8.0.3(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)))
       '@williamthorsen/release-kit':
-        specifier: 2.3.1
-        version: 2.3.1
+        specifier: 2.3.2
+        version: 2.3.2
       '@williamthorsen/toolbelt.objects':
         specifier: 3.2.6
         version: 3.2.6
@@ -893,8 +893,8 @@ packages:
   '@williamthorsen/node-monorepo-core@0.2.1':
     resolution: {integrity: sha512-HO9YeViFGsjdLSZGxV1oC3LMoiSTcC1t7jvvsh9fj5nBnjDEeyBFnQwNI66MrdVp+HrZw6ggW4nEWKAv4w2Qyw==}
 
-  '@williamthorsen/release-kit@2.3.1':
-    resolution: {integrity: sha512-N2jyy+s4Oxpo5QQ9EoBrjpiWB7lvjlBuzGw5Wyz2nKL8qDU/29zaYL6GLim7lO8+Zehr4nC4I1qRQM0tFy2iFQ==}
+  '@williamthorsen/release-kit@2.3.2':
+    resolution: {integrity: sha512-HwdzqrNzAiqNMW6R8Vm/d30ZgWK+WU/qS0j2IOrhGSd+ZFrk7AgqSci9ZPJ6lmSeQltcQT3rFYfp2Byc71SgZA==}
     engines: {node: '>=18.17.0'}
     hasBin: true
 
@@ -3471,7 +3471,7 @@ snapshots:
 
   '@williamthorsen/node-monorepo-core@0.2.1': {}
 
-  '@williamthorsen/release-kit@2.3.1':
+  '@williamthorsen/release-kit@2.3.2':
     dependencies:
       '@williamthorsen/node-monorepo-core': 0.2.1
       glob: 13.0.6
