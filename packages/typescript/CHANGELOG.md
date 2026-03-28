@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [typescript-v5.17.3] - 2026-03-28
+
+### Dependencies
+
+- Ts|deps: Upgrade all deps to latest minor version
+
 ## [typescript-v5.17.1] - 2026-03-28
 
 ### Bug fixes
