@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [strict-lint-v6.2.1] - 2026-03-28
+## [typescript-v5.17.1] - 2026-03-28
 
 ### Bug fixes
 
