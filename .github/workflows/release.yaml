@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: 'Components to release (comma-separated, leave empty for all)'
+        description: 'Workspaces to release (comma-separated, leave empty for all)'
         required: false
         type: string
       bump:
@@ -17,6 +17,11 @@ on:
           - patch
           - minor
           - major
+      force:
+        description: 'Force a release even when no commits or no bump-worthy commits exist (defaults to patch; combine with --bump for a different level)'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -24,10 +29,8 @@ permissions:
 
 jobs:
   release:
-    uses: williamthorsen/.github/.github/workflows/release-pnpm.yaml@v2
+    uses: williamthorsen/node-monorepo-tools/.github/workflows/release.reusable.yaml@workflow/release-v1
     with:
-      # TODO: Set the Node.js and pnpm versions for your project
-      node-version: '24.14.0'
-      pnpm-version: '10.33.0'
       only: ${{ inputs.only }}
       bump: ${{ inputs.bump }}
+      force: ${{ inputs.force }}

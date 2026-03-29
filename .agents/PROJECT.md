@@ -1,118 +1,66 @@
-# Project summary
+# eslint-config monorepo
 
-## Project overview
+## Overview
 
-This is a monorepo for ESLint configurations published by William Thorsen. It contains three main packages:
+A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published under `@williamthorsen/*`. Three packages: a small JavaScript config (`basic`), a comprehensive TypeScript config (`typescript`, the primary public artifact, with React/Next/Vitest/testing-library presets and custom rules), and a CLI utility that runs ESLint with warnings promoted to errors (`strict-lint`).
 
-- `@williamthorsen/eslint-config-basic` - Basic ESLint config for JavaScript projects
-- `@williamthorsen/eslint-config-typescript` - Comprehensive ESLint config for TypeScript projects with support for React, Next.js, testing frameworks, and more
-- `@williamthorsen/strict-lint` - A utility that converts ESLint warnings to errors for stricter linting
+## Project structure
+
+- `packages/basic/` — `@williamthorsen/eslint-config-basic`. Flat config for JavaScript/JSON/MD/YAML. No build step; ships `index.mjs` directly.
+- `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `plugins/rules/`.
+- `packages/strict-lint/` — `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
+- `eslint.config.js` (repo root) — imports from `packages/typescript/dist/esm/`; depends on a built typescript package.
+- `.config/nmr.config.ts` — repo-level overrides for the `nmr` script runner.
+- `.config/release-kit.config.ts`, `.config/audit-deps.config.json`, `.config/sync-labels.config.ts` — config for the corresponding tools invoked by GitHub Actions reusable workflows.
+- `cliff.toml` — git-cliff template aware of the `workspace|type:` commit format.
+- `__tests__/version-alignment.app.test.ts` — root-level test that checks Node version consistency across the monorepo.
+
+## Commands
+
+This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamthorsen/nmr) as its script runner. Most commands come from nmr's built-in registries; only project-specific overrides live in `.config/nmr.config.ts`. From the repo root, commands fan out across all workspaces; from a workspace directory, they target that package only.
+
+```bash
+nmr ci                # Build all packages, then run check:strict (matches GitHub Actions)
+nmr check             # typecheck + format check + lint check + tests
+nmr check:strict      # check + coverage + audit + strict-lint
+nmr build             # Build all packages (or the current package from a workspace dir)
+nmr lint              # eslint --fix; lint:check is the non-mutating variant
+nmr lint:strict       # Run strict-lint over the codebase
+nmr test              # vitest
+nmr outdated          # Check dependencies (use outdated:latest for non-compatible)
+```
+
+Releases are triggered via the **Release** GitHub Actions workflow (`workflow_dispatch`), which uses release-kit to bump versions, regenerate CHANGELOGs, and push tags. Tag pushes (`<workspace>-v<semver>`) then trigger the **Publish** and **Create GitHub Release** workflows. Don't push release tags by hand.
 
 ## Architecture
 
-### Monorepo structure
+- **Flat ESLint config (ESLint 9+) everywhere.** Both consumer-facing packages export arrays compatible with the flat-config format. Selective subpath imports are supported on the typescript package (`@williamthorsen/eslint-config-typescript/configs`, `/plugins`, etc.).
+- **The repo's own lint depends on the typescript package's compiled output.** Root `eslint.config.js` imports `packages/typescript/dist/esm/index.js` and `.../ignores/index.js`. Build before lint on a clean checkout.
+- **strict-lint runs from source in dev.** Its bin is not symlinked into the workspace `node_modules/.bin/`, so the repo overrides `lint:strict` and `root:lint:strict` to invoke the source via `tsx` (see `.config/nmr.config.ts`).
+- **Custom ESLint rules** in `packages/typescript/plugins/rules/`: `memoized-functions-returned-by-hook`, `no-undefined-with-number`, `no-unused-map`, `prefer-function-declaration`.
+- **Hooks:** `lefthook` runs prettier on staged files pre-commit (see `lefthook.yml`).
 
-- Uses pnpm workspaces with packages in `/packages/*`
-- Root package.json contains scripts that run across all workspaces
-- Each package has its own build/test/lint configuration
+## Commit conventions
 
-### Package architecture
+Commit titles are rendered by `describe-change.sh` from `commit.title_format` in `~/.agents/preferences.yaml` (currently `[{scope}|{type}: ]{title}`). Don't assemble titles by hand — invoke the commit skill, which calls the script. The project-specific values to pass are:
 
-- **basic/**: Simple JavaScript ESLint config with plugins for common use cases
-- **typescript/**: Complex TypeScript config with modular architecture:
-  - `configs/` - Individual rule configurations (javascript.ts, typescript.ts, react.ts, etc.)
-  - `plugins/` - Custom ESLint plugins with rules like `prefer-function-declaration`
-  - `ignores/` - Common ignore patterns
-  - `utils/` - Helper utilities for config resolution
-- **strict-lint/**: Standalone tool that processes ESLint output to convert warnings to errors
+- **`--scope`:** `basic`, `root`, `strict-lint`, `ts`, or `*` for changes spanning multiple workspaces.
+- **`--type`:** `ai`, `ci`, `deps`, `docs`, `feat`, `refactor`, `tests`, `tooling`. Append `!` after the type for breaking changes (e.g., `feat!`).
+- **Separation rule:** `deps` is always its own commit. Never mix dependency updates with `feat`/`refactor`/etc. — `cliff.toml` and release-kit categorize by type, so mixed commits land in the wrong section.
 
-### Key design patterns
+Full reference: `docs/versioning-and-changelog.md`.
 
-- Flat ESLint config format (ESLint 9+)
-- TypeScript configs are built and distributed as compiled JavaScript
-- Modular configuration approach allowing selective inclusion of rule sets
-- Custom ESLint plugins for organization-specific rules
+## Code style
 
-## Development commands
+- **pnpm command usage convention:**
+  - Binaries: `pnpm exec {binary}` (e.g., `pnpm exec vitest`)
+  - Package scripts: `pnpm run {script}`
+  - Built-in pnpm commands: `pnpm {command}` (e.g., `pnpm install`)
 
-This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamthorsen/nmr) as its script runner. All standard scripts are provided by nmr's built-in registries; repo-level overrides live in `.config/nmr.config.ts`.
+## Gotchas
 
-### Building
-
-```bash
-nmr build                    # Build all packages (from root) or current package (from workspace)
-nmr clean                    # Remove dist artifacts
-```
-
-### Linting & type checking
-
-```bash
-nmr check                    # Run typecheck, format check, lint check, and tests
-nmr check:strict             # Strict checks including coverage, audit, and strict lint
-nmr typecheck                # TypeScript type checking
-nmr lint                     # ESLint with auto-fix
-nmr lint:check               # ESLint check without fixing
-nmr lint:strict              # Run strict-lint (warnings as errors)
-```
-
-### Testing
-
-```bash
-nmr test                     # Run tests
-nmr test:coverage            # Run tests with coverage
-nmr root:test                # Run root-level tests only
-```
-
-### CI
-
-```bash
-nmr ci                       # Build all packages, then run check:strict
-```
-
-### Package management
-
-```bash
-nmr outdated                 # Check for compatible updates
-nmr outdated:latest          # Check for all updates
-nmr update                   # Update dependencies
-nmr audit                    # Security audit
-```
-
-### Versioning (release-kit)
-
-```bash
-pnpm run release:prepare           # Analyze commits, generate CHANGELOGs, bump versions
-pnpm run release:prepare:dry       # Dry run to preview changes
-```
-
-## TypeScript Configuration
-
-The TypeScript package uses a complex build system:
-
-- Source files in TypeScript are compiled to `dist/esm/`
-- Build configuration in `build.config.ts`
-- Multiple tsconfig files for different purposes (build, eslint, scripts)
-- The package exports both the main config and individual components
-
-## Testing Framework
-
-- Uses Vitest for testing
-- Root-level tests exclude packages (handled by individual package tests)
-- Coverage reporting with v8
-- Integration and unit test configurations available
-
-## Custom ESLint Rules
-
-The typescript package includes custom rules in `plugins/rules/`:
-
-- `memoized-functions-returned-by-hook` - Enforces memoization patterns
-- `no-undefined-with-number` - Prevents undefined comparisons with numbers
-- `no-unused-map` - Detects unused map operations
-- `prefer-function-declaration` - Prefers function declarations over expressions
-
-## Important Files
-
-- `pnpm-workspace.yaml` - Workspace configuration
-- `eslint.config.js` - Root ESLint configuration that uses the typescript package
-- `vitest.root.config.ts` - Root test configuration
-- `.config/nmr.config.ts` - nmr script runner configuration (overrides `ci` ordering)
+- **`nmr lint`/`nmr check` will fail on a clean checkout** until `packages/typescript` is built. The root eslint config imports from its `dist/`. `nmr ci` deliberately runs `build` before `check:strict` for the same reason.
+- **The `basic` package has no build step** (`build` and `test` scripts are no-ops). Edits to `index.mjs` or `rules/*.mjs` take effect immediately.
+- **Publishing targets differ by package.** `basic` publishes to GitHub Packages (restricted scope `@williamthorsen`); `typescript` and `strict-lint` publish to public npm. Tags, tokens, and audiences are not interchangeable.
+- **Don't push release tags manually.** The `Release` workflow is the source of truth; manual tags can desync versions and CHANGELOGs from the actual commit history release-kit analyzes.
+- **Root-level Vitest excludes `packages/**`.** Each package owns its own test config; `nmr root:test` runs only root-level tests.

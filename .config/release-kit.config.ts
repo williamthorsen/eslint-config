@@ -1,12 +1,16 @@
 import type { ReleaseKitConfig } from '@williamthorsen/release-kit';
 
 const config: ReleaseKitConfig = {
-  formatCommand: 'pnpm run fmt',
+  releaseNotes: {
+    shouldInjectIntoReadme: true,
+  },
 
-  // Uncomment to set custom release tags or exclude components from release processing:
-  // components: [
+  // Uncomment to exclude workspaces from release processing:
+  // workspaces: [
   //   { dir: 'my-package', shouldExclude: true },
   // ],
+
+  // Formatting: prettier is auto-detected. Set formatCommand to override.
 
   // Uncomment to override the default version patterns:
   // versionPatterns: { major: ['!'], minor: ['feat', 'feature'] },

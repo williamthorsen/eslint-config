@@ -1,0 +1,11 @@
+{
+  "$schema": "https://github.com/williamthorsen/node-monorepo-tools/raw/audit-deps-v0.6.0/packages/audit-deps/schemas/config.json",
+  "dev": {
+    "severityThreshold": "moderate",
+    "allowlist": []
+  },
+  "prod": {
+    "severityThreshold": "low",
+    "allowlist": []
+  }
+}
