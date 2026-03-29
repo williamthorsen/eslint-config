@@ -24,14 +24,12 @@
     "dist/esm/utils/*"
   ],
   "scripts": {
-    "build": "pnpm run ws clean && pnpm run ws compile && pnpm run ws generate-typings",
-    "prepublishOnly": "pnpm run build",
+    "prepublishOnly": "nmr build",
     "publish:github": "GH_PACKAGES_TOKEN=$GITHUB_TOKEN pnpm publish",
     "publish:jsr": "npx jsr publish",
     "publish:jsr:dry-run": "npx jsr publish --dry-run",
-    "test": "echo 'No tests defined for typescript package.'",
-    "test:coverage": "echo 'No tests defined for typescript package.'",
-    "ws": "node --import tsx ../../scripts/run-workspace-script.ts"
+    "test": ":",
+    "test:coverage": ":"
   },
   "dependencies": {
     "eslint-plugin-eslint-comments": "3.2.0",

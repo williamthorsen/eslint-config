@@ -22,12 +22,12 @@
     "utils/*"
   ],
   "scripts": {
-    "check": "pnpm run lint:strict",
-    "lint": "pnpm eslint .",
-    "lint:fix": "pnpm eslint --fix .",
-    "lint:strict": "../strict-lint/scripts/strict-lint.ts",
-    "test": "echo 'No tests defined for basic package.'",
-    "test:coverage": "echo 'No tests defined for basic package.'"
+    "build": ":",
+    "check": "nmr lint:strict",
+    "lint": "eslint --fix .",
+    "lint:check": "eslint .",
+    "test": ":",
+    "test:coverage": ":"
   },
   "dependencies": {
     "@eslint/markdown": "7.5.1",
