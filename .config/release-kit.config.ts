@@ -6,9 +6,26 @@ const config: ReleaseKitConfig = {
   },
 
   // Uncomment to exclude workspaces from release processing:
-  // workspaces: [
-  //   { dir: 'my-package', shouldExclude: true },
-  // ],
+  workspaces: [
+    {
+      dir: 'basic',
+      legacyIdentities: [
+        {
+          name: '@williamthorsen/eslint-config-basic',
+          tagPrefix: 'basic-v',
+        },
+      ],
+    },
+    {
+      dir: 'typescript',
+      legacyIdentities: [
+        {
+          name: '@williamthorsen/eslint-config-typescript',
+          tagPrefix: 'typescript-v',
+        },
+      ],
+    },
+  ],
 
   // Formatting: prettier is auto-detected. Set formatCommand to override.
 
