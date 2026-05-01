@@ -2,6 +2,7 @@ import type { MaxSeverityMap } from './types.ts';
 
 export const defaultMaxSeverity = {
   '@typescript-eslint/no-deprecated': 'warn',
+  '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
   'unicorn/consistent-function-scoping': 'warn',
   'unicorn/no-array-reduce': 'warn',
   'unicorn/no-lonely-if': 'warn',
