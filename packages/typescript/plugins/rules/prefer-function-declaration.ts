@@ -48,7 +48,7 @@ function containsThisExpression(root: TSESTree.Node): boolean {
           for (const c of child) {
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (typeof c === 'object' && c !== null) {
-              stack.push(c as TSESTree.Node);
+              stack.push(c);
             }
           }
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

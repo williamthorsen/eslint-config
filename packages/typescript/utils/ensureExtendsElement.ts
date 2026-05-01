@@ -7,6 +7,5 @@ import type { ExtendsElement } from '@eslint/config-helpers';
  * The override performed by this function is designed to have a small blast radius.
  */
 export function ensureExtendsElement(config: Record<string, unknown>): ExtendsElement {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return config as ExtendsElement;
+  return config;
 }
