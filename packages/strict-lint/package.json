@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "6.2.2",
+  "version": "6.3.0",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
   "homepage": "https://github.com/williamthorsen/eslint-config/tree/main/packages/strict-lint#readme",

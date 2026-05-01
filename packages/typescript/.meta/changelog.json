@@ -1,0 +1,80 @@
+[
+  {
+    "version": "5.17.4",
+    "date": "2026-05-01",
+    "sections": [
+      {
+        "title": "Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Adopt the nmr script runner (#58)",
+            "body": "Replaces the hand-rolled `run-workspace-script.ts` infrastructure and custom utility scripts with `@williamthorsen/nmr`, a context-aware script runner for pnpm monorepos. The root `package.json` scripts go from ~30 entries to 3 (`ci`, `postinstall`, `prepare`), and the consistency tests are replaced with a single `runConsistencyChecks` import from nmr. In total, ~635 lines are removed and ~76 added."
+          }
+        ]
+      },
+      {
+        "title": "Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Declare `@typescript-eslint/utils` as a peer dependency (#67)",
+            "body": "Fixes `ERR_MODULE_NOT_FOUND` failures in consumers of `@williamthorsen/eslint-config-typescript` whose pnpm graph does not happen to hoist `@typescript-eslint/utils` into a location reachable from the eslint-config's compiled files. The package's compiled rules import `@typescript-eslint/utils` at runtime, but it was previously declared only in `devDependencies` — so pnpm's strict isolation could leave it unreachable depending on the consumer's resolution graph. Declaring it as a peer dependency makes the contract explicit and ensures consumers resolve a single shared copy."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "5.17.1",
+    "date": "2026-03-28",
+    "sections": [
+      {
+        "title": "Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Fix broken next config with @next/eslint-plugin-next 16.x (#53)",
+            "body": "Update `configs/next.ts` and its ambient type declaration to use the `@next/eslint-plugin-next` 16.x API, which moved flat config exports from `flatConfig` to `configs` with kebab-case keys."
+          }
+        ]
+      },
+      {
+        "title": "Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Defer loading of optional config modules (#54)",
+            "body": "Replaces static imports of the 5 optional config modules (`jsx-a11y`, `next`, `react`, `testing-library`, `vitest`) with inline dynamic `import()` wrappers in `createConfig`. Fixes the `./plugins` export path, which incorrectly pointed to `configs/index.js` instead of `plugins/index.js`."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "5.12.2",
+    "date": "2026-03-09",
+    "sections": [
+      {
+        "title": "Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrade all deps to latest compatible version (#33)",
+            "body": "Upgrades all dependencies to the latest compatible version across the monorepo. Includes 8 major version bumps, a deprecated package migration, parser import adaptations for breaking ESM changes, a pre-existing tsconfig bug fix, and audit-ci allowlist entries for transitive dev-only vulnerabilities.\n\nMajor upgrades:\n- @types/node 22 → 25\n- globals 16 → 17\n- eslint-plugin-unicorn 62 → 63\n- eslint-plugin-jsonc 2 → 3, jsonc-eslint-parser 2 → 3\n- eslint-plugin-yml 1 → 3, yaml-eslint-parser 1 → 2\n- glob 11 → 13\n- vite-tsconfig-paths 5 → 6\n\nReplaced deprecated eslint-plugin-markdown with @eslint/markdown.\n\nAdapted parser imports to namespace imports (`import * as`) required by jsonc-eslint-parser v3 and yaml-eslint-parser v2, which dropped default exports.\n\nFixed pre-existing bug in tsconfig.eslint.json where `include` patterns failed to resolve linted files, causing 27 parserOptions errors.\n\nDeduplicated lockfile and added audit-ci allowlist entries for 6 transitive dev-only vulnerabilities (3 × minimatch via ESLint 9, rollup via vite, ajv via eslint, js-yaml via changesets)."
+          }
+        ]
+      },
+      {
+        "title": "Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Replace jsonc/sort-keys with eslint-plugin-package-json (#37)",
+            "body": "Replaces the hand-maintained `jsonc/sort-keys` package.json ordering configuration with `eslint-plugin-package-json`'s `recommended` and `stylistic` configs in both the `basic` and `typescript` ESLint config packages. This eliminates ~190 lines of manually maintained key-order rules and delegates to `sort-package-json`'s canonical ordering."
+          }
+        ]
+      }
+    ]
+  }
+]

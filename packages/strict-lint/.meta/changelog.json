@@ -1,0 +1,98 @@
+[
+  {
+    "version": "6.3.0",
+    "date": "2026-05-01",
+    "sections": [
+      {
+        "title": "Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Adopt the nmr script runner (#58)",
+            "body": "Replaces the hand-rolled `run-workspace-script.ts` infrastructure and custom utility scripts with `@williamthorsen/nmr`, a context-aware script runner for pnpm monorepos. The root `package.json` scripts go from ~30 entries to 3 (`ci`, `postinstall`, `prepare`), and the consistency tests are replaced with a single `runConsistencyChecks` import from nmr. In total, ~635 lines are removed and ~76 added."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "6.2.1",
+    "date": "2026-03-28",
+    "sections": [
+      {
+        "title": "Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Handle numeric severity 1 in convertWarnToError (#50)",
+            "body": "`convertWarnToError` now handles ESLint's numeric severity `1` in both bare and array forms. The array-form branch no longer incorrectly targets numeric `2` (which was a no-op converting error to error)."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "6.2.0",
+    "date": "2026-03-23",
+    "sections": [
+      {
+        "title": "Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Modify strict-lint to accept ESLint CLI arguments (#49)",
+            "body": "Adds full ESLint CLI argument support to `strict-lint`. A new `parseCliArgs` module parses `process.argv` using `node:util` `parseArgs` and maps flags to ESLint constructor options, file patterns, rule overrides, and output-control flags. The programmatic API gains `patterns` and `ruleOverrides` fields for parity."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "6.1.2",
+    "date": "2026-03-12",
+    "sections": [
+      {
+        "title": "Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Migrate to release-kit v1.0.0 CLI (#47)",
+            "body": "Upgrade `@williamthorsen/release-kit` from v0.2.3 to v1.0.0 and migrate from the script-based release preparation to the CLI-driven approach. The CLI auto-discovers workspaces from `pnpm-workspace.yaml`, replacing the manually maintained component list and custom scripts."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "6.1.1",
+    "date": "2026-03-11",
+    "sections": [
+      {
+        "title": "Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Exit 0 when only warnings are reported (#44)",
+            "body": "Replaced the regex-based exit logic in `strictLint()` with an `errorCount` check on ESLint's `LintResult[]` objects. `doLint()` now returns `{ text, errorCount }` and `strictLint()` exits 1 only when `errorCount > 0`. Also refactored `strictLint()` from `.then()/.catch()` promise chaining to `async/await` with `try/catch`."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "version": "6.0.0",
+    "date": "2026-03-11",
+    "sections": [
+      {
+        "title": "Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Add maxSeverity support to exclude rules from escalation (#42)",
+            "body": "Add a three-layer `maxSeverity` merge system that controls which rules are excluded from warn-to-error escalation.\n\nBuilt-in defaults ship with `@typescript-eslint/no-deprecated` set to 'warn'.\n\nA project-level `.config/strict-lint.config.ts` file can override defaults, and programmatic options passed to `strictLint()` take highest precedence.\n\nThe `strictLint()` signature changes from positional `baseConfig` to an options object (`StrictLintOptions`).\n\nThe `convertWarnToError` function accepts an optional `MaxSeverityMap` that skips escalation for rules mapped to 'warn'.\n\nA new `loadStrictLintConfig` loader uses tsx's `tsImport` to dynamically load TypeScript config files with shape validation."
+          }
+        ]
+      }
+    ]
+  }
+]

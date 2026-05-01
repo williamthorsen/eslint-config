@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-basic",
-  "version": "5.11.9",
+  "version": "5.11.10",
   "private": true,
   "description": "ESLint config for TypeScript, JSON, Markdown & YML",
   "keywords": [
