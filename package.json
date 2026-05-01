@@ -4,7 +4,15 @@
   "private": true,
   "description": "ESLint configs monorepo",
   "keywords": [],
-  "license": "UNLICENSED",
+  "homepage": "https://github.com/williamthorsen/eslint-config#readme",
+  "bugs": {
+    "url": "https://github.com/williamthorsen/eslint-config/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamthorsen/eslint-config.git"
+  },
+  "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "scripts": {
@@ -39,6 +47,6 @@
   },
   "packageManager": "pnpm@10.33.2",
   "engines": {
-    "node": ">=18"
+    "node": ">=18.17.0"
   }
 }

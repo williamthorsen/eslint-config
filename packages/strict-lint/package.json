@@ -3,7 +3,16 @@
   "version": "6.2.2",
   "description": "Strict linting for ESLint projects",
   "keywords": [],
-  "license": "UNLICENSED",
+  "homepage": "https://github.com/williamthorsen/eslint-config/tree/main/packages/strict-lint#readme",
+  "bugs": {
+    "url": "https://github.com/williamthorsen/eslint-config/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamthorsen/eslint-config.git",
+    "directory": "packages/strict-lint"
+  },
+  "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "exports": {
@@ -27,6 +36,9 @@
   },
   "peerDependencies": {
     "eslint": ">=9"
+  },
+  "engines": {
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public",

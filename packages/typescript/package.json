@@ -5,8 +5,16 @@
   "keywords": [
     "eslint-config"
   ],
-  "homepage": "https://github.com/williamthorsen/eslint-config",
-  "license": "UNLICENSED",
+  "homepage": "https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#readme",
+  "bugs": {
+    "url": "https://github.com/williamthorsen/eslint-config/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamthorsen/eslint-config.git",
+    "directory": "packages/typescript"
+  },
+  "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "exports": {
@@ -25,9 +33,6 @@
   ],
   "scripts": {
     "prepublishOnly": "nmr build",
-    "publish:github": "GH_PACKAGES_TOKEN=$GITHUB_TOKEN pnpm publish",
-    "publish:jsr": "npx jsr publish",
-    "publish:jsr:dry-run": "npx jsr publish --dry-run",
     "test": ":",
     "test:coverage": ":"
   },
@@ -62,7 +67,7 @@
     "typescript": ">=5"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18.17.0"
   },
   "publishConfig": {
     "access": "public",
