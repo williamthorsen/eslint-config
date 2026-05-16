@@ -1,10 +1,10 @@
 ---
-source: '@williamthorsen/nmr@0.12.1'
+source: '@williamthorsen/nmr@0.14.0'
 ---
 
 # nmr: agent guidance
 
-This file is managed by `@williamthorsen/nmr`. Do not edit — re-run `pnpm exec nmr sync-agent-files` after an nmr upgrade to refresh it.
+This file is managed by `@williamthorsen/nmr`. Do not edit — re-run `nmr sync-agent-files` after an nmr upgrade to refresh it.
 
 ## Discover scripts by running nmr
 
@@ -13,8 +13,20 @@ Run `nmr` with no command (from the monorepo root or any workspace package) to l
 ## Invocation rules
 
 - Use `nmr <command>` for anything nmr provides. Do not use `pnpm run <command>`.
-- Use `pnpm exec nmr`, not `npx nmr`. Inside git worktrees, `npx` can resolve a different nmr binary from outside the working tree.
-- If `nmr` itself fails to run (fresh clone, missing build output), run `pnpm run bootstrap` from the repo root first.
+- You can invoke nmr from the monorepo root or any workspace package.
+
+### How to make `nmr` resolvable
+
+`nmr` ships as a workspace bin. The bare `nmr` command works only when your shell can find `<root>/node_modules/.bin/nmr`. Choose one:
+
+- **direnv** (recommended for contributors). With [direnv](https://direnv.net/) installed, the repo's `.envrc` adds `node_modules/.bin` to your `PATH` automatically. From any subdirectory, bare `nmr` works.
+- **`pnpm exec nmr <command>`** — works without setup. pnpm resolves the bin from the workspace root.
+
+Avoid `npx nmr`. Inside git worktrees, `npx` can resolve a different nmr binary from outside the working tree.
+
+### Bootstrap fallback
+
+If `nmr` itself fails to run (fresh clone, missing build output), run `pnpm run bootstrap` from the repo root first.
 
 ## Root vs. workspace context
 
@@ -35,6 +47,42 @@ In `.config/nmr.config.ts` or a package's `package.json`, override values have s
 - `""` (empty string) — skip the script with a "Skipping" message; exit 0.
 - `":"` — no-op; exit 0. Prefer this over `""` if your repo enforces non-empty script values.
 - Any other string — runs in place of the default.
+
+## Pre and post hooks
+
+Every `nmr X` invocation auto-wraps as the equivalent of `nmr X:pre && nmr X && nmr X:post`. Hooks are first-class scripts that resolve through the same 3-tier registry (built-in defaults → `.config/nmr.config.ts` → per-package `package.json`). Wrapping is uniform; nested invocations from composite expansion get their own hook treatment. Hook failure short-circuits the chain via shell `&&` semantics, propagating the failing exit code.
+
+Behaviors worth knowing:
+
+- **Silent when absent** — missing hooks produce no error and no output.
+- **Skip overrides apply to hooks** — a hook value of `""` or `":"` is treated the same as not defining the hook. No console message.
+- **Skipping the main command skips its hooks** — when `X` is overridden to `""` or `":"`, neither `X:pre` nor `X:post` fires.
+- **Recursion guard** — direct invocation of a hook (e.g., `nmr build:pre`) is treated as a leaf operation. It does NOT itself attempt to resolve `build:pre:pre` or `build:pre:post`.
+- **Passthrough args attach only to the main command** — `nmr X --flag value` runs hooks without `--flag value`.
+
+Worked examples:
+
+```ts
+// .config/nmr.config.ts — extend `nmr build` with a pre-build compile step
+import { defineConfig } from '@williamthorsen/nmr';
+
+export default defineConfig({
+  workspaceScripts: {
+    'build:pre': 'npx rdy compile',
+  },
+});
+```
+
+```jsonc
+// packages/nmr/package.json — re-stamp .agents/nmr/AGENTS.md after every build
+{
+  "scripts": {
+    "build:post": "nmr-sync-agent-files",
+  },
+}
+```
+
+The second example calls the bin directly to sidestep the workspace-vs-root registry distinction.
 
 ## Agent-file sync
 

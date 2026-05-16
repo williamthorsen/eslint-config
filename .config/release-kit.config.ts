@@ -5,7 +5,6 @@ const config: ReleaseKitConfig = {
     shouldInjectIntoReadme: true,
   },
 
-  // Uncomment to exclude workspaces from release processing:
   workspaces: [
     {
       dir: 'basic',
