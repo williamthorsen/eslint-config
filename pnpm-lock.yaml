@@ -23,9 +23,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: 4.1.6
         version: 4.1.6(vitest@4.1.6)
-      '@williamthorsen/audit-deps':
-        specifier: 0.6.1
-        version: 0.6.1
       '@williamthorsen/nmr':
         specifier: 0.14.0
         version: 0.14.0
@@ -71,6 +68,9 @@ importers:
       typescript-eslint:
         specifier: 8.59.3
         version: 8.59.3(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
+      v11y-check:
+        specifier: 0.7.0
+        version: 0.7.0
       vite:
         specifier: 8.0.13
         version: 8.0.13(@types/node@24.12.4)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.0)(yaml@2.8.3)
@@ -898,11 +898,6 @@ packages:
 
   '@vitest/utils@4.1.6':
     resolution: {integrity: sha512-FxIY+U81R3LGKCxaHHFRQ5+g6/iRgGLmeHWdp2Amj4ljQRrEIWHmZyDfDYBRZlpyqA7qKxtS9DD1dhk8RnRIVQ==}
-
-  '@williamthorsen/audit-deps@0.6.1':
-    resolution: {integrity: sha512-Oxi4Lr9s9MdtNJvqReJtva5q1WeRi2/ltfXVXnkbuA97UjWE0PAYoEAjGHmk1SelkqAowVIEA0kmmpnQQk/G9g==}
-    engines: {node: '>=18.17.0'}
-    hasBin: true
 
   '@williamthorsen/nmr-core@0.3.1':
     resolution: {integrity: sha512-qgk7fylHYbVPWmBmfq5pduY9YogHbIfn4MZN4oo9kF9/Cv+tTOqng68CaKPXTAerDj07Qac9x5hBRuzh6tAlLw==}
@@ -2749,6 +2744,11 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  v11y-check@0.7.0:
+    resolution: {integrity: sha512-hIVTkDOKDD3Lw8GcDKOgqrmDqH5TDAPeCr977vo+HmmygIndsZGEdmcY1y6kiVdRBaiNH3OtSn3YRGQeuzNoGw==}
+    engines: {node: '>=18.17.0'}
+    hasBin: true
+
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
 
@@ -3560,12 +3560,6 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
-  '@williamthorsen/audit-deps@0.6.1':
-    dependencies:
-      '@williamthorsen/nmr-core': 0.3.1
-      audit-ci: 7.1.0
-      zod: 4.4.3
-
   '@williamthorsen/nmr-core@0.3.1': {}
 
   '@williamthorsen/nmr@0.14.0':
@@ -3695,7 +3689,7 @@ snapshots:
       jju: 1.4.0
       jsonstream-next: 3.0.0
       readline-transform: 1.0.0
-      semver: 7.7.4
+      semver: 7.8.0
       tslib: 2.8.1
       yargs: 17.7.2
 
@@ -5894,6 +5888,12 @@ snapshots:
       punycode: 2.3.1
 
   util-deprecate@1.0.2: {}
+
+  v11y-check@0.7.0:
+    dependencies:
+      '@williamthorsen/nmr-core': 0.3.1
+      audit-ci: 7.1.0
+      zod: 4.4.3
 
   validate-npm-package-license@3.0.4:
     dependencies:
