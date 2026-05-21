@@ -47,13 +47,13 @@
     "eslint-plugin-yml": "3.3.2",
     "globals": "17.6.0",
     "jsonc-eslint-parser": "3.1.0",
-    "typescript-eslint": "8.59.3",
+    "typescript-eslint": "8.59.4",
     "yaml-eslint-parser": "2.0.0"
   },
   "devDependencies": {
     "@eslint/config-helpers": "0.6.0",
     "@next/eslint-plugin-next": "16.2.6",
-    "@typescript-eslint/utils": "8.59.3",
+    "@typescript-eslint/utils": "8.59.4",
     "@vitest/eslint-plugin": "1.6.17",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jest-dom": "5.5.0",
