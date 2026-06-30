@@ -6,7 +6,5 @@
  */
 
 export const include = [
-  'scripts/strict-lint.ts', //
-  'src/**/*.ts',
-  'index.ts',
+  'src/**/*.ts', //
 ];

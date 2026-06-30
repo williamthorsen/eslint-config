@@ -3,11 +3,7 @@
   "extends": "../../tsconfig.json",
   // prettier-ignore
   "include": [
-    "index.ts",
-    "configs/",
-    "ignores/",
-    "plugins/",
-    "utils/",
+    "src/**/*.ts",
     "types/**/*.d.ts",
   ],
 }

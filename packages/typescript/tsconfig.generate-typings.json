@@ -9,7 +9,7 @@
     "emitDeclarationOnly": true,
     "noEmit": false,
     "outDir": "./dist/esm",
-    "rootDir": ".",
+    "rootDir": "./src",
     "sourceMap": false,
     "tsBuildInfoFile": "./dist/tsconfig.generate-typings.tsbuildinfo",
   },
@@ -17,11 +17,7 @@
     "**/__tests__", //
   ],
   "include": [
-    "index.ts", //
-    "configs/",
-    "ignores/",
-    "plugins/",
-    "utils/",
+    "src", //
     "types/**/*.d.ts",
   ],
 }

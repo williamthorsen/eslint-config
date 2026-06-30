@@ -6,9 +6,5 @@
  */
 
 export const include = [
-  'index.ts', //
-  'configs/**/*.ts',
-  'ignores/**/*.ts',
-  'plugins/**/*.ts',
-  'utils/**/*.ts',
+  'src/**/*.ts', //
 ];

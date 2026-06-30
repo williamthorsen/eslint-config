@@ -19,16 +19,17 @@
     ".": "./dist/esm/index.js"
   },
   "bin": {
-    "strict-lint": "./dist/esm/bin/strict-lint.js"
+    "strict-lint": "bin/strict-lint.js"
   },
   "files": [
+    "bin",
     "dist/esm/**/*.js",
     "dist/esm/**/*.ts"
   ],
   "scripts": {
-    "build": "nmr clean && nmr compile && nmr generate-typings && mv dist/esm/scripts dist/esm/bin && tsx scripts/replace-shebang.ts && rimraf dist/esm/bin/*.d.ts",
+    "build": "nmr clean && nmr compile && nmr generate-typings && rimraf dist/esm/bin/*.d.ts",
     "clean": "pnpm rimraf dist/*",
-    "lint:strict": "tsx scripts/strict-lint.ts",
+    "lint:strict": "tsx src/bin/strict-lint.ts",
     "prepublishOnly": "nmr build"
   },
   "dependencies": {
