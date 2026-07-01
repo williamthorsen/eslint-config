@@ -9,7 +9,7 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 ## Project structure
 
 - `packages/basic/` — `@williamthorsen/eslint-config-basic`. Flat config for JavaScript/JSON/MD/YAML. No build step; ships `index.mjs` directly.
-- `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `plugins/rules/`.
+- `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Sources under `src/`, compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `src/plugins/rules/`.
 - `packages/strict-lint/` — `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
 - `eslint.config.js` (repo root) — imports from `packages/typescript/dist/esm/`; depends on a built typescript package.
 - `.config/nmr.config.ts` — repo-level overrides for the `nmr` script runner.
@@ -39,7 +39,7 @@ Releases are triggered via the **Release** GitHub Actions workflow (`workflow_di
 - **Flat ESLint config (ESLint 9+) everywhere.** Both consumer-facing packages export arrays compatible with the flat-config format. Selective subpath imports are supported on the typescript package (`@williamthorsen/eslint-config-typescript/configs`, `/plugins`, etc.).
 - **The repo's own lint depends on the typescript package's compiled output.** Root `eslint.config.js` imports `packages/typescript/dist/esm/index.js` and `.../ignores/index.js`. Build before lint on a clean checkout.
 - **strict-lint runs from source in dev.** Its bin is not symlinked into the workspace `node_modules/.bin/`, so the repo overrides `lint:strict` and `root:lint:strict` to invoke the source via `tsx` (see `.config/nmr.config.ts`).
-- **Custom ESLint rules** in `packages/typescript/plugins/rules/`: `memoized-functions-returned-by-hook`, `no-undefined-with-number`, `no-unused-map`, `prefer-function-declaration`.
+- **Custom ESLint rules** in `packages/typescript/src/plugins/rules/`: `memoized-functions-returned-by-hook`, `no-undefined-with-number`, `no-unused-map`, `prefer-function-declaration`.
 - **Hooks:** `lefthook` runs prettier on staged files pre-commit (see `lefthook.yml`).
 
 ## Commit conventions

@@ -12,9 +12,9 @@ import { defineConfig } from '@williamthorsen/nmr';
 export default defineConfig({
   rootScripts: {
     ci: ['build', 'check:strict'],
-    'root:lint:strict': "tsx packages/strict-lint/scripts/strict-lint.ts --ignore-pattern 'packages/**' .",
+    'root:lint:strict': "tsx packages/strict-lint/src/bin/strict-lint.ts --ignore-pattern 'packages/**' .",
   },
   workspaceScripts: {
-    'lint:strict': 'tsx ../strict-lint/scripts/strict-lint.ts',
+    'lint:strict': 'tsx ../strict-lint/src/bin/strict-lint.ts',
   },
 });

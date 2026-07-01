@@ -16,19 +16,20 @@
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "exports": {
-    ".": "./dist/esm/index.js"
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/esm/index.d.ts"
+    }
   },
   "bin": {
-    "strict-lint": "./dist/esm/bin/strict-lint.js"
+    "strict-lint": "bin/strict-lint.js"
   },
   "files": [
-    "dist/esm/**/*.js",
-    "dist/esm/**/*.ts"
+    "bin",
+    "dist"
   ],
   "scripts": {
-    "build": "nmr clean && nmr compile && nmr generate-typings && mv dist/esm/scripts dist/esm/bin && tsx scripts/replace-shebang.ts && rimraf dist/esm/bin/*.d.ts",
-    "clean": "pnpm rimraf dist/*",
-    "lint:strict": "tsx scripts/strict-lint.ts",
+    "lint:strict": "tsx src/bin/strict-lint.ts",
     "prepublishOnly": "nmr build"
   },
   "dependencies": {
