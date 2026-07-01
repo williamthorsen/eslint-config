@@ -27,8 +27,6 @@
     "dist/esm/**/*.ts"
   ],
   "scripts": {
-    "build": "nmr clean && nmr compile && nmr generate-typings && rimraf dist/esm/bin/*.d.ts",
-    "clean": "pnpm rimraf dist/*",
     "lint:strict": "tsx src/bin/strict-lint.ts",
     "prepublishOnly": "nmr build"
   },
