@@ -35,18 +35,12 @@ importers:
       '@williamthorsen/toolbelt.objects':
         specifier: 3.2.6
         version: 3.2.6
-      esbuild:
-        specifier: 0.28.0
-        version: 0.28.0
       eslint:
         specifier: 9.39.4
         version: 9.39.4(jiti@2.7.0)
       eslint-plugin-n:
         specifier: 17.24.0
         version: 17.24.0(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
-      glob:
-        specifier: 13.0.6
-        version: 13.0.6
       globals:
         specifier: 17.6.0
         version: 17.6.0
