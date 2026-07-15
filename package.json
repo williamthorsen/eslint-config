@@ -26,7 +26,7 @@
     "@types/node": "24.13.2",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "4.1.10",
-    "@williamthorsen/nmr": "0.17.1",
+    "@williamthorsen/nmr": "0.18.1",
     "@williamthorsen/release-kit": "5.4.0",
     "@williamthorsen/toolbelt.objects": "3.2.6",
     "eslint": "9.39.4",

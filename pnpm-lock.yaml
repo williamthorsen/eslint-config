@@ -27,8 +27,8 @@ importers:
         specifier: 4.1.10
         version: 4.1.10(vitest@4.1.10)
       '@williamthorsen/nmr':
-        specifier: 0.17.1
-        version: 0.17.1(typescript@6.0.3)
+        specifier: 0.18.1
+        version: 0.18.1(typescript@6.0.3)
       '@williamthorsen/release-kit':
         specifier: 5.4.0
         version: 5.4.0
@@ -953,8 +953,11 @@ packages:
   '@williamthorsen/nmr-core@0.6.0':
     resolution: {integrity: sha512-ItnvSgp7+PyncR6mq2FpcKsdHniqrDxrdw+EA329krZiyF/rHebarjZJN7J9zREobdamISDKEUmzQsUt78h69Q==}
 
-  '@williamthorsen/nmr@0.17.1':
-    resolution: {integrity: sha512-RbF5ECDwKAwnOgoLzEwYw3fzLczMkAs+C2diS/tLEZplFpfaxUsHLs7DHLziwfGFlvRsM2siQEmCk9zEO3/3Wg==}
+  '@williamthorsen/nmr-core@0.7.0':
+    resolution: {integrity: sha512-0Go/8helfB+nXldaAt6z9lDpV0m7gu9tZ8rrmu2KhEVGeH3VrnLB83wNwm41lZffmooC5tkj3cD3Z04xzt6yJg==}
+
+  '@williamthorsen/nmr@0.18.1':
+    resolution: {integrity: sha512-wEXadR7+jQiPZnjuCSiiAAj3GD4IRQ3hKAH2b96HEWDxRytg6DeFU7uLZlS1wSmg9DSLmo4Hdg6Y/d8BOOqzdA==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.7.0'
@@ -3901,9 +3904,11 @@ snapshots:
 
   '@williamthorsen/nmr-core@0.6.0': {}
 
-  '@williamthorsen/nmr@0.17.1(typescript@6.0.3)':
+  '@williamthorsen/nmr-core@0.7.0': {}
+
+  '@williamthorsen/nmr@0.18.1(typescript@6.0.3)':
     dependencies:
-      '@williamthorsen/nmr-core': 0.6.0
+      '@williamthorsen/nmr-core': 0.7.0
       glob: 13.0.6
       jiti: 2.7.0
       typescript: 6.0.3
