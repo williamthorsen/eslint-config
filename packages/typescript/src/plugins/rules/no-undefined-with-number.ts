@@ -6,17 +6,19 @@ const create: TSESLint.RuleCreateFunction<'undefinedWithNumber'> = (context) => 
 
   return {
     CallExpression(node: TSESTree.CallExpression) {
-      if (node.callee.type === AST_NODE_TYPES.Identifier && node.callee.name === 'Number') {
-        const [arg] = node.arguments;
-        if (arg) {
-          const tsNode = parserServices.esTreeNodeToTSNodeMap.get(arg);
-          const type = checker.getTypeAtLocation(tsNode);
-          if (checker.typeToString(type).includes('undefined')) {
-            context.report({
-              node: arg,
-              messageId: 'undefinedWithNumber',
-            });
-          }
+      if (!(node.callee.type === AST_NODE_TYPES.Identifier && node.callee.name === 'Number')) {
+        return;
+      }
+
+      const [arg] = node.arguments;
+      if (arg) {
+        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(arg);
+        const type = checker.getTypeAtLocation(tsNode);
+        if (checker.typeToString(type).includes('undefined')) {
+          context.report({
+            node: arg,
+            messageId: 'undefinedWithNumber',
+          });
         }
       }
     },

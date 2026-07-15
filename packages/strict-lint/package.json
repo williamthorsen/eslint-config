@@ -36,10 +36,10 @@
     "tsx": "4.23.1"
   },
   "peerDependencies": {
-    "eslint": ">=9"
+    "eslint": ">=10"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": "^22.13.0 || >=24"
   },
   "publishConfig": {
     "access": "public",

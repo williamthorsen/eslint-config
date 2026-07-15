@@ -42,10 +42,10 @@ vi.mock('eslint', () => {
   mockLoadFormatter.mockReturnValue(Promise.resolve({ format: mockFormat }));
   return {
     ESLint: class {
-      lintFiles = mockLintFiles;
-      loadFormatter = mockLoadFormatter;
       static outputFixes = mockOutputFixes;
       static getErrorResults = mockGetErrorResults;
+      lintFiles = mockLintFiles;
+      loadFormatter = mockLoadFormatter;
     },
     type: {},
   };

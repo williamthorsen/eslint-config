@@ -59,6 +59,16 @@ const config = [
     },
   },
   {
+    // Build and config files legitimately trip rules meant for published source: they use
+    // TypeScript `.js` import specifiers that resolve at runtime (tsc still reports genuinely
+    // missing imports) and compose config objects at module top level.
+    files: ['*.config.{cjs,js,mjs,ts}', 'config/**'],
+    rules: {
+      'n/no-missing-import': 'off',
+      'unicorn/no-top-level-side-effects': 'off',
+    },
+  },
+  {
     ignores: commonIgnores,
   },
 ];

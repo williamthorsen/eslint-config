@@ -2,7 +2,7 @@
 // See https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new
 
 import markdownPlugin from '@eslint/markdown';
-import eslintCommentsPlugin from 'eslint-plugin-eslint-comments';
+import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import jsoncPlugin from 'eslint-plugin-jsonc';
 import nPlugin from 'eslint-plugin-n';
 import packageJsonPlugin from 'eslint-plugin-package-json';
