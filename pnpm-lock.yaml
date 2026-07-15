@@ -66,8 +66,8 @@ importers:
         specifier: 8.64.0
         version: 8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3)
       v11y-check:
-        specifier: 0.10.0
-        version: 0.10.0
+        specifier: 0.11.0
+        version: 0.11.0
       vite:
         specifier: 8.1.4
         version: 8.1.4(@types/node@22.20.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)
@@ -957,9 +957,6 @@ packages:
 
   '@vitest/utils@4.1.10':
     resolution: {integrity: sha512-fy9am/HWxbaGt/Sawrp90vt6Y6jQwf1RX77cz3uwoJwJVMli/e1IEwRPnMNJ7vKfPTwo0diXifkpPvwH9v7nGA==}
-
-  '@williamthorsen/nmr-core@0.6.0':
-    resolution: {integrity: sha512-ItnvSgp7+PyncR6mq2FpcKsdHniqrDxrdw+EA329krZiyF/rHebarjZJN7J9zREobdamISDKEUmzQsUt78h69Q==}
 
   '@williamthorsen/nmr-core@0.7.0':
     resolution: {integrity: sha512-0Go/8helfB+nXldaAt6z9lDpV0m7gu9tZ8rrmu2KhEVGeH3VrnLB83wNwm41lZffmooC5tkj3cD3Z04xzt6yJg==}
@@ -2957,8 +2954,8 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  v11y-check@0.10.0:
-    resolution: {integrity: sha512-PQTkocxIVfLSJzVDprmqGVzfjTbe4eGui10uvo/DTvv4rMyIy4/n4FGb6czKRki+2+zczAvLcp2k6i6jJ4+kig==}
+  v11y-check@0.11.0:
+    resolution: {integrity: sha512-Gln0oxiiuxqBOOkD81x6wcB+LAfvy05FyOtlGpdnJNk5Ar0peOOA5HH4CCOOF/t82D8larVl1bnPen5AS8qTew==}
     engines: {node: '>=18.17.0'}
     hasBin: true
 
@@ -3806,7 +3803,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.10(@types/node@24.13.2)(@vitest/coverage-v8@4.1.10)(vite@8.1.4(@types/node@24.13.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
+      vitest: 4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(vite@8.1.4(@types/node@22.20.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0))
 
   '@vitest/eslint-plugin@1.6.23(@typescript-eslint/eslint-plugin@8.64.0(@typescript-eslint/parser@8.64.0(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.7.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.10)':
     dependencies:
@@ -3844,6 +3841,7 @@ snapshots:
       magic-string: 0.30.21
     optionalDependencies:
       vite: 8.1.4(@types/node@24.13.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)
+    optional: true
 
   '@vitest/pretty-format@4.1.10':
     dependencies:
@@ -3868,8 +3866,6 @@ snapshots:
       '@vitest/pretty-format': 4.1.10
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
-
-  '@williamthorsen/nmr-core@0.6.0': {}
 
   '@williamthorsen/nmr-core@0.7.0': {}
 
@@ -6368,9 +6364,9 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  v11y-check@0.10.0:
+  v11y-check@0.11.0:
     dependencies:
-      '@williamthorsen/nmr-core': 0.6.0
+      '@williamthorsen/nmr-core': 0.7.0
       audit-ci: 7.1.0
       zod: 4.4.3
 
@@ -6411,6 +6407,7 @@ snapshots:
       jiti: 2.7.0
       tsx: 4.23.1
       yaml: 2.9.0
+    optional: true
 
   vitest@4.1.10(@types/node@22.20.1)(@vitest/coverage-v8@4.1.10)(vite@8.1.4(@types/node@22.20.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)):
     dependencies:
@@ -6467,6 +6464,7 @@ snapshots:
       '@vitest/coverage-v8': 4.1.10(vitest@4.1.10)
     transitivePeerDependencies:
       - msw
+    optional: true
 
   web-worker@1.5.0: {}
 
