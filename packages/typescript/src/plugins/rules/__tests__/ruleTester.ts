@@ -8,7 +8,6 @@ import { afterAll, describe, it } from 'vitest';
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
 RuleTester.it = it;
-RuleTester.itOnly = it.only;
 
 // eslint-disable-next-line unicorn/prefer-export-from -- re-export follows the static-hook wiring above
 export { RuleTester };
