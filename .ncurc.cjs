@@ -11,7 +11,7 @@ module.exports = {
  * @returns {boolean} - true if the package should be included
  */
 function filterResults(packageName, versioningMetadata) {
-  return !(packageName === '@types/node' && Number.parseInt(versioningMetadata.upgradedVersionSemver.major) > 24);
+  return !(packageName === '@types/node' && Number.parseInt(versioningMetadata.upgradedVersionSemver.major) > 22);
 }
 
 /**
