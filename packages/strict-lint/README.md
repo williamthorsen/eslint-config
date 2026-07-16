@@ -167,7 +167,7 @@ This pattern lets you enable a stricter rule as a warning, watch it appear in lo
 
 | Dependency | Required |
 | ---------- | -------- |
-| `eslint`   | `>=9`    |
+| `eslint`   | `>=10`   |
 
 ## License
 

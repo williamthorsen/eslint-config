@@ -4,22 +4,24 @@ import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint
 const create: TSESLint.RuleCreateFunction<'preferDeclaration'> = (context) => {
   return {
     VariableDeclarator(node: TSESTree.VariableDeclarator) {
-      if (
+      if (!(
         node.init &&
         [AST_NODE_TYPES.ArrowFunctionExpression, AST_NODE_TYPES.FunctionExpression].includes(node.init.type) &&
         !node.id.typeAnnotation // Preserves exception for typed functions
-      ) {
-        // If the function is an arrow function and uses 'this', then a function declaration might not be possible,
-        // so do not report it as a rule violation.
-        if (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression && containsThisExpression(node.init.body)) {
-          return;
-        }
-
-        context.report({
-          node,
-          messageId: 'preferDeclaration',
-        });
+      )) {
+        return;
       }
+
+      // If the function is an arrow function and uses 'this', then a function declaration might not be possible,
+      // so do not report it as a rule violation.
+      if (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression && containsThisExpression(node.init.body)) {
+        return;
+      }
+
+      context.report({
+        node,
+        messageId: 'preferDeclaration',
+      });
     },
   };
 };
@@ -41,20 +43,22 @@ function containsThisExpression(root: TSESTree.Node): boolean {
     }
 
     for (const key in node) {
-      if (Object.hasOwn(node, key)) {
-        const child = node[key as keyof TSESTree.Node];
+      if (!Object.hasOwn(node, key)) {
+        continue;
+      }
 
-        if (Array.isArray(child)) {
-          for (const c of child) {
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            if (typeof c === 'object' && c !== null) {
-              stack.push(c);
-            }
-          }
+      const child = node[key as keyof TSESTree.Node];
+
+      if (Array.isArray(child)) {
+        for (const c of child) {
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        } else if (typeof child === 'object' && child !== null) {
-          stack.push(child as TSESTree.Node);
+          if (typeof c === 'object' && c !== null) {
+            stack.push(c);
+          }
         }
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      } else if (typeof child === 'object' && child !== null) {
+        stack.push(child as TSESTree.Node);
       }
     }
   }

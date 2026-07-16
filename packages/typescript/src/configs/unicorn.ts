@@ -16,17 +16,21 @@ const rules: Linter.RulesRecord = {
 
   // Downgrade or disable overly prescriptive rules
   'unicorn/catch-error-name': 'warn', // 🔴🟠
+  'unicorn/consistent-boolean-name': 'off', // 🔴⚫ Prescriptive predicate naming; false-positives on predicate functions
   'unicorn/consistent-function-scoping': 'warn', // 🔴🟠 Legitimate to co-locate helpers
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
   'unicorn/explicit-length-check': 'warn', // 🔴🟠
   'unicorn/filename-case': 'off', // 🔴⚫
   'unicorn/import-style': ['warn', { extendDefaultStyles: false }],
+  'unicorn/name-replacements': 'off', // 🔴⚫ Abbreviations are allowed
   'unicorn/no-array-callback-reference': 'off', // 🔴⚫ Overly prescriptive
   'unicorn/no-array-for-each': 'off', // 🔴⚫
   'unicorn/no-array-reduce': 'warn', // 🔴🟠
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
+  'unicorn/no-break-in-nested-loop': 'off', // 🔴⚫ Break/continue in nested loops is idiomatic; extracting a function is overkill
   'unicorn/no-lonely-if': 'warn', // 🔴🟠
   'unicorn/no-negated-condition': 'off', // 🔴⚫ Too prescriptive
+  'unicorn/no-non-function-verb-prefix': 'off', // 🔴⚫ Flags verb-named holders like the `createConfig` factory map
   'unicorn/no-nested-ternary': 'warn', // 🔴🟠
   'unicorn/no-for-loop': 'off', // 🔴⚫ Traditional for loops are sometimes clearer
   'unicorn/no-null': 'off', // 🔴⚫ Prefer `undefined` over `null`
@@ -40,8 +44,10 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-includes': 'warn', // 🔴🟠 Prefer `includes` over `indexOf` when checking for existence
   'unicorn/prefer-math-min-max': 'off', // 🔴⚫ Ternary is often more readable than Math.min/Math.max
   'unicorn/prefer-node-protocol': 'warn', // 🔴🟠 Prefer `node:`-prefixed modules
+  'unicorn/prefer-number-coercion': 'off', // 🔴⚫ Number() and parseInt() differ; the auto-fix can change behavior
   'unicorn/prefer-number-properties': 'warn', // 🔴🟠
   'unicorn/prefer-query-selector': 'warn', // 🔴🟠
+  'unicorn/prefer-simplified-conditions': 'off', // 🔴⚫ Rewrites guard clauses in ways that can reduce readability
   'unicorn/prefer-spread': 'off', // 🔴⚫ Prefer spread operator over Array.from, Array#concat, Array#{slice,toSpliced} and String#split
   'unicorn/prefer-string-raw': 'warn', // 🔴🟠
   'unicorn/prefer-string-replace-all': 'off', // 🔴⚫ Not sure whether I can trust this rule's auto-fixes.

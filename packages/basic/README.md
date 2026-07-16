@@ -72,7 +72,7 @@ import commonIgnores from '@williamthorsen/eslint-config-basic/ignores/common.js
 
 | Dependency | Required | Why                 |
 | ---------- | -------- | ------------------- |
-| `eslint`   | `>=9`    | flat-config support |
+| `eslint`   | `>=10`   | flat-config support |
 
 ## License
 

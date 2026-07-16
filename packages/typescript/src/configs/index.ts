@@ -29,11 +29,11 @@ export const configs = {
 } satisfies Record<string, Config[]>;
 
 export const createConfig = {
-  jsxA11y: (): Promise<ConfigArray> => import('./jsx-a11y.ts').then((m) => m.default()),
-  next: (): Promise<Linter.Config> => import('./next.ts').then((m) => m.default()),
-  react: (): Promise<ConfigArray> => import('./react.ts').then((m) => m.default()),
-  reactTestingLibrary: (): Promise<ConfigArray> => import('./testing-library.ts').then((m) => m.default.react()),
-  vitest: (): Promise<Linter.Config[]> => import('./vitest.ts').then((m) => m.default()),
+  jsxA11y: async (): Promise<ConfigArray> => (await import('./jsx-a11y.ts')).default(),
+  next: async (): Promise<Linter.Config> => (await import('./next.ts')).default(),
+  react: async (): Promise<ConfigArray> => (await import('./react.ts')).default(),
+  reactTestingLibrary: async (): Promise<ConfigArray> => (await import('./testing-library.ts')).default.react(),
+  vitest: async (): Promise<Linter.Config[]> => (await import('./vitest.ts')).default(),
 };
 
 export default configs;

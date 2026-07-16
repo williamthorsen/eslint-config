@@ -125,7 +125,7 @@ export default [
 
 | Dependency   | Required |
 | ------------ | -------- |
-| `eslint`     | `>=9`    |
+| `eslint`     | `>=10`   |
 | `typescript` | `>=5`    |
 
 ## License
