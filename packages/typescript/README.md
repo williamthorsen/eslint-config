@@ -95,6 +95,12 @@ export default [
 
 These plugins are declared as `devDependencies` of this package. Install them yourself in projects that use them.
 
+`createConfig.react()` pins `settings.react.version` to a recent default, because `eslint-plugin-react`'s `'detect'` mode is incompatible with ESLint 10 (it calls a removed API). Override it to match your React version by appending a settings block:
+
+```js
+export default [...config, ...(await createConfig.react()), { settings: { react: { version: '18.3' } } }];
+```
+
 ## File patterns
 
 For composing your own scoped configs without re-deriving the globs:
