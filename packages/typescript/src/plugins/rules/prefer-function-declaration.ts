@@ -78,6 +78,6 @@ const ruleDefinition = {
       preferDeclaration: 'Prefer function declarations over function expressions.',
     },
   },
-};
+} as const;
 
 export default ruleDefinition;

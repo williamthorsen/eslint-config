@@ -69,6 +69,11 @@ const config = [
     },
   },
   {
+    // Test fixtures are intentionally-minimal lint targets exercised by the smoke tests,
+    // not repo source. Keep them out of the repo's own lint.
+    ignores: ['**/__tests__/fixtures/**'],
+  },
+  {
     ignores: commonIgnores,
   },
 ];

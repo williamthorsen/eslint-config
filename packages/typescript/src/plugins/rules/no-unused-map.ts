@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
-const create: TSESLint.LooseRuleCreateFunction = (context: TSESLint.RuleContext<'unusedMap', unknown[]>) => {
+const create: TSESLint.RuleCreateFunction<'unusedMap'> = (context) => {
   return {
     CallExpression(node: TSESTree.CallExpression) {
       if (isMapCall(node) && !isResultUsed(node)) {
@@ -23,7 +23,9 @@ function isMapCall(node: TSESTree.CallExpression) {
 }
 
 function isResultUsed(node: TSESTree.Node): boolean {
-  let current: TSESTree.Node | undefined = node;
+  // Start from the parent: the `.map()` call is itself a `CallExpression`, so beginning
+  // at `node` would match the "result is used" list immediately and never report.
+  let current: TSESTree.Node | undefined = node.parent;
   while (current) {
     if (
       [
@@ -53,6 +55,6 @@ const ruleDefinition = {
     },
   },
   create,
-};
+} as const;
 
 export default ruleDefinition;

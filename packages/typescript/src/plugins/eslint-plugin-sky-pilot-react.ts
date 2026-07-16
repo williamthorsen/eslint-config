@@ -21,7 +21,7 @@ const configs = {
   },
   strict: {
     plugins: {
-      'sky-pilot': skyPilotReactPlugin,
+      'sky-pilot-react': skyPilotReactPlugin,
     },
     rules: {
       'sky-pilot-react/memoized-functions-returned-by-hook': 'error',

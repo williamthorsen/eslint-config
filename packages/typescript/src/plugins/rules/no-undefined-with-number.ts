@@ -34,9 +34,9 @@ const ruleDefinition = {
     },
     schema: [],
     messages: {
-      avoidUndefined: 'Do not pass a possibly undefined value to `Number()`.',
+      undefinedWithNumber: 'Do not pass a possibly undefined value to `Number()`.',
     },
   },
-};
+} as const;
 
 export default ruleDefinition;

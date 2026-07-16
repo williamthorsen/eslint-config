@@ -11,7 +11,7 @@ async function createConfig(): Promise<ConfigArray> {
   return defineConfig({
     extends: [
       reactPlugin.configs.flat.recommended, //
-      ensureExtendsElement(reactHooksPlugin.configs['recommended-latest']),
+      ensureExtendsElement(reactHooksPlugin.configs.flat['recommended-latest']),
       ensureExtendsElement(skyPilotReactPlugin.configs.recommended),
     ],
     rules: {
@@ -21,7 +21,10 @@ async function createConfig(): Promise<ConfigArray> {
     },
     settings: {
       react: {
-        version: 'detect',
+        // `'detect'` resolves the React version via `context.getFilename()`, removed in ESLint 10,
+        // so eslint-plugin-react@7 crashes on it. Pin a default; consumers override this setting to
+        // match their React version (flat-config `settings` merge, last wins).
+        version: '19.0',
       },
     },
   });
