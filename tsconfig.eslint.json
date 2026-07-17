@@ -6,9 +6,6 @@
 //   Parsing error: "parserOptions.project" has been set for @typescript-eslint/parser.`
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "noEmit": true, // ensure that nobody can accidentally use this config for a build
-  },
   // These files will be linted
   // prettier-ignore
   "include": [

@@ -1,10 +1,8 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "lib": ["ES2022", "DOM"],
+    "lib": ["ES2024", "DOM"],
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
     "types": [],
   },
   "include": ["**/*.ts", "**/*.tsx"],

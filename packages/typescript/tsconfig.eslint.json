@@ -11,10 +11,10 @@
   },
   // These files will be linted
   "include": [
-    "*.ts",
-    // These patterns include files not reachable from `src/index.ts`
     "src/",
+    // These patterns include files not reachable from `src/index.ts`
     "types/",
     "eslint.config.js",
+    "*.ts",
   ],
 }

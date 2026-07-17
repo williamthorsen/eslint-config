@@ -4,11 +4,10 @@
   "compilerOptions": {
     "noEmit": true, // ensure that nobody can accidentally use this config for a build
   },
-  "exclude": [],
-  // prettier-ignore
   "include": [
-    "scripts/",
     "src/",
+    // These patterns include files not reachable from `src/index.ts`
+    "scripts/",
     "eslint.config.js",
     "*.json",
     "*.ts",
