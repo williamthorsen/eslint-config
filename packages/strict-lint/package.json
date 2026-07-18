@@ -29,7 +29,6 @@
     "dist"
   ],
   "scripts": {
-    "lint:strict": "tsx src/bin/strict-lint.ts",
     "prepublishOnly": "nmr build"
   },
   "dependencies": {
