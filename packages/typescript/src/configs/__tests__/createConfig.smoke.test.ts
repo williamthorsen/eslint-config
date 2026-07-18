@@ -62,12 +62,21 @@ describe('createConfig preset load smoke tests', () => {
   }
 });
 
+// `Config`'s `parserOptions` is typed as `{}`, so read `projectService` through an
+// `unknown`-typed guard rather than the type assertion the repo's rules forbid.
+function enablesProjectService(parserOptions: unknown): boolean {
+  return (
+    typeof parserOptions === 'object' &&
+    parserOptions !== null &&
+    'projectService' in parserOptions &&
+    parserOptions.projectService === true
+  );
+}
+
 describe('base config type-information wiring', () => {
   it('enables projectService so type-aware rules work without a consumer-supplied project', () => {
-    const enablesProjectService = baseConfig.some(
-      (entry) => entry.languageOptions?.parserOptions?.projectService === true,
-    );
+    const enabled = baseConfig.some((entry) => enablesProjectService(entry.languageOptions?.parserOptions));
 
-    expect(enablesProjectService).toBe(true);
+    expect(enabled).toBe(true);
   });
 });
