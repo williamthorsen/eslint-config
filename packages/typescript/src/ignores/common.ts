@@ -1,5 +1,5 @@
 export const commonIgnores: string[] = [
-  '**/*.md/*.ts', // disabled for now: not correctly recognized by the `include` block in `tsconfig.eslint.json`
+  '**/*.md/*.ts', // Markdown-embedded TS has no owning tsconfig, so the project service cannot type it.
   '**/dist/**',
   '**/dist-ssr/**',
   '**/coverage/**',

@@ -20,16 +20,13 @@ const devModules = Object.keys(packageJson.devDependencies);
 /** @type {import('typescript-eslint').Config} */
 const config = [
   ...baseConfig,
-  // Provide type information for type-checking rules
+  // Anchor the project service at the repo root for type-aware rules. `projectService` itself is
+  // enabled by the base config; the consumer supplies only the root directory.
   {
     files: typeScriptFiles,
     languageOptions: {
       parserOptions: {
-        // prettier-ignore
-        project: [
-          './tsconfig.eslint.json',
-          './packages/*/tsconfig.eslint.json',
-        ],
+        tsconfigRootDir: import.meta.dirname,
       },
     },
   },
