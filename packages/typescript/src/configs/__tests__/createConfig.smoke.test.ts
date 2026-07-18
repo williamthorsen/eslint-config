@@ -8,13 +8,12 @@ import baseConfig, { createConfig } from '../../index.ts';
 
 const fixturesDir = path.join(import.meta.dirname, 'fixtures');
 
-// The published base config carries no type-information parser options (the repo adds
-// them only for its own lint), but its type-aware rules throw without a TS program.
-// Supply one so composing with the base config exercises every rule for real.
+// The base config enables `projectService` but leaves `tsconfigRootDir` to the consumer.
+// Point it at the fixtures dir so composing with the base resolves the fixture tsconfig and
+// exercises every type-aware rule for real.
 const typedParserSettings: Linter.Config = {
   languageOptions: {
     parserOptions: {
-      projectService: true,
       tsconfigRootDir: fixturesDir,
     },
   },
@@ -61,4 +60,23 @@ describe('createConfig preset load smoke tests', () => {
       expect(results[0]?.fatalErrorCount).toBe(0);
     });
   }
+});
+
+// `Config`'s `parserOptions` is typed as `{}`, so read `projectService` through an
+// `unknown`-typed guard rather than the type assertion the repo's rules forbid.
+function enablesProjectService(parserOptions: unknown): boolean {
+  return (
+    typeof parserOptions === 'object' &&
+    parserOptions !== null &&
+    'projectService' in parserOptions &&
+    parserOptions.projectService === true
+  );
+}
+
+describe('base config type-information wiring', () => {
+  it('enables projectService so type-aware rules work without a consumer-supplied project', () => {
+    const enabled = baseConfig.some((entry) => enablesProjectService(entry.languageOptions?.parserOptions));
+
+    expect(enabled).toBe(true);
+  });
 });

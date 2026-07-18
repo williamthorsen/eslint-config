@@ -48,6 +48,7 @@
   "include": [
     ".config/**/*.ts",
     ".github/scripts/",
+    "__tests__/",
     "config/",
     "scripts/",
     "*.ts",

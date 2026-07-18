@@ -70,6 +70,13 @@ const config = defineConfig({
     promisePlugin.configs['flat/recommended'],
     ensureExtendsElement(skyPilotPlugin.configs.recommended),
   ],
+  // Enable type-aware linting out of the box. The project service discovers each file's owning
+  // tsconfig automatically, so consumers set only `tsconfigRootDir`, never `parserOptions.project`.
+  languageOptions: {
+    parserOptions: {
+      projectService: true,
+    },
+  },
   rules,
 });
 
