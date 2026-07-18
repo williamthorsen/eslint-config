@@ -20,9 +20,32 @@ import tsConfig from '@williamthorsen/eslint-config-typescript';
 
 export default [
   ...tsConfig,
+  {
+    languageOptions: {
+      parserOptions: {
+        // Anchor type-aware linting at your repo root.
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   // your overrides
 ];
 ```
+
+## Type-aware linting
+
+The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), so each file's owning `tsconfig.json` is discovered automatically — you do **not** set `parserOptions.project`. Two requirements follow:
+
+- Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project — for example a test directory excluded from your build config — must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
+- Set `tsconfigRootDir` (as in Quick start) to anchor resolution at your repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
+
+## Migrating from `parserOptions.project`
+
+Earlier versions left type-information wiring to the consumer: you set `parserOptions.project` and usually kept a dedicated `tsconfig.eslint.json`. This version supplies `projectService` itself, so:
+
+1. Remove `parserOptions.project` from your ESLint config. Leaving it set now throws `Enabling "project" does nothing when "projectService" is enabled`.
+2. Fold any lint-only `tsconfig.eslint.json` `include` entries into the real `tsconfig.json`, then delete the `tsconfig.eslint.json`. Widening `include` is safe when the config is typecheck-only.
+3. Keep only `tsconfigRootDir: import.meta.dirname` in your `parserOptions`.
 
 ## What's included
 
