@@ -8,6 +8,7 @@ const config: ReleaseKitConfig = {
   workspaces: [
     {
       dir: 'basic',
+      shouldExclude: true,
       legacyIdentities: [
         {
           name: '@williamthorsen/eslint-config-basic',
