@@ -38,7 +38,7 @@ Releases are triggered via the **Release** GitHub Actions workflow (`workflow_di
 
 - **Flat ESLint config (ESLint 9+) everywhere.** Both consumer-facing packages export arrays compatible with the flat-config format. Selective subpath imports are supported on the typescript package (`@williamthorsen/eslint-config-typescript/configs`, `/plugins`, etc.).
 - **The repo's own lint depends on the typescript package's compiled output.** Root `eslint.config.js` imports `packages/typescript/dist/esm/index.js` and `.../ignores/index.js`. Build before lint on a clean checkout.
-- **strict-lint runs from source in dev.** Its bin is not symlinked into the workspace `node_modules/.bin/`, so the repo overrides `lint:strict` and `root:lint:strict` to invoke the source via `tsx` (see `.config/nmr.config.ts`).
+- **strict-lint runs from source in dev.** Its bin is not linked into `node_modules/.bin/` until built, so `.config/nmr.config.ts` maps the `strict-lint` binary to its source entry point via nmr's `devBin`; scripts everywhere name the bare binary, and nmr rewrites it to `tsx packages/strict-lint/src/bin/strict-lint.ts` in every context.
 - **Custom ESLint rules** in `packages/typescript/src/plugins/rules/`: `memoized-functions-returned-by-hook`, `no-undefined-with-number`, `no-unused-map`, `prefer-function-declaration`.
 - **Hooks:** `lefthook` runs prettier on staged files pre-commit (see `lefthook.yml`).
 
