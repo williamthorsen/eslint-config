@@ -1,5 +1,56 @@
 [
   {
+    "version": "7.0.0",
+    "date": "2026-07-18",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Adopt projectService in the published TypeScript config (#86)",
+            "body": "The TypeScript preset now resolves each file's owning `tsconfig.json` itself, so type-aware linting no longer needs per-repo parser wiring. Consumers no longer set `parserOptions.project` or maintain a lint-only `tsconfig.eslint.json`; the only setting they keep is `tsconfigRootDir`.\n\nUpgrading is breaking: Remove any `parserOptions.project` and ensure every linted TypeScript file belongs to a discoverable `tsconfig.json`, folding any lint-only `tsconfig.eslint.json` include globs into the real `tsconfig.json` before deleting it.",
+            "breaking": true,
+            "hash": "5d8cb5f19540feca4425a512189f088ec31c92d8"
+          }
+        ]
+      },
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Migrate the build to nmr-compile by converging packages on the canonical src/ layout (#75)",
+            "body": "The two compiled packages now build on the project's shared build tooling, so upgrading that tooling no longer risks silently breaking either package's build. Anyone importing either package's main entry now receives its type declarations — one of the two previously shipped its main entry without them.",
+            "hash": "55d9b0dcf21d250fa2b50d5b6fb29c784f5bbb60"
+          },
+          {
+            "description": "Reduce tsconfigs to deviations from TypeScript 6 defaults (#83)",
+            "body": "Streamlines TypeScript configs by removing settings that were identical to the default.\n\nTwo behavior changes are included: Unused function parameters now raise a type error (prefix a parameter's name with `_` to exempt one), and the compilation target now matches the supported Node version instead of trailing it.",
+            "hash": "feeba72a9affe22cb99d37859843eb25d6202a2f"
+          },
+          {
+            "description": "Simplify nmr config by adopting devBin for strict-lint (#88)",
+            "body": "Consolidates the location of the strict-lint source entry point into a single record in the repo's nmr config, replacing three differently spelled copies. `nmr lint:strict` behaves exactly as before in every context — repo root and workspaces — but a future move of the entry point is now a one-line config change instead of a multi-file hunt, and there is no longer a stale copy that could silently break the command.",
+            "hash": "bc71879654a8c1f19ef86109e81c3b590631d692"
+          }
+        ]
+      },
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrade dependencies to latest and drop Node 18/20 support (#78)",
+            "body": "Consuming a published config now requires ESLint 10 and Node `^22.13.0 || >=24`; support for Node 18 and 20 is dropped.",
+            "breaking": true,
+            "hash": "75ee76c17e9219773e65f608b56ccf6b9443cb74"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "6.3.0",
     "date": "2026-05-01",
     "sections": [

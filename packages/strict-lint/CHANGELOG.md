@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## 7.0.0 — 2026-07-18
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Adopt projectService in the published TypeScript config (#86)
+
+  The TypeScript preset now resolves each file's owning `tsconfig.json` itself, so type-aware linting no longer needs per-repo parser wiring. Consumers no longer set `parserOptions.project` or maintain a lint-only `tsconfig.eslint.json`; the only setting they keep is `tsconfigRootDir`.
+
+  Upgrading is breaking: Remove any `parserOptions.project` and ensure every linted TypeScript file belongs to a discoverable `tsconfig.json`, folding any lint-only `tsconfig.eslint.json` include globs into the real `tsconfig.json` before deleting it.
+
+### ⚙️ Tooling
+
+- Migrate the build to nmr-compile by converging packages on the canonical src/ layout (#75)
+
+  The two compiled packages now build on the project's shared build tooling, so upgrading that tooling no longer risks silently breaking either package's build. Anyone importing either package's main entry now receives its type declarations — one of the two previously shipped its main entry without them.
+
+- Reduce tsconfigs to deviations from TypeScript 6 defaults (#83)
+
+  Streamlines TypeScript configs by removing settings that were identical to the default.
+
+  Two behavior changes are included: Unused function parameters now raise a type error (prefix a parameter's name with `_` to exempt one), and the compilation target now matches the supported Node version instead of trailing it.
+
+- Simplify nmr config by adopting devBin for strict-lint (#88)
+
+  Consolidates the location of the strict-lint source entry point into a single record in the repo's nmr config, replacing three differently spelled copies. `nmr lint:strict` behaves exactly as before in every context — repo root and workspaces — but a future move of the entry point is now a one-line config change instead of a multi-file hunt, and there is no longer a stale copy that could silently break the command.
+
+### 📦 Dependencies
+
+- 🚨 **Breaking:** Upgrade dependencies to latest and drop Node 18/20 support (#78)
+
+  Consuming a published config now requires ESLint 10 and Node `^22.13.0 || >=24`; support for Node 18 and 20 is dropped.
+
 ## 6.3.0 — 2026-05-01
 
 ### ⚙️ Tooling

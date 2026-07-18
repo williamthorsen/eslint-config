@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.0.0 — 2026-07-18
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Adopt projectService in the published TypeScript config (#86)
+
+  The TypeScript preset now resolves each file's owning `tsconfig.json` itself, so type-aware linting no longer needs per-repo parser wiring. Consumers no longer set `parserOptions.project` or maintain a lint-only `tsconfig.eslint.json`; the only setting they keep is `tsconfigRootDir`.
+
+  Upgrading is breaking: Remove any `parserOptions.project` and ensure every linted TypeScript file belongs to a discoverable `tsconfig.json`, folding any lint-only `tsconfig.eslint.json` include globs into the real `tsconfig.json` before deleting it.
+
+### 🧪 Tests
+
+- Add a test suite to the typescript package and fix the defects it surfaced (#79)
+
+  Fixes four defects in the package's opt-in config presets and custom lint rules. `createConfig.react()` now loads under ESLint 10 instead of erroring at config load, and the React strict preset now loads instead of failing. One custom rule now reports a violation instead of crashing the lint run when it matches, and another now flags discarded `Array#map` results that it previously missed — so projects using the recommended or strict preset may see new lint findings where `map` is called only for its side effects.
+
+### ⚙️ Tooling
+
+- Migrate the build to nmr-compile by converging packages on the canonical src/ layout (#75)
+
+  The two compiled packages now build on the project's shared build tooling, so upgrading that tooling no longer risks silently breaking either package's build. Anyone importing either package's main entry now receives its type declarations — one of the two previously shipped its main entry without them.
+
+- Reduce tsconfigs to deviations from TypeScript 6 defaults (#83)
+
+  Streamlines TypeScript configs by removing settings that were identical to the default.
+
+  Two behavior changes are included: Unused function parameters now raise a type error (prefix a parameter's name with `_` to exempt one), and the compilation target now matches the supported Node version instead of trailing it.
+
+### 📦 Dependencies
+
+- 🚨 **Breaking:** Upgrade dependencies to latest and drop Node 18/20 support (#78)
+
+  Consuming a published config now requires ESLint 10 and Node `^22.13.0 || >=24`; support for Node 18 and 20 is dropped.
+
 ## 5.17.4 — 2026-05-01
 
 ### 🐛 Bug fixes
