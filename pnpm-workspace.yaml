@@ -1,5 +1,24 @@
 packages:
   - packages/*
-onlyBuiltDependencies:
-  - esbuild
-  - lefthook
+
+allowBuilds:
+  esbuild: true
+  lefthook: true
+
+peerDependencyRules:
+  allowedVersions:
+    'eslint-plugin-import>eslint': '>=10'
+    'eslint-plugin-jest-dom>eslint': '>=10'
+    'eslint-plugin-jsx-a11y>eslint': '>=10'
+    'eslint-plugin-react>eslint': '>=10'
+
+# Keep pnpm 11's 24h minimumReleaseAge soak (supply-chain protection), set
+# explicitly to pin the policy, but exclude first-party packages so a freshly
+# published version can be consumed downstream without waiting out the soak.
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - '@williamthorsen/*'
+  - readyup
+  - v11y-check
+
+savePrefix: ''
