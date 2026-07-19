@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.0.1 — 2026-07-19
+
+### 📦 Dependencies
+
+- Declare @eslint/js as a direct dependency (#96)
+
+  Fixes a packaging defect where consuming `@williamthorsen/eslint-config-typescript` under a strict package manager such as pnpm forced every project to declare `@eslint/js` in its own package.json, even though the project's own code never uses that dependency. Consumers can now remove that spurious declaration.
+
 ## 6.0.0 — 2026-07-18
 
 ### 🎉 Features

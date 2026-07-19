@@ -1,5 +1,22 @@
 [
   {
+    "version": "6.0.1",
+    "date": "2026-07-19",
+    "sections": [
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Declare @eslint/js as a direct dependency (#96)",
+            "body": "Fixes a packaging defect where consuming `@williamthorsen/eslint-config-typescript` under a strict package manager such as pnpm forced every project to declare `@eslint/js` in its own package.json, even though the project's own code never uses that dependency. Consumers can now remove that spurious declaration.",
+            "hash": "774f041b4f83a8e65d967f25724c90235b0c1d4f"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "6.0.0",
     "date": "2026-07-18",
     "sections": [
