@@ -23,7 +23,12 @@ export function collectStaticExternalImports(entryFile: string, repoRoot: string
 
   function walk(candidate: string): void {
     const file = resolveModuleFile(candidate);
-    if (file === undefined || visited.has(file)) {
+    if (file === undefined) {
+      // An unresolved edge would silently truncate the graph and let an undeclared import past it
+      // escape the guard, so fail loud rather than skip a relative-import style not modeled here.
+      throw new Error(`Unresolved import in the static import graph: ${candidate}`);
+    }
+    if (visited.has(file)) {
       return;
     }
     visited.add(file);

@@ -58,6 +58,12 @@ describe('eager-config dependency guard', () => {
       expect(collected.has(plugin), `${plugin} should not be reachable via a static import`).toBe(false);
     }
   });
+
+  it('throws on an unresolvable edge rather than silently under-reporting the graph', () => {
+    const missingEntry = path.join(repoRoot, 'packages', 'typescript', 'src', 'does-not-exist.ts');
+
+    expect(() => collectStaticExternalImports(missingEntry, repoRoot)).toThrow(/Unresolved import/);
+  });
 });
 
 describe('import-graph classification', () => {
