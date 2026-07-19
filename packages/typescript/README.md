@@ -41,6 +41,8 @@ The TypeScript rules are type-aware, and the preset enables typescript-eslint's 
 
 ## Migrating from `parserOptions.project`
 
+This section covers the parser change alone. For the complete v5 → v6 upgrade — the Node and ESLint floors, the package bump, and post-upgrade cleanup — see [Migrating to v6](../../docs/migrating-to-v6.md).
+
 Earlier versions left type-information wiring to the consumer: you set `parserOptions.project` and usually kept a dedicated `tsconfig.eslint.json`. This version supplies `projectService` itself, so:
 
 1. Remove `parserOptions.project` from your ESLint config. Leaving it set now throws `Enabling "project" does nothing when "projectService" is enabled`.
