@@ -44,18 +44,8 @@
     "vitest": "4.1.10",
     "zod": "4.4.3"
   },
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@11.15.0",
   "engines": {
     "node": "^22.13.0 || >=24"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "eslint-plugin-import>eslint": ">=10",
-        "eslint-plugin-jest-dom>eslint": ">=10",
-        "eslint-plugin-jsx-a11y>eslint": ">=10",
-        "eslint-plugin-react>eslint": ">=10"
-      }
-    }
   }
 }
