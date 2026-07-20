@@ -1,10 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { strictLint } from '../strictLint.ts';
+
 const {
   mockedConvertWarnToError,
-  mockedFindNearestFile,
+  mockedResolveEslintConfig,
   mockedLoadStrictLintConfig,
   mockedWriteFile,
+  mockEslintConstructor,
   mockFormat,
   mockGetErrorResults,
   mockLintFiles,
@@ -12,9 +15,10 @@ const {
   mockOutputFixes,
 } = vi.hoisted(() => ({
   mockedConvertWarnToError: vi.fn((config: Record<string, unknown>) => config),
-  mockedFindNearestFile: vi.fn<(fileName: string) => string | undefined>(),
+  mockedResolveEslintConfig: vi.fn(),
   mockedLoadStrictLintConfig: vi.fn(),
   mockedWriteFile: vi.fn().mockResolvedValue(undefined),
+  mockEslintConstructor: vi.fn(),
   mockFormat: vi.fn().mockResolvedValue(''),
   mockGetErrorResults: vi.fn((results: unknown[]) => results),
   mockLintFiles: vi.fn().mockResolvedValue([]),
@@ -26,8 +30,8 @@ vi.mock('../convertWarnToError.ts', () => ({
   convertWarnToError: mockedConvertWarnToError,
 }));
 
-vi.mock('../common/findNearestFile.ts', () => ({
-  findNearestFile: mockedFindNearestFile,
+vi.mock('../resolveEslintConfig.ts', () => ({
+  resolveEslintConfig: mockedResolveEslintConfig,
 }));
 
 vi.mock('../loadStrictLintConfig.ts', () => ({
@@ -46,298 +50,301 @@ vi.mock('eslint', () => {
       static getErrorResults = mockGetErrorResults;
       lintFiles = mockLintFiles;
       loadFormatter = mockLoadFormatter;
+      constructor(options: unknown) {
+        mockEslintConstructor(options);
+      }
     },
     type: {},
   };
 });
 
-// Import after mocks are set up
+describe(strictLint, () => {
+  describe('maxSeverity merge precedence', () => {
+    // Prevent process.exit from terminating tests
+    const originalExit = process.exit;
+    const originalArgv = process.argv;
 
-const { strictLint } = await import('../strictLint.ts');
-
-describe('strictLint() maxSeverity merge precedence', () => {
-  // Prevent process.exit from terminating tests
-  const originalExit = process.exit;
-  const originalArgv = process.argv;
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    process.exit = vi.fn<(code?: string | number | null) => never>();
-    process.argv = ['node', 'strict-lint'];
-  });
-
-  afterEach(() => {
-    process.exit = originalExit;
-    process.argv = originalArgv;
-  });
-
-  it('applies only built-in defaults when no config file or programmatic overrides exist', async () => {
-    mockedFindNearestFile.mockReturnValue('/project/eslint.config.js');
-    vi.doMock('/project/eslint.config.js', () => ({ default: [{ rules: {} }] }));
-    mockedLoadStrictLintConfig.mockResolvedValue(undefined);
-
-    await strictLint();
-
-    expect(mockedConvertWarnToError).toHaveBeenCalledWith(
-      { rules: {} },
-      expect.objectContaining({ '@typescript-eslint/no-deprecated': 'warn' }),
-    );
-  });
-
-  it('config file overrides built-in defaults', async () => {
-    mockedFindNearestFile.mockReturnValue('/project/eslint.config.js');
-    vi.doMock('/project/eslint.config.js', () => ({ default: [{ rules: {} }] }));
-    mockedLoadStrictLintConfig.mockResolvedValue({
-      maxSeverity: { '@typescript-eslint/no-deprecated': 'error' },
+    beforeEach(() => {
+      vi.clearAllMocks();
+      process.exit = vi.fn<(code?: string | number | null) => never>();
+      process.argv = ['node', 'strict-lint'];
     });
 
-    await strictLint();
-
-    expect(mockedConvertWarnToError).toHaveBeenCalledWith(
-      { rules: {} },
-      expect.objectContaining({ '@typescript-eslint/no-deprecated': 'error' }),
-    );
-  });
-
-  it('programmatic overrides take precedence over config file', async () => {
-    mockedFindNearestFile.mockReturnValue('/project/eslint.config.js');
-    vi.doMock('/project/eslint.config.js', () => ({ default: [{ rules: {} }] }));
-    mockedLoadStrictLintConfig.mockResolvedValue({
-      maxSeverity: { 'some-rule': 'error' },
+    afterEach(() => {
+      process.exit = originalExit;
+      process.argv = originalArgv;
     });
 
-    await strictLint({
-      maxSeverity: { 'some-rule': 'warn' },
+    it('applies only built-in defaults when no config file or programmatic overrides exist', async () => {
+      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+
+      await strictLint();
+
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith(
+        { rules: {} },
+        expect.objectContaining({ '@typescript-eslint/no-deprecated': 'warn' }),
+      );
     });
 
-    expect(mockedConvertWarnToError).toHaveBeenCalledWith(
-      { rules: {} },
-      expect.objectContaining({
-        '@typescript-eslint/no-deprecated': 'warn',
-        'some-rule': 'warn',
-      }),
-    );
-  });
+    it('config file overrides built-in defaults', async () => {
+      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedLoadStrictLintConfig.mockResolvedValue({
+        maxSeverity: { '@typescript-eslint/no-deprecated': 'error' },
+      });
 
-  it('uses process.cwd() as config dir when baseConfig is provided', async () => {
-    mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+      await strictLint();
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
-
-    expect(mockedLoadStrictLintConfig).toHaveBeenCalledWith(process.cwd());
-  });
-
-  it('merges all three layers with correct precedence', async () => {
-    mockedFindNearestFile.mockReturnValue('/project/eslint.config.js');
-    vi.doMock('/project/eslint.config.js', () => ({ default: [{ rules: {} }] }));
-    mockedLoadStrictLintConfig.mockResolvedValue({
-      maxSeverity: {
-        '@typescript-eslint/no-deprecated': 'error',
-        'config-only-rule': 'warn',
-      },
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith(
+        { rules: {} },
+        expect.objectContaining({ '@typescript-eslint/no-deprecated': 'error' }),
+      );
     });
 
-    await strictLint({
-      maxSeverity: {
-        '@typescript-eslint/no-deprecated': 'warn',
-        'programmatic-only-rule': 'warn',
-      },
+    it('programmatic overrides take precedence over config file', async () => {
+      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedLoadStrictLintConfig.mockResolvedValue({
+        maxSeverity: { 'some-rule': 'error' },
+      });
+
+      await strictLint({
+        maxSeverity: { 'some-rule': 'warn' },
+      });
+
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith(
+        { rules: {} },
+        expect.objectContaining({
+          '@typescript-eslint/no-deprecated': 'warn',
+          'some-rule': 'warn',
+        }),
+      );
     });
 
-    expect(mockedConvertWarnToError).toHaveBeenCalledWith(
-      { rules: {} },
-      expect.objectContaining({
-        '@typescript-eslint/no-deprecated': 'warn',
-        'config-only-rule': 'warn',
-        'programmatic-only-rule': 'warn',
-      }),
-    );
-  });
-});
+    it('uses process.cwd() as config dir when baseConfig is provided', async () => {
+      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
 
-describe('strictLint() exit code', () => {
-  const originalExit = process.exit;
-  const originalArgv = process.argv;
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    process.exit = vi.fn<(code?: string | number | null) => never>();
-    process.argv = ['node', 'strict-lint'];
-    mockedLoadStrictLintConfig.mockResolvedValue(undefined);
-  });
+      expect(mockedLoadStrictLintConfig).toHaveBeenCalledWith(process.cwd());
+    });
 
-  afterEach(() => {
-    process.exit = originalExit;
-    process.argv = originalArgv;
-  });
+    it('merges all three layers with correct precedence', async () => {
+      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedLoadStrictLintConfig.mockResolvedValue({
+        maxSeverity: {
+          '@typescript-eslint/no-deprecated': 'error',
+          'config-only-rule': 'warn',
+        },
+      });
 
-  it('exits 0 when no problems are reported', async () => {
-    mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 0 }]);
+      await strictLint({
+        maxSeverity: {
+          '@typescript-eslint/no-deprecated': 'warn',
+          'programmatic-only-rule': 'warn',
+        },
+      });
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
-
-    expect(process.exit).not.toHaveBeenCalled();
-  });
-
-  it('exits 0 when only warnings are reported', async () => {
-    mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
-
-    await strictLint({ baseConfig: [{ rules: {} }] });
-
-    expect(process.exit).not.toHaveBeenCalled();
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith(
+        { rules: {} },
+        expect.objectContaining({
+          '@typescript-eslint/no-deprecated': 'warn',
+          'config-only-rule': 'warn',
+          'programmatic-only-rule': 'warn',
+        }),
+      );
+    });
   });
 
-  it('exits 1 when errors are reported', async () => {
-    mockLintFiles.mockResolvedValueOnce([
-      { errorCount: 2, warningCount: 1 },
-      { errorCount: 1, warningCount: 0 },
-    ]);
+  describe('exit code', () => {
+    const originalExit = process.exit;
+    const originalArgv = process.argv;
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+    beforeEach(() => {
+      vi.clearAllMocks();
+      process.exit = vi.fn<(code?: string | number | null) => never>();
+      process.argv = ['node', 'strict-lint'];
+      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+    });
 
-    expect(process.exit).toHaveBeenCalledWith(1);
+    afterEach(() => {
+      process.exit = originalExit;
+      process.argv = originalArgv;
+    });
+
+    it('exits 0 when no problems are reported', async () => {
+      mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 0 }]);
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(process.exit).not.toHaveBeenCalled();
+    });
+
+    it('exits 0 when only warnings are reported', async () => {
+      mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(process.exit).not.toHaveBeenCalled();
+    });
+
+    it('exits 1 when errors are reported', async () => {
+      mockLintFiles.mockResolvedValueOnce([
+        { errorCount: 2, warningCount: 1 },
+        { errorCount: 1, warningCount: 0 },
+      ]);
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(process.exit).toHaveBeenCalledWith(1);
+    });
+
+    it('exits 1 when doLint throws an error', async () => {
+      mockLintFiles.mockRejectedValueOnce(new Error('lint failure'));
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(process.exit).toHaveBeenCalledWith(1);
+    });
   });
 
-  it('exits 1 when doLint throws an error', async () => {
-    mockLintFiles.mockRejectedValueOnce(new Error('lint failure'));
+  describe('CLI behavior', () => {
+    const originalExit = process.exit;
+    const originalArgv = process.argv;
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+    beforeEach(() => {
+      vi.clearAllMocks();
+      process.exit = vi.fn<(code?: string | number | null) => never>();
+      process.argv = ['node', 'strict-lint'];
+      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+      mockFormat.mockResolvedValue('');
+      mockLintFiles.mockResolvedValue([{ errorCount: 0, warningCount: 0 }]);
+    });
 
-    expect(process.exit).toHaveBeenCalledWith(1);
-  });
-});
+    afterEach(() => {
+      process.exit = originalExit;
+      process.argv = originalArgv;
+    });
 
-describe('strictLint() CLI behavior', () => {
-  const originalExit = process.exit;
-  const originalArgv = process.argv;
+    it('uses CLI positionals as lint patterns', async () => {
+      process.argv = ['node', 'strict-lint', 'src/', 'lib/'];
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    process.exit = vi.fn<(code?: string | number | null) => never>();
-    process.argv = ['node', 'strict-lint'];
-    mockedLoadStrictLintConfig.mockResolvedValue(undefined);
-    mockFormat.mockResolvedValue('');
-    mockLintFiles.mockResolvedValue([{ errorCount: 0, warningCount: 0 }]);
-  });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-  afterEach(() => {
-    process.exit = originalExit;
-    process.argv = originalArgv;
-  });
+      expect(mockLintFiles).toHaveBeenCalledWith(['src/', 'lib/']);
+    });
 
-  it('uses CLI positionals as lint patterns', async () => {
-    process.argv = ['node', 'strict-lint', 'src/', 'lib/'];
+    it('uses programmatic patterns when no CLI positionals are provided', async () => {
+      await strictLint({ baseConfig: [{ rules: {} }], patterns: ['custom/'] });
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      expect(mockLintFiles).toHaveBeenCalledWith(['custom/']);
+    });
 
-    expect(mockLintFiles).toHaveBeenCalledWith(['src/', 'lib/']);
-  });
+    it('prefers CLI positionals over programmatic patterns', async () => {
+      process.argv = ['node', 'strict-lint', 'cli-path/'];
 
-  it('uses programmatic patterns when no CLI positionals are provided', async () => {
-    await strictLint({ baseConfig: [{ rules: {} }], patterns: ['custom/'] });
+      await strictLint({ baseConfig: [{ rules: {} }], patterns: ['programmatic-path/'] });
 
-    expect(mockLintFiles).toHaveBeenCalledWith(['custom/']);
-  });
+      expect(mockLintFiles).toHaveBeenCalledWith(['cli-path/']);
+    });
 
-  it('prefers CLI positionals over programmatic patterns', async () => {
-    process.argv = ['node', 'strict-lint', 'cli-path/'];
+    it('defaults to ["."] when no patterns are specified', async () => {
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    await strictLint({ baseConfig: [{ rules: {} }], patterns: ['programmatic-path/'] });
+      expect(mockLintFiles).toHaveBeenCalledWith(['.']);
+    });
 
-    expect(mockLintFiles).toHaveBeenCalledWith(['cli-path/']);
-  });
+    it('suppresses outputFixes when --fix-dry-run is specified', async () => {
+      process.argv = ['node', 'strict-lint', '--fix-dry-run'];
 
-  it('defaults to ["."] when no patterns are specified', async () => {
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(mockLintFiles).toHaveBeenCalledWith(['.']);
-  });
+      expect(mockOutputFixes).not.toHaveBeenCalled();
+    });
 
-  it('suppresses outputFixes when --fix-dry-run is specified', async () => {
-    process.argv = ['node', 'strict-lint', '--fix-dry-run'];
+    it('calls outputFixes when --fix is specified without --fix-dry-run', async () => {
+      process.argv = ['node', 'strict-lint', '--fix'];
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(mockOutputFixes).not.toHaveBeenCalled();
-  });
+      expect(mockOutputFixes).toHaveBeenCalled();
+    });
 
-  it('calls outputFixes when --fix is specified without --fix-dry-run', async () => {
-    process.argv = ['node', 'strict-lint', '--fix'];
+    it('filters warnings through getErrorResults when --quiet is specified', async () => {
+      process.argv = ['node', 'strict-lint', '--quiet'];
+      const results = [{ errorCount: 1, warningCount: 3 }];
+      mockLintFiles.mockResolvedValueOnce(results);
+      mockGetErrorResults.mockReturnValueOnce([{ errorCount: 1, warningCount: 0 }]);
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(mockOutputFixes).toHaveBeenCalled();
-  });
+      expect(mockGetErrorResults).toHaveBeenCalledWith(results);
+    });
 
-  it('filters warnings through getErrorResults when --quiet is specified', async () => {
-    process.argv = ['node', 'strict-lint', '--quiet'];
-    const results = [{ errorCount: 1, warningCount: 3 }];
-    mockLintFiles.mockResolvedValueOnce(results);
-    mockGetErrorResults.mockReturnValueOnce([{ errorCount: 1, warningCount: 0 }]);
+    it('evaluates --max-warnings against unfiltered results even when --quiet is active', async () => {
+      process.argv = ['node', 'strict-lint', '--quiet', '--max-warnings', '2'];
+      const results = [{ errorCount: 0, warningCount: 5 }];
+      mockLintFiles.mockResolvedValueOnce(results);
+      // getErrorResults strips warnings, so filtered warningCount would be 0
+      mockGetErrorResults.mockReturnValueOnce([{ errorCount: 0, warningCount: 0 }]);
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(mockGetErrorResults).toHaveBeenCalledWith(results);
-  });
+      expect(process.exit).toHaveBeenCalledWith(1);
+    });
 
-  it('evaluates --max-warnings against unfiltered results even when --quiet is active', async () => {
-    process.argv = ['node', 'strict-lint', '--quiet', '--max-warnings', '2'];
-    const results = [{ errorCount: 0, warningCount: 5 }];
-    mockLintFiles.mockResolvedValueOnce(results);
-    // getErrorResults strips warnings, so filtered warningCount would be 0
-    mockGetErrorResults.mockReturnValueOnce([{ errorCount: 0, warningCount: 0 }]);
+    it('does not filter through getErrorResults when --quiet is not specified', async () => {
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      expect(mockGetErrorResults).not.toHaveBeenCalled();
+    });
 
-    expect(process.exit).toHaveBeenCalledWith(1);
-  });
+    it('exits 1 when warnings exceed --max-warnings threshold', async () => {
+      process.argv = ['node', 'strict-lint', '--max-warnings', '2'];
+      mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
 
-  it('does not filter through getErrorResults when --quiet is not specified', async () => {
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(mockGetErrorResults).not.toHaveBeenCalled();
-  });
+      expect(process.exit).toHaveBeenCalledWith(1);
+    });
 
-  it('exits 1 when warnings exceed --max-warnings threshold', async () => {
-    process.argv = ['node', 'strict-lint', '--max-warnings', '2'];
-    mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
+    it('does not exit when warnings are within --max-warnings threshold', async () => {
+      process.argv = ['node', 'strict-lint', '--max-warnings', '5'];
+      mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(process.exit).toHaveBeenCalledWith(1);
-  });
+      expect(process.exit).not.toHaveBeenCalled();
+    });
 
-  it('does not exit when warnings are within --max-warnings threshold', async () => {
-    process.argv = ['node', 'strict-lint', '--max-warnings', '5'];
-    mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
+    it('loads the specified formatter when --format is provided', async () => {
+      process.argv = ['node', 'strict-lint', '--format', 'json'];
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(process.exit).not.toHaveBeenCalled();
-  });
+      expect(mockLoadFormatter).toHaveBeenCalledWith('json');
+    });
 
-  it('loads the specified formatter when --format is provided', async () => {
-    process.argv = ['node', 'strict-lint', '--format', 'json'];
+    it('writes formatted output to file when --output-file is specified', async () => {
+      process.argv = ['node', 'strict-lint', '--output-file', 'results.txt'];
+      mockFormat.mockResolvedValueOnce('formatted output');
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(mockLoadFormatter).toHaveBeenCalledWith('json');
-  });
+      expect(mockedWriteFile).toHaveBeenCalledWith('results.txt', 'formatted output', 'utf8');
+    });
 
-  it('writes formatted output to file when --output-file is specified', async () => {
-    process.argv = ['node', 'strict-lint', '--output-file', 'results.txt'];
-    mockFormat.mockResolvedValueOnce('formatted output');
+    it('exits 1 when --rule specifies an invalid severity', async () => {
+      process.argv = ['node', 'strict-lint', '--rule', 'no-console: typo'];
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    expect(mockedWriteFile).toHaveBeenCalledWith('results.txt', 'formatted output', 'utf8');
-  });
+      expect(process.exit).toHaveBeenCalledWith(1);
+    });
 
-  it('exits 1 when --rule specifies an invalid severity', async () => {
-    process.argv = ['node', 'strict-lint', '--rule', 'no-console: typo'];
+    it('constructs ESLint with overrideConfigFile: true so it does not re-load the config', async () => {
+      await strictLint({ baseConfig: [{ rules: {} }] });
 
-    await strictLint({ baseConfig: [{ rules: {} }] });
-
-    expect(process.exit).toHaveBeenCalledWith(1);
+      expect(mockEslintConstructor).toHaveBeenCalledWith(expect.objectContaining({ overrideConfigFile: true }));
+    });
   });
 });

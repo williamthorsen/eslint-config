@@ -1,8 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { tsImport } from 'tsx/esm/api';
-
+import { importConfigModule } from './common/importConfigModule.ts';
 import type { StrictLintConfig } from './types.ts';
 
 export async function loadStrictLintConfig(eslintConfigDir: string): Promise<StrictLintConfig | undefined> {
@@ -12,7 +11,7 @@ export async function loadStrictLintConfig(eslintConfigDir: string): Promise<Str
     return undefined;
   }
 
-  const mod: unknown = await tsImport(configFilePath, { parentURL: import.meta.url });
+  const mod = await importConfigModule(configFilePath);
   assertIsStrictLintConfig(mod);
   return mod.default;
 }
