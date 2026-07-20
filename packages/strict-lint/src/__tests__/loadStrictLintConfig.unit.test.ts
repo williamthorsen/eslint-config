@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
-const { mockedExistsSync, mockedTsImport } = vi.hoisted(() => ({
+import { loadStrictLintConfig } from '../loadStrictLintConfig.ts';
+
+const { mockedExistsSync, mockedImportConfigModule } = vi.hoisted(() => ({
   mockedExistsSync: vi.fn<(path: string) => boolean>(),
-  mockedTsImport: vi.fn(),
+  mockedImportConfigModule: vi.fn(),
 }));
 
 vi.mock('node:fs', () => ({
@@ -10,16 +12,14 @@ vi.mock('node:fs', () => ({
   existsSync: mockedExistsSync,
 }));
 
-vi.mock('tsx/esm/api', () => ({
-  tsImport: mockedTsImport,
+vi.mock('../common/importConfigModule.ts', () => ({
+  importConfigModule: mockedImportConfigModule,
 }));
 
-import { loadStrictLintConfig } from '../loadStrictLintConfig.ts';
-
-describe('loadStrictLintConfig()', () => {
+describe(loadStrictLintConfig, () => {
   it('returns the config when the file exists and has a valid shape', async () => {
     mockedExistsSync.mockReturnValue(true);
-    mockedTsImport.mockResolvedValue({
+    mockedImportConfigModule.mockResolvedValue({
       default: { maxSeverity: { 'some-rule': 'warn' } },
     });
 
@@ -38,7 +38,7 @@ describe('loadStrictLintConfig()', () => {
 
   it('throws when the config has an invalid shape', async () => {
     mockedExistsSync.mockReturnValue(true);
-    mockedTsImport.mockResolvedValue({
+    mockedImportConfigModule.mockResolvedValue({
       default: { maxSeverity: { 'some-rule': 'invalid' } },
     });
 
@@ -49,7 +49,7 @@ describe('loadStrictLintConfig()', () => {
 
   it('throws when the default export is not an object', async () => {
     mockedExistsSync.mockReturnValue(true);
-    mockedTsImport.mockResolvedValue({
+    mockedImportConfigModule.mockResolvedValue({
       default: 'not-an-object',
     });
 
@@ -60,7 +60,7 @@ describe('loadStrictLintConfig()', () => {
 
   it('throws when the module is not an object', async () => {
     mockedExistsSync.mockReturnValue(true);
-    mockedTsImport.mockResolvedValue(null);
+    mockedImportConfigModule.mockResolvedValue(null);
 
     await expect(loadStrictLintConfig('/project')).rejects.toThrow(
       'Expected strict-lint config module to be an object',
@@ -69,7 +69,7 @@ describe('loadStrictLintConfig()', () => {
 
   it('throws when the module has no default export', async () => {
     mockedExistsSync.mockReturnValue(true);
-    mockedTsImport.mockResolvedValue({});
+    mockedImportConfigModule.mockResolvedValue({});
 
     await expect(loadStrictLintConfig('/project')).rejects.toThrow(
       'Expected strict-lint config module to have a default export',
@@ -78,7 +78,7 @@ describe('loadStrictLintConfig()', () => {
 
   it('throws when maxSeverity is not an object', async () => {
     mockedExistsSync.mockReturnValue(true);
-    mockedTsImport.mockResolvedValue({
+    mockedImportConfigModule.mockResolvedValue({
       default: { maxSeverity: 'not-an-object' },
     });
 
@@ -87,7 +87,7 @@ describe('loadStrictLintConfig()', () => {
 
   it('returns the config when the default export has no maxSeverity key', async () => {
     mockedExistsSync.mockReturnValue(true);
-    mockedTsImport.mockResolvedValue({
+    mockedImportConfigModule.mockResolvedValue({
       default: {},
     });
 

@@ -2,18 +2,22 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * Walks up the directory tree, starting at the current directory, until it finds the named file.
- * Returns the path to the file or null if the file was not found.
- * TODO: Allow use of a file pattern instead of a single file name.
+ * Walks up the directory tree from `startDir`, returning the path to the first matching file.
+ * When several names are given, all are checked at each directory level in list order before ascending, so a
+ * nearer directory wins over a farther one and, within a level, an earlier name wins. This mirrors ESLint's own
+ * `findUp` over its ordered config filenames. Returns undefined if no name is found before the filesystem root.
  */
-export function findNearestFile(fileName: string, startDir = process.cwd()): string | undefined {
+export function findNearestFile(fileNames: string | readonly string[], startDir = process.cwd()): string | undefined {
+  const names = typeof fileNames === 'string' ? [fileNames] : fileNames;
   let currentDir = startDir;
 
   while (currentDir !== '/') {
-    const filePath = path.join(currentDir, fileName);
+    for (const name of names) {
+      const filePath = path.join(currentDir, name);
 
-    if (fs.existsSync(filePath)) {
-      return filePath;
+      if (fs.existsSync(filePath)) {
+        return filePath;
+      }
     }
 
     // Move one directory up

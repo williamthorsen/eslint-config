@@ -1,16 +1,15 @@
 import fs from 'node:fs/promises';
-import path from 'node:path';
 
 import { ESLint, type Linter } from 'eslint';
 
-import { findNearestFile } from './common/findNearestFile.ts';
 import { convertWarnToError } from './convertWarnToError.ts';
 import { defaultMaxSeverity } from './defaultMaxSeverity.ts';
 import { loadStrictLintConfig } from './loadStrictLintConfig.ts';
 import { parseCliArgs } from './parseCliArgs.ts';
+import { resolveEslintConfig } from './resolveEslintConfig.ts';
 import type { MaxSeverityMap, StrictLintOptions } from './types.ts';
 
-/** Run strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
+/** Runs strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
   const args = process.argv.slice(2);
   try {
@@ -27,7 +26,7 @@ export async function strictLint(options?: StrictLintOptions): Promise<string> {
 }
 
 /**
- * Run ESLint with strict-lint errorization applied.
+ * Runs ESLint with strict-lint errorization applied.
  * @link https://eslint.org/docs/latest/integrate/nodejs-api#eslint-class
  */
 async function doLint(
@@ -38,7 +37,7 @@ async function doLint(
 
   const { config, configDir } = await resolveConfigAndDir(options, parsed.configPath);
 
-  const strictLintConfig = configDir ? await loadStrictLintConfig(configDir) : undefined;
+  const strictLintConfig = await loadStrictLintConfig(configDir);
 
   const resolvedMaxSeverity: MaxSeverityMap = {
     ...defaultMaxSeverity,
@@ -55,6 +54,9 @@ async function doLint(
     cwd: process.cwd(),
     ...parsed.eslintOptions,
     overrideConfig,
+    // strict-lint has already loaded and errorized the config, so ESLint must not re-load it from
+    // disk (which would require jiti for TypeScript configs). Lint against only the config passed here.
+    overrideConfigFile: true,
   });
 
   // Determine file patterns: CLI positionals > programmatic patterns > default
@@ -99,24 +101,16 @@ async function doLint(
   return { text, errorCount };
 }
 
-/** Resolve the ESLint config array and config directory from programmatic options, --config flag, or file discovery. */
+/** Resolves the ESLint config array & config directory from programmatic options, --config flag, or file discovery. */
 async function resolveConfigAndDir(
   options: StrictLintOptions | undefined,
   configPath: string | undefined,
-): Promise<{ config: Linter.Config[]; configDir: string | undefined }> {
+): Promise<{ config: Linter.Config[]; configDir: string }> {
   if (options?.baseConfig) {
     return { config: options.baseConfig, configDir: process.cwd() };
   }
 
-  const filePath = configPath ?? findNearestFile('eslint.config.js');
-  if (!filePath) {
-    throw new Error('Could not find eslint.config.js');
-  }
-
-  const resolvedPath = path.resolve(filePath);
-  const mod: unknown = await import(resolvedPath);
-  assertIsConfig(mod);
-  return { config: mod.default, configDir: path.dirname(resolvedPath) };
+  return resolveEslintConfig(configPath);
 }
 
 /** Build the override config array from errorized config and rule overrides. */
@@ -150,28 +144,11 @@ const SEVERITY_MAP: Record<string, Linter.RuleSeverity> = {
   error: 'error',
 };
 
-/** Convert a CLI severity string to a typed `Linter.RuleSeverity`. */
+/** Converts a CLI severity string to a typed `Linter.RuleSeverity`. */
 function toRuleSeverity(value: string): Linter.RuleSeverity {
   const severity = SEVERITY_MAP[value];
   if (severity === undefined) {
     throw new Error(`Invalid rule severity "${value}". Expected "off", "warn", or "error".`);
   }
   return severity;
-}
-
-function assertIsConfig(mod: unknown): asserts mod is { default: Linter.Config[] } {
-  if (typeof mod !== 'object' || mod === null) {
-    throw new TypeError('Expected module to be an object');
-  }
-  if (!('default' in mod)) {
-    throw new TypeError('Expected module to have a default export');
-  }
-  if (!Array.isArray(mod.default)) {
-    throw new TypeError('Expected config to be an array');
-  }
-  for (const item of mod.default) {
-    if (typeof item !== 'object') {
-      throw new TypeError('Expected config item to be an object');
-    }
-  }
 }

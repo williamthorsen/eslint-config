@@ -10,7 +10,7 @@ Run ESLint with all warnings promoted to errors — except for an allowlist that
 pnpm add -D @williamthorsen/strict-lint eslint
 ```
 
-Requires ESLint 9+ (flat config).
+Requires ESLint 10+ (flat config) and Node 24+ (for native TypeScript config loading).
 
 ## Quick start
 
@@ -24,7 +24,7 @@ Every warning emitted by your ESLint config becomes an error and fails the run, 
 
 ## How it works
 
-1. Loads your `eslint.config.js` (auto-discovered via parent walk, or `--config <path>`).
+1. Loads your ESLint flat config (one of `eslint.config.js`, `.mjs`, `.cjs`, `.ts`, `.mts`, or `.cts`), auto-discovered by walking up from the current directory in ESLint's own priority order, or via `--config <path>`.
 2. Rewrites every rule whose severity is `'warn'` to `'error'`, except those listed in `maxSeverity`.
 3. Runs ESLint via the Node API and exits non-zero on any errors.
 
@@ -51,7 +51,7 @@ const config: StrictLintConfig = {
 export default config;
 ```
 
-The config file is loaded with `tsx`, so TypeScript syntax works without a build step.
+The config file is loaded through Node's native TypeScript support (Node 24+), so TypeScript syntax works without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not.
 
 ## CLI reference
 
@@ -63,7 +63,7 @@ strict-lint [options] [file|dir|glob...]
 
 | Option                         | Description                                                                  |
 | ------------------------------ | ---------------------------------------------------------------------------- |
-| `-c, --config <path>`          | Path to `eslint.config.js`                                                   |
+| `-c, --config <path>`          | Path to your ESLint config file                                              |
 | `--rule <name:severity>`       | Override a single rule (repeatable). Severity: `off` \| `warn` \| `error`.   |
 | `--fix`                        | Auto-fix problems                                                            |
 | `--fix-dry-run`                | Compute fixes but do not write                                               |
@@ -106,12 +106,12 @@ await strictLint({
 });
 ```
 
-| Option          | Type                                         | Description                                               |
-| --------------- | -------------------------------------------- | --------------------------------------------------------- |
-| `baseConfig`    | `Linter.Config[]`                            | Use this config instead of loading `eslint.config.js`.    |
-| `patterns`      | `string[]`                                   | Files or globs to lint (default: `['.']`).                |
-| `maxSeverity`   | `Record<string, 'warn' \| 'error'>`          | Keep listed rules at this severity; skip error promotion. |
-| `ruleOverrides` | `Record<string, 'off' \| 'warn' \| 'error'>` | Force rule severity (applied after errorization).         |
+| Option          | Type                                         | Description                                                 |
+| --------------- | -------------------------------------------- | ----------------------------------------------------------- |
+| `baseConfig`    | `Linter.Config[]`                            | Use this config instead of loading a config file from disk. |
+| `patterns`      | `string[]`                                   | Files or globs to lint (default: `['.']`).                  |
+| `maxSeverity`   | `Record<string, 'warn' \| 'error'>`          | Keep listed rules at this severity; skip error promotion.   |
+| `ruleOverrides` | `Record<string, 'off' \| 'warn' \| 'error'>` | Force rule severity (applied after errorization).           |
 
 `strictLint()` reads `process.argv` and merges CLI flags with the programmatic options. CLI rule overrides win over programmatic ones.
 
