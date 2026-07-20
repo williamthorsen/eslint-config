@@ -1,5 +1,33 @@
 [
   {
+    "version": "6.0.2",
+    "date": "2026-07-20",
+    "sections": [
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Declare eslint-plugin-import as a direct dependency (#99)",
+            "body": "Fixes a failure that prevented `@williamthorsen/eslint-config-typescript` from loading for consumers that had not separately installed `eslint-plugin-import`.",
+            "hash": "259e5474226e428877445dfce381c2e9cd1e1dee"
+          }
+        ]
+      },
+      {
+        "title": "📚 Documentation",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Add a migrating-to-v6 guide for consumers upgrading from v5 (#101)",
+            "body": "Adds a guide with a complete walkthrough for migrating @williamthorsen/eslint-config-typescript from v5 to v6.\n\nCloses #100.",
+            "hash": "826e253605971e3677d36136e31688f52b8e11d4"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "6.0.1",
     "date": "2026-07-19",
     "sections": [

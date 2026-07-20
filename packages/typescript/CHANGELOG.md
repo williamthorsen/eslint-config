@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.0.2 — 2026-07-20
+
+### 📦 Dependencies
+
+- Declare eslint-plugin-import as a direct dependency (#99)
+
+  Fixes a failure that prevented `@williamthorsen/eslint-config-typescript` from loading for consumers that had not separately installed `eslint-plugin-import`.
+
+### 📚 Documentation
+
+- Add a migrating-to-v6 guide for consumers upgrading from v5 (#101)
+
+  Adds a guide with a complete walkthrough for migrating @williamthorsen/eslint-config-typescript from v5 to v6.
+
+  Closes #100.
+
 ## 6.0.1 — 2026-07-19
 
 ### 📦 Dependencies
