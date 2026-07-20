@@ -1,5 +1,23 @@
 [
   {
+    "version": "8.0.0",
+    "date": "2026-07-20",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Support .ts ESLint config file types (#104)",
+            "body": "strict-lint now lints projects whose ESLint config is any `eslint.config.*` file — `.ts`, `.mts`, `.cts`, `.mjs`, or `.cjs` — not only `eslint.config.js`. TypeScript configs need no build step or separate transformer. Now requires Node 24 or later.",
+            "breaking": true,
+            "hash": "1890ed83433ad5e61c77790e8e7510d2f4802404"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "7.0.0",
     "date": "2026-07-18",
     "sections": [

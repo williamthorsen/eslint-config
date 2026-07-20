@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.0.0 — 2026-07-20
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Support .ts ESLint config file types (#104)
+
+  strict-lint now lints projects whose ESLint config is any `eslint.config.*` file — `.ts`, `.mts`, `.cts`, `.mjs`, or `.cjs` — not only `eslint.config.js`. TypeScript configs need no build step or separate transformer. Now requires Node 24 or later.
+
 ## 7.0.0 — 2026-07-18
 
 ### 🎉 Features
