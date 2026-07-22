@@ -9,6 +9,7 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 | [`@williamthorsen/eslint-config-basic`](packages/basic)           | Flat ESLint preset for JavaScript, JSON, YAML, Markdown, and `package.json`                   |
 | [`@williamthorsen/eslint-config-typescript`](packages/typescript) | Flat ESLint preset for TypeScript projects, with opt-in React, Next, Vitest, and a11y configs |
 | [`@williamthorsen/strict-lint`](packages/strict-lint)             | CLI that runs ESLint with warnings promoted to errors, with a configurable allowlist          |
+| [`@williamthorsen/tsconfig`](packages/tsconfig)                   | Shared TypeScript base config for Node-only projects                                          |
 
 Each package has its own README with installation and usage details.
 
@@ -61,14 +62,15 @@ Publishing targets differ by package:
 | `@williamthorsen/eslint-config-basic`      | GitHub Packages | restricted |
 | `@williamthorsen/eslint-config-typescript` | npm             | public     |
 | `@williamthorsen/strict-lint`              | npm             | public     |
+| `@williamthorsen/tsconfig`                 | npm             | public     |
 
 ## Commit conventions
 
 Commit titles follow the format `[{scope}|{type}: ]{title}`, rendered by `describe-change.sh`:
 
-- **Scopes:** `basic`, `root`, `strict-lint`, `ts`, or `*` for changes spanning multiple workspaces.
+- **Scopes:** `basic`, `root`, `strict-lint`, `ts`, `tsconfig`, or `*` for changes spanning multiple workspaces.
 - **Types:** `ai`, `ci`, `deps`, `docs`, `feat`, `fix`, `internal`, `refactor`, `tests`, `tooling`. Append `!` for breaking changes (e.g., `feat!`).
-- **`deps` is always its own commit.** `cliff.toml` and release-kit categorize the changelog by type — mixed commits land in the wrong section.
+- **`deps` is always its own commit.** release-kit categorizes the changelog by type — mixed commits land in the wrong section.
 
 Full reference: [`docs/versioning-and-changelog.md`](docs/versioning-and-changelog.md).
 

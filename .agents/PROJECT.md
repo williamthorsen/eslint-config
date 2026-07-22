@@ -4,17 +4,17 @@
 
 ## Overview
 
-A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published under `@williamthorsen/*`. Three packages: a small JavaScript config (`basic`), a comprehensive TypeScript config (`typescript`, the primary public artifact, with React/Next/Vitest/testing-library presets and custom rules), and a CLI utility that runs ESLint with warnings promoted to errors (`strict-lint`).
+A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published under `@williamthorsen/*`. Four packages: a small JavaScript config (`basic`), a comprehensive TypeScript config (`typescript`, the primary public artifact, with React/Next/Vitest/testing-library presets and custom rules), a CLI utility that runs ESLint with warnings promoted to errors (`strict-lint`), and a shared TypeScript base config (`tsconfig`).
 
 ## Project structure
 
 - `packages/basic/` — `@williamthorsen/eslint-config-basic`. Flat config for JavaScript/JSON/MD/YAML. No build step; ships `index.mjs` directly.
 - `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Sources under `src/`, compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `src/plugins/rules/`.
 - `packages/strict-lint/` — `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
+- `packages/tsconfig/` — `@williamthorsen/tsconfig`. No build step; ships `base.json`, which extends `@tsconfig/strictest` and adds the Node/build options it omits. The repo root consumes it via the workspace symlink.
 - `eslint.config.js` (repo root) — imports from `packages/typescript/dist/esm/`; depends on a built typescript package.
 - `.config/nmr.config.ts` — repo-level overrides for the `nmr` script runner.
 - `.config/release-kit.config.ts`, `.config/audit-deps.config.json`, `.config/sync-labels.config.ts` — config for the corresponding tools invoked by GitHub Actions reusable workflows.
-- `cliff.toml` — git-cliff template aware of the `workspace|type:` commit format.
 - `__tests__/version-alignment.app.test.ts` — root-level test that checks Node version consistency across the monorepo.
 
 ## Commands
@@ -46,9 +46,9 @@ Releases are triggered via the **Release** GitHub Actions workflow (`workflow_di
 
 Commit titles are rendered by `describe-change.sh` from `commit.title_format` in `~/.agents/preferences.yaml` (currently `[{scope}|{type}: ]{title}`). Don't assemble titles by hand — invoke the commit skill, which calls the script. The project-specific values to pass are:
 
-- **`--scope`:** `basic`, `root`, `strict-lint`, `ts`, or `*` for changes spanning multiple workspaces.
+- **`--scope`:** `basic`, `root`, `strict-lint`, `ts`, `tsconfig`, or `*` for changes spanning multiple workspaces.
 - **`--type`:** `ai`, `ci`, `deps`, `docs`, `feat`, `refactor`, `tests`, `tooling`. Append `!` after the type for breaking changes (e.g., `feat!`).
-- **Separation rule:** `deps` is always its own commit. Never mix dependency updates with `feat`/`refactor`/etc. — `cliff.toml` and release-kit categorize by type, so mixed commits land in the wrong section.
+- **Separation rule:** `deps` is always its own commit. Never mix dependency updates with `feat`/`refactor`/etc. — release-kit categorizes by type, so mixed commits land in the wrong section.
 
 Full reference: `docs/versioning-and-changelog.md`.
 
@@ -63,6 +63,6 @@ Full reference: `docs/versioning-and-changelog.md`.
 
 - **`nmr lint`/`nmr check` will fail on a clean checkout** until `packages/typescript` is built. The root eslint config imports from its `dist/`. `nmr ci` deliberately runs `build` before `check:strict` for the same reason.
 - **The `basic` package has no build step** (`build` and `test` scripts are no-ops). Edits to `index.mjs` or `rules/*.mjs` take effect immediately.
-- **Publishing targets differ by package.** `basic` publishes to GitHub Packages (restricted scope `@williamthorsen`); `typescript` and `strict-lint` publish to public npm. Tags, tokens, and audiences are not interchangeable.
+- **Publishing targets differ by package.** `basic` publishes to GitHub Packages (restricted scope `@williamthorsen`); `typescript`, `strict-lint`, and `tsconfig` publish to public npm. Tags, tokens, and audiences are not interchangeable.
 - **Don't push release tags manually.** The `Release` workflow is the source of truth; manual tags can desync versions and CHANGELOGs from the actual commit history release-kit analyzes.
 - **Root-level Vitest excludes `packages/**`.** Each package owns its own test config; `nmr root:test` runs only root-level tests.
