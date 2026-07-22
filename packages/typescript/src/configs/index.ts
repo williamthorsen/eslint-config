@@ -1,4 +1,3 @@
-import type { Linter } from 'eslint';
 import type { Config } from 'eslint/config';
 
 import eslintComments from './eslint-comments.ts';
@@ -29,7 +28,7 @@ export const configs = {
 
 export const createConfig = {
   jsxA11y: async (): Promise<Config[]> => (await import('./jsx-a11y.ts')).default(),
-  next: async (): Promise<Linter.Config> => (await import('./next.ts')).default(),
+  next: async (): Promise<Config[]> => (await import('./next.ts')).default(),
   react: async (): Promise<Config[]> => (await import('./react.ts')).default(),
   reactTestingLibrary: async (): Promise<Config[]> => (await import('./testing-library.ts')).default.react(),
   vitest: async (): Promise<Config[]> => (await import('./vitest.ts')).default(),
