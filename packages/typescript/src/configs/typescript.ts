@@ -9,6 +9,7 @@ import { ensureExtendsElement } from '../utils/ensureExtendsElement.ts';
 const rules: Linter.RulesRecord = {
   // Disable rules inappropriate for TypeScript
   'consistent-return': 'off',
+  'dot-notation': 'off',
   'no-redeclare': 'off',
   'no-unused-vars': 'off',
 
@@ -61,6 +62,7 @@ const rules: Linter.RulesRecord = {
 
   // Stylistic: Enabled
   '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'], // ⚫🟠
+  '@typescript-eslint/dot-notation': ['warn', { allowKeywords: true, allowIndexSignaturePropertyAccess: true }], // ⚫🟠
   '@typescript-eslint/no-inferrable-types': 'warn', // ⚫🟠
 };
 
@@ -70,10 +72,10 @@ const config = defineConfig({
     promisePlugin.configs['flat/recommended'],
     ensureExtendsElement(skyPilotPlugin.configs.recommended),
   ],
-  // Enable type-aware linting out of the box. The project service discovers each file's owning
-  // tsconfig automatically, so consumers set only `tsconfigRootDir`, never `parserOptions.project`.
   languageOptions: {
     parserOptions: {
+      // Enable type-aware linting out of the box. The project service discovers each file's owning tsconfig
+      // automatically, so consumers set only `tsconfigRootDir`. never `parserOptions.project`.
       projectService: true,
     },
   },
