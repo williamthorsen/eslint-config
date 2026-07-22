@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// The root config extends `@williamthorsen/tsconfig/base.json` by package name, so resolving it
+// The root config extends `@williamthorsen/tsconfig/tsconfig.base.json` by package name, so resolving it
 // exercises the same path a published consumer takes rather than a relative-path shortcut.
 const options = parseRootConfig();
 
@@ -30,8 +30,8 @@ describe('@williamthorsen/tsconfig base config', () => {
   });
 
   it('leaves types, paths, and jsx to the consumer', () => {
-    // The root declares all three itself; the assertion guards against them migrating into the
-    // base, where `paths` in particular would resolve relative to the base and break aliases.
+    // The root declares all three itself; the assertion guards against them migrating into the base,
+    // where `paths` in particular would resolve relative to the base and break aliases.
     expect(options.types).toEqual(['node']);
     expect(options.paths).toEqual({ '~/*': ['./*'] });
     expect(options.jsx).toBe(ts.JsxEmit.ReactJSX);

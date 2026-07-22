@@ -11,7 +11,7 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 - `packages/basic/` — `@williamthorsen/eslint-config-basic`. Flat config for JavaScript/JSON/MD/YAML. No build step; ships `index.mjs` directly.
 - `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Sources under `src/`, compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `src/plugins/rules/`.
 - `packages/strict-lint/` — `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
-- `packages/tsconfig/` — `@williamthorsen/tsconfig`. No build step; ships `base.json`, which extends `@tsconfig/strictest` and adds the Node/build options it omits. The repo root consumes it via the workspace symlink.
+- `packages/tsconfig/` — `@williamthorsen/tsconfig`. No build step; ships `tsconfig.base.json`, which extends `@tsconfig/strictest` and adds the Node/build options it omits. The repo root consumes it via the workspace symlink.
 - `eslint.config.js` (repo root) — imports from `packages/typescript/dist/esm/`; depends on a built typescript package.
 - `.config/nmr.config.ts` — repo-level overrides for the `nmr` script runner.
 - `.config/release-kit.config.ts`, `.config/audit-deps.config.json`, `.config/sync-labels.config.ts` — config for the corresponding tools invoked by GitHub Actions reusable workflows.

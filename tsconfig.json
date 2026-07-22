@@ -1,15 +1,13 @@
 // TSConfig for monorepo root. Packages have their own tsconfig.json files that extend this one.
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@williamthorsen/tsconfig/base.json",
+  "extends": "@williamthorsen/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     // Modern transformation by React 17+
     "jsx": "react-jsx",
-    // Cannot move to the base: `baseUrl`-less `paths` resolve relative to the declaring file.
     "paths": {
       "~/*": ["./*"],
     },
-    // Restrict ambient types to Node's, rather than every @types package in scope.
     "types": ["node"],
   },
   // prettier-ignore

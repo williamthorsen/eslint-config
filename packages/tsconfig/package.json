@@ -19,11 +19,11 @@
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "type": "module",
   "exports": {
-    "./base.json": "./base.json",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./tsconfig.base.json": "./tsconfig.base.json"
   },
   "files": [
-    "base.json"
+    "tsconfig.base.json"
   ],
   "scripts": {
     "build": ":",

@@ -16,7 +16,7 @@ pnpm add -D @williamthorsen/tsconfig
 
 ```jsonc
 {
-  "extends": "@williamthorsen/tsconfig/base.json",
+  "extends": "@williamthorsen/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "types": ["node"],
   },
