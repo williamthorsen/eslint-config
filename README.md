@@ -69,7 +69,7 @@ Publishing targets differ by package:
 Commit titles follow the format `[{scope}|{type}: ]{title}`, rendered by `describe-change.sh`:
 
 - **Scopes:** `basic`, `root`, `strict-lint`, `ts`, `tsconfig`, or `*` for changes spanning multiple workspaces.
-- **Types:** `ai`, `ci`, `deps`, `docs`, `feat`, `fix`, `internal`, `refactor`, `tests`, `tooling`. Append `!` for breaking changes (e.g., `feat!`).
+- **Types:** see the work-types table in [`docs/versioning-and-changelog.md`](docs/versioning-and-changelog.md). Append `!` for breaking changes (e.g., `feat!`); `drop` always carries it.
 - **`deps` is always its own commit.** release-kit categorizes the changelog by type — mixed commits land in the wrong section.
 
 Full reference: [`docs/versioning-and-changelog.md`](docs/versioning-and-changelog.md).

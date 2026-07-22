@@ -20,6 +20,7 @@
     "basic": "scope:basic",
     "strict-lint": "scope:strict-lint",
     "typescript": "scope:typescript",
-    "root": "scope:root"
+    "root": "scope:root",
+    "tsconfig": "scope:tsconfig"
   }
 }
