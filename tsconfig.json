@@ -1,46 +1,14 @@
 // TSConfig for monorepo root. Packages have their own tsconfig.json files that extend this one.
-//
-// Every setting here is a deviation from a TypeScript default; anything absent is intentionally default.
-// Where a setting's necessity isn't self-evident, the comment says why it can't be dropped — not what it does.
 {
   "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@williamthorsen/tsconfig/base.json",
   "compilerOptions": {
-    // Permit `./foo.ts` specifiers. nmr-compile rewrites them on emit.
-    "allowImportingTsExtensions": true,
-    // Default is `undefined`, which is only an editor hint. `false` promotes it to an error.
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    // Each file must transpile standalone, as Vitest/esbuild does it.
-    "isolatedModules": true,
     // Modern transformation by React 17+
     "jsx": "react-jsx",
-    // Omitting a value would cause `lib` to default to `lib.es2024.full.d.ts` (based on `target`),
-    // allowing the use of browser-only code; this is not something we want in a Node-only codebase.
-    "lib": ["ES2024"], // Keep this value aligned with the `engines` floor.
-    // Omitting this would default to `ES2022` with `Bundler` resolution, which is wrong for published Node packages.
-    // Deliberately a moving alias: `target`/`lib` are capability claims pinned to the `engines` floor,
-    // whereas this tracks Node's current module semantics.
-    "module": "NodeNext",
-    // Treat every file as a module, including those with no import or export.
-    "moduleDetection": "force",
-    // This config typechecks only; nmr-compile overrides emit settings when building.
-    "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    // Consider enabling this; see https://www.typescriptlang.org/tsconfig#noPropertyAccessFromIndexSignature
-    // "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    // TypeScript exempts `_`-prefixed parameters; it does not exempt `_`-prefixed locals.
-    "noUnusedParameters": true,
+    // Cannot move to the base: `baseUrl`-less `paths` resolve relative to the declaring file.
     "paths": {
       "~/*": ["./*"],
     },
-    // Strip comments from published dist output.
-    "removeComments": true,
-    "skipLibCheck": true,
-    "target": "ES2024", // Keep this value aligned with the `engines` floor.
     // Restrict ambient types to Node's, rather than every @types package in scope.
     "types": ["node"],
   },

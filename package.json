@@ -26,6 +26,7 @@
     "@williamthorsen/nmr": "0.18.2",
     "@williamthorsen/release-kit": "8.0.1",
     "@williamthorsen/toolbelt.objects": "3.2.6",
+    "@williamthorsen/tsconfig": "workspace:*",
     "eslint": "10.7.0",
     "eslint-plugin-n": "18.2.2",
     "globals": "17.7.0",

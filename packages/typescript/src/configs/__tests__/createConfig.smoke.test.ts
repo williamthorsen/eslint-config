@@ -75,7 +75,7 @@ function enablesProjectService(parserOptions: unknown): boolean {
 
 describe('base config type-information wiring', () => {
   it('enables projectService so type-aware rules work without a consumer-supplied project', () => {
-    const enabled = baseConfig.some((entry) => enablesProjectService(entry.languageOptions?.parserOptions));
+    const enabled = baseConfig.some((entry) => enablesProjectService(entry.languageOptions?.['parserOptions']));
 
     expect(enabled).toBe(true);
   });
