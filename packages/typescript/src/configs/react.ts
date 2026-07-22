@@ -1,10 +1,9 @@
-import { defineConfig } from 'eslint/config';
-import { type ConfigArray } from 'typescript-eslint';
+import { type Config, defineConfig } from 'eslint/config';
 
 import skyPilotReactPlugin from '../plugins/eslint-plugin-sky-pilot-react.ts';
 import { ensureExtendsElement } from '../utils/ensureExtendsElement.ts';
 
-async function createConfig(): Promise<ConfigArray> {
+async function createConfig(): Promise<Config[]> {
   const { default: reactPlugin } = await import('eslint-plugin-react');
   const { default: reactHooksPlugin } = await import('eslint-plugin-react-hooks');
 
