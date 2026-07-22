@@ -22,7 +22,7 @@ const config = defineConfig({
     yml: yamlPlugin,
   },
   rules: {
-    ...yamlPlugin.configs.recommended?.rules,
+    ...yamlPlugin.configs['recommended']?.rules,
     ...rules,
   },
 });

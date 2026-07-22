@@ -12,20 +12,27 @@ All commits follow the structured format: `{workspace}|{work_type}: {description
 - `root` - Changes affecting the monorepo root
 - `strict-lint` - Strict-lint package (`@williamthorsen/strict-lint`)
 - `ts` - TypeScript package (`@williamthorsen/eslint-config-typescript`)
+- `tsconfig` - TSConfig package (`@williamthorsen/tsconfig`)
 - `*` - Changes affecting multiple workspaces
 
 ### Work types
 
-| Code       | Category      | Description                                              |
-| ---------- | ------------- | -------------------------------------------------------- |
-| `ai`       | AI            | AI agent rules and AI-specific configurations            |
-| `ci`       | CI            | CI pipeline and supporting CI-only files                 |
-| `deps`     | Dependencies  | Dependency updates, runtime upgrades, dependency configs |
-| `docs`     | Documentation | Documentation and code comments only                     |
-| `feat`     | Features      | New functionality, enhancements, or removed features     |
-| `refactor` | Refactoring   | Internal improvements with no consumer-facing changes    |
-| `tests`    | Tests         | Test-only changes, no source code modifications          |
-| `tooling`  | Tooling       | Development configs, scripts, TSConfig, manifests        |
+| Code        | Category          | Description                                              |
+| ----------- | ----------------- | -------------------------------------------------------- |
+| `ai`        | AI                | AI agent rules and AI-specific configurations            |
+| `ci`        | CI                | CI pipeline and supporting CI-only files                 |
+| `deprecate` | Deprecated        | Public surface marked for removal, still functional      |
+| `deps`      | Dependencies      | Dependency updates, runtime upgrades, dependency configs |
+| `docs`      | Documentation     | Documentation and code comments only                     |
+| `drop`      | Removed           | Public surface removed; always breaking                  |
+| `feat`      | Features          | New functionality or enhancements                        |
+| `fix`       | Bug fixes         | Corrections to defective behavior                        |
+| `internal`  | Internal features | Functionality not reachable by consumers                 |
+| `perf`      | Performance       | Speed or resource-use improvements with no API change    |
+| `refactor`  | Refactoring       | Internal improvements with no consumer-facing changes    |
+| `sec`       | Security          | Vulnerability remediation or hardening                   |
+| `tests`     | Tests             | Test-only changes, no source code modifications          |
+| `tooling`   | Tooling           | Development configs, scripts, TSConfig, manifests        |
 
 ### Breaking changes
 
@@ -51,32 +58,25 @@ Add `!` after the work type to indicate breaking changes: `ts|feat!: Remove depr
 
 ## Changelog categories
 
-Generated changelogs organize changes into these sections:
-
-1. **Breaking changes** - API changes requiring consumer updates
-2. **Features** - New functionality and enhancements
-3. **Fixes** - Bug fixes and corrections
-4. **Refactoring** - Internal improvements
-5. **Tests** - Test-related changes
-6. **Dependencies** - Dependency updates
-7. **CI** - Continuous integration changes
-8. **Tooling** - Development tooling updates
-9. **AI** - AI-related configurations
-10. **Documentation** - Documentation updates
+Generated changelogs group commits under the Category column of the [work types](#work-types) table, plus a **Breaking changes** section for any commit carrying `!`.
 
 ## Release process
 
-### Automated workflow
+Releases run through the **Release** workflow, which analyzes commits since each workspace's last release, bumps versions, regenerates CHANGELOGs, and pushes tags:
 
-1. **Prepare release**: `pnpm run release:prepare` — Analyzes commits since last release, generates CHANGELOGs, and bumps versions
-2. **Review changes**: Examine generated changelog and version bumps
-3. **Commit and publish**: Commit the updated CHANGELOGs and package versions
+```shell
+gh workflow run release.yaml
+```
+
+It accepts three optional inputs: `only` (comma-separated workspaces), `bump` (override the derived level), and `force` (release when no bump-worthy commits exist). Pushing a `<workspace>-v<semver>` tag triggers the **Publish** and **Create GitHub Release** workflows, so tags must come from this workflow rather than by hand.
 
 ### Dry run
 
-Preview what `release:prepare` would do without making changes:
+Preview the derived versions, tags, and changelog entries without writing files:
 
-- `pnpm run release:prepare:dry`
+```shell
+pnpm exec release-kit prepare --dry-run
+```
 
 ## Release notes
 
@@ -89,7 +89,7 @@ Release notes automatically generated for published packages include only consum
 
 - **Packages**: Use semantic versioning with release-kit-managed bumps
 - **Monorepo root**: Version matches the highest published package version
-- **Published packages**: `@williamthorsen/eslint-config-typescript` and `@williamthorsen/strict-lint`
+- **Published packages**: `@williamthorsen/eslint-config-typescript`, `@williamthorsen/strict-lint`, and `@williamthorsen/tsconfig`
 
 This system ensures consistent, professional release documentation while maintaining clean git history and minimizing manual effort.
 
