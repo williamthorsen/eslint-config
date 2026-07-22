@@ -1,0 +1,44 @@
+{
+  "name": "@williamthorsen/tsconfig",
+  "version": "1.0.0",
+  "description": "Shared TypeScript base config for Node-only projects",
+  "keywords": [
+    "tsconfig",
+    "typescript"
+  ],
+  "homepage": "https://github.com/williamthorsen/eslint-config/tree/main/packages/tsconfig#readme",
+  "bugs": {
+    "url": "https://github.com/williamthorsen/eslint-config/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamthorsen/eslint-config.git",
+    "directory": "packages/tsconfig"
+  },
+  "license": "ISC",
+  "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
+  "type": "module",
+  "exports": {
+    "./base.json": "./base.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "base.json"
+  ],
+  "scripts": {
+    "build": ":",
+    "check": "nmr lint:strict",
+    "test": ":",
+    "test:coverage": ":"
+  },
+  "dependencies": {
+    "@tsconfig/strictest": "2.0.8"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}

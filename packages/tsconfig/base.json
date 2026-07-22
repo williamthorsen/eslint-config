@@ -1,0 +1,23 @@
+// Base TSConfig for Node-only TypeScript: `@tsconfig/strictest` plus the Node/build options it omits.
+// Consumers set `types`, `paths`, `jsx`, and `include`. Node 24 floor.
+//
+// Every setting deviates from a TypeScript default; a comment says why it can't be dropped.
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@tsconfig/strictest",
+  "compilerOptions": {
+    // Permit `./foo.ts` specifiers; the build step rewrites them on emit.
+    "allowImportingTsExtensions": true,
+    // Without this, `lib` follows `target` into the `.full` variant, admitting DOM globals.
+    "lib": ["ES2025"],
+    // Default is `ES2022` with `Bundler` resolution — wrong for published Node packages.
+    "module": "NodeNext",
+    // Files with no import or export would otherwise be scripts sharing global scope.
+    "moduleDetection": "force",
+    // Typecheck-only base; build steps override emit settings.
+    "noEmit": true,
+    // Inert until a build step clears `noEmit`; keeps published output comment-free.
+    "removeComments": true,
+    "target": "ES2025",
+  },
+}

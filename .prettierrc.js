@@ -3,7 +3,7 @@ export default {
   jsxSingleQuote: false,
   overrides: [
     {
-      files: ['*.json5', '*.jsonc', 'tsconfig.json', 'tsconfig.*.json'],
+      files: ['*.json5', '*.jsonc', 'tsconfig.json', 'tsconfig.*.json', 'packages/tsconfig/base.json'],
       options: {
         parser: 'jsonc',
         singleQuote: false,
