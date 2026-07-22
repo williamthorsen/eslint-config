@@ -75,7 +75,7 @@ const config = defineConfig({
   languageOptions: {
     parserOptions: {
       // Enable type-aware linting out of the box. The project service discovers each file's owning tsconfig
-      // automatically, so consumers set only `tsconfigRootDir`. never `parserOptions.project`.
+      // automatically, so consumers set only `tsconfigRootDir`, never `parserOptions.project`.
       projectService: true,
     },
   },
