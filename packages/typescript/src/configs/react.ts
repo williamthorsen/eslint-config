@@ -11,7 +11,7 @@ async function createConfig(): Promise<Config[]> {
     extends: [
       reactPlugin.configs.flat.recommended, //
       ensureExtendsElement(reactHooksPlugin.configs.flat['recommended-latest']),
-      ensureExtendsElement(skyPilotReactPlugin.configs.recommended),
+      skyPilotReactPlugin.configs.recommended,
     ],
     rules: {
       'react/prop-types': 'off',

@@ -4,7 +4,6 @@ import promisePlugin from 'eslint-plugin-promise';
 import tseslint from 'typescript-eslint';
 
 import skyPilotPlugin from '../plugins/eslint-plugin-sky-pilot.ts';
-import { ensureExtendsElement } from '../utils/ensureExtendsElement.ts';
 
 const rules: Linter.RulesRecord = {
   // Disable rules inappropriate for TypeScript
@@ -70,7 +69,7 @@ const config = defineConfig({
   extends: [
     ...tseslint.configs.strictTypeChecked, //
     promisePlugin.configs['flat/recommended'],
-    ensureExtendsElement(skyPilotPlugin.configs.recommended),
+    skyPilotPlugin.configs.recommended,
   ],
   languageOptions: {
     parserOptions: {

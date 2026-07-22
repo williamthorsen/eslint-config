@@ -1,23 +1,26 @@
-import type { TSESLint } from '@typescript-eslint/utils';
+import type { ESLint } from 'eslint';
+import type { Config } from 'eslint/config';
 
+import { ensurePluginRules } from '../utils/ensurePluginRules.ts';
 import noUndefinedWithNumberRule from './rules/no-undefined-with-number.ts';
 import noUnusedMapRule from './rules/no-unused-map.ts';
 import preferFunctionDeclarationRule from './rules/prefer-function-declaration.ts';
 
 // Define the plugin
-const skyPilotPlugin: TSESLint.FlatConfig.Plugin = {
+const skyPilotPlugin: ESLint.Plugin = {
   meta: {
     name: 'eslint-plugin-sky-pilot',
   },
-  rules: {
+  rules: ensurePluginRules({
     'no-undefined-with-number': noUndefinedWithNumberRule,
     'no-unused-map': noUnusedMapRule,
     'prefer-function-declaration': preferFunctionDeclarationRule,
-  },
+  }),
 };
 
-// Define the configs that can be extended
-const configs = {
+// Define the configs that can be extended. The annotation is explicit rather than `satisfies`:
+// declaration emit cannot name `@eslint/core`'s `Plugin`, which the inferred type would reference.
+const configs: { recommended: Config; strict: Config } = {
   recommended: {
     plugins: {
       'sky-pilot': skyPilotPlugin,
@@ -38,7 +41,7 @@ const configs = {
       'sky-pilot/prefer-function-declaration': 'error',
     },
   },
-} satisfies Record<string, TSESLint.FlatConfig.Config>;
+};
 
 // Export the plugin
 export default { configs };
