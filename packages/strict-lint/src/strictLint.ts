@@ -35,7 +35,7 @@ async function doLint(
 ): Promise<{ text: string; errorCount: number }> {
   const parsed = parseCliArgs(args);
 
-  const { config } = await resolveConfigAndDir(options, parsed.configPath);
+  const config = await resolveConfig(options, parsed.configPath);
 
   // The walk is anchored where the run is: ESLint resolves its own config and its lint targets from the cwd.
   const strictLintConfig = await loadStrictLintConfig(process.cwd());
@@ -102,16 +102,17 @@ async function doLint(
   return { text, errorCount };
 }
 
-/** Resolves the ESLint config array & config directory from programmatic options, --config flag, or file discovery. */
-async function resolveConfigAndDir(
+/** Resolves the ESLint config array from programmatic options, the --config flag, or file discovery. */
+async function resolveConfig(
   options: StrictLintOptions | undefined,
   configPath: string | undefined,
-): Promise<{ config: Linter.Config[]; configDir: string }> {
+): Promise<Linter.Config[]> {
   if (options?.baseConfig) {
-    return { config: options.baseConfig, configDir: process.cwd() };
+    return options.baseConfig;
   }
 
-  return resolveEslintConfig(configPath);
+  const { config } = await resolveEslintConfig(configPath);
+  return config;
 }
 
 /** Build the override config array from errorized config and rule overrides. */
