@@ -63,6 +63,34 @@ describe('native config loading (subprocess)', () => {
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
+  it('applies a package-level strict-lint config when the ESLint config lives at the root', () => {
+    const dir = makeFixture({
+      'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
+      'packages/pkg/.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
+      'packages/pkg/a.js': UNUSED_VAR_FILE,
+    });
+
+    const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+
+    expect(status).toBe(0);
+    expect(stdout).toContain('0 errors, 1 warning');
+  }, 30_000);
+
+  it('prefers a package-level strict-lint config over one at the root', () => {
+    const dir = makeFixture({
+      '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
+      'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
+      'packages/pkg/.config/strict-lint.config.ts': 'export default { maxSeverity: {} };\n',
+      'packages/pkg/a.js': UNUSED_VAR_FILE,
+    });
+
+    const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+
+    // The package's empty allowlist shadows the root's outright, so the rule is promoted.
+    expect(status).toBe(1);
+    expect(stdout).toContain('1 error, 0 warnings');
+  }, 30_000);
+
   it('fails a config with non-erasable syntax with an actionable message', () => {
     const dir = makeFixture({
       'eslint.config.ts': 'enum Severity { Warn }\nexport default [{ rules: {}, name: Severity.Warn }];\n',

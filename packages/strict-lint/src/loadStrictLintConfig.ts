@@ -5,12 +5,12 @@ import type { StrictLintConfig } from './types.ts';
 const STRICT_LINT_CONFIG_NAME = '.config/strict-lint.config.ts';
 
 /**
- * Loads the nearest strict-lint config at or above `eslintConfigDir`, mirroring ESLint's own find-up. The nearest
- * config wins outright; configs at farther levels are ignored rather than merged. Returns undefined when the walk
- * reaches the filesystem root without a match.
+ * Loads the nearest strict-lint config at or above `startDir`, mirroring ESLint's own find-up. The nearest config
+ * wins outright; configs at farther levels are ignored rather than merged. Returns undefined when the walk reaches
+ * the filesystem root without a match.
  */
-export async function loadStrictLintConfig(eslintConfigDir: string): Promise<StrictLintConfig | undefined> {
-  const configFilePath = findNearestFile(STRICT_LINT_CONFIG_NAME, eslintConfigDir);
+export async function loadStrictLintConfig(startDir: string): Promise<StrictLintConfig | undefined> {
+  const configFilePath = findNearestFile(STRICT_LINT_CONFIG_NAME, startDir);
 
   if (configFilePath === undefined) {
     return undefined;

@@ -120,10 +120,19 @@ describe(strictLint, () => {
       );
     });
 
-    it('uses process.cwd() as config dir when baseConfig is provided', async () => {
+    it('starts the config walk at the cwd when baseConfig is provided', async () => {
       mockedLoadStrictLintConfig.mockResolvedValue(undefined);
 
       await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(mockedLoadStrictLintConfig).toHaveBeenCalledWith(process.cwd());
+    });
+
+    it('starts the config walk at the cwd, not at the resolved ESLint config directory', async () => {
+      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+
+      await strictLint();
 
       expect(mockedLoadStrictLintConfig).toHaveBeenCalledWith(process.cwd());
     });

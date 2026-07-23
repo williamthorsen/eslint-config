@@ -35,9 +35,10 @@ async function doLint(
 ): Promise<{ text: string; errorCount: number }> {
   const parsed = parseCliArgs(args);
 
-  const { config, configDir } = await resolveConfigAndDir(options, parsed.configPath);
+  const { config } = await resolveConfigAndDir(options, parsed.configPath);
 
-  const strictLintConfig = await loadStrictLintConfig(configDir);
+  // The walk is anchored where the run is: ESLint resolves its own config and its lint targets from the cwd.
+  const strictLintConfig = await loadStrictLintConfig(process.cwd());
 
   const resolvedMaxSeverity: MaxSeverityMap = {
     ...defaultMaxSeverity,
