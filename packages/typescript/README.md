@@ -16,21 +16,22 @@ Requires ESLint 9+ and TypeScript 5+.
 
 ```js
 // eslint.config.js
+import { defineConfig } from 'eslint/config';
+
 import tsConfig from '@williamthorsen/eslint-config-typescript';
 
-export default [
-  ...tsConfig,
-  {
-    languageOptions: {
-      parserOptions: {
-        // Anchor type-aware linting at your repo root.
-        tsconfigRootDir: import.meta.dirname,
-      },
+export default defineConfig(tsConfig, {
+  languageOptions: {
+    parserOptions: {
+      // Anchor type-aware linting at your repo root.
+      tsconfigRootDir: import.meta.dirname,
     },
   },
   // your overrides
-];
+});
 ```
+
+Everything this package exports is typed with ESLint core's own `Config`, so the same composition typechecks unchanged in an `eslint.config.ts` — no `tseslint.config()`, type assertion, or widening cast.
 
 ## Type-aware linting
 
@@ -70,13 +71,15 @@ Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `
 The default export is the catch-all "everything on" preset. For à la carte composition, import individual configs:
 
 ```js
+import { defineConfig } from 'eslint/config';
+
 import { configs } from '@williamthorsen/eslint-config-typescript';
 
-export default [
-  ...configs.typeScript,
-  ...configs.import,
+export default defineConfig(
+  configs.typeScript,
+  configs.import,
   // skip configs.unicorn entirely
-];
+);
 ```
 
 | Config                     | Targets                                    |
@@ -95,19 +98,21 @@ export default [
 
 ## Framework configs (lazy-loaded)
 
-Framework-specific configs are exposed via `createConfig` so their plugin dependencies (`eslint-plugin-react`, `@next/eslint-plugin-next`, etc.) load only when used:
+Framework-specific configs are exposed via `createConfig` so their plugin dependencies (`eslint-plugin-react`, `@next/eslint-plugin-next`, etc.) load only when used. Every factory resolves to a config array, so spread each one (or pass them through `extends`):
 
 ```js
+import { defineConfig } from 'eslint/config';
+
 import config, { createConfig } from '@williamthorsen/eslint-config-typescript';
 
-export default [
-  ...config,
+export default defineConfig(
+  config,
   ...(await createConfig.react()),
   ...(await createConfig.jsxA11y()),
-  await createConfig.next(),
+  ...(await createConfig.next()),
   ...(await createConfig.vitest()),
   ...(await createConfig.reactTestingLibrary()),
-];
+);
 ```
 
 | Method                               | Loads                                              |
@@ -123,7 +128,9 @@ These plugins are declared as `devDependencies` of this package. Install them yo
 `createConfig.react()` pins `settings.react.version` to a recent default, because `eslint-plugin-react`'s `'detect'` mode is incompatible with ESLint 10 (it calls a removed API). Override it to match your React version by appending a settings block:
 
 ```js
-export default [...config, ...(await createConfig.react()), { settings: { react: { version: '18.3' } } }];
+export default defineConfig(config, ...(await createConfig.react()), {
+  settings: { react: { version: '18.3' } },
+});
 ```
 
 ## File patterns
@@ -131,16 +138,16 @@ export default [...config, ...(await createConfig.react()), { settings: { react:
 For composing your own scoped configs without re-deriving the globs:
 
 ```js
+import { defineConfig } from 'eslint/config';
+
 import { patterns } from '@williamthorsen/eslint-config-typescript';
 
-export default [
-  {
-    files: patterns.typeScriptFiles,
-    rules: {
-      // TypeScript-only overrides
-    },
+export default defineConfig({
+  files: patterns.typeScriptFiles,
+  rules: {
+    // TypeScript-only overrides
   },
-];
+});
 ```
 
 | Constant                        | Value                       |

@@ -1,7 +1,6 @@
-import { defineConfig } from 'eslint/config';
-import { type ConfigArray } from 'typescript-eslint';
+import { type Config, defineConfig } from 'eslint/config';
 
-export async function createReactTestingLibraryConfig(): Promise<ConfigArray> {
+export async function createReactTestingLibraryConfig(): Promise<Config[]> {
   const { default: jestDomPlugin } = await import('eslint-plugin-jest-dom');
   const { default: testingLibraryPlugin } = await import('eslint-plugin-testing-library');
 

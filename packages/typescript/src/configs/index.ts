@@ -1,6 +1,4 @@
-import type { Linter } from 'eslint';
 import type { Config } from 'eslint/config';
-import type { ConfigArray } from 'typescript-eslint';
 
 import eslintComments from './eslint-comments.ts';
 import importConfig from './import.ts';
@@ -29,11 +27,11 @@ export const configs = {
 } satisfies Record<string, Config[]>;
 
 export const createConfig = {
-  jsxA11y: async (): Promise<ConfigArray> => (await import('./jsx-a11y.ts')).default(),
-  next: async (): Promise<Linter.Config> => (await import('./next.ts')).default(),
-  react: async (): Promise<ConfigArray> => (await import('./react.ts')).default(),
-  reactTestingLibrary: async (): Promise<ConfigArray> => (await import('./testing-library.ts')).default.react(),
-  vitest: async (): Promise<Linter.Config[]> => (await import('./vitest.ts')).default(),
+  jsxA11y: async (): Promise<Config[]> => (await import('./jsx-a11y.ts')).default(),
+  next: async (): Promise<Config[]> => (await import('./next.ts')).default(),
+  react: async (): Promise<Config[]> => (await import('./react.ts')).default(),
+  reactTestingLibrary: async (): Promise<Config[]> => (await import('./testing-library.ts')).default.react(),
+  vitest: async (): Promise<Config[]> => (await import('./vitest.ts')).default(),
 };
 
 export default configs;

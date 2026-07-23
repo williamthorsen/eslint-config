@@ -1,8 +1,10 @@
-import type { Linter } from 'eslint';
+import { type Config, defineConfig } from 'eslint/config';
 
-async function createConfig(): Promise<Linter.Config> {
+async function createConfig(): Promise<Config[]> {
   const { default: nextEslintPlugin } = await import('@next/eslint-plugin-next');
 
-  return nextEslintPlugin.configs['core-web-vitals'];
+  return defineConfig({
+    extends: [nextEslintPlugin.configs['core-web-vitals']],
+  });
 }
 export default createConfig;
