@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 7.0.0 — 2026-07-23
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Publish a shared TypeScript config on a Node 24 floor (#108)
+
+  Introduces `@williamthorsen/tsconfig`, a published baseline that Node-only TypeScript projects can extend. It pairs the strictest available TypeScript settings with additional Node and build options. A consumer is left to declare its own ambient types, path aliases, JSX, and file globs.
+
+  `@williamthorsen/eslint-config-typescript` now requires Node 24 or later.
+
+- 🚨 **Breaking:** Make exported configs composable with ESLint core's defineConfig (#109)
+
+  Every config this package exports now composes with ESLint's `defineConfig()` in a TypeScript `eslint.config.ts` that typechecks under strict mode. Previously this was a type error, so a TypeScript config had to fall back to the deprecated `tseslint.config()` or a cast, leaving a deprecation warning that could not be cleared.
+
+  `createConfig.next()` now resolves to an array of configs and must be spread: `...(await createConfig.next())`.
+
 ## 6.0.2 — 2026-07-20
 
 ### 📦 Dependencies

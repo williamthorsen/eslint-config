@@ -1,0 +1,20 @@
+[
+  {
+    "version": "0.1.0",
+    "date": "2026-07-23",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Publish a shared TypeScript config on a Node 24 floor (#108)",
+            "body": "Introduces `@williamthorsen/tsconfig`, a published baseline that Node-only TypeScript projects can extend. It pairs the strictest available TypeScript settings with additional Node and build options. A consumer is left to declare its own ambient types, path aliases, JSX, and file globs.\n\n`@williamthorsen/eslint-config-typescript` now requires Node 24 or later.",
+            "breaking": true,
+            "hash": "a8386334bd04b7e41bb617c20795900163d56089"
+          }
+        ]
+      }
+    ]
+  }
+]
