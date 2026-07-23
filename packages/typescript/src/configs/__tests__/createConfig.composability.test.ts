@@ -1,21 +1,11 @@
 import assert from 'node:assert';
 
-import { type ESLint } from 'eslint';
 import { defineConfig } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
 import { createConfig } from '../../index.ts';
 import { skyPilot } from '../../plugins/index.ts';
 import { factoryCases, fixtureWiring, lintFixture } from './helpers.ts';
-
-// A config that matches no file is skipped with a lone 'File ignored' notice, which would satisfy the
-// fatal-error check without linting anything. Require the fixture to have actually been processed.
-function expectFixtureLinted(results: ESLint.LintResult[]): void {
-  expect(results[0]?.fatalErrorCount).toBe(0);
-  expect(results[0]?.messages ?? []).not.toContainEqual(
-    expect.objectContaining({ message: expect.stringContaining('File ignored') }),
-  );
-}
 
 // Every composition below passes a factory result to `defineConfig()` with no type assertion. A
 // factory that regressed to a typescript-eslint-typed return would fail to compile here, which is
@@ -25,20 +15,23 @@ describe('createConfig composability with defineConfig', () => {
     it(`${name}: composes as a direct defineConfig() argument and lints the fixture`, async () => {
       const composed = defineConfig(fixtureWiring, ...(await load()));
 
-      expectFixtureLinted(await lintFixture(composed, fixture));
+      const results = await lintFixture(composed, fixture);
+
+      expect(results[0]?.fatalErrorCount).toBe(0);
     });
 
     it(`${name}: composes through defineConfig()'s extends and lints the fixture`, async () => {
       const composed = defineConfig(fixtureWiring, { extends: await load() });
 
-      expectFixtureLinted(await lintFixture(composed, fixture));
+      const results = await lintFixture(composed, fixture);
+
+      expect(results[0]?.fatalErrorCount).toBe(0);
     });
   }
 });
 
-// next() is the breaking change in this branch: it now returns an array carrying the plugin's rules
-// rather than a bare config object. Pin that the rules actually reach the linter through both
-// composition forms — the fatal-error check above passes even for a composition that dropped them.
+// Pin that the plugin's rules actually reach the linter through both composition forms — the
+// fatal-error check above passes even for a composition that dropped them.
 describe('createConfig.next carries the plugin rules', () => {
   for (const form of ['direct argument', 'extends'] as const) {
     it(`applies a @next/next rule when composed via ${form}`, async () => {

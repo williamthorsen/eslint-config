@@ -1,3 +1,4 @@
+import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -25,7 +26,7 @@ export const fixtureWiring: Config = {
 // `new ESLint({ overrideConfig })` accepts `Linter.Config[]`, which models `languageOptions` with a
 // nominally-incompatible index signature. Bridge only at that constructor — never on the factory
 // results, whose assignability to `Config[]` is what the composability suite proves.
-export function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
+function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above
   return configs as Linter.Config[];
 }
@@ -39,6 +40,10 @@ export async function lintFixture(composed: readonly Config[], fixture: string):
   });
 
   const filePath = path.join(fixturesDir, fixture);
+
+  // ESLint skips a file that no config's `files` glob matches, reporting a single notice in place of
+  // any rule output. Results from a skipped file satisfy assertions without exercising the config.
+  assert.ok(!(await eslint.isPathIgnored(filePath)), `no composed config matches ${fixture}`);
 
   return eslint.lintText(fs.readFileSync(filePath, 'utf8'), { filePath });
 }
