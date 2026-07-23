@@ -19,18 +19,15 @@ export const ESLINT_CONFIG_FILENAMES = [
  * Resolves and loads the ESLint flat config, either from an explicit path or by walking up for the first of
  * ESLint's config filenames. TypeScript configs load through Node's native loader (Node >=24).
  */
-export async function resolveEslintConfig(
-  configPath?: string,
-): Promise<{ config: Linter.Config[]; configDir: string }> {
+export async function resolveEslintConfig(configPath?: string): Promise<Linter.Config[]> {
   const filePath = configPath ?? findNearestFile(ESLINT_CONFIG_FILENAMES);
   if (!filePath) {
     throw new Error(`Could not find an ESLint config file (looked for ${ESLINT_CONFIG_FILENAMES.join(', ')}).`);
   }
 
-  const resolvedPath = path.resolve(filePath);
-  const mod = await importConfigModule(resolvedPath);
+  const mod = await importConfigModule(path.resolve(filePath));
   assertIsConfig(mod);
-  return { config: mod.default, configDir: path.dirname(resolvedPath) };
+  return mod.default;
 }
 
 function assertIsConfig(mod: unknown): asserts mod is { default: Linter.Config[] } {

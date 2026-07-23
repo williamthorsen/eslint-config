@@ -107,12 +107,7 @@ async function resolveConfig(
   options: StrictLintOptions | undefined,
   configPath: string | undefined,
 ): Promise<Linter.Config[]> {
-  if (options?.baseConfig) {
-    return options.baseConfig;
-  }
-
-  const { config } = await resolveEslintConfig(configPath);
-  return config;
+  return options?.baseConfig ?? (await resolveEslintConfig(configPath));
 }
 
 /** Build the override config array from errorized config and rule overrides. */
