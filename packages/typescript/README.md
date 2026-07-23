@@ -98,9 +98,7 @@ export default defineConfig(
 
 ## Framework configs (lazy-loaded)
 
-Framework-specific configs are exposed via `createConfig` so their plugin dependencies (`eslint-plugin-react`, `@next/eslint-plugin-next`, etc.) load only when used:
-
-Every factory resolves to a config array, so spread each one (or pass them through `extends`):
+Framework-specific configs are exposed via `createConfig` so their plugin dependencies (`eslint-plugin-react`, `@next/eslint-plugin-next`, etc.) load only when used. Every factory resolves to a config array, so spread each one (or pass them through `extends`):
 
 ```js
 import { defineConfig } from 'eslint/config';
