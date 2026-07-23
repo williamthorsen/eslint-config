@@ -64,16 +64,22 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('applies a package-level strict-lint config when the ESLint config lives at the root', () => {
-    const dir = makeFixture({
-      'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
-      'packages/pkg/.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
-      'packages/pkg/a.js': UNUSED_VAR_FILE,
-    });
+    const dir = makePackageAllowlistFixture();
 
     const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
 
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
+  }, 30_000);
+
+  it('ignores a strict-lint config below the directory the run starts in', () => {
+    const dir = makePackageAllowlistFixture();
+
+    const { status, stdout } = runCli(dir, ['packages/pkg/a.js']);
+
+    // Config selection follows the working directory, so linting the package's own file does not reach its allowlist.
+    expect(status).toBe(1);
+    expect(stdout).toContain('1 error, 0 warnings');
   }, 30_000);
 
   it('prefers a package-level strict-lint config over one at the root', () => {
@@ -104,6 +110,15 @@ describe('native config loading (subprocess)', () => {
     expect(stderr).toContain('eslint.config.ts');
   }, 30_000);
 });
+
+/** A monorepo tree whose only ESLint config sits at the root and whose only allowlist sits inside the package. */
+function makePackageAllowlistFixture(): string {
+  return makeFixture({
+    'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
+    'packages/pkg/.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
+    'packages/pkg/a.js': UNUSED_VAR_FILE,
+  });
+}
 
 /** Write the given files into a fresh temp directory and return its path. */
 function makeFixture(files: Record<string, string>): string {
