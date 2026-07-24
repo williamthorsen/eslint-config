@@ -159,6 +159,32 @@ export default defineConfig({
 | `patterns.typeScriptExtensions` | `['{ts,cts,mts,tsx}']`      |
 | `patterns.codeExtensions`       | both                        |
 
+## Advisory rule severities
+
+`advisoryRuleSeverities` is a map of the 22 rules in this config that report style and modernization advice rather than defects — `@typescript-eslint/no-deprecated`, most of the `unicorn` `prefer-*` set, and their neighbours — each mapped to `'warn'`.
+
+Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
+
+```ts
+// .config/strict-lint.config.ts
+import { advisoryRuleSeverities } from '@williamthorsen/eslint-config-typescript';
+import type { StrictLintConfig } from '@williamthorsen/strict-lint';
+
+const config: StrictLintConfig = {
+  maxSeverity: { ...advisoryRuleSeverities },
+};
+
+export default config;
+```
+
+Or spread it into an ordinary flat-config `rules` block to set those severities directly:
+
+```js
+import { advisoryRuleSeverities } from '@williamthorsen/eslint-config-typescript';
+
+export default [{ rules: { ...advisoryRuleSeverities } }];
+```
+
 ## Peer dependencies
 
 | Dependency   | Required |
