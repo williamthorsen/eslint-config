@@ -161,7 +161,7 @@ export default defineConfig({
 
 ## Advisory rule severities
 
-`advisoryRuleSeverities` is a map of the 22 rules in this config that report style and modernization advice rather than defects — `@typescript-eslint/no-deprecated`, most of the `unicorn` `prefer-*` set, and their neighbours — each mapped to `'warn'`.
+`advisoryRuleSeverities` maps the rules this config sets to `'warn'` because they report style and modernization advice rather than defects — `@typescript-eslint/no-deprecated`, most of the `unicorn` `prefer-*` set, and their neighbours. Rules this config disables outright are not included.
 
 Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
 
@@ -184,6 +184,8 @@ import { advisoryRuleSeverities } from '@williamthorsen/eslint-config-typescript
 
 export default [{ rules: { ...advisoryRuleSeverities } }];
 ```
+
+An unscoped block applies `'warn'` everywhere, including in test files, where this config turns `unicorn/consistent-function-scoping` and `unicorn/no-useless-undefined` off. Scope the block with `files` to keep those exceptions.
 
 ## Peer dependencies
 
