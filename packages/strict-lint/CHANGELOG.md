@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 9.0.0 — 2026-07-24
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Bound config discovery and remove the built-in allowlist (#115)
+
+  `strict-lint` now stops at the project root when walking up the directory tree to find configs. Within the project, all configs on the path from the project root to the directory where the command is run are merged; later settings prevail. A new `--debug` flag reports the resolved project root and the config files that contributed.
+
+  `@williamthorsen/strict-lint` no longer carries built-in exemptions: The style and modernization rules that used to stay warnings now fail the lint run unless a config exempts them. Projects that want the previous exemptions can now import them from `@williamthorsen/eslint-config-typescript`, which exports that set of downgrades as `advisoryRuleSeverities`.
+
+### 🐛 Bug fixes
+
+- Apply the nearest strict-lint config found from the working directory (#112)
+
+  Fixes the issue that `strict-lint`, if run from a workspace, would ignore the workspace-level `strict-lint` configuration if no ESLint configuration file existed at the same level. `strict-lint` now finds its configuration by searching upward from the directory the run starts in, rather than from the nearest ESLint config. The nearest configuration is used outright; configurations at farther levels are ignored rather than merged into it. The search ascends to the filesystem root.
+
 ## 8.0.0 — 2026-07-20
 
 ### 🎉 Features

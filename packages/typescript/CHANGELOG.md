@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.0.0 — 2026-07-24
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Bound config discovery and remove the built-in allowlist (#115)
+
+  `strict-lint` now stops at the project root when walking up the directory tree to find configs. Within the project, all configs on the path from the project root to the directory where the command is run are merged; later settings prevail. A new `--debug` flag reports the resolved project root and the config files that contributed.
+
+  `@williamthorsen/strict-lint` no longer carries built-in exemptions: The style and modernization rules that used to stay warnings now fail the lint run unless a config exempts them. Projects that want the previous exemptions can now import them from `@williamthorsen/eslint-config-typescript`, which exports that set of downgrades as `advisoryRuleSeverities`.
+
+### 🐛 Bug fixes
+
+- Eliminate no-unused-map false positives and false negatives (#118)
+
+  Fixes an issue where the `sky-pilot/no-unused-map` rule erroneously flagged `.map()` calls whose results were in fact used: passed to a constructor, spread, interpolated into a template literal, or implicitly returned from an arrow function. The rule also now ignores `.map` calls on values that are not arrays, and it flags discarded `.map()` calls that previously slipped through, including calls inside a nested callback and calls written with optional chaining. A call prefixed with `void` is accepted as an explicit discard.
+
 ## 7.0.0 — 2026-07-23
 
 ### 🎉 Features
