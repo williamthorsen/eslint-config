@@ -92,8 +92,18 @@ describe(loadStrictLintConfigs, () => {
         message: `Expected the default export of "${configPathIn('/project')}" to be an object`,
       },
       {
+        name: 'the default export is an array',
+        config: [{ rules: {} }],
+        message: `Expected the default export of "${configPathIn('/project')}" to be an object`,
+      },
+      {
         name: 'maxSeverity is not an object',
         config: { maxSeverity: 'not-an-object' },
+        message: `Expected maxSeverity in "${configPathIn('/project')}" to be an object`,
+      },
+      {
+        name: 'maxSeverity is an array',
+        config: { maxSeverity: ['some-rule'] },
         message: `Expected maxSeverity in "${configPathIn('/project')}" to be an object`,
       },
       {
