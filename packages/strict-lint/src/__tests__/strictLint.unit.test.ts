@@ -193,6 +193,30 @@ describe(strictLint, () => {
       ]);
     });
 
+    it.each([
+      {
+        name: 'a marker',
+        projectRoot: { marker: '.git', rootDir: '/project', source: 'marker' },
+        expected: 'strict-lint: project root /project (marker: .git)',
+      },
+      {
+        name: 'the nearest package.json',
+        projectRoot: { marker: null, rootDir: '/project', source: 'package-json' },
+        expected: 'strict-lint: project root /project (nearest package.json)',
+      },
+      {
+        name: 'the start directory',
+        projectRoot: { marker: null, rootDir: '/project/packages/pkg', source: 'start-dir' },
+        expected: 'strict-lint: project root /project/packages/pkg (no project marker; using the start directory)',
+      },
+    ] as const)('names the project root chosen by $name', async ({ projectRoot, expected }) => {
+      withProjectRoot(projectRoot);
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(reportedLines()).toContain(expected);
+    });
+
     it('reports that no config file was found when the cascade collected none', async () => {
       withStrictLintConfigs();
 
@@ -440,6 +464,15 @@ function withCascade(configs: StrictLintConfig[], stopReason: 'predicate' | 'pro
     projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
     stopReason,
   });
+}
+
+/** Make the mocked loader resolve with the given project root and no config files. */
+function withProjectRoot(projectRoot: {
+  marker: string | null;
+  rootDir: string;
+  source: 'marker' | 'package-json' | 'start-dir';
+}): void {
+  mockedLoadStrictLintConfigs.mockResolvedValue({ entries: [], projectRoot, stopReason: 'project-root' });
 }
 
 /** The strict-lint config path within the given directory. */
