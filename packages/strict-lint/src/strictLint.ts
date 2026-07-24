@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 
-import type { ConfigEntry } from '@williamthorsen/toolbelt.filesystem';
+import type { ConfigCascade, ConfigEntry, ProjectRoot } from '@williamthorsen/toolbelt.filesystem';
 import { ESLint, type Linter } from 'eslint';
 
 import { convertWarnToError } from './convertWarnToError.ts';
@@ -39,6 +39,10 @@ async function doLint(
 
   // The walk is anchored where the run is: ESLint resolves its own config and its lint targets from the cwd.
   const cascade = await loadStrictLintConfigs(process.cwd());
+
+  if (parsed.debug) {
+    reportConfigProvenance(cascade);
+  }
 
   const resolvedMaxSeverity: MaxSeverityMap = {
     ...mergeMaxSeverity(cascade.entries),
@@ -99,6 +103,34 @@ async function doLint(
   }
 
   return { text, errorCount };
+}
+
+/** Reports where the allowlist came from, on stderr, so it stays clear of the formatter output. */
+function reportConfigProvenance(cascade: ConfigCascade<StrictLintConfig>): void {
+  const { entries, projectRoot, stopReason } = cascade;
+
+  console.error(`strict-lint: project root ${projectRoot.rootDir} (${describeRootSource(projectRoot)})`);
+
+  if (entries.length === 0) {
+    console.error('strict-lint: no config file found');
+  } else {
+    console.error('strict-lint: config files, lowest precedence first:');
+    for (const entry of entries.toReversed()) {
+      console.error(`strict-lint:   ${entry.filePath}`);
+    }
+  }
+
+  if (stopReason === 'predicate') {
+    console.error('strict-lint: ascent stopped by shouldIgnoreAncestors');
+  }
+}
+
+/** How the project root was chosen: by a marker file, or by one of the fallbacks. */
+function describeRootSource({ marker, source }: ProjectRoot): string {
+  if (marker !== null) {
+    return `marker: ${marker}`;
+  }
+  return source === 'package-json' ? 'nearest package.json' : 'no project marker; using the start directory';
 }
 
 /** Merges the collected allowlists farthest level first, so a nearer config wins per rule. */

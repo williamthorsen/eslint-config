@@ -15,6 +15,13 @@ describe(parseCliArgs, () => {
     expect(result.maxWarnings).toBe(-1);
     expect(result.outputFile).toBeUndefined();
     expect(result.configPath).toBeUndefined();
+    expect(result.debug).toBe(false);
+  });
+
+  it('sets debug when --debug is provided', () => {
+    const result = parseCliArgs(['--debug']);
+
+    expect(result.debug).toBe(true);
   });
 
   it('returns positional args as patterns', () => {

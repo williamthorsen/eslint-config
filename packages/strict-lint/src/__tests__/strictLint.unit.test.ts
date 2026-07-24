@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import { strictLint } from '../strictLint.ts';
 import type { StrictLintConfig } from '../types.ts';
@@ -160,6 +160,68 @@ describe(strictLint, () => {
         },
       );
     });
+  });
+
+  describe('--debug provenance', () => {
+    const originalExit = process.exit;
+    const originalArgv = process.argv;
+    let errorSpy: MockInstance<typeof console.error>;
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      process.exit = vi.fn<(code?: string | number | null) => never>();
+      process.argv = ['node', 'strict-lint', '--debug'];
+      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      errorSpy.mockRestore();
+      process.exit = originalExit;
+      process.argv = originalArgv;
+    });
+
+    it('names the project root and every contributing config file, lowest precedence first', async () => {
+      withStrictLintConfigs({ maxSeverity: {} }, { maxSeverity: {} });
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(reportedLines()).toEqual([
+        'strict-lint: project root /project (marker: pnpm-workspace.yaml)',
+        'strict-lint: config files, lowest precedence first:',
+        `strict-lint:   ${configPathIn('/project/level-1')}`,
+        `strict-lint:   ${configPathIn('/project/level-0')}`,
+      ]);
+    });
+
+    it('reports that no config file was found when the cascade collected none', async () => {
+      withStrictLintConfigs();
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(reportedLines()).toContain('strict-lint: no config file found');
+    });
+
+    it('reports the stop when a config bounded the ascent', async () => {
+      withStoppedAscent({ shouldIgnoreAncestors: true });
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(reportedLines()).toContain('strict-lint: ascent stopped by shouldIgnoreAncestors');
+    });
+
+    it('stays silent when --debug is absent', async () => {
+      process.argv = ['node', 'strict-lint'];
+      withStrictLintConfigs({ maxSeverity: {} });
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(errorSpy).not.toHaveBeenCalled();
+    });
+
+    /** The lines the run wrote to stderr. */
+    function reportedLines(): string[] {
+      return errorSpy.mock.calls.map(([line]) => String(line));
+    }
   });
 
   describe('exit code', () => {
@@ -360,15 +422,29 @@ describe(strictLint, () => {
 
 /** Make the mocked loader resolve with one cascade entry per config, given nearest first. */
 function withStrictLintConfigs(...configs: StrictLintConfig[]): void {
+  withCascade(configs, 'project-root');
+}
+
+/** The same, for a walk that a `shouldIgnoreAncestors` config cut short. */
+function withStoppedAscent(...configs: StrictLintConfig[]): void {
+  withCascade(configs, 'predicate');
+}
+
+function withCascade(configs: StrictLintConfig[], stopReason: 'predicate' | 'project-root'): void {
   mockedLoadStrictLintConfigs.mockResolvedValue({
     entries: configs.map((config, index) => ({
       config,
       dir: `/project/level-${String(index)}`,
-      filePath: `/project/level-${String(index)}/.config/strict-lint.config.ts`,
+      filePath: configPathIn(`/project/level-${String(index)}`),
     })),
     projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
-    stopReason: 'project-root',
+    stopReason,
   });
+}
+
+/** The strict-lint config path within the given directory. */
+function configPathIn(dir: string): string {
+  return `${dir}/.config/strict-lint.config.ts`;
 }
 
 // endregion | Helpers
