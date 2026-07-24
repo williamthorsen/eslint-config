@@ -25,7 +25,7 @@
     "@vitest/coverage-v8": "4.1.10",
     "@williamthorsen/nmr": "0.19.0",
     "@williamthorsen/release-kit": "8.1.0",
-    "@williamthorsen/toolbelt.objects": "3.2.8",
+    "@williamthorsen/toolbelt.objects": "3.2.9",
     "@williamthorsen/tsconfig": "workspace:*",
     "eslint": "10.7.0",
     "eslint-plugin-n": "18.2.2",
