@@ -8,7 +8,6 @@ export const advisoryRuleSeverities = {
   'unicorn/consistent-function-scoping': 'warn',
   'unicorn/no-array-reduce': 'warn',
   'unicorn/no-lonely-if': 'warn',
-  'unicorn/no-negated-condition': 'warn',
   'unicorn/no-nested-ternary': 'warn',
   'unicorn/no-useless-undefined': 'warn',
   'unicorn/numeric-separators-style': 'warn',
