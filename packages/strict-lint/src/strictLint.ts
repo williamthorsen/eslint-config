@@ -1,13 +1,13 @@
 import fs from 'node:fs/promises';
 
+import type { ConfigEntry } from '@williamthorsen/toolbelt.filesystem';
 import { ESLint, type Linter } from 'eslint';
 
 import { convertWarnToError } from './convertWarnToError.ts';
-import { defaultMaxSeverity } from './defaultMaxSeverity.ts';
-import { loadStrictLintConfig } from './loadStrictLintConfig.ts';
+import { loadStrictLintConfigs } from './loadStrictLintConfigs.ts';
 import { parseCliArgs } from './parseCliArgs.ts';
 import { resolveEslintConfig } from './resolveEslintConfig.ts';
-import type { MaxSeverityMap, StrictLintOptions } from './types.ts';
+import type { MaxSeverityMap, StrictLintConfig, StrictLintOptions } from './types.ts';
 
 /** Runs strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
@@ -38,11 +38,10 @@ async function doLint(
   const config = await resolveConfig(options, parsed.configPath);
 
   // The walk is anchored where the run is: ESLint resolves its own config and its lint targets from the cwd.
-  const strictLintConfig = await loadStrictLintConfig(process.cwd());
+  const cascade = await loadStrictLintConfigs(process.cwd());
 
   const resolvedMaxSeverity: MaxSeverityMap = {
-    ...defaultMaxSeverity,
-    ...strictLintConfig?.maxSeverity,
+    ...mergeMaxSeverity(cascade.entries),
     ...options?.maxSeverity,
   };
 
@@ -100,6 +99,15 @@ async function doLint(
   }
 
   return { text, errorCount };
+}
+
+/** Merges the collected allowlists farthest level first, so a nearer config wins per rule. */
+function mergeMaxSeverity(entries: ReadonlyArray<ConfigEntry<StrictLintConfig>>): MaxSeverityMap {
+  const merged: MaxSeverityMap = {};
+  for (const entry of entries.toReversed()) {
+    Object.assign(merged, entry.config.maxSeverity);
+  }
+  return merged;
 }
 
 /** Resolves the ESLint config array from programmatic options, the --config flag, or file discovery. */

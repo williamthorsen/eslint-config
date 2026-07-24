@@ -1,11 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { strictLint } from '../strictLint.ts';
+import type { StrictLintConfig } from '../types.ts';
 
 const {
   mockedConvertWarnToError,
   mockedResolveEslintConfig,
-  mockedLoadStrictLintConfig,
+  mockedLoadStrictLintConfigs,
   mockedWriteFile,
   mockEslintConstructor,
   mockFormat,
@@ -16,7 +17,7 @@ const {
 } = vi.hoisted(() => ({
   mockedConvertWarnToError: vi.fn((config: Record<string, unknown>) => config),
   mockedResolveEslintConfig: vi.fn(),
-  mockedLoadStrictLintConfig: vi.fn(),
+  mockedLoadStrictLintConfigs: vi.fn(),
   mockedWriteFile: vi.fn().mockResolvedValue(undefined),
   mockEslintConstructor: vi.fn(),
   mockFormat: vi.fn().mockResolvedValue(''),
@@ -34,8 +35,8 @@ vi.mock('../resolveEslintConfig.ts', () => ({
   resolveEslintConfig: mockedResolveEslintConfig,
 }));
 
-vi.mock('../loadStrictLintConfig.ts', () => ({
-  loadStrictLintConfig: mockedLoadStrictLintConfig,
+vi.mock('../loadStrictLintConfigs.ts', () => ({
+  loadStrictLintConfigs: mockedLoadStrictLintConfigs,
 }));
 
 vi.mock('node:fs/promises', () => ({
@@ -75,91 +76,88 @@ describe(strictLint, () => {
       process.argv = originalArgv;
     });
 
-    it('applies only built-in defaults when no config file or programmatic overrides exist', async () => {
+    it('applies an empty allowlist when no config file or programmatic overrides exist', async () => {
       mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
-      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+      withStrictLintConfigs();
+
+      await strictLint();
+
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith({ rules: {} }, {});
+    });
+
+    it('applies the allowlist of the only config file', async () => {
+      mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
+      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
+
+      await strictLint();
+
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith({ rules: {} }, { 'some-rule': 'warn' });
+    });
+
+    it('keeps the entries of a farther config that a nearer one does not mention', async () => {
+      mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
+      withStrictLintConfigs({ maxSeverity: { 'nearer-rule': 'warn' } }, { maxSeverity: { 'farther-rule': 'warn' } });
 
       await strictLint();
 
       expect(mockedConvertWarnToError).toHaveBeenCalledWith(
         { rules: {} },
-        expect.objectContaining({ '@typescript-eslint/no-deprecated': 'warn' }),
+        { 'farther-rule': 'warn', 'nearer-rule': 'warn' },
       );
     });
 
-    it('config file overrides built-in defaults', async () => {
+    it('lets a nearer config drop an inherited entry by promoting it to error', async () => {
       mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
-      mockedLoadStrictLintConfig.mockResolvedValue({
-        maxSeverity: { '@typescript-eslint/no-deprecated': 'error' },
-      });
+      withStrictLintConfigs({ maxSeverity: { 'shared-rule': 'error' } }, { maxSeverity: { 'shared-rule': 'warn' } });
 
       await strictLint();
 
-      expect(mockedConvertWarnToError).toHaveBeenCalledWith(
-        { rules: {} },
-        expect.objectContaining({ '@typescript-eslint/no-deprecated': 'error' }),
-      );
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith({ rules: {} }, { 'shared-rule': 'error' });
     });
 
-    it('programmatic overrides take precedence over config file', async () => {
+    it('programmatic overrides take precedence over every config file', async () => {
       mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
-      mockedLoadStrictLintConfig.mockResolvedValue({
-        maxSeverity: { 'some-rule': 'error' },
-      });
+      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'error' } }, { maxSeverity: { 'some-rule': 'warn' } });
 
-      await strictLint({
-        maxSeverity: { 'some-rule': 'warn' },
-      });
+      await strictLint({ maxSeverity: { 'some-rule': 'warn' } });
 
-      expect(mockedConvertWarnToError).toHaveBeenCalledWith(
-        { rules: {} },
-        expect.objectContaining({
-          '@typescript-eslint/no-deprecated': 'warn',
-          'some-rule': 'warn',
-        }),
-      );
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith({ rules: {} }, { 'some-rule': 'warn' });
     });
 
     it('starts the config walk at the cwd when baseConfig is provided', async () => {
-      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+      withStrictLintConfigs();
 
       await strictLint({ baseConfig: [{ rules: {} }] });
 
-      expect(mockedLoadStrictLintConfig).toHaveBeenCalledWith(process.cwd());
+      expect(mockedLoadStrictLintConfigs).toHaveBeenCalledWith(process.cwd());
     });
 
     it('starts the config walk at the cwd when the ESLint config is discovered', async () => {
       mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
-      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+      withStrictLintConfigs();
 
       await strictLint();
 
-      expect(mockedLoadStrictLintConfig).toHaveBeenCalledWith(process.cwd());
+      expect(mockedLoadStrictLintConfigs).toHaveBeenCalledWith(process.cwd());
     });
 
-    it('merges all three layers with correct precedence', async () => {
+    it('merges every layer with correct precedence', async () => {
       mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
-      mockedLoadStrictLintConfig.mockResolvedValue({
-        maxSeverity: {
-          '@typescript-eslint/no-deprecated': 'error',
-          'config-only-rule': 'warn',
-        },
-      });
+      withStrictLintConfigs(
+        { maxSeverity: { 'nearer-rule': 'warn', 'shared-rule': 'error' } },
+        { maxSeverity: { 'farther-rule': 'warn', 'shared-rule': 'warn' } },
+      );
 
-      await strictLint({
-        maxSeverity: {
-          '@typescript-eslint/no-deprecated': 'warn',
-          'programmatic-only-rule': 'warn',
-        },
-      });
+      await strictLint({ maxSeverity: { 'programmatic-only-rule': 'warn', 'shared-rule': 'warn' } });
 
       expect(mockedConvertWarnToError).toHaveBeenCalledWith(
         { rules: {} },
-        expect.objectContaining({
-          '@typescript-eslint/no-deprecated': 'warn',
-          'config-only-rule': 'warn',
+        {
+          'farther-rule': 'warn',
+          'nearer-rule': 'warn',
           'programmatic-only-rule': 'warn',
-        }),
+          'shared-rule': 'warn',
+        },
       );
     });
   });
@@ -172,7 +170,7 @@ describe(strictLint, () => {
       vi.clearAllMocks();
       process.exit = vi.fn<(code?: string | number | null) => never>();
       process.argv = ['node', 'strict-lint'];
-      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+      withStrictLintConfigs();
     });
 
     afterEach(() => {
@@ -224,7 +222,7 @@ describe(strictLint, () => {
       vi.clearAllMocks();
       process.exit = vi.fn<(code?: string | number | null) => never>();
       process.argv = ['node', 'strict-lint'];
-      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+      withStrictLintConfigs();
       mockFormat.mockResolvedValue('');
       mockLintFiles.mockResolvedValue([{ errorCount: 0, warningCount: 0 }]);
     });
@@ -357,3 +355,20 @@ describe(strictLint, () => {
     });
   });
 });
+
+// region | Helpers
+
+/** Make the mocked loader resolve with one cascade entry per config, given nearest first. */
+function withStrictLintConfigs(...configs: StrictLintConfig[]): void {
+  mockedLoadStrictLintConfigs.mockResolvedValue({
+    entries: configs.map((config, index) => ({
+      config,
+      dir: `/project/level-${String(index)}`,
+      filePath: `/project/level-${String(index)}/.config/strict-lint.config.ts`,
+    })),
+    projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
+    stopReason: 'project-root',
+  });
+}
+
+// endregion | Helpers

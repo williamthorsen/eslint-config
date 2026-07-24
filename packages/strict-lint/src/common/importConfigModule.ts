@@ -19,7 +19,7 @@ export async function importConfigModule(filePath: string): Promise<unknown> {
     return await import(pathToFileURL(filePath).href);
   } catch (error: unknown) {
     if (isTypeScript) {
-      const actionable = wrapNativeTsSyntaxError(error, filePath);
+      const actionable = wrapNativeTsError(error, filePath);
       if (actionable) throw actionable;
     }
     throw error;
@@ -27,17 +27,21 @@ export async function importConfigModule(filePath: string): Promise<unknown> {
 }
 
 /**
- * Maps a native `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX` failure to an actionable error, or returns undefined when the
- * error is unrelated and should propagate as-is.
+ * Maps Node's two native-TypeScript failure modes — syntax type stripping cannot erase, and a TypeScript extension on
+ * a runtime where stripping is disabled — to actionable errors, or returns undefined when the error is unrelated and
+ * should propagate as-is. Callers that reach Node's loader without the runtime pre-check above rely on the second
+ * mapping.
  * Exported for unit testing, since Vitest transforms TypeScript itself and cannot reproduce native failure in-process.
  * @internal - Exported to allow testing
  */
-export function wrapNativeTsSyntaxError(error: unknown, filePath: string): Error | undefined {
-  if (!hasErrorCode(error, 'ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX')) return undefined;
-  return new Error(
-    `Cannot load the TypeScript config "${filePath}": it uses syntax Node's native type stripping cannot handle (for example an enum, or a namespace with runtime values). Use erasable TypeScript syntax only.`,
-    { cause: error },
-  );
+export function wrapNativeTsError(error: unknown, filePath: string): Error | undefined {
+  if (hasErrorCode(error, 'ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX')) {
+    return new Error(unsupportedSyntaxMessage(filePath), { cause: error });
+  }
+  if (hasErrorCode(error, 'ERR_UNKNOWN_FILE_EXTENSION') && !process.features.typescript) {
+    return new Error(unsupportedRuntimeMessage(filePath), { cause: error });
+  }
+  return undefined;
 }
 
 // region | Helpers
@@ -49,6 +53,11 @@ function hasErrorCode(error: unknown, code: string): boolean {
 /** Message for a TypeScript config on a runtime without native type stripping. */
 function unsupportedRuntimeMessage(filePath: string): string {
   return `Cannot load the TypeScript config "${filePath}": this Node runtime has no native TypeScript support. Upgrade to Node >=24.`;
+}
+
+/** Message for a TypeScript config using syntax that native type stripping cannot erase. */
+function unsupportedSyntaxMessage(filePath: string): string {
+  return `Cannot load the TypeScript config "${filePath}": it uses syntax Node's native type stripping cannot handle (for example an enum, or a namespace with runtime values). Use erasable TypeScript syntax only.`;
 }
 
 // endregion | Helpers
