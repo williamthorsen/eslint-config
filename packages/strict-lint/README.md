@@ -28,11 +28,11 @@ Every warning emitted by your ESLint config becomes an error and fails the run, 
 2. Rewrites every rule whose severity is `'warn'` to `'error'`, except those listed in `maxSeverity`.
 3. Runs ESLint via the Node API and exits non-zero on any errors.
 
-`maxSeverity` is the resolved allowlist, computed by merging — in increasing precedence — built-in defaults, `.config/strict-lint.config.ts`, and any `maxSeverity` passed programmatically.
+`maxSeverity` is the resolved allowlist, computed by merging — in increasing precedence — built-in defaults, the nearest `.config/strict-lint.config.ts`, and any `maxSeverity` passed programmatically.
 
 ## Configuration
 
-Create `.config/strict-lint.config.ts` next to your ESLint config to extend or replace the default allowlist:
+Create `.config/strict-lint.config.ts` at or above the directory you run `strict-lint` from to extend or replace the default allowlist:
 
 ```ts
 // .config/strict-lint.config.ts
@@ -52,6 +52,33 @@ export default config;
 ```
 
 The config file is loaded through Node's native TypeScript support (Node 24+), so TypeScript syntax works without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not.
+
+### Discovery
+
+`strict-lint` walks up from the current working directory and uses the first `.config/strict-lint.config.ts` it finds, the same anchor ESLint uses to discover its own config. The nearest config wins outright: configs at farther levels are ignored, not merged into it.
+
+The walk is not bounded by the project. It ascends to the filesystem root, so a `~/.config/strict-lint.config.ts` applies to every project on that machine that has none of its own, and CI, running under a different `HOME`, will disagree. Commit a config at the repo root when local runs and CI need to match.
+
+Exactly one config applies per run, selected by where you run from rather than by which files you lint. In a monorepo, running from `packages/pkg` picks up that package's config and falls back to the repo root's when the package has none; running from the repo root picks up the root's, even when the targets are inside a package.
+
+A package that needs its own allowlist declares a complete one; to build on the root's, import it and spread its `maxSeverity`:
+
+```ts
+// packages/pkg/.config/strict-lint.config.ts
+import type { StrictLintConfig } from '@williamthorsen/strict-lint';
+
+import rootConfig from '../../../.config/strict-lint.config.ts';
+
+const config: StrictLintConfig = {
+  maxSeverity: {
+    ...rootConfig.maxSeverity,
+    // promote a rule this package is already clean of
+    'unicorn/prefer-ternary': 'error',
+  },
+};
+
+export default config;
+```
 
 ## CLI reference
 

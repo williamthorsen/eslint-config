@@ -38,7 +38,7 @@ describe(resolveEslintConfig, () => {
 
     expect(mockedFindNearestFile).toHaveBeenCalledWith(ESLINT_CONFIG_FILENAMES);
     expect(mockedImportConfigModule).toHaveBeenCalledWith('/proj/eslint.config.ts');
-    expect(result).toEqual({ config: [{ rules: {} }], configDir: '/proj' });
+    expect(result).toEqual([{ rules: {} }]);
   });
 
   it('loads an explicit config path without discovery', async () => {
@@ -49,7 +49,7 @@ describe(resolveEslintConfig, () => {
 
     expect(mockedFindNearestFile).not.toHaveBeenCalled();
     expect(mockedImportConfigModule).toHaveBeenCalledWith(explicit);
-    expect(result.configDir).toBe(path.dirname(explicit));
+    expect(result).toEqual([]);
   });
 
   it('throws a not-found error naming all six filenames when no config exists', async () => {

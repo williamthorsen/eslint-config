@@ -76,7 +76,7 @@ describe(strictLint, () => {
     });
 
     it('applies only built-in defaults when no config file or programmatic overrides exist', async () => {
-      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
       mockedLoadStrictLintConfig.mockResolvedValue(undefined);
 
       await strictLint();
@@ -88,7 +88,7 @@ describe(strictLint, () => {
     });
 
     it('config file overrides built-in defaults', async () => {
-      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
       mockedLoadStrictLintConfig.mockResolvedValue({
         maxSeverity: { '@typescript-eslint/no-deprecated': 'error' },
       });
@@ -102,7 +102,7 @@ describe(strictLint, () => {
     });
 
     it('programmatic overrides take precedence over config file', async () => {
-      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
       mockedLoadStrictLintConfig.mockResolvedValue({
         maxSeverity: { 'some-rule': 'error' },
       });
@@ -120,7 +120,7 @@ describe(strictLint, () => {
       );
     });
 
-    it('uses process.cwd() as config dir when baseConfig is provided', async () => {
+    it('starts the config walk at the cwd when baseConfig is provided', async () => {
       mockedLoadStrictLintConfig.mockResolvedValue(undefined);
 
       await strictLint({ baseConfig: [{ rules: {} }] });
@@ -128,8 +128,17 @@ describe(strictLint, () => {
       expect(mockedLoadStrictLintConfig).toHaveBeenCalledWith(process.cwd());
     });
 
+    it('starts the config walk at the cwd when the ESLint config is discovered', async () => {
+      mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
+      mockedLoadStrictLintConfig.mockResolvedValue(undefined);
+
+      await strictLint();
+
+      expect(mockedLoadStrictLintConfig).toHaveBeenCalledWith(process.cwd());
+    });
+
     it('merges all three layers with correct precedence', async () => {
-      mockedResolveEslintConfig.mockResolvedValue({ config: [{ rules: {} }], configDir: '/project' });
+      mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
       mockedLoadStrictLintConfig.mockResolvedValue({
         maxSeverity: {
           '@typescript-eslint/no-deprecated': 'error',
