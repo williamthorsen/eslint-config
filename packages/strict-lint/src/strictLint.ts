@@ -1,13 +1,13 @@
 import fs from 'node:fs/promises';
 
+import type { ConfigCascade, ConfigEntry, ProjectRoot } from '@williamthorsen/toolbelt.filesystem';
 import { ESLint, type Linter } from 'eslint';
 
 import { convertWarnToError } from './convertWarnToError.ts';
-import { defaultMaxSeverity } from './defaultMaxSeverity.ts';
-import { loadStrictLintConfig } from './loadStrictLintConfig.ts';
+import { loadStrictLintConfigs } from './loadStrictLintConfigs.ts';
 import { parseCliArgs } from './parseCliArgs.ts';
 import { resolveEslintConfig } from './resolveEslintConfig.ts';
-import type { MaxSeverityMap, StrictLintOptions } from './types.ts';
+import type { MaxSeverityMap, StrictLintConfig, StrictLintOptions } from './types.ts';
 
 /** Runs strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
@@ -38,11 +38,14 @@ async function doLint(
   const config = await resolveConfig(options, parsed.configPath);
 
   // The walk is anchored where the run is: ESLint resolves its own config and its lint targets from the cwd.
-  const strictLintConfig = await loadStrictLintConfig(process.cwd());
+  const cascade = await loadStrictLintConfigs(process.cwd());
+
+  if (parsed.debug) {
+    reportConfigProvenance(cascade);
+  }
 
   const resolvedMaxSeverity: MaxSeverityMap = {
-    ...defaultMaxSeverity,
-    ...strictLintConfig?.maxSeverity,
+    ...mergeMaxSeverity(cascade.entries),
     ...options?.maxSeverity,
   };
 
@@ -100,6 +103,43 @@ async function doLint(
   }
 
   return { text, errorCount };
+}
+
+/** Reports where the allowlist came from, on stderr, so it stays clear of the formatter output. */
+function reportConfigProvenance(cascade: ConfigCascade<StrictLintConfig>): void {
+  const { entries, projectRoot, stopReason } = cascade;
+
+  console.error(`strict-lint: project root ${projectRoot.rootDir} (${describeRootSource(projectRoot)})`);
+
+  if (entries.length === 0) {
+    console.error('strict-lint: no config file found');
+  } else {
+    console.error('strict-lint: config files, lowest precedence first:');
+    for (const entry of entries.toReversed()) {
+      console.error(`strict-lint:   ${entry.filePath}`);
+    }
+  }
+
+  if (stopReason === 'predicate') {
+    console.error('strict-lint: ascent stopped by shouldIgnoreAncestors');
+  }
+}
+
+/** How the project root was chosen: by a marker file, or by one of the fallbacks. */
+function describeRootSource({ marker, source }: ProjectRoot): string {
+  if (marker !== null) {
+    return `marker: ${marker}`;
+  }
+  return source === 'package-json' ? 'nearest package.json' : 'no project marker; using the start directory';
+}
+
+/** Merges the collected allowlists farthest level first, so a nearer config wins per rule. */
+function mergeMaxSeverity(entries: ReadonlyArray<ConfigEntry<StrictLintConfig>>): MaxSeverityMap {
+  const merged: MaxSeverityMap = {};
+  for (const entry of entries.toReversed()) {
+    Object.assign(merged, entry.config.maxSeverity);
+  }
+  return merged;
 }
 
 /** Resolves the ESLint config array from programmatic options, the --config flag, or file discovery. */

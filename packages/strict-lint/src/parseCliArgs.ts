@@ -13,6 +13,7 @@ export interface ParsedCliArgs {
   maxWarnings: number;
   outputFile: string | undefined;
   configPath: string | undefined;
+  debug: boolean;
 }
 
 /** Parse process.argv-style arguments into ESLint constructor options and metadata. */
@@ -35,6 +36,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
       'cache-strategy': { type: 'string' },
       'warn-ignored': { type: 'boolean' },
       config: { type: 'string', short: 'c' },
+      debug: { type: 'boolean', default: false },
       stats: { type: 'boolean', default: false },
       flag: { type: 'string', multiple: true },
       concurrency: { type: 'string' },
@@ -133,6 +135,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     maxWarnings: parseMaxWarnings(values['max-warnings']),
     outputFile: values['output-file'],
     configPath: values.config,
+    debug: values.debug,
   };
 }
 

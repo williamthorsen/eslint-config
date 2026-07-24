@@ -31,6 +31,9 @@
   "scripts": {
     "prepublishOnly": "nmr build"
   },
+  "dependencies": {
+    "@williamthorsen/toolbelt.filesystem": "0.2.0"
+  },
   "peerDependencies": {
     "eslint": ">=10"
   },

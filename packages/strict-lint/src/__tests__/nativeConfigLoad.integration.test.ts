@@ -12,6 +12,8 @@ import { afterAll, describe, expect, it } from 'vitest';
 
 const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const UNUSED_VAR_FILE = 'const unused = 1;\n';
+const UNUSED_VAR_AND_CONSOLE_FILE = "const unused = 1;\nconsole.log('hi');\n";
+const ROOT_MARKER = 'pnpm-workspace.yaml';
 
 const createdDirs: string[] = [];
 
@@ -82,19 +84,66 @@ describe('native config loading (subprocess)', () => {
     expect(stdout).toContain('1 error, 0 warnings');
   }, 30_000);
 
-  it('prefers a package-level strict-lint config over one at the root', () => {
+  it('merges a package config over the root config, dropping only the entry it overrides', () => {
     const dir = makeFixture({
-      '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
-      'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
-      'packages/pkg/.config/strict-lint.config.ts': 'export default { maxSeverity: {} };\n',
-      'packages/pkg/a.js': UNUSED_VAR_FILE,
+      '.config/strict-lint.config.ts':
+        "export default { maxSeverity: { 'no-console': 'warn', 'no-unused-vars': 'warn' } };\n",
+      'eslint.config.ts': "export default [{ rules: { 'no-console': 'warn', 'no-unused-vars': 'warn' } }];\n",
+      'packages/pkg/.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'error' } };\n",
+      'packages/pkg/a.js': UNUSED_VAR_AND_CONSOLE_FILE,
     });
 
     const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
 
-    // The package's empty allowlist shadows the root's outright, so the rule is promoted.
+    // The package drops the inherited `no-unused-vars` entry by promoting it; the root's `no-console` entry survives.
+    expect(status).toBe(1);
+    expect(stdout).toContain('1 error, 1 warning');
+  }, 30_000);
+
+  it('ignores a strict-lint config above the project root', () => {
+    const dir = makeFixture({
+      '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
+      [`project/${ROOT_MARKER}`]: '',
+      'project/eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
+      'project/a.js': UNUSED_VAR_FILE,
+    });
+
+    const { status, stdout } = runCli(path.join(dir, 'project'), ['a.js']);
+
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 0 warnings');
+  }, 30_000);
+
+  it('stops the ascent at a config declaring shouldIgnoreAncestors', () => {
+    const dir = makeFixture({
+      '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-console': 'warn' } };\n",
+      'eslint.config.ts': "export default [{ rules: { 'no-console': 'warn', 'no-unused-vars': 'warn' } }];\n",
+      'packages/pkg/.config/strict-lint.config.ts':
+        "export default { maxSeverity: { 'no-unused-vars': 'warn' }, shouldIgnoreAncestors: true };\n",
+      'packages/pkg/a.js': UNUSED_VAR_AND_CONSOLE_FILE,
+    });
+
+    const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+
+    // Only the package's entry applies, so `no-console` is promoted while `no-unused-vars` stays a warning.
+    expect(status).toBe(1);
+    expect(stdout).toContain('1 error, 1 warning');
+  }, 30_000);
+
+  it('leaves a config above shouldIgnoreAncestors unimported', () => {
+    const dir = makeFixture({
+      '.config/strict-lint.config.ts': "throw new Error('ancestor config was imported');\n",
+      'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
+      'packages/pkg/.config/strict-lint.config.ts': 'export default { shouldIgnoreAncestors: true };\n',
+      'packages/pkg/a.js': UNUSED_VAR_FILE,
+    });
+
+    const { status, stdout, stderr } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+
+    // A run that reached the ancestor would die on its throw instead of reporting the promoted rule.
+    expect(status).toBe(1);
+    expect(stdout).toContain('1 error, 0 warnings');
+    expect(stderr).not.toContain('ancestor config was imported');
   }, 30_000);
 
   it('fails a config with non-erasable syntax with an actionable message', () => {
@@ -120,11 +169,16 @@ function makePackageAllowlistFixture(): string {
   });
 }
 
-/** Write the given files into a fresh temp directory and return its path. */
+/**
+ * Write the given files into a fresh temp directory and return its path. The directory gets a project-root marker,
+ * so config discovery is bounded by the fixture rather than by whatever happens to sit above the system temp
+ * directory on the machine running the suite.
+ */
 function makeFixture(files: Record<string, string>): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-int-'));
   createdDirs.push(dir);
-  for (const [name, content] of Object.entries(files)) {
+  const contents = { [ROOT_MARKER]: '', ...files };
+  for (const [name, content] of Object.entries(contents)) {
     const full = path.join(dir, name);
     fs.mkdirSync(path.dirname(full), { recursive: true });
     fs.writeFileSync(full, content);

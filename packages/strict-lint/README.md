@@ -1,6 +1,6 @@
 # @williamthorsen/strict-lint
 
-Run ESLint with all warnings promoted to errors — except for an allowlist that stays as warnings. Ships a `strict-lint` binary that drops in for `eslint` in CI, plus a programmatic API.
+Run ESLint with all warnings promoted to errors — except for an allowlist you declare. Ships a `strict-lint` binary that drops in for `eslint` in CI, plus a programmatic API.
 
 <!-- section:release-notes --><!-- /section:release-notes -->
 
@@ -20,7 +20,7 @@ In CI, use `strict-lint` instead of `eslint`:
 strict-lint .
 ```
 
-Every warning emitted by your ESLint config becomes an error and fails the run, except for rules in the built-in allowlist (rules that are intentionally advisory, like `@typescript-eslint/no-deprecated`). The CLI accepts the same flags as `eslint` and forwards them through.
+Every warning emitted by your ESLint config becomes an error and fails the run, except for the rules you allowlist. Out of the box nothing is exempt. The CLI accepts the same flags as `eslint` and forwards them through.
 
 ## How it works
 
@@ -28,11 +28,11 @@ Every warning emitted by your ESLint config becomes an error and fails the run, 
 2. Rewrites every rule whose severity is `'warn'` to `'error'`, except those listed in `maxSeverity`.
 3. Runs ESLint via the Node API and exits non-zero on any errors.
 
-`maxSeverity` is the resolved allowlist, computed by merging — in increasing precedence — built-in defaults, the nearest `.config/strict-lint.config.ts`, and any `maxSeverity` passed programmatically.
+`maxSeverity` is the resolved allowlist, computed by merging — in increasing precedence — every `.config/strict-lint.config.ts` from the project root down to the directory you run from, then any `maxSeverity` passed programmatically. No rule is exempt unless one of those sources says so.
 
 ## Configuration
 
-Create `.config/strict-lint.config.ts` at or above the directory you run `strict-lint` from to extend or replace the default allowlist:
+Create `.config/strict-lint.config.ts` at or above the directory you run `strict-lint` from to declare an allowlist:
 
 ```ts
 // .config/strict-lint.config.ts
@@ -43,8 +43,6 @@ const config: StrictLintConfig = {
     // keep these as warnings (don't promote to error)
     'unicorn/no-array-reduce': 'warn',
     'unicorn/no-nested-ternary': 'warn',
-    // explicitly opt this rule into error promotion (overrides the built-in default)
-    '@typescript-eslint/no-deprecated': 'error',
   },
 };
 
@@ -53,32 +51,58 @@ export default config;
 
 The config file is loaded through Node's native TypeScript support (Node 24+), so TypeScript syntax works without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not.
 
+If you lint with [`@williamthorsen/eslint-config-typescript`](https://www.npmjs.com/package/@williamthorsen/eslint-config-typescript), its `advisoryRuleSeverities` export is a ready-made allowlist of style and modernization rules — `maxSeverity: { ...advisoryRuleSeverities }`.
+
 ### Discovery
 
-`strict-lint` walks up from the current working directory and uses the first `.config/strict-lint.config.ts` it finds, the same anchor ESLint uses to discover its own config. The nearest config wins outright: configs at farther levels are ignored, not merged into it.
+`strict-lint` collects every `.config/strict-lint.config.ts` between the current working directory and the project root, the same anchor ESLint uses to discover its own config. A config above the project root does not apply, so a stray `~/.config/strict-lint.config.ts` cannot govern a repository, and CI running under a different `HOME` resolves the same way a laptop does.
 
-The walk is not bounded by the project. It ascends to the filesystem root, so a `~/.config/strict-lint.config.ts` applies to every project on that machine that has none of its own, and CI, running under a different `HOME`, will disagree. Commit a config at the repo root when local runs and CI need to match.
+The project root is the nearest ancestor directory holding one of these markers:
 
-Exactly one config applies per run, selected by where you run from rather than by which files you lint. In a monorepo, running from `packages/pkg` picks up that package's config and falls back to the repo root's when the package has none; running from the repo root picks up the root's, even when the targets are inside a package.
+- `.git` (a directory in a clone, a file in a worktree)
+- `pnpm-workspace.yaml`
+- `pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`, or `bun.lock`
 
-A package that needs its own allowlist declares a complete one; to build on the root's, import it and spread its `maxSeverity`:
+Failing that, it is the nearest directory holding a `package.json`; failing that, the directory the run starts in.
+
+Selection follows the working directory, not the files you lint. Running from the repo root applies the root's config even when the targets sit inside a package.
+
+#### Merging across levels
+
+Configs merge per rule, with the nearer one winning. In a monorepo, running from `packages/pkg` applies the repo root's allowlist and then the package's, so a package extends the root's by naming only what differs — no import, no spread.
+
+Overriding an inherited entry to `'error'` drops it, promoting that rule to an error in this subtree:
 
 ```ts
 // packages/pkg/.config/strict-lint.config.ts
 import type { StrictLintConfig } from '@williamthorsen/strict-lint';
 
-import rootConfig from '../../../.config/strict-lint.config.ts';
-
 const config: StrictLintConfig = {
   maxSeverity: {
-    ...rootConfig.maxSeverity,
-    // promote a rule this package is already clean of
+    // this package is already clean of the rule, so let it fail the build here
     'unicorn/prefer-ternary': 'error',
   },
 };
 
 export default config;
 ```
+
+#### Bounding the search early
+
+A config that sets `shouldIgnoreAncestors: true` stops the search at its own level:
+
+```ts
+const config: StrictLintConfig = {
+  maxSeverity: { 'unicorn/no-array-reduce': 'warn' },
+  shouldIgnoreAncestors: true,
+};
+```
+
+Configs above it contribute nothing and are never imported, so their module-level side effects do not run.
+
+#### Seeing what applied
+
+`strict-lint --debug` writes the resolved project root, the marker that chose it, and every config file that contributed — in the order they merge — to stderr. It reports strict-lint's own resolution; it does not enable ESLint's internal debug logging.
 
 ## CLI reference
 
@@ -91,6 +115,7 @@ strict-lint [options] [file|dir|glob...]
 | Option                         | Description                                                                  |
 | ------------------------------ | ---------------------------------------------------------------------------- |
 | `-c, --config <path>`          | Path to your ESLint config file                                              |
+| `--debug`                      | Report strict-lint's own config resolution on stderr                         |
 | `--rule <name:severity>`       | Override a single rule (repeatable). Severity: `off` \| `warn` \| `error`.   |
 | `--fix`                        | Auto-fix problems                                                            |
 | `--fix-dry-run`                | Compute fixes but do not write                                               |
@@ -141,35 +166,6 @@ await strictLint({
 | `ruleOverrides` | `Record<string, 'off' \| 'warn' \| 'error'>` | Force rule severity (applied after errorization).           |
 
 `strictLint()` reads `process.argv` and merges CLI flags with the programmatic options. CLI rule overrides win over programmatic ones.
-
-### Built-in allowlist defaults
-
-These rules are kept as warnings out of the box. Set them to `'error'` in your config to promote them.
-
-```
-@typescript-eslint/no-deprecated
-@typescript-eslint/no-unnecessary-type-arguments
-unicorn/consistent-function-scoping
-unicorn/no-array-reduce
-unicorn/no-lonely-if
-unicorn/no-negated-condition
-unicorn/no-nested-ternary
-unicorn/no-useless-undefined
-unicorn/numeric-separators-style
-unicorn/prefer-global-this
-unicorn/prefer-dom-node-text-content
-unicorn/prefer-includes
-unicorn/prefer-node-protocol
-unicorn/prefer-number-properties
-unicorn/prefer-query-selector
-unicorn/prefer-string-raw
-unicorn/prefer-string-slice
-unicorn/prefer-string-starts-ends-with
-unicorn/prefer-ternary
-unicorn/prefer-top-level-await
-unicorn/prefer-type-error
-unicorn/text-encoding-identifier-case
-```
 
 ## Recommended setup
 

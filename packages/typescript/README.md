@@ -159,6 +159,34 @@ export default defineConfig({
 | `patterns.typeScriptExtensions` | `['{ts,cts,mts,tsx}']`      |
 | `patterns.codeExtensions`       | both                        |
 
+## Advisory rule severities
+
+`advisoryRuleSeverities` maps the rules this config sets to `'warn'` because they report style and modernization advice rather than defects — `@typescript-eslint/no-deprecated`, most of the `unicorn` `prefer-*` set, and their neighbours. Rules this config disables outright are not included.
+
+Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
+
+```ts
+// .config/strict-lint.config.ts
+import { advisoryRuleSeverities } from '@williamthorsen/eslint-config-typescript';
+import type { StrictLintConfig } from '@williamthorsen/strict-lint';
+
+const config: StrictLintConfig = {
+  maxSeverity: { ...advisoryRuleSeverities },
+};
+
+export default config;
+```
+
+Or spread it into an ordinary flat-config `rules` block to set those severities directly:
+
+```js
+import { advisoryRuleSeverities } from '@williamthorsen/eslint-config-typescript';
+
+export default [{ rules: { ...advisoryRuleSeverities } }];
+```
+
+An unscoped block applies `'warn'` everywhere, including in test files, where this config turns `unicorn/consistent-function-scoping` and `unicorn/no-useless-undefined` off. Scope the block with `files` to keep those exceptions.
+
 ## Peer dependencies
 
 | Dependency   | Required |

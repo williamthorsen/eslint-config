@@ -78,6 +78,7 @@ const patterns = {
   typeScriptFiles,
 };
 
+export { advisoryRuleSeverities } from './advisoryRuleSeverities.ts';
 export { default as configs, createConfig } from './configs/index.ts';
 export { patterns };
 export default config;
