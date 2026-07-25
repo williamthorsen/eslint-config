@@ -15,7 +15,6 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 - `eslint.config.js` (repo root) — imports from `packages/typescript/dist/esm/`; depends on a built typescript package.
 - `.config/nmr.config.ts` — repo-level overrides for the `nmr` script runner.
 - `.config/release-kit.config.ts`, `.config/audit-deps.config.json`, `.config/sync-labels.config.ts` — config for the corresponding tools invoked by GitHub Actions reusable workflows.
-- `__tests__/version-alignment.app.test.ts` — root-level test that checks Node version consistency across the monorepo.
 
 ## Commands
 
