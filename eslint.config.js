@@ -41,6 +41,9 @@ const config = [
       },
     },
     rules: {
+      // `bin` names the compiled path; mapping the source to it makes the shebang here read as a bin's.
+      // Keep on this rule: via `settings.n` it makes `n/no-unpublished-import` reject the opt-in plugins.
+      'n/hashbang': ['error', { convertPath: { 'src/bin/**/*.ts': [String.raw`^src/(.+)\.ts$`, 'dist/esm/$1.js'] } }],
       'n/no-extraneous-import': ['error', { allowModules: devModules }],
       'n/no-unsupported-features/es-syntax': 'error',
     },

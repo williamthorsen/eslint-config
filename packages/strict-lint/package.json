@@ -22,10 +22,9 @@
     }
   },
   "bin": {
-    "strict-lint": "bin/strict-lint.js"
+    "strict-lint": "dist/esm/bin/strict-lint.js"
   },
   "files": [
-    "bin",
     "dist"
   ],
   "scripts": {
