@@ -15,7 +15,7 @@ Requires ESLint 9+ and TypeScript 5+.
 ## Quick start
 
 ```js
-// eslint.config.js
+// eslint.config.ts
 import { defineConfig } from 'eslint/config';
 
 import tsConfig from '@williamthorsen/eslint-config-typescript';

@@ -38,6 +38,9 @@ importers:
       globals:
         specifier: 17.7.0
         version: 17.7.0
+      jiti:
+        specifier: 2.7.0
+        version: 2.7.0
       lefthook:
         specifier: 2.1.10
         version: 2.1.10

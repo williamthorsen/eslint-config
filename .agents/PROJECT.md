@@ -12,7 +12,7 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 - `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Sources under `src/`, compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `src/plugins/rules/`.
 - `packages/strict-lint/` — `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
 - `packages/tsconfig/` — `@williamthorsen/tsconfig`. No build step; ships `tsconfig.base.json`, which extends `@tsconfig/strictest` and adds the Node/build options it omits. The repo root consumes it via the workspace symlink.
-- `eslint.config.js` (repo root) — imports `packages/typescript/src/` directly; needs no build.
+- `eslint.config.ts` (repo root) — imports `packages/typescript/src/` directly; needs no build.
 - `.config/nmr.config.ts` — repo-level overrides for the `nmr` script runner.
 - `.config/release-kit.config.ts`, `.config/audit-deps.config.json`, `.config/sync-labels.config.ts` — config for the corresponding tools invoked by GitHub Actions reusable workflows.
 
@@ -36,8 +36,6 @@ Releases are triggered via the **Release** GitHub Actions workflow (`workflow_di
 ## Architecture
 
 - **Flat ESLint config (ESLint 9+) everywhere.** Both consumer-facing packages export arrays compatible with the flat-config format. Selective subpath imports are supported on the typescript package (`@williamthorsen/eslint-config-typescript/configs`, `/plugins`, etc.).
-- **The repo consumes its own config from source.** Root `eslint.config.js` imports `packages/typescript/src/index.ts` and `.../ignores/index.ts`, which Node loads through native type stripping. No local task needs a build; `nmr build` exists because Node refuses to strip types under `node_modules`, so published packages must ship compiled `dist/`.
-- **strict-lint runs from source in dev.** Nothing in the workspace depends on `@williamthorsen/strict-lint`, so its bin is never linked into `node_modules/.bin/`. `.config/nmr.config.ts` maps the bare `strict-lint` binary to `node packages/strict-lint/src/bin/strict-lint.ts` via nmr's `devBin`, and nmr rewrites it in every context. Node runs the TypeScript entry point directly, so the mapping needs no transpiler.
 - **Custom ESLint rules** in `packages/typescript/src/plugins/rules/`: `memoized-functions-returned-by-hook`, `no-undefined-with-number`, `no-unused-map`, `prefer-function-declaration`.
 - **Hooks:** `lefthook` runs prettier on staged files pre-commit (see `lefthook.yml`).
 

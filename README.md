@@ -21,7 +21,7 @@ This repo uses [pnpm](https://pnpm.io/) and Node.js. Versions are pinned via `pa
 pnpm install
 ```
 
-That is the whole setup. The root `eslint.config.js` imports `packages/typescript/src` directly, which Node loads through native type stripping, so lint, typecheck, and tests all run without a build. `nmr build` serves publishing: it emits the `dist/` that consumers resolve through `node_modules`, where Node will not strip types.
+The root `eslint.config.ts` imports `packages/typescript/src` directly. `nmr build` serves publishing: it emits the `dist/` that consumers resolve through `node_modules`.
 
 ## Scripts
 
@@ -39,8 +39,6 @@ nmr lint:check        # eslint without fix
 nmr lint:strict       # strict-lint
 nmr test              # vitest
 nmr test:coverage     # vitest with coverage
-nmr outdated          # compatible-range dependency check
-nmr outdated:latest   # latest-version dependency check
 ```
 
 `nmr` is context-aware: the same command runs different scripts depending on whether you're in the repo root or a workspace directory. See the [nmr README](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/nmr#readme) for the full command reference.
@@ -63,20 +61,8 @@ Publishing targets differ by package:
 | `@williamthorsen/strict-lint`              | npm             | public     |
 | `@williamthorsen/tsconfig`                 | npm             | public     |
 
-## Commit conventions
-
-Commit titles follow the format `[{scope}|{type}: ]{title}`, rendered by `describe-change.sh`:
-
-- **Scopes:** `basic`, `root`, `strict-lint`, `ts`, `tsconfig`, or `*` for changes spanning multiple workspaces.
-- **Types:** see the work-types table in [`docs/versioning-and-changelog.md`](docs/versioning-and-changelog.md). Append `!` for breaking changes (e.g., `feat!`); `drop` always carries it.
-- **`deps` is always its own commit.** release-kit categorizes the changelog by type — mixed commits land in the wrong section.
-
-Full reference: [`docs/versioning-and-changelog.md`](docs/versioning-and-changelog.md).
-
 ## Gotchas
 
-- **The build is for publishing, not for working here.** The root `eslint.config.js` reads `packages/typescript/src` directly, so no local task needs `nmr build`. Node refuses to strip types under `node_modules`, which is why the published packages still ship compiled `dist/`.
-- **The `basic` package has no build step.** `build` and `test` are no-ops — edits to `index.mjs` and `rules/*.mjs` take effect immediately.
 - **Root-level Vitest excludes `packages/**`.** Each package owns its own test config; `nmr root:test` runs only root-level tests.
 
 ## License
