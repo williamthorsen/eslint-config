@@ -19,10 +19,9 @@ This repo uses [pnpm](https://pnpm.io/) and Node.js. Versions are pinned via `pa
 
 ```shell
 pnpm install
-pnpm exec nmr build    # required on a clean checkout — see "Gotchas" below
 ```
 
-The build step is required because the root `eslint.config.js` imports from `packages/typescript/dist/esm/`. After the first build, `nmr ci` keeps things in order automatically.
+That is the whole setup. The root `eslint.config.js` imports `packages/typescript/src` directly, which Node loads through native type stripping, so lint, typecheck, and tests all run without a build. `nmr build` serves publishing: it emits the `dist/` that consumers resolve through `node_modules`, where Node will not strip types.
 
 ## Scripts
 
@@ -34,7 +33,7 @@ Run from the repo root to fan out across all workspaces, or from a workspace dir
 nmr ci                # build + check:strict (mirrors GitHub Actions)
 nmr build             # build all packages (or current package from a workspace dir)
 nmr check             # typecheck + format check + lint check + tests
-nmr check:strict      # check + coverage + audit + strict-lint
+nmr check:strict      # typecheck + format check + strict-lint + coverage + agent-file check
 nmr lint              # eslint --fix
 nmr lint:check        # eslint without fix
 nmr lint:strict       # strict-lint
@@ -76,7 +75,7 @@ Full reference: [`docs/versioning-and-changelog.md`](docs/versioning-and-changel
 
 ## Gotchas
 
-- **`nmr lint` and `nmr check` fail on a clean checkout** until `packages/typescript` is built. The root `eslint.config.js` imports from its `dist/`. Run `nmr build` first, or use `nmr ci`, which builds before checking.
+- **The build is for publishing, not for working here.** The root `eslint.config.js` reads `packages/typescript/src` directly, so no local task needs `nmr build`. Node refuses to strip types under `node_modules`, which is why the published packages still ship compiled `dist/`.
 - **The `basic` package has no build step.** `build` and `test` are no-ops — edits to `index.mjs` and `rules/*.mjs` take effect immediately.
 - **Root-level Vitest excludes `packages/**`.** Each package owns its own test config; `nmr root:test` runs only root-level tests.
 

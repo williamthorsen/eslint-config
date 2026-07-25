@@ -4,8 +4,10 @@ import { fileURLToPath } from 'node:url';
 
 import globals from 'globals';
 
-import { commonIgnores } from './packages/typescript/dist/esm/ignores/index.js';
-import baseConfig from './packages/typescript/dist/esm/index.js';
+// The config package is consumed from source, not from its build output: Node strips types
+// natively, so the repo's own lint needs no prior build. The build serves publishing alone.
+import { commonIgnores } from './packages/typescript/src/ignores/index.ts';
+import baseConfig from './packages/typescript/src/index.ts';
 
 const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
 const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];

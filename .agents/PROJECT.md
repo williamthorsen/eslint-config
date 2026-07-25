@@ -12,7 +12,7 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 - `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Sources under `src/`, compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `src/plugins/rules/`.
 - `packages/strict-lint/` — `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
 - `packages/tsconfig/` — `@williamthorsen/tsconfig`. No build step; ships `tsconfig.base.json`, which extends `@tsconfig/strictest` and adds the Node/build options it omits. The repo root consumes it via the workspace symlink.
-- `eslint.config.js` (repo root) — imports from `packages/typescript/dist/esm/`; depends on a built typescript package.
+- `eslint.config.js` (repo root) — imports `packages/typescript/src/` directly; needs no build.
 - `.config/nmr.config.ts` — repo-level overrides for the `nmr` script runner.
 - `.config/release-kit.config.ts`, `.config/audit-deps.config.json`, `.config/sync-labels.config.ts` — config for the corresponding tools invoked by GitHub Actions reusable workflows.
 
@@ -23,7 +23,7 @@ This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamtho
 ```bash
 nmr ci                # Build all packages, then run check:strict (matches GitHub Actions)
 nmr check             # typecheck + format check + lint check + tests
-nmr check:strict      # check + coverage + audit + strict-lint
+nmr check:strict      # typecheck + format check + strict-lint + coverage + agent-file check
 nmr build             # Build all packages (or the current package from a workspace dir)
 nmr lint              # eslint --fix; lint:check is the non-mutating variant
 nmr lint:strict       # Run strict-lint over the codebase
@@ -36,8 +36,8 @@ Releases are triggered via the **Release** GitHub Actions workflow (`workflow_di
 ## Architecture
 
 - **Flat ESLint config (ESLint 9+) everywhere.** Both consumer-facing packages export arrays compatible with the flat-config format. Selective subpath imports are supported on the typescript package (`@williamthorsen/eslint-config-typescript/configs`, `/plugins`, etc.).
-- **The repo's own lint depends on the typescript package's compiled output.** Root `eslint.config.js` imports `packages/typescript/dist/esm/index.js` and `.../ignores/index.js`. Build before lint on a clean checkout.
-- **strict-lint runs from source in dev.** Its bin is not linked into `node_modules/.bin/` until built, so `.config/nmr.config.ts` maps the `strict-lint` binary to its source entry point via nmr's `devBin`; scripts everywhere name the bare binary, and nmr rewrites it to `tsx packages/strict-lint/src/bin/strict-lint.ts` in every context.
+- **The repo consumes its own config from source.** Root `eslint.config.js` imports `packages/typescript/src/index.ts` and `.../ignores/index.ts`, which Node loads through native type stripping. No local task needs a build; `nmr build` exists because Node refuses to strip types under `node_modules`, so published packages must ship compiled `dist/`.
+- **strict-lint runs from source in dev.** Its committed `bin/strict-lint.js` shim is linked at install but resolves `dist/`, so it fails until the package is built. `.config/nmr.config.ts` maps the `strict-lint` binary to `node packages/strict-lint/src/bin/strict-lint.ts` via nmr's `devBin`; scripts everywhere name the bare binary, and nmr rewrites it in every context. Plain `node` rather than a transpiler is deliberate — it exercises the native type stripping the published CLI relies on.
 - **Custom ESLint rules** in `packages/typescript/src/plugins/rules/`: `memoized-functions-returned-by-hook`, `no-undefined-with-number`, `no-unused-map`, `prefer-function-declaration`.
 - **Hooks:** `lefthook` runs prettier on staged files pre-commit (see `lefthook.yml`).
 
@@ -60,7 +60,7 @@ Full reference: `docs/versioning-and-changelog.md`.
 
 ## Gotchas
 
-- **`nmr lint`/`nmr check` will fail on a clean checkout** until `packages/typescript` is built. The root eslint config imports from its `dist/`. `nmr ci` deliberately runs `build` before `check:strict` for the same reason.
+- **`nmr build` is a publishing step, not a prerequisite.** Lint, typecheck, and tests all read `src`. `nmr ci` still runs `build` first so publish-path breakage surfaces early, and its `nmr` override exists to drop the `audit` step that `audit.yaml` runs separately.
 - **The `basic` package has no build step** (`build` and `test` scripts are no-ops). Edits to `index.mjs` or `rules/*.mjs` take effect immediately.
 - **Publishing targets differ by package.** `basic` publishes to GitHub Packages (restricted scope `@williamthorsen`); `typescript`, `strict-lint`, and `tsconfig` publish to public npm. Tags, tokens, and audiences are not interchangeable.
 - **Don't push release tags manually.** The `Release` workflow is the source of truth; manual tags can desync versions and CHANGELOGs from the actual commit history release-kit analyzes.
