@@ -47,7 +47,7 @@ export default [
 After (v6):
 
 ```js
-// eslint.config.js
+// eslint.config.ts
 import tsConfig from '@williamthorsen/eslint-config-typescript';
 
 export default [

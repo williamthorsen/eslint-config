@@ -19,10 +19,9 @@ This repo uses [pnpm](https://pnpm.io/) and Node.js. Versions are pinned via `pa
 
 ```shell
 pnpm install
-pnpm exec nmr build    # required on a clean checkout — see "Gotchas" below
 ```
 
-The build step is required because the root `eslint.config.js` imports from `packages/typescript/dist/esm/`. After the first build, `nmr ci` keeps things in order automatically.
+The root `eslint.config.ts` imports `packages/typescript/src` directly. `nmr build` serves publishing: it emits the `dist/` that consumers resolve through `node_modules`.
 
 ## Scripts
 
@@ -34,14 +33,12 @@ Run from the repo root to fan out across all workspaces, or from a workspace dir
 nmr ci                # build + check:strict (mirrors GitHub Actions)
 nmr build             # build all packages (or current package from a workspace dir)
 nmr check             # typecheck + format check + lint check + tests
-nmr check:strict      # check + coverage + audit + strict-lint
+nmr check:strict      # typecheck + format check + strict-lint + coverage + agent-file check
 nmr lint              # eslint --fix
 nmr lint:check        # eslint without fix
 nmr lint:strict       # strict-lint
 nmr test              # vitest
 nmr test:coverage     # vitest with coverage
-nmr outdated          # compatible-range dependency check
-nmr outdated:latest   # latest-version dependency check
 ```
 
 `nmr` is context-aware: the same command runs different scripts depending on whether you're in the repo root or a workspace directory. See the [nmr README](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/nmr#readme) for the full command reference.
@@ -64,20 +61,8 @@ Publishing targets differ by package:
 | `@williamthorsen/strict-lint`              | npm             | public     |
 | `@williamthorsen/tsconfig`                 | npm             | public     |
 
-## Commit conventions
-
-Commit titles follow the format `[{scope}|{type}: ]{title}`, rendered by `describe-change.sh`:
-
-- **Scopes:** `basic`, `root`, `strict-lint`, `ts`, `tsconfig`, or `*` for changes spanning multiple workspaces.
-- **Types:** see the work-types table in [`docs/versioning-and-changelog.md`](docs/versioning-and-changelog.md). Append `!` for breaking changes (e.g., `feat!`); `drop` always carries it.
-- **`deps` is always its own commit.** release-kit categorizes the changelog by type — mixed commits land in the wrong section.
-
-Full reference: [`docs/versioning-and-changelog.md`](docs/versioning-and-changelog.md).
-
 ## Gotchas
 
-- **`nmr lint` and `nmr check` fail on a clean checkout** until `packages/typescript` is built. The root `eslint.config.js` imports from its `dist/`. Run `nmr build` first, or use `nmr ci`, which builds before checking.
-- **The `basic` package has no build step.** `build` and `test` are no-ops — edits to `index.mjs` and `rules/*.mjs` take effect immediately.
 - **Root-level Vitest excludes `packages/**`.** Each package owns its own test config; `nmr root:test` runs only root-level tests.
 
 ## License

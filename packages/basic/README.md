@@ -14,7 +14,7 @@ Requires ESLint 9 or higher (flat config).
 
 ## Quick start
 
-Add the config to `eslint.config.js`:
+Add the config to `eslint.config.ts`:
 
 ```js
 import basicConfig from '@williamthorsen/eslint-config-basic';
