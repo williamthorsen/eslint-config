@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.1.0 — 2026-07-26
+
+### ⚙️ Tooling
+
+- Consume TypeScript config from source (#121)
+
+  Simplifies the repo's own ESLint configuration and migrates the configuration to TypeScript. Tooling no longer depends on a build step; `nmr build` now serves publishing alone. The `strict-lint` command runs its compiled entry point directly instead of a committed launcher. `tsx` is no longer a dependency.
+
 ## 8.0.0 — 2026-07-24
 
 ### 🎉 Features

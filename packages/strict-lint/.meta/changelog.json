@@ -1,5 +1,22 @@
 [
   {
+    "version": "9.0.1",
+    "date": "2026-07-26",
+    "sections": [
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Consume TypeScript config from source (#121)",
+            "body": "Simplifies the repo's own ESLint configuration and migrates the configuration to TypeScript. Tooling no longer depends on a build step; `nmr build` now serves publishing alone. The `strict-lint` command runs its compiled entry point directly instead of a committed launcher. `tsx` is no longer a dependency.",
+            "hash": "544838248f83ff41565fbd35ed45ddbdb68cc6d2"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "9.0.0",
     "date": "2026-07-24",
     "sections": [
