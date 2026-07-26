@@ -22,6 +22,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/explicit-length-check': 'warn', // 🔴🟠
   'unicorn/filename-case': 'off', // 🔴⚫
   'unicorn/import-style': ['warn', { extendDefaultStyles: false }],
+  'unicorn/max-nested-calls': 'off', // 🔴⚫ Overly prescriptive
   'unicorn/name-replacements': 'off', // 🔴⚫ Abbreviations are allowed
   'unicorn/no-array-callback-reference': 'off', // 🔴⚫ Overly prescriptive
   'unicorn/no-array-for-each': 'off', // 🔴⚫
@@ -57,6 +58,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-top-level-await': 'warn', // 🔴🟠
   'unicorn/prefer-type-error': 'warn', // 🔴🟠 Prefer a TypeError when an error is thrown while checking `typeof`
   'unicorn/prevent-abbreviations': 'off', // 🔴⚫
+  'unicorn/require-array-sort-compare': 'off', // 🔴⚫ Disallows cases when the default sort is desired
   'unicorn/switch-case-braces': ['error', 'avoid'], // Avoid braces in switch cases unless scope is needed.
   'unicorn/text-encoding-identifier-case': 'warn', // 🔴🟠
 };

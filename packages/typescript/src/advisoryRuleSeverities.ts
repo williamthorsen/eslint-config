@@ -5,6 +5,7 @@
 export const advisoryRuleSeverities = {
   '@typescript-eslint/no-deprecated': 'warn',
   '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
+
   'unicorn/consistent-function-scoping': 'warn',
   'unicorn/no-array-reduce': 'warn',
   'unicorn/no-lonely-if': 'warn',
