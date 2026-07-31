@@ -2,26 +2,10 @@
   "$schema": "https://github.com/williamthorsen/node-monorepo-tools/raw/audit-deps-v0.6.0/packages/audit-deps/schemas/config.json",
   "dev": {
     "severityThreshold": "moderate",
-    "allowlist": [
-      {
-        "addedAt": "2026-07-25T15:01:22.741Z",
-        "id": "1124334",
-        "path": "packages__typescript>eslint-plugin-jsx-a11y>minimatch>brace-expansion",
-        "reason": "Added by v11y sync at 2026-07-25 15:01:22 UTC",
-        "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg"
-      }
-    ]
+    "allowlist": []
   },
   "prod": {
     "severityThreshold": "low",
-    "allowlist": [
-      {
-        "addedAt": "2026-07-25T15:01:23.546Z",
-        "id": "1124334",
-        "path": "packages__typescript>eslint-plugin-import>minimatch>brace-expansion",
-        "reason": "Added by v11y sync at 2026-07-25 15:01:23 UTC",
-        "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg"
-      }
-    ]
+    "allowlist": []
   }
 }

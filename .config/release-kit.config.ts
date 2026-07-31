@@ -1,8 +1,19 @@
-import type { ReleaseKitConfig } from '@williamthorsen/release-kit';
+import { defineConfig } from '@williamthorsen/release-kit';
 
-const config: ReleaseKitConfig = {
+const config = defineConfig({
   releaseNotes: {
     shouldInjectIntoReadme: true,
+  },
+
+  repoLabels: {
+    extends: ['common'],
+    labels: {
+      'scope:root': { color: '00ff96' },
+      'scope:basic': { color: '00ff96' },
+      'scope:strict-lint': { color: '00ff96' },
+      'scope:tsconfig': { color: '00ff96' },
+      'scope:typescript': { color: '00ff96' },
+    },
   },
 
   workspaces: [
@@ -34,6 +45,6 @@ const config: ReleaseKitConfig = {
 
   // Uncomment to add custom work types (merged with defaults):
   // workTypes: { perf: { header: 'Performance' } },
-};
+});
 
 export default config;

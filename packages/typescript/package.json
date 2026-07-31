@@ -62,11 +62,11 @@
     "yaml-eslint-parser": "2.1.0"
   },
   "devDependencies": {
-    "@eslint/config-helpers": "0.6.0",
+    "@eslint/config-helpers": "0.7.0",
     "@next/eslint-plugin-next": "16.2.11",
     "@typescript-eslint/rule-tester": "8.65.0",
     "@typescript-eslint/utils": "8.65.0",
-    "@vitest/eslint-plugin": "1.6.23",
+    "@vitest/eslint-plugin": "1.6.24",
     "eslint-plugin-jest-dom": "5.5.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
