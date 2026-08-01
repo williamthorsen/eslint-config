@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.1.1 — 2026-08-01
+
+### ⚙️ Tooling
+
+- Migrate Vitest configs to the nmr projects model (#126)
+
+  The suite in which a test runs is now determined by filename alone: An `.int.` infix marks an integration test; an `.app.` marks an app test; and anything else under `__tests__` runs as a unit test. Integration tests are again excluded from the default test run and from the standard check, and are instead run by `nmr test:integration`. A new workspace picks up the same rules without a test config.
+
 ## 8.1.0 — 2026-07-26
 
 ### ⚙️ Tooling

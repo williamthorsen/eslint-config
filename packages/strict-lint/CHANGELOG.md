@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 9.1.0 — 2026-08-01
+
+### 🎉 Features
+
+- Accept every ESLint severity as a maxSeverity ceiling (#127)
+
+  The max-severity feature of `strict-lint` now accepts every ESLint severity, instead of only `'warn'` and `'error'`. A rule's severity can also be set to `undefined`, which unsets a value inherited for that rule.
+
+### ⚙️ Tooling
+
+- Migrate Vitest configs to the nmr projects model (#126)
+
+  The suite in which a test runs is now determined by filename alone: An `.int.` infix marks an integration test; an `.app.` marks an app test; and anything else under `__tests__` runs as a unit test. Integration tests are again excluded from the default test run and from the standard check, and are instead run by `nmr test:integration`. A new workspace picks up the same rules without a test config.
+
 ## 9.0.1 — 2026-07-26
 
 ### ⚙️ Tooling

@@ -1,5 +1,33 @@
 [
   {
+    "version": "9.1.0",
+    "date": "2026-08-01",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Accept every ESLint severity as a maxSeverity ceiling (#127)",
+            "body": "The max-severity feature of `strict-lint` now accepts every ESLint severity, instead of only `'warn'` and `'error'`. A rule's severity can also be set to `undefined`, which unsets a value inherited for that rule.",
+            "hash": "ffaa4e062160ced13bf9453dff202c7ad06432f3"
+          }
+        ]
+      },
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Migrate Vitest configs to the nmr projects model (#126)",
+            "body": "The suite in which a test runs is now determined by filename alone: An `.int.` infix marks an integration test; an `.app.` marks an app test; and anything else under `__tests__` runs as a unit test. Integration tests are again excluded from the default test run and from the standard check, and are instead run by `nmr test:integration`. A new workspace picks up the same rules without a test config.",
+            "hash": "d6f8e243f262c2a7524715ecfe008422fcbfb1a3"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "9.0.1",
     "date": "2026-07-26",
     "sections": [

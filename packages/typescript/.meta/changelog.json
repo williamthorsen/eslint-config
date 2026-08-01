@@ -1,5 +1,22 @@
 [
   {
+    "version": "8.1.1",
+    "date": "2026-08-01",
+    "sections": [
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Migrate Vitest configs to the nmr projects model (#126)",
+            "body": "The suite in which a test runs is now determined by filename alone: An `.int.` infix marks an integration test; an `.app.` marks an app test; and anything else under `__tests__` runs as a unit test. Integration tests are again excluded from the default test run and from the standard check, and are instead run by `nmr test:integration`. A new workspace picks up the same rules without a test config.",
+            "hash": "d6f8e243f262c2a7524715ecfe008422fcbfb1a3"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "8.1.0",
     "date": "2026-07-26",
     "sections": [
