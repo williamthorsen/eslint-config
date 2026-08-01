@@ -43,7 +43,9 @@ describe('createConfig composability with defineConfig', () => {
 // Pin that the plugin's rules actually reach the linter through both composition forms — the
 // fatal-error check above passes even for a composition that dropped them.
 describe('createConfig.next carries the plugin rules', () => {
-  it.each(['direct argument', 'extends'])(`applies a @next/next rule when composed via %s`, async (form) => {
+  // `as const` keeps `form` a literal union, so a typo in the comparison below is a compile error rather than a
+  // silent fall-through that runs the same composition form twice.
+  it.each(['direct argument', 'extends'] as const)(`applies a @next/next rule when composed via %s`, async (form) => {
     const next = await createConfig.next();
     const composed =
       form === 'extends' ? defineConfig(fixtureWiring, { extends: next }) : defineConfig(fixtureWiring, ...next);
