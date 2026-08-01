@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.1 — 2026-08-01
+
+### 🐛 Bug fixes
+
+- Inline @tsconfig/strictest instead of extending it (#129)
+
+  Fixes an issue where, under pnpm, tools that resolve tsconfig files without following symlinks failed to find `@tsconfig/strictest`, breaking lint runs and builds in projects that declare only `@williamthorsen/tsconfig`. Consuming projects no longer need to add `@tsconfig/strictest` to their own `package.json` as a workaround.
+
 ## 0.1.0 — 2026-07-23
 
 ### 🎉 Features
