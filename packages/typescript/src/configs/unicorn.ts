@@ -38,7 +38,16 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-process-exit': 'off', // 🔴⚫ Needed in CLI tools and scripts
   'unicorn/no-useless-undefined': 'warn', // 🔴🟠
   'unicorn/number-literal-case': ['warn', { hexadecimalValue: 'lowercase' }], // to align with Prettier
-  'unicorn/numeric-separators-style': 'warn', // 🔴🟠
+  'unicorn/numeric-separators-style': [
+    'warn',
+    {
+      onlyIfContainsSeparator: false,
+      hexadecimal: { minimumDigits: 0, groupLength: 4 },
+      binary: { minimumDigits: 0, groupLength: 4 },
+      octal: { minimumDigits: 0, groupLength: 4 },
+      number: { minimumDigits: 5, groupLength: 3, fractionGroupLength: Infinity },
+    },
+  ], // 🔴🟠
   'unicorn/prefer-global-this': 'warn', // 🔴🟠
   'unicorn/prefer-default-parameters': 'off', // 🔴⚫ Incorrectly handles `null`
   'unicorn/prefer-dom-node-text-content': 'warn', // 🔴🟠 Prefer `textContent` over `innerText`

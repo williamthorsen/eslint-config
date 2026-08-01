@@ -20,9 +20,7 @@ async function createConfig(): Promise<Config[]> {
 
   return defineConfig({
     extends: [vitestPlugin.configs.all],
-    rules: {
-      ...modifiedStrictRules,
-    },
+    rules: modifiedStrictRules,
     settings: {
       vitest: {
         typecheck: true,
