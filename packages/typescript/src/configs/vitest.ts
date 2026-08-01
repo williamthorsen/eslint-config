@@ -10,6 +10,7 @@ const modifiedStrictRules: Linter.RulesRecord = {
   'vitest/prefer-called-once': 'off', // conflicts with `vitest/prefer-called-times`
   'vitest/prefer-called-with': 'off', // fixer is defective
   'vitest/prefer-expect-assertions': 'off', // 🟠⚫
+  'vitest/prefer-import-in-mock': 'off', // 🟠⚫ fixer is defective
   'vitest/prefer-importing-vitest-globals': 'off', // 🟠⚫ falsely flags imported functions
   'vitest/prefer-lowercase-title': 'off', // 🟠⚫
 };
