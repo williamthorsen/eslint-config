@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import { afterAll, describe, it } from 'vitest';
 
@@ -11,3 +13,18 @@ RuleTester.it = it;
 
 // eslint-disable-next-line unicorn/prefer-export-from -- re-export follows the static-hook wiring above
 export { RuleTester };
+
+// Builds a tester for type-aware rules, which need a TS program. `allowDefaultProject` type-checks the
+// inline code against the fixture `tsconfig.json`.
+export function createTypedRuleTester(): RuleTester {
+  return new RuleTester({
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['*.ts*'],
+        },
+        tsconfigRootDir: path.join(import.meta.dirname, '../../../../__fixtures__/rules'),
+      },
+    },
+  });
+}

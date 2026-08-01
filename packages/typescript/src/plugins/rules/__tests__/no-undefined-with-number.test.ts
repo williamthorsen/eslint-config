@@ -1,21 +1,8 @@
-import path from 'node:path';
-
 import rule from '../no-undefined-with-number.ts';
-import { RuleTester } from './ruleTester.ts';
+import { createTypedRuleTester } from './ruleTester.ts';
 
-// This rule is type-aware (it consults the TS type checker), so the tester needs a
-// TS program. `projectService` with `allowDefaultProject` type-checks the inline
-// code against the fixtures `tsconfig.json`.
-const ruleTester = new RuleTester({
-  languageOptions: {
-    parserOptions: {
-      projectService: {
-        allowDefaultProject: ['*.ts*'],
-      },
-      tsconfigRootDir: path.join(import.meta.dirname, '../../../../__fixtures__/rules'),
-    },
-  },
-});
+// This rule is type-aware, so it needs the tester backed by a TS program.
+const ruleTester = createTypedRuleTester();
 
 ruleTester.run('no-undefined-with-number', rule, {
   valid: [

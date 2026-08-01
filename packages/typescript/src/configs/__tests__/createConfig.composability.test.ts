@@ -10,23 +10,35 @@ import { factoryCases, fixtureWiring, lintFixture } from './helpers.ts';
 // Every composition below passes a factory result to `defineConfig()` with no type assertion. A
 // factory that regressed to a typescript-eslint-typed return would fail to compile here, which is
 // the type-level half of the contract; the runtime lint is the other half.
+// The first case absorbs the cost of loading its plugin and building the TS program, which on a cold
+// module cache runs to ~9s — well past Vitest's 5s default.
+const COLD_START_TIMEOUT_MS = 20_000;
+
 describe('createConfig composability with defineConfig', () => {
   for (const { name, load, fixture } of factoryCases) {
-    it(`${name}: composes as a direct defineConfig() argument and lints the fixture`, async () => {
-      const composed = defineConfig(fixtureWiring, ...(await load()));
+    it(
+      `${name}: composes as a direct defineConfig() argument and lints the fixture`,
+      async () => {
+        const composed = defineConfig(fixtureWiring, ...(await load()));
 
-      const results = await lintFixture(composed, fixture);
+        const results = await lintFixture(composed, fixture);
 
-      expect(results[0]?.fatalErrorCount).toBe(0);
-    });
+        expect(results[0]?.fatalErrorCount).toBe(0);
+      },
+      COLD_START_TIMEOUT_MS,
+    );
 
-    it(`${name}: composes through defineConfig()'s extends and lints the fixture`, async () => {
-      const composed = defineConfig(fixtureWiring, { extends: await load() });
+    it(
+      `${name}: composes through defineConfig()'s extends and lints the fixture`,
+      async () => {
+        const composed = defineConfig(fixtureWiring, { extends: await load() });
 
-      const results = await lintFixture(composed, fixture);
+        const results = await lintFixture(composed, fixture);
 
-      expect(results[0]?.fatalErrorCount).toBe(0);
-    });
+        expect(results[0]?.fatalErrorCount).toBe(0);
+      },
+      COLD_START_TIMEOUT_MS,
+    );
   }
 });
 
