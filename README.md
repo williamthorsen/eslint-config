@@ -30,15 +30,16 @@ This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamtho
 Run from the repo root to fan out across all workspaces, or from a workspace directory to target that package only.
 
 ```shell
-nmr ci            # build + check:strict (mirrors GitHub Actions)
-nmr build         # build all packages (or current package from a workspace dir)
-nmr check         # typecheck + format check + lint check + tests
-nmr check:strict  # typecheck + format check + strict-lint + coverage + agent-file check
-nmr lint          # eslint --fix
-nmr lint:check    # eslint without fix
-nmr lint:strict   # strict-lint
-nmr test          # vitest
-nmr test:coverage # vitest with coverage
+nmr ci               # build + check:strict (mirrors GitHub Actions)
+nmr build            # build all packages (or current package from a workspace dir)
+nmr check            # typecheck + format check + lint check + tests
+nmr check:strict     # typecheck + format check + strict-lint + coverage + agent-file check
+nmr lint             # eslint --fix
+nmr lint:check       # eslint without fix
+nmr lint:strict      # strict-lint
+nmr test             # vitest, excluding integration tests
+nmr test:integration # vitest, integration tests alone (not run by ci)
+nmr test:coverage    # vitest with coverage, excluding integration tests
 ```
 
 `nmr` is context-aware: the same command runs different scripts depending on whether you're in the repo root or a workspace directory. See the [nmr README](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/nmr#readme) for the full command reference.
