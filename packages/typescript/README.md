@@ -110,10 +110,21 @@ export default defineConfig(
   ...(await createConfig.react()),
   ...(await createConfig.jsxA11y()),
   ...(await createConfig.next()),
-  ...(await createConfig.vitest()),
-  ...(await createConfig.reactTestingLibrary()),
 );
 ```
+
+Scope the test-oriented factories to your test files rather than spreading them across the whole project. Applied to ordinary source, `vitest/require-hook` reports on every top-level statement:
+
+```js
+import { patterns } from '@williamthorsen/eslint-config-typescript';
+
+export default defineConfig(config, {
+  files: patterns.testFiles,
+  extends: [await createConfig.vitest(), await createConfig.reactTestingLibrary()],
+});
+```
+
+`createConfig.vitest()` includes `vitest/unbound-method`, which is type-aware: apply it only to files a type-aware parser handles, or ESLint throws when the rule loads.
 
 | Method                               | Loads                                              |
 | ------------------------------------ | -------------------------------------------------- |
