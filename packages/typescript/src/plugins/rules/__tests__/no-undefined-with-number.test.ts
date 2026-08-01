@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import rule from '../no-undefined-with-number.ts';
 import { RuleTester } from './ruleTester.ts';
 
@@ -10,7 +12,7 @@ const ruleTester = new RuleTester({
       projectService: {
         allowDefaultProject: ['*.ts*'],
       },
-      tsconfigRootDir: import.meta.dirname + '/fixtures',
+      tsconfigRootDir: path.join(import.meta.dirname, '../../../../__fixtures__/rules'),
     },
   },
 });

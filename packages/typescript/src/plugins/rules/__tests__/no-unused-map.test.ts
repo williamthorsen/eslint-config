@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import { Linter } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
@@ -13,7 +15,7 @@ const typedRuleTester = new RuleTester({
       projectService: {
         allowDefaultProject: ['*.ts*'],
       },
-      tsconfigRootDir: import.meta.dirname + '/fixtures',
+      tsconfigRootDir: path.join(import.meta.dirname, '../../../../__fixtures__/rules'),
     },
   },
 });
