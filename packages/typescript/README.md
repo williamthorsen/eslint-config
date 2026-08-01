@@ -161,14 +161,15 @@ export default defineConfig({
 });
 ```
 
-| Constant                        | Value                       |
-| ------------------------------- | --------------------------- |
-| `patterns.javaScriptFiles`      | `['**/*.{js,cjs,mjs,jsx}']` |
-| `patterns.typeScriptFiles`      | `['**/*.{ts,cts,mts,tsx}']` |
-| `patterns.codeFiles`            | both of the above           |
-| `patterns.javaScriptExtensions` | `['{js,cjs,mjs,jsx}']`      |
-| `patterns.typeScriptExtensions` | `['{ts,cts,mts,tsx}']`      |
-| `patterns.codeExtensions`       | both                        |
+| Constant                        | Value                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| `patterns.javaScriptFiles`      | `['**/*.{js,cjs,mjs,jsx}']`                                                  |
+| `patterns.typeScriptFiles`      | `['**/*.{ts,cts,mts,tsx}']`                                                  |
+| `patterns.codeFiles`            | both of the above                                                            |
+| `patterns.testFiles`            | `['**/*.{spec,test}.{js,cjs,mjs,jsx}', '**/*.{spec,test}.{ts,cts,mts,tsx}']` |
+| `patterns.javaScriptExtensions` | `['{js,cjs,mjs,jsx}']`                                                       |
+| `patterns.typeScriptExtensions` | `['{ts,cts,mts,tsx}']`                                                       |
+| `patterns.codeExtensions`       | both                                                                         |
 
 ## Advisory rule severities
 

@@ -10,6 +10,7 @@ const codeExtensions = [...javaScriptExtensions, ...typeScriptExtensions];
 const javaScriptFiles = javaScriptExtensions.map((ext) => `**/*.${ext}`);
 const typeScriptFiles = typeScriptExtensions.map((ext) => `**/*.${ext}`);
 const codeFiles = codeExtensions.map((ext) => `**/*.${ext}`);
+const testFiles = codeExtensions.map((ext) => `**/*.{spec,test}.${ext}`);
 
 const config: Config[] = [
   ...defineConfig({
@@ -49,7 +50,7 @@ const config: Config[] = [
   },
   // Test files
   {
-    files: codeExtensions.map((ext) => `**/*.{spec,test}.${ext}`),
+    files: testFiles,
     rules: {
       '@typescript-eslint/no-confusing-void-expression': 'off',
       '@typescript-eslint/no-empty-function': 'off',
@@ -74,6 +75,7 @@ const patterns = {
   codeFiles,
   javaScriptExtensions,
   javaScriptFiles,
+  testFiles,
   typeScriptExtensions,
   typeScriptFiles,
 };
