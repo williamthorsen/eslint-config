@@ -12,6 +12,6 @@ describe('advisoryRuleSeverities', () => {
 
     const unconfigured = Object.keys(advisoryRuleSeverities).filter((rule) => !configured.has(rule));
 
-    expect(unconfigured).toEqual([]);
+    expect(unconfigured).toStrictEqual([]);
   });
 });

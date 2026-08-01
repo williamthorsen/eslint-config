@@ -41,7 +41,7 @@ describe(loadStrictLintConfigs, () => {
 
     const { entries } = await loadStrictLintConfigs('/project/packages/pkg');
 
-    expect(entries).toEqual([
+    expect(entries).toStrictEqual([
       {
         config: { maxSeverity: { 'nearer-rule': 'warn' } },
         dir: '/project/packages/pkg',
@@ -56,7 +56,7 @@ describe(loadStrictLintConfigs, () => {
 
     const { entries } = await loadStrictLintConfigs('/project/packages/pkg');
 
-    expect(entries).toEqual([]);
+    expect(entries).toStrictEqual([]);
   });
 
   it('passes the cascade provenance through to the caller', async () => {
@@ -64,7 +64,7 @@ describe(loadStrictLintConfigs, () => {
 
     const { projectRoot, stopReason } = await loadStrictLintConfigs('/project');
 
-    expect(projectRoot).toEqual(PROJECT_ROOT);
+    expect(projectRoot).toStrictEqual(PROJECT_ROOT);
     expect(stopReason).toBe('predicate');
   });
 
@@ -137,7 +137,7 @@ describe(loadStrictLintConfigs, () => {
 
       const { entries } = await loadStrictLintConfigs('/project');
 
-      expect(entries).toEqual([{ config: {}, dir: '/project', filePath: configPathIn('/project') }]);
+      expect(entries).toStrictEqual([{ config: {}, dir: '/project', filePath: configPathIn('/project') }]);
     });
 
     it.each(['off', 'warn', 'error', 0, 1, 2, undefined])('accepts the maxSeverity value %o', async (severity) => {
@@ -146,7 +146,7 @@ describe(loadStrictLintConfigs, () => {
 
       const { entries } = await loadStrictLintConfigs('/project');
 
-      expect(entries).toEqual([{ config, dir: '/project', filePath: configPathIn('/project') }]);
+      expect(entries).toStrictEqual([{ config, dir: '/project', filePath: configPathIn('/project') }]);
     });
 
     it('rejects when a farther config is malformed and the nearest one is valid', async () => {

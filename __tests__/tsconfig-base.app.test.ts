@@ -43,7 +43,7 @@ describe('@williamthorsen/tsconfig base config', () => {
 
   it('supplies the Node and build options strictest omits', () => {
     expect(options.allowImportingTsExtensions).toBe(true);
-    expect(options.lib).toEqual([lib('ES2025')]);
+    expect(options.lib).toStrictEqual([lib('ES2025')]);
     expect(options.module).toBe(ts.ModuleKind.NodeNext);
     expect(options.moduleDetection).toBe(ts.ModuleDetectionKind.Force);
     expect(options.noEmit).toBe(true);
@@ -52,8 +52,8 @@ describe('@williamthorsen/tsconfig base config', () => {
   });
 
   it('resolves the consumer-owned keys the root declares', () => {
-    expect(options.types).toEqual(['node']);
-    expect(options.paths).toEqual({ '~/*': ['./*'] });
+    expect(options.types).toStrictEqual(['node']);
+    expect(options.paths).toStrictEqual({ '~/*': ['./*'] });
     expect(options.jsx).toBe(ts.JsxEmit.ReactJSX);
   });
 
@@ -61,7 +61,7 @@ describe('@williamthorsen/tsconfig base config', () => {
     // Merged options can't show which config declared a key, so read the base directly.
     const declared = Object.keys(readBaseCompilerOptions());
 
-    expect(declared.filter((key) => consumerOwnedKeys.has(key))).toEqual([]);
+    expect(declared.filter((key) => consumerOwnedKeys.has(key))).toStrictEqual([]);
   });
 
   it('anchors path aliases to the consumer, not to itself', () => {
@@ -84,7 +84,7 @@ describe('@williamthorsen/tsconfig base config', () => {
       .filter(([key, value]) => JSON.stringify(declared[key]) !== JSON.stringify(value))
       .map(([key, value]) => `${key}: expected ${JSON.stringify(value)}, found ${JSON.stringify(declared[key])}`);
 
-    expect(mismatched).toEqual([]);
+    expect(mismatched).toStrictEqual([]);
   });
 
   it('declares nothing beyond @tsconfig/strictest but the Node layer', () => {
@@ -93,7 +93,7 @@ describe('@williamthorsen/tsconfig base config', () => {
     const upstreamKeys = new Set(Object.keys(readUpstreamCompilerOptions()));
     const beyondUpstream = Object.keys(readBaseCompilerOptions()).filter((key) => !upstreamKeys.has(key));
 
-    expect(beyondUpstream.toSorted()).toEqual(nodeLayerKeys.toSorted());
+    expect(beyondUpstream.toSorted()).toStrictEqual(nodeLayerKeys.toSorted());
   });
 });
 
@@ -134,7 +134,7 @@ function readUpstreamCompilerOptions(): Record<string, unknown> {
 }
 
 function readConfig(configPath: string): z.infer<typeof configSchema> {
-  const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile);
+  const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile.bind(ts.sys));
 
   if (error) throw new Error(ts.flattenDiagnosticMessageText(error.messageText, '\n'));
 

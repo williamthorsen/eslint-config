@@ -20,19 +20,17 @@ const typedParserSettings: Config = {
 const COLD_START_TIMEOUT_MS = 20_000;
 
 describe('createConfig preset load smoke tests', () => {
-  for (const { name, load, fixture } of factoryCases) {
-    it(
-      `${name}: composes with the base config and lints without a rule-load error`,
-      async () => {
-        const results = await lintFixture([...baseConfig, ...(await load()), typedParserSettings], fixture);
+  it.each(factoryCases)(
+    `$name: composes with the base config and lints without a rule-load error`,
+    async ({ load, fixture }) => {
+      const results = await lintFixture([...baseConfig, ...(await load()), typedParserSettings], fixture);
 
-        // A rule that fails to instantiate (e.g. a removed ESLint 10 API) throws out of
-        // `lintText`; a parser failure surfaces as a fatal message. Assert neither occurs.
-        expect(results[0]?.fatalErrorCount).toBe(0);
-      },
-      COLD_START_TIMEOUT_MS,
-    );
-  }
+      // A rule that fails to instantiate (e.g. a removed ESLint 10 API) throws out of
+      // `lintText`; a parser failure surfaces as a fatal message. Assert neither occurs.
+      expect(results[0]?.fatalErrorCount).toBe(0);
+    },
+    COLD_START_TIMEOUT_MS,
+  );
 });
 
 // `Config`'s `parserOptions` is typed as `{}`, so read `projectService` through an
