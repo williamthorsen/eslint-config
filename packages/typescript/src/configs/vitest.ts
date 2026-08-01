@@ -8,6 +8,7 @@ const modifiedStrictRules: Linter.RulesRecord = {
   'vitest/padding-around-all': 'off', // 🟠⚫
   'vitest/padding-around-expect-groups': 'off', // 🟠⚫
   'vitest/prefer-called-once': 'off', // conflicts with `vitest/prefer-called-times`
+  'vitest/prefer-called-with': 'off', // fixer is defective
   'vitest/prefer-expect-assertions': 'off', // 🟠⚫
   'vitest/prefer-importing-vitest-globals': 'off', // 🟠⚫ falsely flags imported functions
   'vitest/prefer-lowercase-title': 'off', // 🟠⚫
