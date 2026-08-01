@@ -105,7 +105,7 @@ async function doLint(
   return { text, errorCount };
 }
 
-/** Reports where the allowlist came from, on stderr, so it stays clear of the formatter output. */
+/** Reports where the ceilings came from, on stderr, so it stays clear of the formatter output. */
 function reportConfigProvenance(cascade: ConfigCascade<StrictLintConfig>): void {
   const { entries, projectRoot, stopReason } = cascade;
 
@@ -133,7 +133,7 @@ function describeRootSource({ marker, source }: ProjectRoot): string {
   return source === 'package-json' ? 'nearest package.json' : 'no project marker; using the start directory';
 }
 
-/** Merges the collected allowlists farthest level first, so a nearer config wins per rule. */
+/** Merges the collected ceilings farthest level first, so a nearer config wins per rule. */
 function mergeMaxSeverity(entries: ReadonlyArray<ConfigEntry<StrictLintConfig>>): MaxSeverityMap {
   const merged: MaxSeverityMap = {};
   for (const entry of entries.toReversed()) {

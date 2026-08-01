@@ -107,9 +107,19 @@ describe(loadStrictLintConfigs, () => {
         message: `Expected maxSeverity in "${configPathIn('/project')}" to be an object`,
       },
       {
-        name: 'a maxSeverity value is neither "warn" nor "error"',
+        name: 'a maxSeverity value is not a rule severity',
         config: { maxSeverity: { 'some-rule': 'invalid' } },
-        message: `Expected maxSeverity["some-rule"] in "${configPathIn('/project')}" to be "warn" or "error", got "invalid"`,
+        message: `Expected maxSeverity["some-rule"] in "${configPathIn('/project')}" to be a rule severity ("off", "warn", "error", 0, 1, or 2), got "invalid"`,
+      },
+      {
+        name: 'a maxSeverity value is a severity-adjacent number outside the vocabulary',
+        config: { maxSeverity: { 'some-rule': 3 } },
+        message: `Expected maxSeverity["some-rule"] in "${configPathIn('/project')}" to be a rule severity ("off", "warn", "error", 0, 1, or 2), got "3"`,
+      },
+      {
+        name: 'a maxSeverity value is an object',
+        config: { maxSeverity: { 'some-rule': { max: 'warn' } } },
+        message: `Expected maxSeverity["some-rule"] in "${configPathIn('/project')}" to be a rule severity ("off", "warn", "error", 0, 1, or 2), got "{"max":"warn"}"`,
       },
       {
         name: 'shouldIgnoreAncestors is not a boolean',
@@ -128,6 +138,15 @@ describe(loadStrictLintConfigs, () => {
       const { entries } = await loadStrictLintConfigs('/project');
 
       expect(entries).toEqual([{ config: {}, dir: '/project', filePath: configPathIn('/project') }]);
+    });
+
+    it.each(['off', 'warn', 'error', 0, 1, 2, undefined])('accepts the maxSeverity value %o', async (severity) => {
+      const config = { maxSeverity: { 'some-rule': severity } };
+      withCascadeEntries([['/project', config]]);
+
+      const { entries } = await loadStrictLintConfigs('/project');
+
+      expect(entries).toEqual([{ config, dir: '/project', filePath: configPathIn('/project') }]);
     });
 
     it('rejects when a farther config is malformed and the nearest one is valid', async () => {

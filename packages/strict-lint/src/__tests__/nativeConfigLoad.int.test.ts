@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
-// Exercises the real production path: a plain `node` subprocess runs the CLI source with native type stripping.
+// Exercises the real production path: A plain `node` subprocess runs the CLI source with native type stripping.
 // Vitest transforms TypeScript through its own pipeline, so it cannot reproduce Node's native loading,
 // native-syntax failures, or the absence of jiti in-process.
 
@@ -60,13 +60,13 @@ describe('native config loading (subprocess)', () => {
     const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
 
     expect(status).toBe(0);
-    // The root config allowlists the rule, so the violation stays a warning instead of being promoted.
+    // The root config caps the rule below error, so the violation stays a warning instead of being promoted.
     expect(stdout).toMatch(/warning\s+.*no-unused-vars/);
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
   it('applies a package-level strict-lint config when the ESLint config lives at the root', () => {
-    const dir = makePackageAllowlistFixture();
+    const dir = makePackageCeilingFixture();
 
     const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
 
@@ -75,11 +75,11 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('ignores a strict-lint config below the directory the run starts in', () => {
-    const dir = makePackageAllowlistFixture();
+    const dir = makePackageCeilingFixture();
 
     const { status, stdout } = runCli(dir, ['packages/pkg/a.js']);
 
-    // Config selection follows the working directory, so linting the package's own file does not reach its allowlist.
+    // Config selection follows the working directory, so linting the package's own file does not reach its ceilings.
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 0 warnings');
   }, 30_000);
@@ -160,8 +160,8 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 });
 
-/** A monorepo tree whose only ESLint config sits at the root and whose only allowlist sits inside the package. */
-function makePackageAllowlistFixture(): string {
+/** A monorepo tree whose only ESLint config sits at the root and whose only ceiling sits inside the package. */
+function makePackageCeilingFixture(): string {
   return makeFixture({
     'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
     'packages/pkg/.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",

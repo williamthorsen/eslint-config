@@ -1,6 +1,12 @@
 import type { Linter } from 'eslint';
 
-export type MaxSeverityMap = Record<string, 'error' | 'warn'>;
+/**
+ * Per-rule ceilings on how high strict-lint promotes a severity. A ceiling below `error` exempts its rule from
+ * promotion; `undefined` imposes no ceiling, exactly as an absent key does. The value type is ESLint's own severity
+ * type, so one map of bare severities serves as a flat-config `rules` value and as a ceiling map alike. Rule entries
+ * carrying options are not ceilings.
+ */
+export type MaxSeverityMap = Record<string, Linter.RuleSeverity | undefined>;
 
 export interface StrictLintConfig {
   maxSeverity?: MaxSeverityMap;
