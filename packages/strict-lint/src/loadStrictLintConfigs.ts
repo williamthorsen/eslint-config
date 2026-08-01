@@ -1,6 +1,7 @@
 import { type ConfigCascade, loadConfigCascade } from '@williamthorsen/toolbelt.filesystem';
 
 import { wrapNativeTsError } from './common/importConfigModule.ts';
+import { formatRuleSeverities, isRuleSeverity } from './common/severity.ts';
 import type { StrictLintConfig } from './types.ts';
 
 /** The config file strict-lint looks for, relative to each directory level of the walk. */
@@ -59,9 +60,11 @@ function assertIsStrictLintConfig(config: unknown, filePath: string): asserts co
       throw new TypeError(`Expected maxSeverity in "${filePath}" to be an object`);
     }
     for (const [rule, severity] of Object.entries(maxSeverity)) {
-      if (severity !== 'warn' && severity !== 'error') {
+      // An explicit `undefined` reads as "no ceiling", exactly as an absent key does, so it never reaches the guard.
+      if (severity !== undefined && !isRuleSeverity(severity)) {
+        const expectation = `to be a rule severity (${formatRuleSeverities()})`;
         throw new TypeError(
-          `Expected maxSeverity["${rule}"] in "${filePath}" to be "warn" or "error", got "${String(severity)}"`,
+          `Expected maxSeverity["${rule}"] in "${filePath}" ${expectation}, got "${describeValue(severity)}"`,
         );
       }
     }
@@ -74,6 +77,14 @@ function assertIsStrictLintConfig(config: unknown, filePath: string): asserts co
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/** Renders a rejected value for a diagnostic, so an object reports its shape rather than `[object Object]`. */
+function describeValue(value: unknown): string {
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value);
+  }
+  return String(value);
 }
 
 // endregion | Helpers

@@ -234,4 +234,50 @@ describe('convertWarnToError()', () => {
 
     expect(actual).toEqual(expected);
   });
+
+  describe('the full severity vocabulary as a ceiling', () => {
+    const warnForms: Array<{ form: string; ruleValue: Linter.RuleEntry; promoted: Linter.RuleEntry }> = [
+      { form: 'string-form', ruleValue: 'warn', promoted: 'error' },
+      { form: 'numeric-form', ruleValue: 1, promoted: 'error' },
+      { form: 'array-form', ruleValue: ['warn', { option: 'value' }], promoted: ['error', { option: 'value' }] },
+    ];
+    const blockingCeilings: Array<Linter.RuleSeverity> = ['off', 0, 'warn', 1];
+    const promotingCeilings: Array<Linter.RuleSeverity | undefined> = ['error', 2, undefined];
+
+    const withEachForm = <T>(ceilings: T[]): Array<{ ceiling: T } & (typeof warnForms)[number]> =>
+      ceilings.flatMap((ceiling) => warnForms.map((warnForm) => ({ ceiling, ...warnForm })));
+
+    it.each(withEachForm(blockingCeilings))(
+      'if the ceiling is $ceiling, leaves a $form warn rule unchanged',
+      ({ ceiling, ruleValue }) => {
+        const config: Config = { rules: { 'some-rule': ruleValue } };
+
+        const actual = convertWarnToError(config, { 'some-rule': ceiling });
+
+        expect(actual.rules).toEqual({ 'some-rule': ruleValue });
+      },
+    );
+
+    it.each(withEachForm(promotingCeilings))(
+      'if the ceiling is $ceiling, escalates a $form warn rule',
+      ({ ceiling, promoted, ruleValue }) => {
+        const config: Config = { rules: { 'some-rule': ruleValue } };
+
+        const actual = convertWarnToError(config, { 'some-rule': ceiling });
+
+        expect(actual.rules).toEqual({ 'some-rule': promoted });
+      },
+    );
+
+    it.each([...blockingCeilings, ...promotingCeilings])(
+      'if the ceiling is %o, leaves an error-configured rule at error',
+      (ceiling) => {
+        const config: Config = { rules: { 'some-rule': 'error' } };
+
+        const actual = convertWarnToError(config, { 'some-rule': ceiling });
+
+        expect(actual.rules).toEqual({ 'some-rule': 'error' });
+      },
+    );
+  });
 });
