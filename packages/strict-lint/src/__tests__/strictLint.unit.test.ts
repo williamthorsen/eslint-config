@@ -76,7 +76,7 @@ describe(strictLint, () => {
       process.argv = originalArgv;
     });
 
-    it('applies an empty allowlist when no config file or programmatic overrides exist', async () => {
+    it('applies no ceilings when no config file or programmatic overrides exist', async () => {
       mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
       withStrictLintConfigs();
 
@@ -85,7 +85,7 @@ describe(strictLint, () => {
       expect(mockedConvertWarnToError).toHaveBeenCalledWith({ rules: {} }, {});
     });
 
-    it('applies the allowlist of the only config file', async () => {
+    it('applies the ceilings of the only config file', async () => {
       mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
 
@@ -106,13 +106,27 @@ describe(strictLint, () => {
       );
     });
 
-    it('lets a nearer config drop an inherited entry by promoting it to error', async () => {
+    it('lets a nearer config drop an inherited ceiling by promoting it to error', async () => {
       mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
       withStrictLintConfigs({ maxSeverity: { 'shared-rule': 'error' } }, { maxSeverity: { 'shared-rule': 'warn' } });
 
       await strictLint();
 
       expect(mockedConvertWarnToError).toHaveBeenCalledWith({ rules: {} }, { 'shared-rule': 'error' });
+    });
+
+    it('lets a nearer config drop an inherited ceiling by setting it to undefined', async () => {
+      mockedResolveEslintConfig.mockResolvedValue([{ rules: {} }]);
+      withStrictLintConfigs(
+        { maxSeverity: { 'shared-rule': undefined } },
+        { maxSeverity: { 'kept-rule': 'warn', 'shared-rule': 'warn' } },
+      );
+
+      await strictLint();
+
+      // `shared-rule` resolves to no ceiling, whether the merge drops the key or keeps it at `undefined`. The
+      // untouched sibling proves the farther config was merged at all, so the drop is not a vacuous pass.
+      expect(mockedConvertWarnToError).toHaveBeenCalledWith({ rules: {} }, { 'kept-rule': 'warn' });
     });
 
     it('programmatic overrides take precedence over every config file', async () => {

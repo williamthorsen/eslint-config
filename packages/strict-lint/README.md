@@ -1,6 +1,6 @@
 # @williamthorsen/strict-lint
 
-Run ESLint with all warnings promoted to errors — except for an allowlist you declare. Ships a `strict-lint` binary that drops in for `eslint` in CI, plus a programmatic API.
+Run ESLint with all warnings promoted to errors, except for the rules you cap below `error`. Ships a `strict-lint` binary that drops in for `eslint` in CI, plus a programmatic API.
 
 <!-- section:release-notes --><!-- /section:release-notes -->
 
@@ -20,19 +20,21 @@ In CI, use `strict-lint` instead of `eslint`:
 strict-lint .
 ```
 
-Every warning emitted by your ESLint config becomes an error and fails the run, except for the rules you allowlist. Out of the box nothing is exempt. The CLI accepts the same flags as `eslint` and forwards them through.
+Every warning emitted by your ESLint config becomes an error and fails the run, except for the rules you cap below `error`. Out of the box nothing is capped. The CLI accepts the same flags as `eslint` and forwards them through.
 
 ## How it works
 
 1. Loads your ESLint flat config (one of `eslint.config.js`, `.mjs`, `.cjs`, `.ts`, `.mts`, or `.cts`), auto-discovered by walking up from the current directory in ESLint's own priority order, or via `--config <path>`.
-2. Rewrites every rule whose severity is `'warn'` to `'error'`, except those listed in `maxSeverity`.
+2. Rewrites every rule whose severity is `'warn'` to `'error'`, except those whose `maxSeverity` ceiling sits below `error`.
 3. Runs ESLint via the Node API and exits non-zero on any errors.
 
-`maxSeverity` is the resolved allowlist, computed by merging — in increasing precedence — every `.config/strict-lint.config.ts` from the project root down to the directory you run from, then any `maxSeverity` passed programmatically. No rule is exempt unless one of those sources says so.
+`maxSeverity` is the resolved set of ceilings, computed by merging, in increasing precedence, every `.config/strict-lint.config.ts` from the project root down to the directory you run from, then any `maxSeverity` passed programmatically. No rule is exempt from promotion unless one of those sources says so.
+
+A ceiling bounds how high strict-lint promotes a rule. It never lowers a severity your ESLint config sets explicitly: a rule configured `'error'` stays an error under every ceiling. To force a severity outright, use `ruleOverrides` or the `--rule` flag.
 
 ## Configuration
 
-Create `.config/strict-lint.config.ts` at or above the directory you run `strict-lint` from to declare an allowlist:
+Create `.config/strict-lint.config.ts` at or above the directory you run `strict-lint` from to declare your ceilings:
 
 ```ts
 // .config/strict-lint.config.ts
@@ -40,7 +42,7 @@ import type { StrictLintConfig } from '@williamthorsen/strict-lint';
 
 const config: StrictLintConfig = {
   maxSeverity: {
-    // keep these as warnings (don't promote to error)
+    // cap these below error, so they stay warnings
     'unicorn/no-array-reduce': 'warn',
     'unicorn/no-nested-ternary': 'warn',
   },
@@ -51,7 +53,27 @@ export default config;
 
 The config file is loaded through Node's native TypeScript support (Node 24+), so TypeScript syntax works without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not.
 
-If you lint with [`@williamthorsen/eslint-config-typescript`](https://www.npmjs.com/package/@williamthorsen/eslint-config-typescript), its `advisoryRuleSeverities` export is a ready-made allowlist of style and modernization rules — `maxSeverity: { ...advisoryRuleSeverities }`.
+### Ceiling values
+
+Every severity ESLint accepts is a valid ceiling, as is `undefined`:
+
+| Ceiling                | Effect                                              |
+| ---------------------- | --------------------------------------------------- |
+| absent, or `undefined` | promote the rule to `'error'`                       |
+| `'error'` or `2`       | promote the rule to `'error'`                       |
+| `'warn'` or `1`        | leave the rule at the severity your config gives it |
+| `'off'` or `0`         | leave the rule at the severity your config gives it |
+
+`'off'` and `'warn'` have the same effect, because strict-lint only ever raises a severity: any ceiling below `'error'` blocks the raise, and none of them disables a rule. What `'off'` buys you is interchangeability. Because the value type is ESLint's own `Linter.RuleSeverity`, one map of rule severities can be spread into a flat-config `rules` block, where `'off'` disables the rule, and into `maxSeverity`, where it exempts the rule from promotion:
+
+```ts
+export const severities = {
+  'unicorn/no-array-reduce': 'warn',
+  'unicorn/prefer-ternary': 'off',
+};
+```
+
+If you lint with [`@williamthorsen/eslint-config-typescript`](https://www.npmjs.com/package/@williamthorsen/eslint-config-typescript), its `advisoryRuleSeverities` export is a ready-made set of ceilings for style and modernization rules: `maxSeverity: { ...advisoryRuleSeverities }`.
 
 ### Discovery
 
@@ -69,9 +91,9 @@ Selection follows the working directory, not the files you lint. Running from th
 
 #### Merging across levels
 
-Configs merge per rule, with the nearer one winning. In a monorepo, running from `packages/pkg` applies the repo root's allowlist and then the package's, so a package extends the root's by naming only what differs — no import, no spread.
+Configs merge per rule, with the nearer one winning. In a monorepo, running from `packages/pkg` applies the repo root's ceilings and then the package's, so a package extends the root's by naming only what differs, with no import and no spread.
 
-Overriding an inherited entry to `'error'` drops it, promoting that rule to an error in this subtree:
+Overriding an inherited ceiling to `'error'` drops it, promoting that rule to an error in this subtree:
 
 ```ts
 // packages/pkg/.config/strict-lint.config.ts
@@ -85,6 +107,17 @@ const config: StrictLintConfig = {
 };
 
 export default config;
+```
+
+Setting it to `undefined` drops it the same way. Reach for this when the map you spread is shared and you want the inherited entry gone rather than restated:
+
+```ts
+const config: StrictLintConfig = {
+  maxSeverity: {
+    ...sharedSeverities,
+    'unicorn/prefer-ternary': undefined,
+  },
+};
 ```
 
 #### Bounding the search early
@@ -158,12 +191,12 @@ await strictLint({
 });
 ```
 
-| Option          | Type                                         | Description                                                 |
-| --------------- | -------------------------------------------- | ----------------------------------------------------------- |
-| `baseConfig`    | `Linter.Config[]`                            | Use this config instead of loading a config file from disk. |
-| `patterns`      | `string[]`                                   | Files or globs to lint (default: `['.']`).                  |
-| `maxSeverity`   | `Record<string, 'warn' \| 'error'>`          | Keep listed rules at this severity; skip error promotion.   |
-| `ruleOverrides` | `Record<string, 'off' \| 'warn' \| 'error'>` | Force rule severity (applied after errorization).           |
+| Option          | Type                                               | Description                                                              |
+| --------------- | -------------------------------------------------- | ------------------------------------------------------------------------ |
+| `baseConfig`    | `Linter.Config[]`                                  | Use this config instead of loading a config file from disk.              |
+| `patterns`      | `string[]`                                         | Files or globs to lint (default: `['.']`).                               |
+| `maxSeverity`   | `Record<string, Linter.RuleSeverity \| undefined>` | Per-rule ceiling on promotion; a ceiling below `error` exempts its rule. |
+| `ruleOverrides` | `Record<string, 'off' \| 'warn' \| 'error'>`       | Force rule severity (applied after errorization).                        |
 
 `strictLint()` reads `process.argv` and merges CLI flags with the programmatic options. CLI rule overrides win over programmatic ones.
 
@@ -182,7 +215,7 @@ Define both a normal lint script and a strict one, and run the strict one in CI:
 ```
 
 - Local dev uses `lint:check`, where warnings stay warnings.
-- CI uses `lint:strict`, where warnings break the build — except for the allowlist you've curated.
+- CI uses `lint:strict`, where warnings break the build, except for the rules you've capped below `error`.
 
 This pattern lets you enable a stricter rule as a warning, watch it appear in local output for a while, and then promote it to an error in CI by simply removing it from `maxSeverity`.
 
