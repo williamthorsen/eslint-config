@@ -59,19 +59,23 @@ Every severity ESLint accepts is a valid ceiling, as is `undefined`:
 
 | Ceiling                | Effect                                              |
 | ---------------------- | --------------------------------------------------- |
-| absent, or `undefined` | promote the rule to `'error'`                       |
-| `'error'` or `2`       | promote the rule to `'error'`                       |
+| absent, or `undefined` | promote a warning to `'error'`                      |
+| `'error'` or `2`       | promote a warning to `'error'`                      |
 | `'warn'` or `1`        | leave the rule at the severity your config gives it |
 | `'off'` or `0`         | leave the rule at the severity your config gives it |
 
 `'off'` and `'warn'` have the same effect, because strict-lint only ever raises a severity: any ceiling below `'error'` blocks the raise, and none of them disables a rule. What `'off'` buys you is interchangeability. Because the value type is ESLint's own `Linter.RuleSeverity`, one map of rule severities can be spread into a flat-config `rules` block, where `'off'` disables the rule, and into `maxSeverity`, where it exempts the rule from promotion:
 
 ```ts
+import type { Linter } from 'eslint';
+
 export const severities = {
   'unicorn/no-array-reduce': 'warn',
   'unicorn/prefer-ternary': 'off',
-};
+} satisfies Record<string, Linter.RuleSeverity>;
 ```
+
+The `satisfies` clause keeps the values at their literal types. Without it they widen to `string`, which is assignable to neither target.
 
 If you lint with [`@williamthorsen/eslint-config-typescript`](https://www.npmjs.com/package/@williamthorsen/eslint-config-typescript), its `advisoryRuleSeverities` export is a ready-made set of ceilings for style and modernization rules: `maxSeverity: { ...advisoryRuleSeverities }`.
 
