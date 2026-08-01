@@ -21,14 +21,14 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamthorsen/nmr) as its script runner. Most commands come from nmr's built-in registries; only project-specific overrides live in `.config/nmr.config.ts`. From the repo root, commands fan out across all workspaces; from a workspace directory, they target that package only.
 
 ```bash
-nmr ci                # Build all packages, then run check:strict (matches GitHub Actions)
-nmr check             # typecheck + format check + lint check + tests
-nmr check:strict      # typecheck + format check + strict-lint + coverage + agent-file check
-nmr build             # Build all packages (or the current package from a workspace dir)
-nmr lint              # eslint --fix; lint:check is the non-mutating variant
-nmr lint:strict       # Run strict-lint over the codebase
-nmr test              # vitest
-nmr outdated          # Check dependencies (use outdated:latest for non-compatible)
+nmr ci           # Build all packages, then run check:strict (matches GitHub Actions)
+nmr check        # typecheck + format check + lint check + tests
+nmr check:strict # typecheck + format check + strict-lint + coverage + agent-file check
+nmr build        # Build all packages (or the current package from a workspace dir)
+nmr lint         # eslint --fix; lint:check is the non-mutating variant
+nmr lint:strict  # Run strict-lint over the codebase
+nmr test         # vitest, excluding integration tests (test:integration runs those alone)
+nmr upgrade      # Report available dependency upgrades (add --write to apply)
 ```
 
 Releases are triggered via the **Release** GitHub Actions workflow (`workflow_dispatch`), which uses release-kit to bump versions, regenerate CHANGELOGs, and push tags. Tag pushes (`<workspace>-v<semver>`) then trigger the **Publish** and **Create GitHub Release** workflows. Don't push release tags by hand.
@@ -58,8 +58,10 @@ Full reference: `docs/versioning-and-changelog.md`.
 
 ## Gotchas
 
-- **`nmr build` is a publishing step, not a prerequisite.** Lint, typecheck, and tests all read `src`. `nmr ci` still runs `build` first so publish-path breakage surfaces early, and its `nmr` override exists to drop the `audit` step that `audit.yaml` runs separately.
+- **`nmr build` is a publishing step, not a prerequisite.** Lint, typecheck, and tests all read `src`. `nmr ci` still runs `build` first so publish-path breakage surfaces early.
 - **The `basic` package has no build step** (`build` and `test` scripts are no-ops). Edits to `index.mjs` or `rules/*.mjs` take effect immediately.
 - **Publishing targets differ by package.** `basic` publishes to GitHub Packages (restricted scope `@williamthorsen`); `typescript`, `strict-lint`, and `tsconfig` publish to public npm. Tags, tokens, and audiences are not interchangeable.
 - **Don't push release tags manually.** The `Release` workflow is the source of truth; manual tags can desync versions and CHANGELOGs from the actual commit history release-kit analyzes.
-- **Root-level Vitest excludes `packages/**`.** Each package owns its own test config; `nmr root:test` runs only root-level tests.
+- **Two Vitest configs serve the whole repo.** `vitest.config.ts` and `vitest.root.config.ts` each call the factory from `@williamthorsen/nmr/vitest`; packages carry no config of their own, because Vitest walks up from the run root to find one. The root variant excludes `packages/**`, so `nmr root:test` runs only root-level tests.
+- **Test suites are selected by filename, not by config.** `*.int.test.ts` is the `integration` project and `*.app.test.ts` the `app` project; everything else under `__tests__` is `unit`. `nmr test` runs `!integration`, so an integration test is reached only by `nmr test:integration`, which `nmr ci` does not invoke. That command also cannot fail empty — the shared config sets `passWithNoTests`, so a suite that loses its `.int.` infix or moves out of `__tests__` stops running and still reports success.
+- **Lint fixtures live in `packages/typescript/__fixtures__/`, outside `src`.** That keeps them out of test collection, coverage, and the published `dist`; two of them are deliberately named `*.test.*`, and ESLint ignores the whole tree because the fixtures violate the rules they exercise.

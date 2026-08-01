@@ -14,7 +14,8 @@ const config = defineConfig([
   globalIgnores([
     // Completely ignore these files.
     ...commonIgnores,
-    '**/__tests__/fixtures/**',
+    // Lint fixtures deliberately violate the rules they exercise.
+    '**/__fixtures__/**',
   ]),
   // Anchor the project service at the repo root for type-aware rules.
   // `projectService` itself is enabled by the base config; the consumer supplies only the root directory.

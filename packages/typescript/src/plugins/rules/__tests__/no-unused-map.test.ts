@@ -3,20 +3,10 @@ import { describe, expect, it } from 'vitest';
 
 import { ensurePluginRules } from '../../../utils/ensurePluginRules.ts';
 import rule from '../no-unused-map.ts';
-import { RuleTester } from './ruleTester.ts';
+import { createTypedRuleTester, RuleTester } from './ruleTester.ts';
 
-// This rule's receiver guard is type-aware (it consults the TS type checker), so the tester needs a TS program.
-// `projectService` with `allowDefaultProject` type-checks the inline code against the fixtures `tsconfig.json`.
-const typedRuleTester = new RuleTester({
-  languageOptions: {
-    parserOptions: {
-      projectService: {
-        allowDefaultProject: ['*.ts*'],
-      },
-      tsconfigRootDir: import.meta.dirname + '/fixtures',
-    },
-  },
-});
+// This rule's receiver guard is type-aware, so it needs the tester backed by a TS program.
+const typedRuleTester = createTypedRuleTester();
 
 typedRuleTester.run('no-unused-map', rule, {
   valid: [

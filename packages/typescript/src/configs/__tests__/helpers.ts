@@ -8,7 +8,9 @@ import tseslint from 'typescript-eslint';
 
 import { createConfig } from '../../index.ts';
 
-export const fixturesDir = path.join(import.meta.dirname, 'fixtures');
+// Fixtures live outside `src` so the build neither compiles nor publishes them, and Vitest never collects
+// the two that are deliberately named `*.test.*`.
+export const fixturesDir = path.join(import.meta.dirname, '../../../__fixtures__/configs');
 
 // Opt the fixture extensions into linting and wire the typescript-eslint parser with a project, so a
 // composed config runs against the fixture instead of being skipped as unmatched by any `files` glob.

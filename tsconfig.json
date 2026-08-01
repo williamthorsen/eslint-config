@@ -15,7 +15,6 @@
     ".config/**/*.ts",
     ".github/scripts/",
     "__tests__/",
-    "config/",
     "packages/*/types/",
     "scripts/",
     "*.ts",
