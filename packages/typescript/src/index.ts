@@ -2,15 +2,7 @@ import { type Config, defineConfig } from 'eslint/config';
 import globals from 'globals';
 
 import configs from './configs/index.ts';
-
-const javaScriptExtensions = ['{js,cjs,mjs,jsx}'];
-const typeScriptExtensions = ['{ts,cts,mts,tsx}'];
-const codeExtensions = [...javaScriptExtensions, ...typeScriptExtensions];
-
-const javaScriptFiles = javaScriptExtensions.map((ext) => `**/*.${ext}`);
-const typeScriptFiles = typeScriptExtensions.map((ext) => `**/*.${ext}`);
-const codeFiles = codeExtensions.map((ext) => `**/*.${ext}`);
-const testFiles = codeExtensions.map((ext) => `**/*.{spec,test}.${ext}`);
+import { codeFiles, javaScriptFiles, testFiles, typeScriptFiles } from './patterns.ts';
 
 const config: Config[] = [
   ...defineConfig({
@@ -70,17 +62,7 @@ const config: Config[] = [
   ...configs.yaml,
 ];
 
-const patterns = {
-  codeExtensions,
-  codeFiles,
-  javaScriptExtensions,
-  javaScriptFiles,
-  testFiles,
-  typeScriptExtensions,
-  typeScriptFiles,
-};
-
 export { advisoryRuleSeverities } from './advisoryRuleSeverities.ts';
 export { default as configs, createConfig } from './configs/index.ts';
-export { patterns };
+export { patterns } from './patterns.ts';
 export default config;

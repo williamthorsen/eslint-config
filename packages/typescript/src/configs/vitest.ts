@@ -1,6 +1,8 @@
 import type { Linter } from 'eslint';
 import { type Config, defineConfig } from 'eslint/config';
 
+import { javaScriptFiles } from '../patterns.ts';
+
 // Modifications of rules that are not in the "recommended" config.
 const modifiedStrictRules: Linter.RulesRecord = {
   'vitest/max-expects': 'off', // 🟠⚫
@@ -24,18 +26,33 @@ const correctedRules: Linter.RulesRecord = {
   'vitest/valid-expect': ['warn', { maxArgs: 2 }],
 };
 
+// Rules that read type information. Each throws out of rule creation or out of a listener when a file has no parser
+// services, aborting the whole ESLint run instead of reporting, so none can reach a file the type-aware parser skips.
+// `settings.vitest.typecheck` below opens the `prefer-describe-function-title` path, so this config enables the hazard.
+const typeAwareRules: Linter.RulesRecord = {
+  'vitest/prefer-describe-function-title': 'off', // fires on a string title naming an imported binding
+  'vitest/unbound-method': 'off', // fires unconditionally, at rule creation
+  'vitest/valid-title': 'off', // fires on a function used as a title
+};
+
 async function createConfig(): Promise<Config[]> {
   const { default: vitestPlugin } = await import('@vitest/eslint-plugin');
 
-  return defineConfig({
-    extends: [vitestPlugin.configs.all],
-    rules: { ...modifiedStrictRules, ...correctedRules },
-    settings: {
-      vitest: {
-        typecheck: true,
+  return defineConfig(
+    {
+      extends: [vitestPlugin.configs.all],
+      rules: { ...modifiedStrictRules, ...correctedRules },
+      settings: {
+        vitest: {
+          typecheck: true,
+        },
       },
     },
-  });
+    {
+      files: javaScriptFiles,
+      rules: typeAwareRules,
+    },
+  );
 }
 
 export default createConfig;

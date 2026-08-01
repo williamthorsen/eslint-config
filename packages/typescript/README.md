@@ -116,7 +116,9 @@ export default defineConfig(
 Scope the test-oriented factories to your test files rather than spreading them across the whole project. Applied to ordinary source, `vitest/require-hook` reports on every top-level statement:
 
 ```js
-import { patterns } from '@williamthorsen/eslint-config-typescript';
+import { defineConfig } from 'eslint/config';
+
+import config, { createConfig, patterns } from '@williamthorsen/eslint-config-typescript';
 
 export default defineConfig(config, {
   files: patterns.testFiles,
@@ -124,7 +126,7 @@ export default defineConfig(config, {
 });
 ```
 
-`createConfig.vitest()` includes `vitest/unbound-method`, which is type-aware: apply it only to files a type-aware parser handles, or ESLint throws when the rule loads.
+`patterns.testFiles` covers JavaScript as well as TypeScript test files. Three of the Vitest rules read type information — `unbound-method`, `valid-title`, and `prefer-describe-function-title` — and each aborts the ESLint run rather than degrading when a file has no parser services, so `createConfig.vitest()` disables all three on JavaScript globs. That makes the scoping above safe whether or not your JavaScript test files get a type-aware parser.
 
 | Method                               | Loads                                              |
 | ------------------------------------ | -------------------------------------------------- |
