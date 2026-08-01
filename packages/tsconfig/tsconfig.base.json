@@ -1,11 +1,31 @@
 // Base TSConfig for Node-only TypeScript: `@tsconfig/strictest` plus the Node/build options it omits.
 // Consumers set `types`, `paths`, `jsx`, and `include`. Node 24 floor.
 //
-// Every setting deviates from a TypeScript default; a comment says why it can't be dropped.
+// Every Node/build setting deviates from a TypeScript default; a comment says why it can't be dropped.
+// The inlined strictest settings carry no such comments: their rationale belongs to upstream.
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@tsconfig/strictest",
   "compilerOptions": {
+    // Inlined from `@tsconfig/strictest`, in upstream's order. Not reached through `extends`, because
+    // resolvers that don't realpath pnpm symlinks can't follow the second hop. The root test
+    // `__tests__/tsconfig-base.app.test.ts` asserts this block still matches the installed devDependency.
+    "strict": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    "isolatedModules": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
     // Permit `./foo.ts` specifiers; the build step rewrites them on emit.
     "allowImportingTsExtensions": true,
     // Without this, `lib` follows `target` into the `.full` variant, admitting DOM globals.

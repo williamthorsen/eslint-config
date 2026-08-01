@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,12 +14,26 @@ const options = parseRootConfig();
 
 const consumerOwnedKeys = new Set(['jsx', 'paths', 'types']);
 
-const baseConfigSchema = z.object({
+// What the base adds on top of the inlined `@tsconfig/strictest` settings. Every other key it declares
+// must come from upstream; a leftover is drift. A key listed here that upstream also starts setting
+// fails both drift assertions, which is the intent: the collision is a decision, not a merge.
+const nodeLayerKeys = [
+  'allowImportingTsExtensions',
+  'lib',
+  'module',
+  'moduleDetection',
+  'noEmit',
+  'removeComments',
+  'target',
+];
+
+const configSchema = z.object({
+  extends: z.unknown().optional(),
   compilerOptions: z.record(z.string(), z.unknown()).optional(),
 });
 
 describe('@williamthorsen/tsconfig base config', () => {
-  it('pulls in @tsconfig/strictest through the extends chain', () => {
+  it('applies @tsconfig/strictest settings', () => {
     expect(options.strict).toBe(true);
     expect(options.exactOptionalPropertyTypes).toBe(true);
     expect(options.noPropertyAccessFromIndexSignature).toBe(true);
@@ -54,6 +69,32 @@ describe('@williamthorsen/tsconfig base config', () => {
     // re-anchor every alias to the base's own directory inside node_modules.
     expect(options['pathsBasePath']).toBe(repoRoot);
   });
+
+  it('extends no package', () => {
+    // An `extends` is what broke under pnpm: resolvers that don't realpath the symlink walk up to a
+    // top-level `node_modules/@tsconfig` that pnpm never creates. Its absence is the fix, so the base
+    // must stay reachable in one hop no matter what it would be convenient to inherit.
+    expect(readBaseConfig().extends).toBeUndefined();
+  });
+
+  it('mirrors every setting of the installed @tsconfig/strictest', () => {
+    const declared = readBaseCompilerOptions();
+
+    const mismatched = Object.entries(readUpstreamCompilerOptions())
+      .filter(([key, value]) => JSON.stringify(declared[key]) !== JSON.stringify(value))
+      .map(([key, value]) => `${key}: expected ${JSON.stringify(value)}, found ${JSON.stringify(declared[key])}`);
+
+    expect(mismatched).toEqual([]);
+  });
+
+  it('declares nothing beyond @tsconfig/strictest but the Node layer', () => {
+    // Catches the direction the mirror test can't: a setting upstream has dropped survives here as an
+    // unexplained key rather than as a missing one.
+    const upstreamKeys = new Set(Object.keys(readUpstreamCompilerOptions()));
+    const beyondUpstream = Object.keys(readBaseCompilerOptions()).filter((key) => !upstreamKeys.has(key));
+
+    expect(beyondUpstream.toSorted()).toEqual(nodeLayerKeys.toSorted());
+  });
 });
 
 function parseRootConfig(): ts.CompilerOptions {
@@ -76,13 +117,28 @@ function parseRootConfig(): ts.CompilerOptions {
   return parsed.options;
 }
 
+function readBaseConfig(): z.infer<typeof configSchema> {
+  return readConfig(path.join(repoRoot, 'packages', 'tsconfig', 'tsconfig.base.json'));
+}
+
 function readBaseCompilerOptions(): Record<string, unknown> {
-  const basePath = path.join(repoRoot, 'packages', 'tsconfig', 'tsconfig.base.json');
-  const { config, error } = ts.readConfigFile(basePath, ts.sys.readFile);
+  return readBaseConfig().compilerOptions ?? {};
+}
+
+// Resolve upstream from the tsconfig package rather than the repo root, which declares no
+// `@tsconfig/strictest` of its own, so the comparison is against the version that package pins.
+function readUpstreamCompilerOptions(): Record<string, unknown> {
+  const requireFromPackage = createRequire(path.join(repoRoot, 'packages', 'tsconfig', 'package.json'));
+
+  return readConfig(requireFromPackage.resolve('@tsconfig/strictest/tsconfig.json')).compilerOptions ?? {};
+}
+
+function readConfig(configPath: string): z.infer<typeof configSchema> {
+  const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile);
 
   if (error) throw new Error(ts.flattenDiagnosticMessageText(error.messageText, '\n'));
 
-  return baseConfigSchema.parse(config).compilerOptions ?? {};
+  return configSchema.parse(config);
 }
 
 // TypeScript normalizes `lib` entries to their `lib.*.d.ts` filenames.

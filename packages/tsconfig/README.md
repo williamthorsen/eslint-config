@@ -1,6 +1,6 @@
 # @williamthorsen/tsconfig
 
-Shared TypeScript base config for Node-only projects. Composes [`@tsconfig/strictest`](https://www.npmjs.com/package/@tsconfig/strictest) and adds the Node and build options it leaves out, so a consuming repo declares only what is genuinely its own.
+Shared TypeScript base config for Node-only projects. Inlines the settings of [`@tsconfig/strictest`](https://www.npmjs.com/package/@tsconfig/strictest) and adds the Node and build options it leaves out, so a consuming repo declares only what is genuinely its own.
 
 <!-- section:release-notes --><!-- /section:release-notes -->
 
@@ -9,8 +9,6 @@ Shared TypeScript base config for Node-only projects. Composes [`@tsconfig/stric
 ```shell
 pnpm add -D @williamthorsen/tsconfig
 ```
-
-`@tsconfig/strictest` comes along as a dependency; it does not need to be installed separately.
 
 ## Quick start
 
@@ -26,7 +24,7 @@ pnpm add -D @williamthorsen/tsconfig
 
 ## What the base sets
 
-Everything from `@tsconfig/strictest`, plus the Node and build options strictest omits:
+Everything `@tsconfig/strictest` sets, plus the Node and build options it omits:
 
 | Option                       | Value        |
 | ---------------------------- | ------------ |
