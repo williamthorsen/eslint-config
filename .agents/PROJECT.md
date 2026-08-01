@@ -21,14 +21,14 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamthorsen/nmr) as its script runner. Most commands come from nmr's built-in registries; only project-specific overrides live in `.config/nmr.config.ts`. From the repo root, commands fan out across all workspaces; from a workspace directory, they target that package only.
 
 ```bash
-nmr ci                # Build all packages, then run check:strict (matches GitHub Actions)
-nmr check             # typecheck + format check + lint check + tests
-nmr check:strict      # typecheck + format check + strict-lint + coverage + agent-file check
-nmr build             # Build all packages (or the current package from a workspace dir)
-nmr lint              # eslint --fix; lint:check is the non-mutating variant
-nmr lint:strict       # Run strict-lint over the codebase
-nmr test              # vitest
-nmr outdated          # Check dependencies (use outdated:latest for non-compatible)
+nmr ci           # Build all packages, then run check:strict (matches GitHub Actions)
+nmr check        # typecheck + format check + lint check + tests
+nmr check:strict # typecheck + format check + strict-lint + coverage + agent-file check
+nmr build        # Build all packages (or the current package from a workspace dir)
+nmr lint         # eslint --fix; lint:check is the non-mutating variant
+nmr lint:strict  # Run strict-lint over the codebase
+nmr test         # vitest
+nmr outdated     # Check dependencies (use outdated:latest for non-compatible)
 ```
 
 Releases are triggered via the **Release** GitHub Actions workflow (`workflow_dispatch`), which uses release-kit to bump versions, regenerate CHANGELOGs, and push tags. Tag pushes (`<workspace>-v<semver>`) then trigger the **Publish** and **Create GitHub Release** workflows. Don't push release tags by hand.
