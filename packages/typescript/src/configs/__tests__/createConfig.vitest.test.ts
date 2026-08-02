@@ -12,17 +12,18 @@ const COLD_START_TIMEOUT_MS = 20_000;
 
 // The config silences two rules that report on valid Vitest code. Assert the lint outcome rather than the config's
 // shape: a shape assertion restates the source and passes forever, while this fails when a plugin upgrade renames an
-// option or changes a default.
+// option or changes a default. Each fixture also carries one expected report, so the absence of the silenced rules is
+// distinguishable from a config that stopped matching the fixture, which would report nothing either way.
 describe('createConfig.vitest rule corrections', () => {
   it(
-    'reports nothing on the patterns the corrections permit',
+    'reports only the untouched rule on the patterns the corrections permit',
     async () => {
       const composed = [fixtureWiring, ...(await createConfig.vitest())];
 
       const results = await lintFixture(composed, 'vitest-tuned.test.ts');
 
       // Map to rule ids so a regression names the rule that fired instead of reporting a length mismatch.
-      expect(results[0]?.messages.map((message) => message.ruleId)).toStrictEqual([]);
+      expect(results[0]?.messages.map((message) => message.ruleId)).toStrictEqual(['vitest/prefer-to-be']);
     },
     COLD_START_TIMEOUT_MS,
   );

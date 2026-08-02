@@ -15,6 +15,12 @@ describe('patterns the vitest config corrections permit', () => {
 
     expect(actual, describeFailure(actual)).toBe(1);
   });
+
+  it('reports a rule the corrections leave alone', () => {
+    // A deep-equality matcher on a primitive trips `prefer-to-be`, so the lint result proves the config reached
+    // this file. `toStrictEqual` rather than `toEqual`, which would trip `prefer-strict-equal` as well.
+    expect(1).toStrictEqual(1);
+  });
 });
 
 function describeFailure(value: number): string {
