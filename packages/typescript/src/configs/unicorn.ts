@@ -16,6 +16,7 @@ const rules: Linter.RulesRecord = {
 
   // Downgrade or disable overly prescriptive rules
   'unicorn/catch-error-name': 'warn', // 🔴🟠
+  'unicorn/class-member-ordering': 'off', // 🔴⚫ Conflicts with `@typescript-eslint/member-ordering` and most style guides
   'unicorn/consistent-boolean-name': 'off', // 🔴⚫ Prescriptive predicate naming; false-positives on predicate functions
   'unicorn/consistent-function-scoping': 'warn', // 🔴🟠 Legitimate to co-locate helpers
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
@@ -45,7 +46,7 @@ const rules: Linter.RulesRecord = {
       hexadecimal: { minimumDigits: 0, groupLength: 4 },
       binary: { minimumDigits: 0, groupLength: 4 },
       octal: { minimumDigits: 0, groupLength: 4 },
-      number: { minimumDigits: 5, groupLength: 3, fractionGroupLength: Infinity },
+      number: { minimumDigits: 5, groupLength: 3, fractionGroupLength: 3 },
     },
   ], // 🔴🟠
   'unicorn/prefer-global-this': 'warn', // 🔴🟠

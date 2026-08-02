@@ -62,6 +62,7 @@ const rules: Linter.RulesRecord = {
   // Stylistic: Enabled
   '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'], // ⚫🟠
   '@typescript-eslint/dot-notation': ['warn', { allowKeywords: true, allowIndexSignaturePropertyAccess: true }], // ⚫🟠
+  '@typescript-eslint/member-ordering': 'warn', // ⚫🟠
   '@typescript-eslint/no-inferrable-types': 'warn', // ⚫🟠
 };
 
