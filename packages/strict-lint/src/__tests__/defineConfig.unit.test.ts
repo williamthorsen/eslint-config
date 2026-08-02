@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import type { MaxSeverityMap, StrictLintConfig } from '../defineConfig.ts';
 import { defineConfig } from '../defineConfig.ts';
 
+const MANIFEST_PATH = fileURLToPath(new URL('../../package.json', import.meta.url));
 const MODULE_PATH = fileURLToPath(new URL('../defineConfig.ts', import.meta.url));
 
 describe(defineConfig, () => {
@@ -43,5 +44,14 @@ describe(defineConfig, () => {
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
+  });
+
+  it('is the module the `./config` subpath entry names', () => {
+    const manifest: unknown = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
+    const name = path.basename(MODULE_PATH, '.ts');
+
+    expect(manifest).toMatchObject({
+      exports: { './config': { import: `./dist/esm/${name}.js`, types: `./dist/esm/${name}.d.ts` } },
+    });
   });
 });
