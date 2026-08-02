@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.3.0 — 2026-08-02
+
+### 🎉 Features
+
+- Add defineConfig for authoring strict-lint configs (#133)
+
+  Adds a `defineConfig` helper function for authoring the `strict-lint` config file.
+
+### 🐛 Bug fixes
+
+- Correct misbehaving Vitest rules (#132)
+
+  Corrects some Vitest rules that were triggering broken behavior in repos using them. The Vitest config is now used in this repo's own linting configuration; some violations surfaced by the newly enabled rules have been fixed. The ESLint config for TypeScript now exports `patterns.testFiles`, an array of file patterns commonly used for tests.
+
 ## 8.1.1 — 2026-08-01
 
 ### ⚙️ Tooling

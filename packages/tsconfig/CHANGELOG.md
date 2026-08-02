@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.2.0 — 2026-08-02
+
+### 🎉 Features
+
+- Add defineConfig for authoring strict-lint configs (#133)
+
+  Adds a `defineConfig` helper function for authoring the `strict-lint` config file.
+
 ## 0.1.1 — 2026-08-01
 
 ### 🐛 Bug fixes

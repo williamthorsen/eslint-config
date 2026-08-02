@@ -1,5 +1,22 @@
 [
   {
+    "version": "0.2.0",
+    "date": "2026-08-02",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Add defineConfig for authoring strict-lint configs (#133)",
+            "body": "Adds a `defineConfig` helper function for authoring the `strict-lint` config file.",
+            "hash": "c7b26ff68ce6daaff9d2ea5bdfc1040d757e78d6"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.1.1",
     "date": "2026-08-01",
     "sections": [
