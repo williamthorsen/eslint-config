@@ -26,13 +26,16 @@ const correctedRules: Linter.RulesRecord = {
   'vitest/valid-expect': ['warn', { maxArgs: 2 }],
 };
 
-// Rules that read type information. Each throws out of rule creation or out of a listener when a file has no parser
-// services, aborting the whole ESLint run instead of reporting, so none can reach a file the type-aware parser skips.
-// `settings.vitest.typecheck` below opens the `prefer-describe-function-title` path, so this config enables the hazard.
+// Rules that read type information. Each aborts the whole ESLint run instead of reporting when a file has no parser
+// services, so none can reach a file the type-aware parser skips. The `settings.vitest.typecheck` this config sets is
+// what opens the lookups in `valid-title` and `prefer-describe-function-title`.
 const typeAwareRules: Linter.RulesRecord = {
-  'vitest/prefer-describe-function-title': 'off', // fires on a string title naming an imported binding
-  'vitest/unbound-method': 'off', // fires unconditionally, at rule creation
-  'vitest/valid-title': 'off', // fires on a function used as a title
+  // Looks up a type when a string title names an imported binding.
+  'vitest/prefer-describe-function-title': 'off',
+  // Declares `requiresTypeChecking`, so it resolves parser services when the rule is created, before reading any code.
+  'vitest/unbound-method': 'off',
+  // Looks up the title's type on every `describe`, `test`, and `it`, whatever shape the title takes.
+  'vitest/valid-title': 'off',
 };
 
 async function createConfig(): Promise<Config[]> {

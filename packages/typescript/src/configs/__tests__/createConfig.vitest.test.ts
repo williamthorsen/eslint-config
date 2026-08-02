@@ -1,7 +1,7 @@
 import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import { configs, createConfig } from '../../index.ts';
+import config, { configs, createConfig } from '../../index.ts';
 import { fixtureWiring, lintFixture } from './helpers.ts';
 
 // No parser override, so the fixture is parsed by espree and carries no parser services.
@@ -27,8 +27,9 @@ describe('createConfig.vitest rule corrections', () => {
     COLD_START_TIMEOUT_MS,
   );
 
-  // The type-aware rules abort the run rather than degrading, so a regression surfaces here as a thrown
-  // "requires type information" error out of `lintFixture`, not as an assertion failure.
+  // The type-aware rules abort the run rather than degrading, so a carve-out regression surfaces here as a thrown
+  // "requires type information" error out of `lintFixture`. The expected report is what separates that from a config
+  // that stopped matching the fixture, which would also produce no throw and no messages.
   it(
     'lints a JavaScript test file that no type-aware parser handles',
     async () => {
@@ -36,14 +37,15 @@ describe('createConfig.vitest rule corrections', () => {
 
       const results = await lintFixture(composed, 'vitest-untyped.test.mjs');
 
-      expect(results[0]?.messages.map((message) => message.ruleId)).toStrictEqual([]);
+      expect(results[0]?.messages.map((message) => message.ruleId)).toStrictEqual(['vitest/prefer-to-be']);
     },
     COLD_START_TIMEOUT_MS,
   );
 });
 
 // The shipped configs previously set vitest severities in two places, which drifted. Iterate the config set rather
-// than naming the offender, so a preset that reintroduces the split is caught without a test edit.
+// than naming the offender, so a preset that reintroduces the split is caught without a test edit. The default export
+// carries a test-scoped rule block, which makes it the nearest config to a report on a test file.
 describe('vitest rule ownership', () => {
   it(
     'sets vitest rule severities in no shipped config but its own',
@@ -51,7 +53,13 @@ describe('vitest rule ownership', () => {
       const lazy = Object.entries(createConfig).filter(([name]) => name !== 'vitest');
       const loaded = await Promise.all(lazy.map(async ([name, load]) => [name, await load()] as const));
 
-      const offenders = [...Object.entries(configs), ...loaded].flatMap(([name, blocks]) =>
+      const shipped: (readonly [string, readonly Config[]])[] = [
+        ['config', config],
+        ...Object.entries(configs),
+        ...loaded,
+      ];
+
+      const offenders = shipped.flatMap(([name, blocks]) =>
         blocks.flatMap((block) =>
           Object.keys(block.rules ?? {})
             .filter((rule) => rule.startsWith('vitest/'))
