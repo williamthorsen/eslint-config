@@ -11,6 +11,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 // native-syntax failures, or the absence of jiti in-process.
 
 const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
+const DEFINE_CONFIG_URL = new URL('../defineConfig.ts', import.meta.url).href;
 const UNUSED_VAR_FILE = 'const unused = 1;\n';
 const UNUSED_VAR_AND_CONSOLE_FILE = "const unused = 1;\nconsole.log('hi');\n";
 const ROOT_MARKER = 'pnpm-workspace.yaml';
@@ -144,6 +145,22 @@ describe('native config loading (subprocess)', () => {
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 0 warnings');
     expect(stderr).not.toContain('ancestor config was imported');
+  }, 30_000);
+
+  it('applies ceilings from a config authored with defineConfig', () => {
+    // The fixture tree carries no `node_modules`, so the config reaches the helper by URL instead of by package name.
+    const dir = makeFixture({
+      '.config/strict-lint.config.ts':
+        `import { defineConfig } from '${DEFINE_CONFIG_URL}';\n` +
+        "export default defineConfig({ maxSeverity: { 'no-unused-vars': 'warn' } });\n",
+      'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
+      'a.js': UNUSED_VAR_FILE,
+    });
+
+    const { status, stdout } = runCli(dir, ['a.js']);
+
+    expect(status).toBe(0);
+    expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
   it('fails a config with non-erasable syntax with an actionable message', () => {
