@@ -40,7 +40,7 @@ Everything `@tsconfig/strictest` sets, plus the Node and build options it omits:
 
 ## What the consumer owns
 
-The base deliberately declares none of these:
+The base declares none of these:
 
 - **`types`** — the ambient type packages in scope. Most Node projects want `["node"]`; declaring it narrows the default, which would otherwise pull in every `@types/*` package installed.
 - **`paths`** — TypeScript resolves `baseUrl`-less `paths` relative to the file that _declares_ them, so a path alias set in this package would resolve inside `node_modules`. Aliases must be declared by the config that owns the source tree.
