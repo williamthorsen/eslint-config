@@ -20,7 +20,7 @@ describe(defineConfig, () => {
   });
 
   it('rejects a config carrying an unknown property', () => {
-    // @ts-expect-error -- a generic signature infers the misspelled key instead of rejecting it, so this fails to error
+    // @ts-expect-error -- rejecting the unknown key is what this test asserts
     const config = defineConfig({ maxSeverity: {}, shouldIgnoreAncestor: true });
 
     expect(config).toBeDefined();

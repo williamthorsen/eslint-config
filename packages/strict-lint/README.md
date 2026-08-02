@@ -49,9 +49,7 @@ export default defineConfig({
 });
 ```
 
-`defineConfig` comes from the `/config` subpath rather than the package root, and resolves to the function alone. Importing it from the root would pull ESLint into your config file's module graph.
-
-The config file is loaded through Node's native TypeScript support (Node 24+), so TypeScript syntax works without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not.
+The config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not.
 
 ### Ceiling values
 
