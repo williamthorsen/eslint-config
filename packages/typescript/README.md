@@ -182,13 +182,11 @@ Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@willi
 ```ts
 // .config/strict-lint.config.ts
 import { advisoryRuleSeverities } from '@williamthorsen/eslint-config-typescript';
-import type { StrictLintConfig } from '@williamthorsen/strict-lint';
+import { defineConfig } from '@williamthorsen/strict-lint/config';
 
-const config: StrictLintConfig = {
+export default defineConfig({
   maxSeverity: { ...advisoryRuleSeverities },
-};
-
-export default config;
+});
 ```
 
 Or spread it into an ordinary flat-config `rules` block to set those severities directly:

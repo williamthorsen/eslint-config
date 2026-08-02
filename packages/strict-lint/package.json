@@ -19,6 +19,10 @@
     ".": {
       "import": "./dist/esm/index.js",
       "types": "./dist/esm/index.d.ts"
+    },
+    "./config": {
+      "import": "./dist/esm/defineConfig.js",
+      "types": "./dist/esm/defineConfig.d.ts"
     }
   },
   "bin": {
