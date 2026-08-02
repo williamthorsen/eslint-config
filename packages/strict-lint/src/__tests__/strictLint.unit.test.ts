@@ -44,7 +44,7 @@ vi.mock('node:fs/promises', () => ({
 }));
 
 vi.mock('eslint', () => {
-  mockLoadFormatter.mockReturnValue(Promise.resolve({ format: mockFormat }));
+  mockLoadFormatter.mockResolvedValue({ format: mockFormat });
   return {
     ESLint: class {
       static outputFixes = mockOutputFixes;
@@ -61,18 +61,17 @@ vi.mock('eslint', () => {
 
 describe(strictLint, () => {
   describe('maxSeverity merge precedence', () => {
-    // Prevent process.exit from terminating tests
-    const originalExit = process.exit;
     const originalArgv = process.argv;
+    let exitSpy: MockInstance<typeof process.exit>;
 
     beforeEach(() => {
       vi.clearAllMocks();
-      process.exit = vi.fn<(code?: string | number | null) => never>();
+      exitSpy = mockExit();
       process.argv = ['node', 'strict-lint'];
     });
 
     afterEach(() => {
-      process.exit = originalExit;
+      exitSpy.mockRestore();
       process.argv = originalArgv;
     });
 
@@ -177,20 +176,20 @@ describe(strictLint, () => {
   });
 
   describe('--debug provenance', () => {
-    const originalExit = process.exit;
     const originalArgv = process.argv;
     let errorSpy: MockInstance<typeof console.error>;
+    let exitSpy: MockInstance<typeof process.exit>;
 
     beforeEach(() => {
       vi.clearAllMocks();
-      process.exit = vi.fn<(code?: string | number | null) => never>();
+      exitSpy = mockExit();
       process.argv = ['node', 'strict-lint', '--debug'];
       errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     });
 
     afterEach(() => {
       errorSpy.mockRestore();
-      process.exit = originalExit;
+      exitSpy.mockRestore();
       process.argv = originalArgv;
     });
 
@@ -199,7 +198,7 @@ describe(strictLint, () => {
 
       await strictLint({ baseConfig: [{ rules: {} }] });
 
-      expect(reportedLines()).toEqual([
+      expect(reportedLines()).toStrictEqual([
         'strict-lint: project root /project (marker: pnpm-workspace.yaml)',
         'strict-lint: config files, lowest precedence first:',
         `strict-lint:   ${configPathIn('/project/level-1')}`,
@@ -263,18 +262,18 @@ describe(strictLint, () => {
   });
 
   describe('exit code', () => {
-    const originalExit = process.exit;
     const originalArgv = process.argv;
+    let exitSpy: MockInstance<typeof process.exit>;
 
     beforeEach(() => {
       vi.clearAllMocks();
-      process.exit = vi.fn<(code?: string | number | null) => never>();
+      exitSpy = mockExit();
       process.argv = ['node', 'strict-lint'];
       withStrictLintConfigs();
     });
 
     afterEach(() => {
-      process.exit = originalExit;
+      exitSpy.mockRestore();
       process.argv = originalArgv;
     });
 
@@ -315,12 +314,12 @@ describe(strictLint, () => {
   });
 
   describe('CLI behavior', () => {
-    const originalExit = process.exit;
     const originalArgv = process.argv;
+    let exitSpy: MockInstance<typeof process.exit>;
 
     beforeEach(() => {
       vi.clearAllMocks();
-      process.exit = vi.fn<(code?: string | number | null) => never>();
+      exitSpy = mockExit();
       process.argv = ['node', 'strict-lint'];
       withStrictLintConfigs();
       mockFormat.mockResolvedValue('');
@@ -328,7 +327,7 @@ describe(strictLint, () => {
     });
 
     afterEach(() => {
-      process.exit = originalExit;
+      exitSpy.mockRestore();
       process.argv = originalArgv;
     });
 
@@ -457,6 +456,14 @@ describe(strictLint, () => {
 });
 
 // region | Helpers
+
+/**
+ * Stop `process.exit` from terminating the run, leaving it a spy the tests assert calls against. The implementation
+ * comes from `vi.fn`, whose type parameter satisfies the `never` return without a type assertion, which this repo bans.
+ */
+function mockExit(): MockInstance<typeof process.exit> {
+  return vi.spyOn(process, 'exit').mockImplementation(vi.fn<(code?: string | number | null) => never>());
+}
 
 /** Make the mocked loader resolve with one cascade entry per config, given nearest first. */
 function withStrictLintConfigs(...configs: StrictLintConfig[]): void {

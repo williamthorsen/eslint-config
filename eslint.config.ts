@@ -2,7 +2,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 
 import { commonIgnores } from './packages/typescript/src/ignores/index.ts';
-import baseConfig from './packages/typescript/src/index.ts';
+import baseConfig, { createConfig, patterns } from './packages/typescript/src/index.ts';
 
 const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
 const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];
@@ -39,10 +39,18 @@ const config = defineConfig([
       // `bin` names the compiled path; mapping the source to it makes the shebang here read as a bin's.
       // Keep on this rule: via `settings.n` it makes `n/no-unpublished-import` reject the opt-in plugins.
       'n/hashbang': ['error', { convertPath: { 'src/bin/**/*.ts': [String.raw`^src/(.+)\.ts$`, 'dist/esm/$1.js'] } }],
-      'n/no-extraneous-import': ['error', { allowModules: ['vitest'] }],
+      'n/no-extraneous-import': ['error', { allowModules: ['@sindresorhus/is', 'vitest'] }],
       'n/no-unsupported-features/es-syntax': 'error',
     },
   },
+  defineConfig({
+    files: patterns.testFiles,
+    // A `*.rules.test.ts` file declares its cases as a table handed to `RuleTester.run()`, which generates the
+    // `describe`/`it` blocks internally. The plugin parses no test call there, so its rules have nothing to act on
+    // and `vitest/require-hook` reports the table itself as unhooked setup.
+    ignores: ['**/*.rules.test.ts'],
+    extends: [await createConfig.vitest()],
+  }),
   {
     files: ['**/scripts/**/*'],
     rules: {

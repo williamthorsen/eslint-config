@@ -15,47 +15,45 @@ import { factoryCases, fixtureWiring, lintFixture } from './helpers.ts';
 const COLD_START_TIMEOUT_MS = 20_000;
 
 describe('createConfig composability with defineConfig', () => {
-  for (const { name, load, fixture } of factoryCases) {
-    it(
-      `${name}: composes as a direct defineConfig() argument and lints the fixture`,
-      async () => {
-        const composed = defineConfig(fixtureWiring, ...(await load()));
+  it.each(factoryCases)(
+    `$name: composes as a direct defineConfig() argument and lints the fixture`,
+    async ({ fixture, load }) => {
+      const composed = defineConfig(fixtureWiring, ...(await load()));
 
-        const results = await lintFixture(composed, fixture);
+      const results = await lintFixture(composed, fixture);
 
-        expect(results[0]?.fatalErrorCount).toBe(0);
-      },
-      COLD_START_TIMEOUT_MS,
-    );
+      expect(results[0]?.fatalErrorCount).toBe(0);
+    },
+    COLD_START_TIMEOUT_MS,
+  );
 
-    it(
-      `${name}: composes through defineConfig()'s extends and lints the fixture`,
-      async () => {
-        const composed = defineConfig(fixtureWiring, { extends: await load() });
+  it.each(factoryCases)(
+    `$name: composes through defineConfig()'s extends and lints the fixture`,
+    async ({ fixture, load }) => {
+      const composed = defineConfig(fixtureWiring, { extends: await load() });
 
-        const results = await lintFixture(composed, fixture);
+      const results = await lintFixture(composed, fixture);
 
-        expect(results[0]?.fatalErrorCount).toBe(0);
-      },
-      COLD_START_TIMEOUT_MS,
-    );
-  }
+      expect(results[0]?.fatalErrorCount).toBe(0);
+    },
+    COLD_START_TIMEOUT_MS,
+  );
 });
 
 // Pin that the plugin's rules actually reach the linter through both composition forms — the
 // fatal-error check above passes even for a composition that dropped them.
 describe('createConfig.next carries the plugin rules', () => {
-  for (const form of ['direct argument', 'extends'] as const) {
-    it(`applies a @next/next rule when composed via ${form}`, async () => {
-      const next = await createConfig.next();
-      const composed =
-        form === 'extends' ? defineConfig(fixtureWiring, { extends: next }) : defineConfig(fixtureWiring, ...next);
+  // `as const` keeps `form` a literal union, so a typo in the comparison below is a compile error rather than a
+  // silent fall-through that runs the same composition form twice.
+  it.each(['direct argument', 'extends'] as const)(`applies a @next/next rule when composed via %s`, async (form) => {
+    const next = await createConfig.next();
+    const composed =
+      form === 'extends' ? defineConfig(fixtureWiring, { extends: next }) : defineConfig(fixtureWiring, ...next);
 
-      const results = await lintFixture(composed, 'next-img.tsx');
+    const results = await lintFixture(composed, 'next-img.tsx');
 
-      expect(results[0]?.messages.map((message) => message.ruleId)).toContain('@next/next/no-img-element');
-    });
-  }
+    expect(results[0]?.messages.map((message) => message.ruleId)).toContain('@next/next/no-img-element');
+  });
 });
 
 describe('plugins subpath composability with defineConfig', () => {

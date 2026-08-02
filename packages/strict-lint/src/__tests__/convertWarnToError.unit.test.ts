@@ -4,14 +4,14 @@ import { describe, expect, it } from 'vitest';
 import { convertWarnToError } from '../convertWarnToError.ts';
 import Config = Linter.Config;
 
-describe('convertWarnToError()', () => {
+describe(convertWarnToError, () => {
   it('if the config has no rules, returns the config', () => {
     const config = {};
     const expected = config;
 
     const actual = convertWarnToError(config);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if a rule has a rule level of "warn", replaces "warn" with "error"', () => {
@@ -30,7 +30,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if a rule has a rule level and options with a level of "warn", replaces "warn" with "error" and preserves the options', () => {
@@ -49,7 +49,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if a rule has a bare numeric severity of 1, replaces it with "error"', () => {
@@ -68,7 +68,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if a rule has an array-form numeric severity of 1, replaces it with "error" and preserves options', () => {
@@ -87,7 +87,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if a rule has a bare numeric severity of 2, leaves it unchanged', () => {
@@ -104,7 +104,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if a rule has an array-form numeric severity of 2, leaves it unchanged', () => {
@@ -121,7 +121,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if maxSeverity maps a rule to "warn", skips escalation for numeric 1', () => {
@@ -141,7 +141,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config, maxSeverity);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if maxSeverity maps a rule to "warn", skips escalation for string-form warn', () => {
@@ -161,7 +161,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config, maxSeverity);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if maxSeverity maps a rule to "warn", skips escalation for array-form warn', () => {
@@ -179,7 +179,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config, maxSeverity);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if maxSeverity maps a rule to "error", escalation proceeds normally', () => {
@@ -197,7 +197,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config, maxSeverity);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if maxSeverity maps a rule to "warn" and the rule is already "error", keeps it as "error"', () => {
@@ -215,7 +215,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config, maxSeverity);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   it('if maxSeverity is not provided, all warn rules are escalated', () => {
@@ -232,7 +232,7 @@ describe('convertWarnToError()', () => {
 
     const actual = convertWarnToError(config);
 
-    expect(actual).toEqual(expected);
+    expect(actual).toStrictEqual(expected);
   });
 
   describe('the full severity vocabulary as a ceiling', () => {
@@ -254,7 +254,7 @@ describe('convertWarnToError()', () => {
 
         const actual = convertWarnToError(config, { 'some-rule': ceiling });
 
-        expect(actual.rules).toEqual({ 'some-rule': ruleValue });
+        expect(actual.rules).toStrictEqual({ 'some-rule': ruleValue });
       },
     );
 
@@ -265,7 +265,7 @@ describe('convertWarnToError()', () => {
 
         const actual = convertWarnToError(config, { 'some-rule': ceiling });
 
-        expect(actual.rules).toEqual({ 'some-rule': promoted });
+        expect(actual.rules).toStrictEqual({ 'some-rule': promoted });
       },
     );
 
@@ -276,7 +276,7 @@ describe('convertWarnToError()', () => {
 
         const actual = convertWarnToError(config, { 'some-rule': ceiling });
 
-        expect(actual.rules).toEqual({ 'some-rule': 'error' });
+        expect(actual.rules).toStrictEqual({ 'some-rule': 'error' });
       },
     );
   });

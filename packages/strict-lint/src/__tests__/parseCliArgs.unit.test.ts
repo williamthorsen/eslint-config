@@ -6,9 +6,9 @@ describe(parseCliArgs, () => {
   it('returns defaults when no arguments are provided', () => {
     const result = parseCliArgs([]);
 
-    expect(result.patterns).toEqual([]);
-    expect(result.eslintOptions).toEqual({});
-    expect(result.ruleOverrides).toEqual({});
+    expect(result.patterns).toStrictEqual([]);
+    expect(result.eslintOptions).toStrictEqual({});
+    expect(result.ruleOverrides).toStrictEqual({});
     expect(result.fixDryRun).toBe(false);
     expect(result.format).toBe('stylish');
     expect(result.quiet).toBe(false);
@@ -27,7 +27,7 @@ describe(parseCliArgs, () => {
   it('returns positional args as patterns', () => {
     const result = parseCliArgs(['src/', 'lib/']);
 
-    expect(result.patterns).toEqual(['src/', 'lib/']);
+    expect(result.patterns).toStrictEqual(['src/', 'lib/']);
   });
 
   it('maps --fix to eslintOptions.fix', () => {
@@ -47,13 +47,13 @@ describe(parseCliArgs, () => {
   it('maps --fix-type to eslintOptions.fixTypes', () => {
     const result = parseCliArgs(['--fix-type', 'problem', '--fix-type', 'suggestion']);
 
-    expect(result.eslintOptions.fixTypes).toEqual(['problem', 'suggestion']);
+    expect(result.eslintOptions.fixTypes).toStrictEqual(['problem', 'suggestion']);
   });
 
   it('maps --ignore-pattern to eslintOptions.ignorePatterns', () => {
     const result = parseCliArgs(['--ignore-pattern', 'dist/**', '--ignore-pattern', 'build/**']);
 
-    expect(result.eslintOptions.ignorePatterns).toEqual(['dist/**', 'build/**']);
+    expect(result.eslintOptions.ignorePatterns).toStrictEqual(['dist/**', 'build/**']);
   });
 
   it('maps --no-ignore to eslintOptions.ignore=false', () => {
@@ -119,7 +119,7 @@ describe(parseCliArgs, () => {
   it('maps --flag to eslintOptions.flags', () => {
     const result = parseCliArgs(['--flag', 'unstable_ts_config']);
 
-    expect(result.eslintOptions.flags).toEqual(['unstable_ts_config']);
+    expect(result.eslintOptions.flags).toStrictEqual(['unstable_ts_config']);
   });
 
   it('maps numeric --concurrency to a number', () => {
@@ -145,13 +145,13 @@ describe(parseCliArgs, () => {
   it('parses --rule into ruleOverrides using colon-split', () => {
     const result = parseCliArgs(['--rule', 'no-console: error']);
 
-    expect(result.ruleOverrides).toEqual({ 'no-console': 'error' });
+    expect(result.ruleOverrides).toStrictEqual({ 'no-console': 'error' });
   });
 
   it('parses multiple --rule flags', () => {
     const result = parseCliArgs(['--rule', 'no-console: error', '--rule', 'no-debugger: warn']);
 
-    expect(result.ruleOverrides).toEqual({
+    expect(result.ruleOverrides).toStrictEqual({
       'no-console': 'error',
       'no-debugger': 'warn',
     });
@@ -160,7 +160,7 @@ describe(parseCliArgs, () => {
   it('parses --rule with colon but no space separator', () => {
     const result = parseCliArgs(['--rule', 'no-console:error']);
 
-    expect(result.ruleOverrides).toEqual({ 'no-console': 'error' });
+    expect(result.ruleOverrides).toStrictEqual({ 'no-console': 'error' });
   });
 
   it('throws on --rule without colon separator', () => {
@@ -230,9 +230,9 @@ describe(parseCliArgs, () => {
   it('combines positional args with flags', () => {
     const result = parseCliArgs(['src/', '--fix', '--quiet', '--rule', 'no-console: error']);
 
-    expect(result.patterns).toEqual(['src/']);
+    expect(result.patterns).toStrictEqual(['src/']);
     expect(result.eslintOptions.fix).toBe(true);
     expect(result.quiet).toBe(true);
-    expect(result.ruleOverrides).toEqual({ 'no-console': 'error' });
+    expect(result.ruleOverrides).toStrictEqual({ 'no-console': 'error' });
   });
 });

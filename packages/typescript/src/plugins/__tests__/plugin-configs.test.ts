@@ -16,18 +16,18 @@ const pluginModules: { name: string; configs: Record<string, Preset> }[] = [
   { name: 'sky-pilot-react', configs: skyPilotReact.configs },
 ];
 
-describe('custom plugin preset integrity', () => {
-  for (const { name, configs } of pluginModules) {
-    for (const [presetName, preset] of Object.entries(configs)) {
-      it(`${name} "${presetName}" registers every rule's plugin prefix`, () => {
-        const registeredPrefixes = Object.keys(preset.plugins ?? {});
-        const rulePrefixes = Object.keys(preset.rules ?? {}).map((ruleId) => ruleId.slice(0, ruleId.indexOf('/')));
+const presetCases = pluginModules.flatMap(({ name, configs }) =>
+  Object.entries(configs).map(([presetName, preset]) => ({ pluginName: name, presetName, preset })),
+);
 
-        expect(rulePrefixes.length).toBeGreaterThan(0);
-        for (const prefix of rulePrefixes) {
-          expect(registeredPrefixes).toContain(prefix);
-        }
-      });
+describe('custom plugin preset integrity', () => {
+  it.each(presetCases)(`$pluginName "$presetName" registers every rule's plugin prefix`, ({ preset }) => {
+    const registeredPrefixes = Object.keys(preset.plugins ?? {});
+    const rulePrefixes = Object.keys(preset.rules ?? {}).map((ruleId) => ruleId.slice(0, ruleId.indexOf('/')));
+
+    expect(rulePrefixes.length).toBeGreaterThan(0);
+    for (const prefix of rulePrefixes) {
+      expect(registeredPrefixes).toContain(prefix);
     }
-  }
+  });
 });

@@ -1,18 +1,15 @@
+import { assert } from '@sindresorhus/is';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { importConfigModule, wrapNativeTsError } from '../importConfigModule.ts';
 
 const original = Object.getOwnPropertyDescriptor(process.features, 'typescript');
 
-afterEach(() => {
-  if (original) Object.defineProperty(process.features, 'typescript', original);
-});
-
-function disableNativeTypeScript(): void {
-  Object.defineProperty(process.features, 'typescript', { value: false, configurable: true, enumerable: true });
-}
-
 describe(importConfigModule, () => {
+  afterEach(() => {
+    if (original) Object.defineProperty(process.features, 'typescript', original);
+  });
+
   it('rejects a TypeScript config with a Node >=24 message when native TS support is absent', async () => {
     disableNativeTypeScript();
 
@@ -30,14 +27,16 @@ describe(importConfigModule, () => {
     }
 
     // A `.js` import is not gated on native TS support; it fails on the missing file instead.
-    expect(error).toBeInstanceOf(Error);
-    if (error instanceof Error) {
-      expect(error.message).not.toContain('Node >=24');
-    }
+    assert.error(error);
+    expect(error.message).not.toContain('Node >=24');
   });
 });
 
 describe(wrapNativeTsError, () => {
+  afterEach(() => {
+    if (original) Object.defineProperty(process.features, 'typescript', original);
+  });
+
   it('wraps ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX with an actionable, path-named message', () => {
     const native = Object.assign(new Error('boom'), { code: 'ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX' });
 
@@ -76,3 +75,7 @@ describe(wrapNativeTsError, () => {
     expect(wrapNativeTsError(otherCode, '/p/x.ts')).toBeUndefined();
   });
 });
+
+function disableNativeTypeScript(): void {
+  Object.defineProperty(process.features, 'typescript', { value: false, configurable: true, enumerable: true });
+}

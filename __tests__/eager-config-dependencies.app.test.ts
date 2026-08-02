@@ -40,15 +40,16 @@ interface Violation {
 }
 
 describe('eager-config dependency guard', () => {
-  for (const pkg of packagesUnderGuard) {
-    it(`every eager import in packages/${pkg} is declared as a dependency or peerDependency`, () => {
+  it.each(packagesUnderGuard)(
+    'every eager import in packages/%s is declared as a dependency or peerDependency',
+    (pkg) => {
       const packageDir = path.join(repoRoot, 'packages', pkg);
       const collected = collectStaticExternalImports(path.join(packageDir, 'src', 'index.ts'), repoRoot);
       const violations = findUndeclared(collected, readManifest(packageDir));
 
-      expect(violations, formatViolations(pkg, violations)).toEqual([]);
-    });
-  }
+      expect(violations, formatViolations(pkg, violations)).toStrictEqual([]);
+    },
+  );
 
   it('excludes opt-in framework plugins reached only through a dynamic import', () => {
     const entry = path.join(repoRoot, 'packages', 'typescript', 'src', 'index.ts');
@@ -78,7 +79,7 @@ describe('import-graph classification', () => {
       'export const used = [valuePlugin, namespaced, load];',
     ].join('\n');
 
-    expect(parseExternalImports(source)).toEqual(['@scope/pkg', 'eslint-plugin-value']);
+    expect(parseExternalImports(source)).toStrictEqual(['@scope/pkg', 'eslint-plugin-value']);
   });
 });
 
@@ -97,7 +98,7 @@ describe('dependency check', () => {
       peerDependencies: { 'plugin-in-peers': '1.0.0' },
     };
 
-    expect(findUndeclared(collected, manifest)).toEqual([
+    expect(findUndeclared(collected, manifest)).toStrictEqual([
       { packageName: 'plugin-absent', status: 'absent', importers: ['packages/x/src/config.ts'] },
       { packageName: 'plugin-in-dev', status: 'devDependencies', importers: ['packages/x/src/config.ts'] },
     ]);

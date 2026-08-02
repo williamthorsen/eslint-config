@@ -110,10 +110,23 @@ export default defineConfig(
   ...(await createConfig.react()),
   ...(await createConfig.jsxA11y()),
   ...(await createConfig.next()),
-  ...(await createConfig.vitest()),
-  ...(await createConfig.reactTestingLibrary()),
 );
 ```
+
+Scope the test-oriented factories to your test files rather than spreading them across the whole project. Applied to ordinary source, `vitest/require-hook` reports on every top-level statement:
+
+```js
+import { defineConfig } from 'eslint/config';
+
+import config, { createConfig, patterns } from '@williamthorsen/eslint-config-typescript';
+
+export default defineConfig(config, {
+  files: patterns.testFiles,
+  extends: [await createConfig.vitest(), await createConfig.reactTestingLibrary()],
+});
+```
+
+`patterns.testFiles` covers JavaScript as well as TypeScript test files. Three of the Vitest rules read type information — `unbound-method`, `valid-title`, and `prefer-describe-function-title` — and each aborts the ESLint run rather than degrading when a file has no parser services, so `createConfig.vitest()` disables all three on JavaScript globs. That makes the scoping above safe whether or not your JavaScript test files get a type-aware parser.
 
 | Method                               | Loads                                              |
 | ------------------------------------ | -------------------------------------------------- |
@@ -150,14 +163,15 @@ export default defineConfig({
 });
 ```
 
-| Constant                        | Value                       |
-| ------------------------------- | --------------------------- |
-| `patterns.javaScriptFiles`      | `['**/*.{js,cjs,mjs,jsx}']` |
-| `patterns.typeScriptFiles`      | `['**/*.{ts,cts,mts,tsx}']` |
-| `patterns.codeFiles`            | both of the above           |
-| `patterns.javaScriptExtensions` | `['{js,cjs,mjs,jsx}']`      |
-| `patterns.typeScriptExtensions` | `['{ts,cts,mts,tsx}']`      |
-| `patterns.codeExtensions`       | both                        |
+| Constant                        | Value                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| `patterns.javaScriptFiles`      | `['**/*.{js,cjs,mjs,jsx}']`                                                  |
+| `patterns.typeScriptFiles`      | `['**/*.{ts,cts,mts,tsx}']`                                                  |
+| `patterns.codeFiles`            | both of the above                                                            |
+| `patterns.testFiles`            | `['**/*.{spec,test}.{js,cjs,mjs,jsx}', '**/*.{spec,test}.{ts,cts,mts,tsx}']` |
+| `patterns.javaScriptExtensions` | `['{js,cjs,mjs,jsx}']`                                                       |
+| `patterns.typeScriptExtensions` | `['{ts,cts,mts,tsx}']`                                                       |
+| `patterns.codeExtensions`       | both                                                                         |
 
 ## Advisory rule severities
 
