@@ -38,18 +38,18 @@ Create `.config/strict-lint.config.ts` at or above the directory you run `strict
 
 ```ts
 // .config/strict-lint.config.ts
-import type { StrictLintConfig } from '@williamthorsen/strict-lint';
+import { defineConfig } from '@williamthorsen/strict-lint/config';
 
-const config: StrictLintConfig = {
+export default defineConfig({
   maxSeverity: {
     // cap these below error, so they stay warnings
     'unicorn/no-array-reduce': 'warn',
     'unicorn/no-nested-ternary': 'warn',
   },
-};
-
-export default config;
+});
 ```
+
+`defineConfig` comes from the `/config` subpath rather than the package root, and resolves to the function alone. Importing it from the root would pull ESLint into your config file's module graph.
 
 The config file is loaded through Node's native TypeScript support (Node 24+), so TypeScript syntax works without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not.
 
@@ -101,27 +101,25 @@ Overriding an inherited ceiling to `'error'` drops it, promoting that rule to an
 
 ```ts
 // packages/pkg/.config/strict-lint.config.ts
-import type { StrictLintConfig } from '@williamthorsen/strict-lint';
+import { defineConfig } from '@williamthorsen/strict-lint/config';
 
-const config: StrictLintConfig = {
+export default defineConfig({
   maxSeverity: {
     // this package is already clean of the rule, so let it fail the build here
     'unicorn/prefer-ternary': 'error',
   },
-};
-
-export default config;
+});
 ```
 
 Setting it to `undefined` drops it the same way. Reach for this when the map you spread is shared and you want the inherited entry gone rather than restated:
 
 ```ts
-const config: StrictLintConfig = {
+export default defineConfig({
   maxSeverity: {
     ...sharedSeverities,
     'unicorn/prefer-ternary': undefined,
   },
-};
+});
 ```
 
 #### Bounding the search early
@@ -129,10 +127,10 @@ const config: StrictLintConfig = {
 A config that sets `shouldIgnoreAncestors: true` stops the search at its own level:
 
 ```ts
-const config: StrictLintConfig = {
+export default defineConfig({
   maxSeverity: { 'unicorn/no-array-reduce': 'warn' },
   shouldIgnoreAncestors: true,
-};
+});
 ```
 
 Configs above it contribute nothing and are never imported, so their module-level side effects do not run.
