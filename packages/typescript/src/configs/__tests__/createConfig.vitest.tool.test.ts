@@ -1,8 +1,10 @@
 import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import config, { configs, createConfig } from '../../index.ts';
-import { fixtureWiring, lintFixture } from './helpers.ts';
+import { baseConfig } from '../../baseConfig.ts';
+import { configs } from '../configs.ts';
+import { createConfig } from '../createConfig.ts';
+import { fixtureWiring, lintFixture } from '../test-utils/lintFixture.ts';
 
 // No parser override, so the fixture is parsed by espree and carries no parser services.
 const untypedWiring: Config = { files: ['**/*.mjs'] };
@@ -55,7 +57,7 @@ describe('vitest rule ownership', () => {
       const loaded = await Promise.all(lazy.map(async ([name, load]) => [name, await load()] as const));
 
       const shipped: (readonly [string, readonly Config[]])[] = [
-        ['config', config],
+        ['baseConfig', baseConfig],
         ...Object.entries(configs),
         ...loaded,
       ];

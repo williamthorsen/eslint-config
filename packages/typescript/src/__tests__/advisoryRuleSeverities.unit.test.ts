@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { advisoryRuleSeverities } from '../advisoryRuleSeverities.ts';
-import baseConfig from '../index.ts';
+import { baseConfig } from '../baseConfig.ts';
 
 // A key naming a rule this config does not set exempts nothing and reports nothing, so a rule renamed by a
 // plugin major would otherwise hollow out the export silently.

@@ -1,8 +1,9 @@
 import { type Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import baseConfig from '../../index.ts';
-import { factoryCases, fixturesDir, lintFixture } from './helpers.ts';
+import { baseConfig } from '../../baseConfig.ts';
+import { factoryCases } from '../test-utils/factoryCases.ts';
+import { fixturesDir, lintFixture } from '../test-utils/lintFixture.ts';
 
 // The base config enables `projectService` but leaves `tsconfigRootDir` to the consumer.
 // Point it at the fixtures dir so composing with the base resolves the fixture tsconfig and

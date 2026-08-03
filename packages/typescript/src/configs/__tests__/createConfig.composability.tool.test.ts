@@ -3,9 +3,10 @@ import assert from 'node:assert';
 import { defineConfig } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import { createConfig } from '../../index.ts';
 import { skyPilot } from '../../plugins/index.ts';
-import { factoryCases, fixtureWiring, lintFixture } from './helpers.ts';
+import { createConfig } from '../createConfig.ts';
+import { factoryCases } from '../test-utils/factoryCases.ts';
+import { fixtureWiring, lintFixture } from '../test-utils/lintFixture.ts';
 
 // Every composition below passes a factory result to `defineConfig()` with no type assertion. A
 // factory that regressed to a typescript-eslint-typed return would fail to compile here, which is

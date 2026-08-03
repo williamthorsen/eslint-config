@@ -6,8 +6,6 @@ import { ESLint, type Linter } from 'eslint';
 import { type Config } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
-import { createConfig } from '../../index.ts';
-
 // Fixtures live outside `src` so the build neither compiles nor publishes them, and Vitest never collects
 // the two that are deliberately named `*.test.*`.
 export const fixturesDir = path.join(import.meta.dirname, '../../../__fixtures__/configs');
@@ -24,14 +22,6 @@ export const fixtureWiring: Config = {
     },
   },
 };
-
-// `new ESLint({ overrideConfig })` accepts `Linter.Config[]`, which models `languageOptions` with a
-// nominally-incompatible index signature. Bridge only at that constructor — never on the factory
-// results, whose assignability to `Config[]` is what the composability suite proves.
-function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above
-  return configs as Linter.Config[];
-}
 
 // Lint one fixture with the composed config and return the per-file results.
 export async function lintFixture(composed: readonly Config[], fixture: string): Promise<ESLint.LintResult[]> {
@@ -50,10 +40,14 @@ export async function lintFixture(composed: readonly Config[], fixture: string):
   return eslint.lintText(fs.readFileSync(filePath, 'utf8'), { filePath });
 }
 
-export const factoryCases: { name: string; load: () => Promise<Config[]>; fixture: string }[] = [
-  { name: 'jsxA11y', load: createConfig.jsxA11y, fixture: 'component.tsx' },
-  { name: 'next', load: createConfig.next, fixture: 'component.tsx' },
-  { name: 'react', load: createConfig.react, fixture: 'component.tsx' },
-  { name: 'reactTestingLibrary', load: createConfig.reactTestingLibrary, fixture: 'Component.test.tsx' },
-  { name: 'vitest', load: createConfig.vitest, fixture: 'example.test.ts' },
-];
+// region | Helpers
+
+// `new ESLint({ overrideConfig })` accepts `Linter.Config[]`, which models `languageOptions` with a
+// nominally-incompatible index signature. Bridge only at that constructor — never on the factory
+// results, whose assignability to `Config[]` is what the composability suite proves.
+function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above
+  return configs as Linter.Config[];
+}
+
+// endregion | Helpers
