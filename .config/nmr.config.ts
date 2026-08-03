@@ -1,4 +1,4 @@
-import { defineConfig } from '@williamthorsen/nmr';
+import { defineConfig } from '@williamthorsen/nmr/config';
 
 /** Repo-level nmr overrides. */
 export default defineConfig({
