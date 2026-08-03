@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { ensurePluginRules } from '../../../utils/ensurePluginRules.ts';
 import rule from '../no-unused-map.ts';
 
-// The rule-tester conformance tables live in `no-unused-map.rules.test.ts`. This file holds the case no tester can
+// The rule-tester conformance tables live in `no-unused-map.rules.tool.test.ts`. This file holds the case no tester can
 // produce: `Linter` runs its default parser (espree), which supplies no parser services at all.
 describe('no-unused-map under a non-TypeScript parser', () => {
   it('applies the syntactic check instead of crashing', () => {
