@@ -1,8 +1,9 @@
-import { Linter } from 'eslint';
+import type { Linter } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
 import { convertWarnToError } from '../convertWarnToError.ts';
-import Config = Linter.Config;
+
+type Config = Linter.Config;
 
 describe(convertWarnToError, () => {
   it('if the config has no rules, returns the config', () => {

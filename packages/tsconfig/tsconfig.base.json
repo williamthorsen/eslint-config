@@ -8,7 +8,7 @@
   "compilerOptions": {
     // Inlined from `@tsconfig/strictest`, in upstream's order. Not reached through `extends`, because
     // resolvers that don't realpath pnpm symlinks can't follow the second hop. The root test
-    // `__tests__/tsconfig-base.app.test.ts` asserts this block still matches the installed devDependency.
+    // `__tests__/tsconfig-base.tool.test.ts` asserts this block still matches the installed devDependency.
     "strict": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,

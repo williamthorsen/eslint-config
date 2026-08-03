@@ -45,10 +45,11 @@ const config = defineConfig([
   },
   defineConfig({
     files: patterns.testFiles,
-    // A `*.rules.test.ts` file declares its cases as a table handed to `RuleTester.run()`, which generates the
+    // A `*.rules.*test.ts` file declares its cases as a table handed to `RuleTester.run()`, which generates the
     // `describe`/`it` blocks internally. The plugin parses no test call there, so its rules have nothing to act on
-    // and `vitest/require-hook` reports the table itself as unhooked setup.
-    ignores: ['**/*.rules.test.ts'],
+    // and `vitest/require-hook` reports the table itself as unhooked setup. The single `*` spans zero characters, so
+    // one pattern covers the bare `*.rules.test.ts` form alongside a tier infix such as `*.rules.tool.test.ts`.
+    ignores: ['**/*.rules.*test.ts'],
     extends: [await createConfig.vitest()],
   }),
   {

@@ -1,6 +1,6 @@
 // The `./config` subpath entry, imported by config files that Node loads with native type stripping. It must never
 // gain a value import — including an inline `import { type … }`, which leaves the specifier behind — so that a config
-// file resolves this function and nothing else. `__tests__/defineConfig.unit.test.ts` enforces that.
+// file resolves this function and nothing else. `__tests__/defineConfig.tool.test.ts` enforces that.
 
 import type { StrictLintConfig } from './types.ts';
 
