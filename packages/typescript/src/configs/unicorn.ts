@@ -46,7 +46,7 @@ const rules: Linter.RulesRecord = {
       hexadecimal: { minimumDigits: 0, groupLength: 4 },
       binary: { minimumDigits: 0, groupLength: 4 },
       octal: { minimumDigits: 0, groupLength: 4 },
-      number: { minimumDigits: 5, groupLength: 3, fractionGroupLength: 3 },
+      number: { minimumDigits: 4, groupLength: 3, fractionGroupLength: 3 },
     },
   ], // 🔴🟠
   'unicorn/prefer-global-this': 'warn', // 🔴🟠
