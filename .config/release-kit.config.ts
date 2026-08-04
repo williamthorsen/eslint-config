@@ -1,6 +1,10 @@
 import { defineConfig } from '@williamthorsen/release-kit/config';
 
 const config = defineConfig({
+  scopeAliases: {
+    ts: 'typescript',
+  },
+
   releaseNotes: {
     shouldInjectIntoReadme: true,
   },
