@@ -1,5 +1,33 @@
 [
   {
+    "version": "8.4.0",
+    "date": "2026-08-04",
+    "sections": [
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Remove runtime logic from config barrel (#138)",
+            "body": "Removes logic from the typescript package's barrel file to make it pure. Expands test coverage to include the opt-in `createConfig` factories in `@williamthorsen/eslint-config-typescript`. Adds a guard that fails when the package or its `./configs` subpath drops or renames an export.",
+            "hash": "26f96279cd5fba0a0b0dd9b966ec79efb91e6684"
+          }
+        ]
+      },
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Migrate the test suite to nmr's isolation tiers (#137)",
+            "body": "Changes Vitest configuration so that test suites are selected by a tier (\"unit\", \"tool\", \"localhost\", and \"remote\") corresponding to the services they use. `nmr test:unit` and `nmr test:tool` each run one of these; `nmr test:all` runs every suite. A test verifies that all test file names include the tier infix. `nmr test:integration` no longer exists, and no tests carry the `.int.` infix.",
+            "hash": "c2ce64bf7eecc1ced1c7c128288b0c0bf91d3544"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "8.3.0",
     "date": "2026-08-02",
     "sections": [

@@ -1,5 +1,44 @@
 [
   {
+    "version": "9.3.0",
+    "date": "2026-08-04",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Resolve config per linted file and support concurrency (#141)",
+            "body": "`strict-lint` now reports what `eslint` reports for every package in a monorepo. It is no longer necessary to have a separate run per workspace for correct results. A package's own `.config/strict-lint.config.ts` now sets the severity ceilings for that package's files, whichever directory the run starts from.\n\n`--concurrency` now works and is off by default, as it is in `eslint`. It is unavailable when an ESLint config is supplied programmatically.\n\nLinting with a TypeScript ESLint config now requires `jiti`. Such a config may now use any TypeScript syntax, not only the subset that can be stripped to plain JavaScript.",
+            "hash": "fdef5ad09cecc702808b6711a6a8543eae5a2d29"
+          }
+        ]
+      },
+      {
+        "title": "🐛 Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Stop printing a blank line when nothing is reported (#140)",
+            "body": "Fixes an issue where a `strict-lint` run that found no problems still printed a blank line, potentially resulting in many blank lines when run recursively in a monorepo. Separately, when a run exceeds its `--max-warnings` threshold with nothing else to report, the message saying so now starts at the top of the output instead of below a blank line.",
+            "hash": "ee18b45a9672217a6916a9a82fafb5c454563079"
+          }
+        ]
+      },
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Migrate the test suite to nmr's isolation tiers (#137)",
+            "body": "Changes Vitest configuration so that test suites are selected by a tier (\"unit\", \"tool\", \"localhost\", and \"remote\") corresponding to the services they use. `nmr test:unit` and `nmr test:tool` each run one of these; `nmr test:all` runs every suite. A test verifies that all test file names include the tier infix. `nmr test:integration` no longer exists, and no tests carry the `.int.` infix.",
+            "hash": "c2ce64bf7eecc1ced1c7c128288b0c0bf91d3544"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "9.2.0",
     "date": "2026-08-02",
     "sections": [

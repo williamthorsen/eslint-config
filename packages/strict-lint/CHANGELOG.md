@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## 9.3.0 — 2026-08-04
+
+### 🎉 Features
+
+- Resolve config per linted file and support concurrency (#141)
+
+  `strict-lint` now reports what `eslint` reports for every package in a monorepo. It is no longer necessary to have a separate run per workspace for correct results. A package's own `.config/strict-lint.config.ts` now sets the severity ceilings for that package's files, whichever directory the run starts from.
+
+  `--concurrency` now works and is off by default, as it is in `eslint`. It is unavailable when an ESLint config is supplied programmatically.
+
+  Linting with a TypeScript ESLint config now requires `jiti`. Such a config may now use any TypeScript syntax, not only the subset that can be stripped to plain JavaScript.
+
+### 🐛 Bug fixes
+
+- Stop printing a blank line when nothing is reported (#140)
+
+  Fixes an issue where a `strict-lint` run that found no problems still printed a blank line, potentially resulting in many blank lines when run recursively in a monorepo. Separately, when a run exceeds its `--max-warnings` threshold with nothing else to report, the message saying so now starts at the top of the output instead of below a blank line.
+
+### ⚙️ Tooling
+
+- Migrate the test suite to nmr's isolation tiers (#137)
+
+  Changes Vitest configuration so that test suites are selected by a tier ("unit", "tool", "localhost", and "remote") corresponding to the services they use. `nmr test:unit` and `nmr test:tool` each run one of these; `nmr test:all` runs every suite. A test verifies that all test file names include the tier infix. `nmr test:integration` no longer exists, and no tests carry the `.int.` infix.
+
 ## 9.2.0 — 2026-08-02
 
 ### 🎉 Features

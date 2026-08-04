@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.4.0 — 2026-08-04
+
+### ♻️ Refactoring
+
+- Remove runtime logic from config barrel (#138)
+
+  Removes logic from the typescript package's barrel file to make it pure. Expands test coverage to include the opt-in `createConfig` factories in `@williamthorsen/eslint-config-typescript`. Adds a guard that fails when the package or its `./configs` subpath drops or renames an export.
+
+### ⚙️ Tooling
+
+- Migrate the test suite to nmr's isolation tiers (#137)
+
+  Changes Vitest configuration so that test suites are selected by a tier ("unit", "tool", "localhost", and "remote") corresponding to the services they use. `nmr test:unit` and `nmr test:tool` each run one of these; `nmr test:all` runs every suite. A test verifies that all test file names include the tier infix. `nmr test:integration` no longer exists, and no tests carry the `.int.` infix.
+
 ## 8.3.0 — 2026-08-02
 
 ### 🎉 Features

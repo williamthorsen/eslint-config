@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.2.1 — 2026-08-04
+
+### ⚙️ Tooling
+
+- Migrate the test suite to nmr's isolation tiers (#137)
+
+  Changes Vitest configuration so that test suites are selected by a tier ("unit", "tool", "localhost", and "remote") corresponding to the services they use. `nmr test:unit` and `nmr test:tool` each run one of these; `nmr test:all` runs every suite. A test verifies that all test file names include the tier infix. `nmr test:integration` no longer exists, and no tests carry the `.int.` infix.
+
 ## 0.2.0 — 2026-08-02
 
 ### 🎉 Features
