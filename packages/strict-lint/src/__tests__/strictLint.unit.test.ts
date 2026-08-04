@@ -465,6 +465,7 @@ describe(strictLint, () => {
       infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
       process.argv = ['node', 'strict-lint'];
       withStrictLintConfigs();
+      mockFormat.mockResolvedValue('');
       mockLintFiles.mockResolvedValue([{ errorCount: 0, warningCount: 0 }]);
     });
 
