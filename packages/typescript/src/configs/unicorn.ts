@@ -18,6 +18,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/catch-error-name': 'warn', // 🔴🟠
   'unicorn/class-member-ordering': 'off', // 🔴⚫ Conflicts with `@typescript-eslint/member-ordering` and most style guides
   'unicorn/consistent-boolean-name': 'off', // 🔴⚫ Prescriptive predicate naming; false-positives on predicate functions
+  'unicorn/consistent-class-member-order': 'off', // 🔴⚫ Conflicts with `@typescript-eslint/member-ordering` and most style guides
   'unicorn/consistent-function-scoping': 'warn', // 🔴🟠 Legitimate to co-locate helpers
   'unicorn/error-message': 'warn', // Pass an error message when throwing errors
   'unicorn/explicit-length-check': 'warn', // 🔴🟠
