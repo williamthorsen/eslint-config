@@ -1,7 +1,7 @@
 import { type ConfigCascade, loadConfigCascade } from '@williamthorsen/toolbelt.filesystem';
 
-import { wrapNativeTsError } from './common/importConfigModule.ts';
 import { formatRuleSeverities, isRuleSeverity } from './common/severity.ts';
+import { wrapNativeTsError } from './common/wrapNativeTsError.ts';
 import type { StrictLintConfig } from './types.ts';
 
 /** The config file strict-lint looks for, relative to each directory level of the walk. */

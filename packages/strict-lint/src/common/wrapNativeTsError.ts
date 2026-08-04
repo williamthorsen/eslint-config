@@ -1,38 +1,8 @@
-import path from 'node:path';
-import { pathToFileURL } from 'node:url';
-
-const TS_EXTENSIONS = new Set(['.ts', '.mts', '.cts']);
-
-/**
- * Loads a config module by path via Node's native loader. TypeScript configs rely on native type stripping (Node >=24)
- * and are loaded erasable-syntax-only; the two native-TS failure modes are mapped to actionable errors.
- * Every other error propagates unchanged.
- */
-export async function importConfigModule(filePath: string): Promise<unknown> {
-  const isTypeScript = TS_EXTENSIONS.has(path.extname(filePath));
-
-  if (isTypeScript && !process.features.typescript) {
-    throw new Error(unsupportedRuntimeMessage(filePath));
-  }
-
-  try {
-    return await import(pathToFileURL(filePath).href);
-  } catch (error: unknown) {
-    if (isTypeScript) {
-      const actionable = wrapNativeTsError(error, filePath);
-      if (actionable) throw actionable;
-    }
-    throw error;
-  }
-}
-
 /**
  * Maps Node's two native-TypeScript failure modes — syntax type stripping cannot erase, and a TypeScript extension on
  * a runtime where stripping is disabled — to actionable errors, or returns undefined when the error is unrelated and
- * should propagate as-is. Callers that reach Node's loader without the runtime pre-check above rely on the second
- * mapping.
- * Exported for unit testing, since Vitest transforms TypeScript itself and cannot reproduce native failure in-process.
- * @internal - Exported to allow testing
+ * should propagate as-is. The config cascade reaches Node's loader with no runtime pre-check of its own, so an
+ * unsupported runtime surfaces here as an unknown extension rather than as a dedicated diagnostic.
  */
 export function wrapNativeTsError(error: unknown, filePath: string): Error | undefined {
   if (hasErrorCode(error, 'ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX')) {

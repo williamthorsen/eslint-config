@@ -75,14 +75,14 @@ describe('native config loading (subprocess)', () => {
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
-  it('ignores a strict-lint config below the directory the run starts in', () => {
+  it('applies a strict-lint config below the directory the run starts in', () => {
     const dir = makePackageCeilingFixture();
 
     const { status, stdout } = runCli(dir, ['packages/pkg/a.js']);
 
-    // Config selection follows the working directory, so linting the package's own file does not reach its ceilings.
-    expect(status).toBe(1);
-    expect(stdout).toContain('1 error, 0 warnings');
+    // Ceilings follow the linted file, so a package's own ceiling governs its files from any working directory.
+    expect(status).toBe(0);
+    expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
   it('merges a package config over the root config, dropping only the entry it overrides', () => {
@@ -163,17 +163,78 @@ describe('native config loading (subprocess)', () => {
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
-  it('fails a config with non-erasable syntax with an actionable message', () => {
+  it('leaves the ignored-file notice a warning, so naming an ignored path does not fail the run', () => {
     const dir = makeFixture({
-      'eslint.config.ts': 'enum Severity { Warn }\nexport default [{ rules: {}, name: Severity.Warn }];\n',
+      'eslint.config.ts': "export default [{ ignores: ['ignored/**'] }, { rules: { 'no-unused-vars': 'warn' } }];\n",
+      'ignored/a.js': UNUSED_VAR_FILE,
+    });
+
+    const { status, stdout } = runCli(dir, ['ignored/a.js']);
+
+    // The notice reports no rule and no problem, and `maxSeverity` has no key that could cap it.
+    expect(status).toBe(0);
+    expect(stdout).toContain('0 errors, 1 warning');
+  }, 30_000);
+
+  it('leaves the unused-directive report a warning, which maxSeverity cannot cap', () => {
+    const dir = makeFixture({
+      'eslint.config.ts':
+        "export default [{ linterOptions: { reportUnusedDisableDirectives: 'warn' }, rules: { 'no-unused-vars': 'error' } }];\n",
+      'a.js': '// eslint-disable-next-line no-console\nexport const ok = 1;\n',
+    });
+
+    const { status, stdout } = runCli(dir, ['a.js']);
+
+    // Raising this one is ESLint's own call, through `linterOptions.reportUnusedDisableDirectives`.
+    expect(status).toBe(0);
+    expect(stdout).toContain('0 errors, 1 warning');
+  }, 30_000);
+
+  it('promotes a cached result exactly as it promotes a freshly linted one', () => {
+    const dir = makeFixture({
+      'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
+      'a.js': UNUSED_VAR_FILE,
+    });
+    const cacheArgs = ['--cache', '--format', 'json', 'a.js'];
+
+    const fresh = runCli(dir, cacheArgs);
+    const cached = runCli(dir, cacheArgs);
+
+    // The second run is served from `.eslintcache`, whose entries hold the severities ESLint recorded before
+    // promotion. Promoting only freshly linted files would let this run report a warning and exit 0.
+    expect(fs.existsSync(path.join(dir, '.eslintcache'))).toBe(true);
+    expect(cached.stdout).toBe(fresh.stdout);
+    expect(cached.status).toBe(1);
+  }, 30_000);
+
+  it('loads an ESLint config carrying non-erasable syntax, which ESLint transpiles', () => {
+    const dir = makeFixture({
+      'eslint.config.ts':
+        "enum Severity { Warn = 'warn' }\nexport default [{ rules: { 'no-unused-vars': Severity.Warn } }];\n",
+      'a.js': UNUSED_VAR_FILE,
+    });
+
+    const { status, stdout } = runCli(dir, ['a.js']);
+
+    // ESLint owns config loading and transpiles rather than stripping types, so an enum resolves where it once threw.
+    expect(status).toBe(1);
+    expect(stdout).toContain('no-unused-vars');
+  }, 30_000);
+
+  it('fails a strict-lint config with non-erasable syntax with an actionable message', () => {
+    const dir = makeFixture({
+      '.config/strict-lint.config.ts':
+        "enum Level { Warn = 'warn' }\nexport default { maxSeverity: { 'no-unused-vars': Level.Warn } };\n",
+      'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
       'a.js': UNUSED_VAR_FILE,
     });
 
     const { status, stderr } = runCli(dir, ['a.js']);
 
+    // strict-lint still loads its own config through Node's native type stripping, which cannot erase an enum.
     expect(status).toBe(1);
     expect(stderr).toContain('native type stripping');
-    expect(stderr).toContain('eslint.config.ts');
+    expect(stderr).toContain('strict-lint.config.ts');
   }, 30_000);
 });
 

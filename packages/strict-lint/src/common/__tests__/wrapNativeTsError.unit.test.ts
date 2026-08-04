@@ -1,36 +1,8 @@
-import { assert } from '@sindresorhus/is';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { importConfigModule, wrapNativeTsError } from '../importConfigModule.ts';
+import { wrapNativeTsError } from '../wrapNativeTsError.ts';
 
 const original = Object.getOwnPropertyDescriptor(process.features, 'typescript');
-
-describe(importConfigModule, () => {
-  afterEach(() => {
-    if (original) Object.defineProperty(process.features, 'typescript', original);
-  });
-
-  it('rejects a TypeScript config with a Node >=24 message when native TS support is absent', async () => {
-    disableNativeTypeScript();
-
-    await expect(importConfigModule('/proj/eslint.config.ts')).rejects.toThrow(/Node >=24/);
-  });
-
-  it('does not apply the TS guard to a JavaScript config', async () => {
-    disableNativeTypeScript();
-
-    let error: unknown;
-    try {
-      await importConfigModule('/proj/does-not-exist.js');
-    } catch (error_: unknown) {
-      error = error_;
-    }
-
-    // A `.js` import is not gated on native TS support; it fails on the missing file instead.
-    assert.error(error);
-    expect(error.message).not.toContain('Node >=24');
-  });
-});
 
 describe(wrapNativeTsError, () => {
   afterEach(() => {
@@ -76,6 +48,10 @@ describe(wrapNativeTsError, () => {
   });
 });
 
+// region | Helpers
+
 function disableNativeTypeScript(): void {
   Object.defineProperty(process.features, 'typescript', { value: false, configurable: true, enumerable: true });
 }
+
+// endregion | Helpers
