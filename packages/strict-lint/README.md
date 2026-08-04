@@ -10,7 +10,7 @@ Run ESLint with all warnings promoted to errors, except for the rules you cap be
 pnpm add -D @williamthorsen/strict-lint eslint
 ```
 
-Requires ESLint 10+ (flat config) and Node 24+ (for native TypeScript config loading).
+Requires ESLint 10+ (flat config) and Node 24+. If your ESLint config is TypeScript, install [`jiti`](https://www.npmjs.com/package/jiti) alongside it: ESLint loads TypeScript configs through jiti, exactly as a plain `eslint` run does.
 
 ## Quick start
 
@@ -24,17 +24,17 @@ Every warning emitted by your ESLint config becomes an error and fails the run, 
 
 ## How it works
 
-1. Loads your ESLint flat config (one of `eslint.config.js`, `.mjs`, `.cjs`, `.ts`, `.mts`, or `.cts`), auto-discovered by walking up from the current directory in ESLint's own priority order, or via `--config <path>`.
-2. Rewrites every rule whose severity is `'warn'` to `'error'`, except those whose `maxSeverity` ceiling sits below `error`.
-3. Runs ESLint via the Node API and exits non-zero on any errors.
+1. Runs ESLint via the Node API, letting it resolve a config for each linted file just as a plain `eslint` run does, or pinning one config for the whole run via `--config <path>`.
+2. Rewrites every reported warning to an error, except those whose `maxSeverity` ceiling sits below `error`.
+3. Exits non-zero on any errors.
 
-`maxSeverity` is the resolved set of ceilings, computed by merging, in increasing precedence, every `.config/strict-lint.config.ts` from the project root down to the directory you run from, then any `maxSeverity` passed programmatically. No rule is exempt from promotion unless one of those sources says so.
+`maxSeverity` is the resolved set of ceilings, computed by merging, in increasing precedence, every `.config/strict-lint.config.ts` from the project root down to the directory of the file being linted, then any `maxSeverity` passed programmatically. No rule is exempt from promotion unless one of those sources says so.
 
 A ceiling bounds how high strict-lint promotes a rule. It never lowers a severity your ESLint config sets explicitly: a rule configured `'error'` stays an error under every ceiling. To force a severity outright, use `ruleOverrides` or the `--rule` flag.
 
 ## Configuration
 
-Create `.config/strict-lint.config.ts` at or above the directory you run `strict-lint` from to declare your ceilings:
+Create `.config/strict-lint.config.ts` at or above the files you lint to declare your ceilings:
 
 ```ts
 // .config/strict-lint.config.ts
@@ -49,7 +49,7 @@ export default defineConfig({
 });
 ```
 
-The config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not.
+The strict-lint config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not. This restriction applies to `.config/strict-lint.config.ts` alone -- your ESLint config is loaded by ESLint through jiti, which transpiles rather than strips, and accepts any TypeScript.
 
 ### Ceiling values
 
@@ -79,7 +79,7 @@ If you lint with [`@williamthorsen/eslint-config-typescript`](https://www.npmjs.
 
 ### Discovery
 
-`strict-lint` collects every `.config/strict-lint.config.ts` between the current working directory and the project root, the same anchor ESLint uses to discover its own config. A config above the project root does not apply, so a stray `~/.config/strict-lint.config.ts` cannot govern a repository, and CI running under a different `HOME` resolves the same way a laptop does.
+`strict-lint` collects every `.config/strict-lint.config.ts` between each linted file's directory and the project root, the same anchor ESLint uses to discover its own config. A config above the project root does not apply, so a stray `~/.config/strict-lint.config.ts` cannot govern a repository, and CI running under a different `HOME` resolves the same way a laptop does.
 
 The project root is the nearest ancestor directory holding one of these markers:
 
@@ -89,11 +89,11 @@ The project root is the nearest ancestor directory holding one of these markers:
 
 Failing that, it is the nearest directory holding a `package.json`; failing that, the directory the run starts in.
 
-Selection follows the working directory, not the files you lint. Running from the repo root applies the root's config even when the targets sit inside a package.
+Selection follows the files you lint, not the working directory. Running from the repo root applies each package's own ceilings to that package's files, so one run over a monorepo resolves exactly what a run inside each package would. The same holds for ESLint's own config, which ESLint resolves per file: a single `strict-lint .` at the repo root honours every package's `eslint.config.*`, and there is no need to run once per workspace.
 
 #### Merging across levels
 
-Configs merge per rule, with the nearer one winning. In a monorepo, running from `packages/pkg` applies the repo root's ceilings and then the package's, so a package extends the root's by naming only what differs, with no import and no spread.
+Configs merge per rule, with the nearer one winning. In a monorepo, a file under `packages/pkg` takes the repo root's ceilings and then the package's, so a package extends the root's by naming only what differs, with no import and no spread.
 
 Overriding an inherited ceiling to `'error'` drops it, promoting that rule to an error in this subtree:
 
@@ -135,7 +135,7 @@ Configs above it contribute nothing and are never imported, so their module-leve
 
 #### Seeing what applied
 
-`strict-lint --debug` writes the resolved project root, the marker that chose it, and every config file that contributed — in the order they merge — to stderr. It reports strict-lint's own resolution; it does not enable ESLint's internal debug logging.
+`strict-lint --debug` writes the resolved project root, the marker that chose it, and every config file that contributed -- in the order they merge -- to stderr. Because ceilings resolve per file, it reports one block per distinct set of config files, naming the directories that set governs, rather than one block per directory. It reports strict-lint's own resolution; it does not enable ESLint's internal debug logging.
 
 ## CLI reference
 
@@ -164,7 +164,7 @@ strict-lint [options] [file|dir|glob...]
 | `--warn-ignored`               | Surface ignored files as warnings                                            |
 | `--stats`                      | Include rule timing stats                                                    |
 | `--flag <name>`                | ESLint feature flag (repeatable)                                             |
-| `--concurrency <n\|auto\|off>` | Concurrency limit                                                            |
+| `--concurrency <n\|auto\|off>` | Lint in worker threads. Default `off`.                                       |
 | `--quiet`                      | Show only errors, hide warnings                                              |
 | `--max-warnings <n>`           | Fail if warnings exceed `n`. `-1` disables.                                  |
 | `-f, --format <name>`          | Formatter (default: `stylish`)                                               |
@@ -200,6 +200,14 @@ await strictLint({
 
 `strictLint()` reads `process.argv` and merges CLI flags with the programmatic options. CLI rule overrides win over programmatic ones.
 
+`baseConfig` is incompatible with `--concurrency`: an in-memory config holds plugin objects, and ESLint clones its options to reach worker threads. Combining them fails with a message naming `baseConfig`. Load the config from a file to lint concurrently.
+
+## Concurrency
+
+`--concurrency auto` lints in worker threads, sized to the number of files and available cores. It is off by default, matching ESLint.
+
+The payoff scales with the number of files in a single run. ESLint allocates one worker per 50 files and treats a count of one as none, so a run below that threshold stays single-threaded, and each worker pays its own config-loading and type-checking startup. Prefer one run over many files to many runs over few: in a monorepo, a single `strict-lint .` at the root beats a run per workspace, both because it loads the config once and because it gives `auto` enough files to work with.
+
 ## Recommended setup
 
 Define both a normal lint script and a strict one, and run the strict one in CI:
@@ -221,9 +229,10 @@ This pattern lets you enable a stricter rule as a warning, watch it appear in lo
 
 ## Peer dependencies
 
-| Dependency | Required |
-| ---------- | -------- |
-| `eslint`   | `>=10`   |
+| Dependency | Required                              |
+| ---------- | ------------------------------------- |
+| `eslint`   | `>=10`                                |
+| `jiti`     | when your ESLint config is TypeScript |
 
 ## License
 
