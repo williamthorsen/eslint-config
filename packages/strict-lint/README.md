@@ -32,6 +32,8 @@ Every warning emitted by your ESLint config becomes an error and fails the run, 
 
 A ceiling bounds how high strict-lint promotes a rule. It never lowers a severity your ESLint config sets explicitly: a rule configured `'error'` stays an error under every ceiling. To force a severity outright, use `ruleOverrides` or the `--rule` flag.
 
+Warnings that name no rule keep the severity ESLint gave them. ESLint reports two of these: the notice for a path you name explicitly that your config ignores, and the unused `eslint-disable` directive report. Since `maxSeverity` is keyed by rule name, promoting either would raise an error no ceiling could exempt -- so `strict-lint some/ignored/file.js` reports the notice and still exits 0. To fail a build on stale disable directives, set `linterOptions.reportUnusedDisableDirectives` to `'error'` in your ESLint config.
+
 ## Configuration
 
 Create `.config/strict-lint.config.ts` at or above the files you lint to declare your ceilings:
@@ -229,10 +231,10 @@ This pattern lets you enable a stricter rule as a warning, watch it appear in lo
 
 ## Peer dependencies
 
-| Dependency | Required                              |
-| ---------- | ------------------------------------- |
-| `eslint`   | `>=10`                                |
-| `jiti`     | when your ESLint config is TypeScript |
+| Dependency | Version | Required when                    | Declared by                   |
+| ---------- | ------- | -------------------------------- | ----------------------------- |
+| `eslint`   | `>=10`  | always                           | `strict-lint`                 |
+| `jiti`     | `*`     | your ESLint config is TypeScript | `eslint`, as an optional peer |
 
 ## License
 

@@ -34,17 +34,18 @@ function countFixableBySeverity(messages: ReadonlyArray<Linter.LintMessage>, sev
 
 /**
  * The severity a message carries once promotion has run: `error` where it is a warning no ceiling caps, and its
- * original severity otherwise. A message reporting no rule — an unused-directive report — can match no ceiling, so
- * nothing stands between it and promotion.
+ * original severity otherwise. A message naming no rule keeps its severity, because `maxSeverity` is keyed by rule
+ * name and promoting one would raise an error no ceiling could ever exempt. ESLint reports both the ignored-file
+ * notice and the unused `eslint-disable` directive that way.
  */
 function promotedSeverity(
   message: Pick<Linter.LintMessage, 'ruleId' | 'severity'>,
   ceilings: MaxSeverityMap,
 ): ReportedSeverity {
-  if (message.severity !== WARNING) {
+  if (message.severity !== WARNING || message.ruleId === null) {
     return message.severity;
   }
-  return allowsPromotion(ceilings[message.ruleId ?? '']) ? ERROR : WARNING;
+  return allowsPromotion(ceilings[message.ruleId]) ? ERROR : WARNING;
 }
 
 /**

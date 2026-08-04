@@ -30,13 +30,21 @@ describe(promoteSeverities, () => {
     expect(promoted?.messages[0]?.severity).toBe(2);
   });
 
-  it('promotes a warning reporting no rule, which no ceiling can name', async () => {
-    // An unused-directive report carries `ruleId: null`, so there is no key a ceiling could match.
+  it('leaves a warning that names no rule, which no ceiling could exempt', async () => {
+    // ESLint reports the ignored-file notice and the unused-directive report with `ruleId: null`.
     const results = [buildResult({ messages: [buildMessage({ ruleId: null, severity: 1 })] })];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({ 'some-rule': 'warn' }));
+    const [promoted] = await promoteSeverities(results, resolverOf({}));
 
-    expect(promoted?.messages[0]?.severity).toBe(2);
+    expect(promoted?.messages[0]?.severity).toBe(1);
+  });
+
+  it('counts a rule-less warning as a warning', async () => {
+    const results = [buildResult({ messages: [buildMessage({ ruleId: null, severity: 1 })] })];
+
+    const [promoted] = await promoteSeverities(results, resolverOf({}));
+
+    expect(promoted).toMatchObject({ errorCount: 0, warningCount: 1 });
   });
 
   it('restates the error and warning counts from the promoted messages', async () => {

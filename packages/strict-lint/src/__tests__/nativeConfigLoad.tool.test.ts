@@ -163,6 +163,33 @@ describe('native config loading (subprocess)', () => {
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
+  it('leaves the ignored-file notice a warning, so naming an ignored path does not fail the run', () => {
+    const dir = makeFixture({
+      'eslint.config.ts': "export default [{ ignores: ['ignored/**'] }, { rules: { 'no-unused-vars': 'warn' } }];\n",
+      'ignored/a.js': UNUSED_VAR_FILE,
+    });
+
+    const { status, stdout } = runCli(dir, ['ignored/a.js']);
+
+    // The notice reports no rule and no problem, and `maxSeverity` has no key that could cap it.
+    expect(status).toBe(0);
+    expect(stdout).toContain('0 errors, 1 warning');
+  }, 30_000);
+
+  it('leaves the unused-directive report a warning, which maxSeverity cannot cap', () => {
+    const dir = makeFixture({
+      'eslint.config.ts':
+        "export default [{ linterOptions: { reportUnusedDisableDirectives: 'warn' }, rules: { 'no-unused-vars': 'error' } }];\n",
+      'a.js': '// eslint-disable-next-line no-console\nexport const ok = 1;\n',
+    });
+
+    const { status, stdout } = runCli(dir, ['a.js']);
+
+    // Raising this one is ESLint's own call, through `linterOptions.reportUnusedDisableDirectives`.
+    expect(status).toBe(0);
+    expect(stdout).toContain('0 errors, 1 warning');
+  }, 30_000);
+
   it('promotes a cached result exactly as it promotes a freshly linted one', () => {
     const dir = makeFixture({
       'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
