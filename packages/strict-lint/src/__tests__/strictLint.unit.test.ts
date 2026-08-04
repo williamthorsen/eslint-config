@@ -453,6 +453,66 @@ describe(strictLint, () => {
       expect(mockEslintConstructor).toHaveBeenCalledWith(expect.objectContaining({ overrideConfigFile: true }));
     });
   });
+
+  describe('stdout output', () => {
+    const originalArgv = process.argv;
+    let exitSpy: MockInstance<typeof process.exit>;
+    let infoSpy: MockInstance<typeof console.info>;
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      exitSpy = mockExit();
+      infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+      process.argv = ['node', 'strict-lint'];
+      withStrictLintConfigs();
+      mockLintFiles.mockResolvedValue([{ errorCount: 0, warningCount: 0 }]);
+    });
+
+    afterEach(() => {
+      infoSpy.mockRestore();
+      exitSpy.mockRestore();
+      process.argv = originalArgv;
+    });
+
+    it('writes nothing when the formatter reports a clean run as an empty string', async () => {
+      mockFormat.mockResolvedValue('');
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(infoSpy).not.toHaveBeenCalled();
+    });
+
+    it('writes whatever the formatter produced, even where another formatter would produce nothing', async () => {
+      // `json` reports a clean run as `[]`, which a count-based guard would wrongly swallow.
+      mockFormat.mockResolvedValue('[]');
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(infoSpy).toHaveBeenCalledWith('[]');
+    });
+
+    it('writes the --max-warnings message alone when the formatter produced no output', async () => {
+      // `--quiet` drops the warning-only results, which is what leaves the formatter with nothing to report.
+      process.argv = ['node', 'strict-lint', '--quiet', '--max-warnings', '0'];
+      mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
+      mockGetErrorResults.mockReturnValueOnce([]);
+      mockFormat.mockResolvedValue('');
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(infoSpy).toHaveBeenCalledWith('ESLint found too many warnings (maximum: 0).');
+    });
+
+    it('separates the --max-warnings message from the report the formatter produced', async () => {
+      process.argv = ['node', 'strict-lint', '--max-warnings', '0'];
+      mockLintFiles.mockResolvedValueOnce([{ errorCount: 0, warningCount: 3 }]);
+      mockFormat.mockResolvedValue('report\n');
+
+      await strictLint({ baseConfig: [{ rules: {} }] });
+
+      expect(infoSpy).toHaveBeenCalledWith('report\n\nESLint found too many warnings (maximum: 0).');
+    });
+  });
 });
 
 // region | Helpers
