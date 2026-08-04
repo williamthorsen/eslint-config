@@ -14,7 +14,8 @@ export async function strictLint(options?: StrictLintOptions): Promise<string> {
   const args = process.argv.slice(2);
   try {
     const { text, errorCount } = await doLint(options, args);
-    // Formatters report a clean run as an empty string, which `console.info` would emit as a blank line.
+    // An empty formatter result means a clean run, which `console.info` would emit as a blank line. The guard keys
+    // on the text, not the problem count, because a clean run is `[]` from `json` and a full document from `html`.
     if (text) {
       console.info(text);
     }
