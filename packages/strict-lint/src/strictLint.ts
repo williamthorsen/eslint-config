@@ -14,7 +14,11 @@ export async function strictLint(options?: StrictLintOptions): Promise<string> {
   const args = process.argv.slice(2);
   try {
     const { text, errorCount } = await doLint(options, args);
-    console.info(text);
+    // An empty formatter result means a clean run, which `console.info` would emit as a blank line. The guard keys
+    // on the text, not the problem count, because a clean run is `[]` from `json` and a full document from `html`.
+    if (text) {
+      console.info(text);
+    }
     if (errorCount > 0) {
       process.exit(1);
     }
@@ -98,7 +102,9 @@ async function doLint(
 
   // Check max-warnings threshold
   if (parsed.maxWarnings >= 0 && warningCount > parsed.maxWarnings) {
-    text += `\nESLint found too many warnings (maximum: ${String(parsed.maxWarnings)}).`;
+    const message = `ESLint found too many warnings (maximum: ${String(parsed.maxWarnings)}).`;
+    // Separate the message from the report only when there is one; otherwise it would lead with a blank line.
+    text = text ? `${text}\n${message}` : message;
     return { text, errorCount: Math.max(errorCount, 1) };
   }
 
