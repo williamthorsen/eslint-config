@@ -1,5 +1,22 @@
 [
   {
+    "version": "8.5.0",
+    "date": "2026-08-05",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Disable conflicting class-member-order rule",
+            "body": "Disables `unicorn/consistent-class-member-order` because it conflicts with a similar `@typescript-eslint` rule.",
+            "hash": "6edc9c24166742bdfd0f20a9b8222a294db2a1e5"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "8.4.0",
     "date": "2026-08-04",
     "sections": [

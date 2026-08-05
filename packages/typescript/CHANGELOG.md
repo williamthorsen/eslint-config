@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.5.0 — 2026-08-05
+
+### 🎉 Features
+
+- Disable conflicting class-member-order rule
+
+  Disables `unicorn/consistent-class-member-order` because it conflicts with a similar `@typescript-eslint` rule.
+
 ## 8.4.0 — 2026-08-04
 
 ### ♻️ Refactoring
