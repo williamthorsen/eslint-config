@@ -59,6 +59,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-number-coercion': 'off', // 🔴⚫ Number() and parseInt() differ; the auto-fix can change behavior
   'unicorn/prefer-number-properties': 'warn', // 🔴🟠
   'unicorn/prefer-query-selector': 'warn', // 🔴🟠
+  'unicorn/prefer-simple-condition-first': 'off', // 🔴⚫ Reorders conditions away from reading order; its unsafe report ships no fix
   'unicorn/prefer-simplified-conditions': 'off', // 🔴⚫ Rewrites guard clauses in ways that can reduce readability
   'unicorn/prefer-spread': 'off', // 🔴⚫ Prefer spread operator over Array.from, Array#concat, Array#{slice,toSpliced} and String#split
   'unicorn/prefer-string-raw': 'warn', // 🔴🟠
