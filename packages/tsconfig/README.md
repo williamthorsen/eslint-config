@@ -26,17 +26,17 @@ pnpm add -D @williamthorsen/tsconfig
 
 Everything `@tsconfig/strictest` sets, plus the Node and build options it omits:
 
-| Option                       | Value        |
-| ---------------------------- | ------------ |
-| `allowImportingTsExtensions` | `true`       |
-| `lib`                        | `["ES2025"]` |
-| `module`                     | `"NodeNext"` |
-| `moduleDetection`            | `"force"`    |
-| `noEmit`                     | `true`       |
-| `removeComments`             | `true`       |
-| `target`                     | `"ES2025"`   |
+| Option                       | Value                             |
+| ---------------------------- | --------------------------------- |
+| `allowImportingTsExtensions` | `true`                            |
+| `lib`                        | `["ES2025", "ESNext.Disposable"]` |
+| `module`                     | `"NodeNext"`                      |
+| `moduleDetection`            | `"force"`                         |
+| `noEmit`                     | `true`                            |
+| `removeComments`             | `true`                            |
+| `target`                     | `"ES2025"`                        |
 
-`target` and `lib` are pinned to a Node 24 floor.
+`target` and `lib` are pinned to a Node 24 floor. `ESNext.Disposable` supplies the explicit-resource-management declarations -- `using`, `Disposable`, `DisposableStack` -- which Node 24 implements and no numbered lib yet carries.
 
 ## What the consumer owns
 

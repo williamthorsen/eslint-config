@@ -43,7 +43,10 @@ describe('@williamthorsen/tsconfig base config', () => {
 
   it('supplies the Node and build options strictest omits', () => {
     expect(options.allowImportingTsExtensions).toBe(true);
-    expect(options.lib).toStrictEqual([lib('ES2025')]);
+    // A `--lib` name is an alias: TypeScript resolves a superseded one to its numbered successor with no
+    // diagnostic, so this array names the file actually loaded. A numbered successor appearing here is the
+    // signal to swap the declared entry for it.
+    expect(options.lib).toStrictEqual([lib('ES2025'), lib('ESNext.Disposable')]);
     expect(options.module).toBe(ts.ModuleKind.NodeNext);
     expect(options.moduleDetection).toBe(ts.ModuleDetectionKind.Force);
     expect(options.noEmit).toBe(true);
