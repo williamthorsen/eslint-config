@@ -29,7 +29,7 @@
     "@williamthorsen/release-kit": "10.2.2",
     "@williamthorsen/strict-lint": "workspace:*",
     "@williamthorsen/tsconfig": "workspace:*",
-    "codeassembly": "0.5.0",
+    "codeassembly": "0.6.0",
     "eslint": "10.8.0",
     "eslint-plugin-n": "18.2.2",
     "globals": "17.8.0",
@@ -45,7 +45,7 @@
     "vitest": "4.1.10",
     "zod": "4.4.3"
   },
-  "packageManager": "pnpm@11.18.0",
+  "packageManager": "pnpm@11.19.0",
   "engines": {
     "node": ">=24"
   }
