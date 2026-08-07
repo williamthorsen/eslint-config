@@ -11,7 +11,6 @@ const rules: Linter.RulesRecord = {
   // These are disabled because Prettier handles formatting.
   'jsonc/array-element-newline': 'off',
   'jsonc/comma-dangle': 'off',
-  'jsonc/no-missing-comma': 'off',
   'jsonc/object-curly-newline': 'off',
   'jsonc/quote-props': 'off',
   'jsonc/quotes': 'off',

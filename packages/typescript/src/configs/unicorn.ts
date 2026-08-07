@@ -16,7 +16,6 @@ const rules: Linter.RulesRecord = {
 
   // Downgrade or disable overly prescriptive rules
   'unicorn/catch-error-name': 'warn', // 🔴🟠
-  'unicorn/class-member-ordering': 'off', // 🔴⚫ Conflicts with `@typescript-eslint/member-ordering` and most style guides
   'unicorn/consistent-boolean-name': 'off', // 🔴⚫ Prescriptive predicate naming; false-positives on predicate functions
   'unicorn/consistent-class-member-order': 'off', // 🔴⚫ Conflicts with `@typescript-eslint/member-ordering` and most style guides
   'unicorn/consistent-function-scoping': 'warn', // 🔴🟠 Legitimate to co-locate helpers
