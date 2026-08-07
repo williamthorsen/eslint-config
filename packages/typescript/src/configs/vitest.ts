@@ -16,7 +16,6 @@ const modifiedStrictRules: Linter.RulesRecord = {
   'vitest/prefer-importing-vitest-globals': 'off', // 🟠⚫ falsely flags imported functions
   'vitest/prefer-lowercase-title': 'off', // 🟠⚫
 };
-
 // Rules whose defaults report on valid Vitest code rather than on defects.
 const correctedRules: Linter.RulesRecord = {
   // 🟠⚫ Demands `vi.fn<T>()` even when an implementation already types the mock, with no option to exempt that.
