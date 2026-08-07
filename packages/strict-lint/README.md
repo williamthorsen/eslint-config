@@ -32,7 +32,7 @@ Every warning emitted by your ESLint config becomes an error and fails the run, 
 
 A ceiling bounds how high strict-lint promotes a rule. It never lowers a severity your ESLint config sets explicitly: a rule configured `'error'` stays an error under every ceiling. To force a severity outright, use `ruleOverrides` or the `--rule` flag.
 
-Warnings that name no rule keep the severity ESLint gave them. ESLint reports two of these: the notice for a path you name explicitly that your config ignores, and the unused `eslint-disable` directive report. Since `maxSeverity` is keyed by rule name, promoting either would raise an error no ceiling could exempt -- so `strict-lint some/ignored/file.js` reports the notice and still exits 0. To fail a build on stale disable directives, set `linterOptions.reportUnusedDisableDirectives` to `'error'` in your ESLint config.
+Warnings that name no rule keep the severity ESLint gave them. ESLint reports two of these: the notice for a path you name explicitly that your config ignores, and the unused `eslint-disable` directive report. Since `maxSeverity` is keyed by rule name, promoting either would raise an error no ceiling could exempt, so `strict-lint some/ignored/file.js` reports the notice and still exits 0. To fail a build on stale disable directives, set `linterOptions.reportUnusedDisableDirectives` to `'error'` in your ESLint config.
 
 ## Configuration
 
@@ -51,7 +51,7 @@ export default defineConfig({
 });
 ```
 
-The strict-lint config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not. This restriction applies to `.config/strict-lint.config.ts` alone -- your ESLint config is loaded by ESLint through jiti, which transpiles rather than strips, and accepts any TypeScript.
+The strict-lint config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not. This restriction applies to `.config/strict-lint.config.ts` alone; your ESLint config is loaded by ESLint through jiti, which transpiles rather than strips, and accepts any TypeScript.
 
 ### Ceiling values
 
@@ -137,7 +137,7 @@ Configs above it contribute nothing and are never imported, so their module-leve
 
 #### Seeing what applied
 
-`strict-lint --debug` writes the resolved project root, the marker that chose it, and every config file that contributed -- in the order they merge -- to stderr. Because ceilings resolve per file, it reports one block per distinct set of config files, naming the directories that set governs, rather than one block per directory. It reports strict-lint's own resolution; it does not enable ESLint's internal debug logging.
+`strict-lint --debug` writes the resolved project root, the marker that chose it, and every config file that contributed (in the order they merge) to stderr. Because ceilings resolve per file, it reports one block per distinct set of config files, naming the directories that set governs, rather than one block per directory. It reports strict-lint's own resolution; it does not enable ESLint's internal debug logging.
 
 ## CLI reference
 
@@ -178,7 +178,7 @@ strict-lint [options] [file|dir|glob...]
 strict-lint --rule 'no-console: warn' --rule 'no-debugger: error' src/
 ```
 
-CLI rule overrides take the highest precedence — they apply after errorization and after any programmatic overrides.
+CLI rule overrides take the highest precedence; they apply after errorization and after any programmatic overrides.
 
 ## Programmatic API
 
