@@ -1,5 +1,27 @@
 [
   {
+    "version": "8.6.0",
+    "date": "2026-08-07",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Disable prefer-simple-condition-first and repair inert rule overrides (#145)",
+            "body": "Disables two rules in `@williamthorsen/eslint-config-typescript`: `unicorn/prefer-simple-condition-first` and `unicorn/no-for-each`.",
+            "hash": "05639ecb1bf1b5ae6498e710058ca843bd6ecf06"
+          },
+          {
+            "description": "Support explicit resource management for consumers (#148)",
+            "body": "Adds `ESNext.Disposable` to the libraries recognized by TypeScript in the exported base config. This enables the use of `using` and `await using` declarations.",
+            "hash": "df0113e43e8ee9994c7d20e5e56fc577f9ca67b3"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "8.5.0",
     "date": "2026-08-05",
     "sections": [

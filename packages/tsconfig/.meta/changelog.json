@@ -1,5 +1,22 @@
 [
   {
+    "version": "0.3.0",
+    "date": "2026-08-07",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Support explicit resource management for consumers (#148)",
+            "body": "Adds `ESNext.Disposable` to the libraries recognized by TypeScript in the exported base config. This enables the use of `using` and `await using` declarations.",
+            "hash": "df0113e43e8ee9994c7d20e5e56fc577f9ca67b3"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.2.1",
     "date": "2026-08-04",
     "sections": [

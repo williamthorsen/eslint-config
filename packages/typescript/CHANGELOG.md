@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.6.0 — 2026-08-07
+
+### 🎉 Features
+
+- Disable prefer-simple-condition-first and repair inert rule overrides (#145)
+
+  Disables two rules in `@williamthorsen/eslint-config-typescript`: `unicorn/prefer-simple-condition-first` and `unicorn/no-for-each`.
+
+- Support explicit resource management for consumers (#148)
+
+  Adds `ESNext.Disposable` to the libraries recognized by TypeScript in the exported base config. This enables the use of `using` and `await using` declarations.
+
 ## 8.5.0 — 2026-08-05
 
 ### 🎉 Features

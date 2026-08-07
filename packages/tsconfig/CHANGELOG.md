@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.3.0 — 2026-08-07
+
+### 🎉 Features
+
+- Support explicit resource management for consumers (#148)
+
+  Adds `ESNext.Disposable` to the libraries recognized by TypeScript in the exported base config. This enables the use of `using` and `await using` declarations.
+
 ## 0.2.1 — 2026-08-04
 
 ### ⚙️ Tooling
