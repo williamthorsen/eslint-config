@@ -41,7 +41,7 @@ Releases are triggered via the **Release** GitHub Actions workflow (`workflow_di
 
 Commit titles are rendered by `describe-change.sh` from `commit.title_format` in `~/.agents/preferences.yaml` (currently `[{scope}|{type}: ]{title}`). Don't assemble titles by hand — invoke the commit skill, which calls the script. The project-specific values to pass are:
 
-- **`--scope`:** `basic`, `root`, `strict-lint`, `ts`, `tsconfig`, or `*` for changes spanning multiple workspaces.
+- **`--scope`:** `basic`, `root`, `strict-lint`, `tsconfig`, `typescript`, or `*` for changes spanning multiple workspaces. Pass `typescript`, never the `ts` alias; `.config/release-kit.config.ts` resolves `ts` only so that the commits predating the switch keep resolving.
 - **`--type`:** see the work-types table in `docs/versioning-and-changelog.md`. Append `!` after the type for breaking changes (e.g., `feat!`); `drop` always carries it.
 - **Separation rule:** `deps` is always its own commit. Never mix dependency updates with `feat`/`refactor`/etc. — release-kit categorizes by type, so mixed commits land in the wrong section. The one carve-out is an `@tsconfig/strictest` bump that changes settings, which must carry the mirrored `tsconfig.base.json` edit; see Gotchas.
 
