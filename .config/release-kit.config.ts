@@ -20,17 +20,18 @@ const config = defineConfig({
     },
   },
 
-  workspaces: [
+  retiredPackages: [
     {
-      dir: 'basic',
-      shouldExclude: true,
-      legacyIdentities: [
-        {
-          name: '@williamthorsen/eslint-config-basic',
-          tagPrefix: 'basic-v',
-        },
-      ],
+      name: '@williamthorsen/eslint-config-basic',
+      tagPrefix: 'basic-v',
     },
+    {
+      name: '@williamthorsen/eslint-config-basic',
+      tagPrefix: 'eslint-config-basic-v',
+    },
+  ],
+
+  workspaces: [
     {
       dir: 'typescript',
       legacyIdentities: [

@@ -2,11 +2,10 @@
 
 ## Overview
 
-A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published under `@williamthorsen/*`. Four packages: a small JavaScript config (`basic`), a comprehensive TypeScript config (`typescript`, the primary public artifact, with React/Next/Vitest/testing-library presets and custom rules), a CLI utility that runs ESLint with warnings promoted to errors (`strict-lint`), and a shared TypeScript base config (`tsconfig`).
+A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published under `@williamthorsen/*`. Three packages: a comprehensive TypeScript config (`typescript`, the primary public artifact, with React/Next/Vitest/testing-library presets and custom rules), a CLI utility that runs ESLint with warnings promoted to errors (`strict-lint`), and a shared TypeScript base config (`tsconfig`).
 
 ## Project structure
 
-- `packages/basic/` — `@williamthorsen/eslint-config-basic`. Flat config for JavaScript/JSON/MD/YAML. No build step; ships `index.mjs` directly.
 - `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Sources under `src/`, compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `src/plugins/rules/`.
 - `packages/strict-lint/` — `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
 - `packages/tsconfig/` — `@williamthorsen/tsconfig`. No build step; ships `tsconfig.base.json`, which inlines `@tsconfig/strictest`'s settings and adds the Node/build options it omits. The repo root consumes it via the workspace symlink.
@@ -33,7 +32,7 @@ Releases are triggered via the **Release** GitHub Actions workflow (`workflow_di
 
 ## Architecture
 
-- **Flat ESLint config (ESLint 9+) everywhere.** Both consumer-facing packages export arrays compatible with the flat-config format. Selective subpath imports are supported on the typescript package (`@williamthorsen/eslint-config-typescript/configs`, `/plugins`, etc.).
+- **Flat ESLint config (ESLint 9+) everywhere.** The typescript package exports arrays compatible with the flat-config format, with selective subpath imports (`@williamthorsen/eslint-config-typescript/configs`, `/plugins`, etc.).
 - **Custom ESLint rules** in `packages/typescript/src/plugins/rules/`: `memoized-functions-returned-by-hook`, `no-undefined-with-number`, `no-unused-map`, `prefer-function-declaration`.
 - **Hooks:** `lefthook` runs prettier on staged files pre-commit (see `lefthook.yml`).
 
@@ -41,7 +40,7 @@ Releases are triggered via the **Release** GitHub Actions workflow (`workflow_di
 
 Commit titles are rendered by `describe-change.sh` from `commit.title_format` in `~/.agents/preferences.yaml` (currently `[{scope}|{type}: ]{title}`). Don't assemble titles by hand — invoke the commit skill, which calls the script. The project-specific values to pass are:
 
-- **`--scope`:** `basic`, `root`, `strict-lint`, `tsconfig`, `typescript`, or `*` for changes spanning multiple workspaces. Pass `typescript`, never the `ts` alias; `.config/release-kit.config.ts` resolves `ts` only so that the commits predating the switch keep resolving.
+- **`--scope`:** `root`, `strict-lint`, `tsconfig`, `typescript`, or `*` for changes spanning multiple workspaces. Pass `typescript`, never the `ts` alias; `.config/release-kit.config.ts` resolves `ts` only so that the commits predating the switch keep resolving.
 - **`--type`:** see the work-types table in `docs/versioning-and-changelog.md`. Append `!` after the type for breaking changes (e.g., `feat!`); `drop` always carries it.
 - **Separation rule:** `deps` is always its own commit. Never mix dependency updates with `feat`/`refactor`/etc. — release-kit categorizes by type, so mixed commits land in the wrong section. The one carve-out is an `@tsconfig/strictest` bump that changes settings, which must carry the mirrored `tsconfig.base.json` edit; see Gotchas.
 
@@ -57,8 +56,6 @@ Full reference: `docs/versioning-and-changelog.md`.
 ## Gotchas
 
 - **`nmr build` is a publishing step, not a prerequisite.** Lint, typecheck, and tests all read `src`. `nmr ci` still runs `build` first so publish-path breakage surfaces early.
-- **The `basic` package has no build step** (`build` and `test` scripts are no-ops). Edits to `index.mjs` or `rules/*.mjs` take effect immediately.
-- **Publishing targets differ by package.** `basic` publishes to GitHub Packages (restricted scope `@williamthorsen`); `typescript`, `strict-lint`, and `tsconfig` publish to public npm. Tags, tokens, and audiences are not interchangeable.
 - **Don't push release tags manually.** The `Release` workflow is the source of truth; manual tags can desync versions and CHANGELOGs from the actual commit history release-kit analyzes.
 - **Two Vitest configs serve the whole repo.** `vitest.config.ts` and `vitest.root.config.ts` each call the factory from `@williamthorsen/nmr/vitest`; packages carry no config of their own, because Vitest walks up from the run root to find one. The root variant excludes `packages/**`, so `nmr root:test` runs only root-level tests.
 - **Test suites are selected by filename, not by config.** The shared config declares four projects named for the furthest thing a test reaches: `*.tool.test.ts` is `tool`, `*.localhost.test.ts` and `*.remote.test.ts` name tiers this repo has no tests in, and everything else under `__tests__` falls to the `unit` residual. `tool` means a process-scale tool — a linter, compiler, or spawned binary — reached as a process or through its own JavaScript API; both consumer packages declare `eslint` as a peer, so a test that constructs an `ESLint`, a `Linter`, or a `RuleTester` belongs there. Importing a peer for constants or types does not, and neither does mocking one out. `nmr test` runs `unit` and `tool` together, naming the tiers rather than negating the ones it skips, so a tier added in a later release is opt-in. Because `unit` is a residual and the shared config sets `passWithNoTests`, a missing or misspelt tier infix is silent in both directions: the file runs under `unit`, and a fan-out that reached nothing still reports success. Verify a tier change by the file count `nmr test:unit` and `nmr test:tool` each collect, never by a green run.

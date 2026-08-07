@@ -8,7 +8,6 @@ All commits follow the structured format: `{workspace}|{work_type}: {description
 
 ### Workspace prefixes
 
-- `basic` - Basic package (`@williamthorsen/eslint-config-basic`)
 - `root` - Changes affecting the monorepo root
 - `strict-lint` - Strict-lint package (`@williamthorsen/strict-lint`)
 - `tsconfig` - TSConfig package (`@williamthorsen/tsconfig`)

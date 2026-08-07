@@ -6,7 +6,6 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 
 | Package                                                           | Description                                                                                   |
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [`@williamthorsen/eslint-config-basic`](packages/basic)           | Flat ESLint preset for JavaScript, JSON, YAML, Markdown, and `package.json`                   |
 | [`@williamthorsen/eslint-config-typescript`](packages/typescript) | Flat ESLint preset for TypeScript projects, with opt-in React, Next, Vitest, and a11y configs |
 | [`@williamthorsen/strict-lint`](packages/strict-lint)             | CLI that runs ESLint with warnings promoted to errors, with a configurable allowlist          |
 | [`@williamthorsen/tsconfig`](packages/tsconfig)                   | Shared TypeScript base config for Node-only projects                                          |
@@ -55,14 +54,7 @@ Releases are triggered by the **Release** GitHub Actions workflow (manual `workf
 
 Don't push release tags by hand — manual tags can desync `package.json` versions, CHANGELOGs, and the commit history that release-kit reads.
 
-Publishing targets differ by package:
-
-| Package                                    | Registry        | Visibility |
-| ------------------------------------------ | --------------- | ---------- |
-| `@williamthorsen/eslint-config-basic`      | GitHub Packages | restricted |
-| `@williamthorsen/eslint-config-typescript` | npm             | public     |
-| `@williamthorsen/strict-lint`              | npm             | public     |
-| `@williamthorsen/tsconfig`                 | npm             | public     |
+All packages publish publicly to npm.
 
 ## Gotchas
 

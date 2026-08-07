@@ -10,8 +10,8 @@ import { collectStaticExternalImports, parseExternalImports } from './support/co
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 // Published packages whose eager configs reach external consumers. `typescript` is the only one
-// today; `basic` is private and `strict-lint` is a CLI with no eager plugin imports. Extend this
-// list when a new published config package appears.
+// today; `strict-lint` is a CLI with no eager plugin imports. Extend this list when a new
+// published config package appears.
 const packagesUnderGuard = ['typescript'];
 
 // Framework plugins the package loads only through a dynamic `import()` in `createConfig`. They are
