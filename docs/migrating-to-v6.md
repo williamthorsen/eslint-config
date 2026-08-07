@@ -6,7 +6,7 @@ Walks a consumer of `@williamthorsen/eslint-config-typescript` v5.x through the 
 
 v6 requires:
 
-- Node `^22.13.0 || >=24` — support for Node 18 and 20 is dropped.
+- Node `^22.13.0 || >=24` (support for Node 18 and 20 is dropped).
 - ESLint 10.
 
 ## Step 1: upgrade the toolchain
@@ -23,7 +23,7 @@ v6 supplies typescript-eslint's project service itself: each linted file's ownin
 
 1. **Remove `parserOptions.project`** from every ESLint config (root and workspaces). Leaving it set now throws `Enabling "project" does nothing when "projectService" is enabled`.
 2. **Delete every `tsconfig.eslint.json`**, first folding any lint-only `include` entries into the real `tsconfig.json`. Widening `include` is safe when the config is typecheck-only (`noEmit`).
-3. **Keep `tsconfigRootDir`** — it is the one parser option that remains, anchoring resolution at the repo root regardless of how ESLint is launched.
+3. **Keep `tsconfigRootDir`**: It is the one parser option that remains, anchoring resolution at the repo root regardless of how ESLint is launched.
 
 Before (v5):
 
@@ -67,7 +67,7 @@ Every linted `.ts`/`.tsx` file must now belong to a discoverable `tsconfig.json`
 
 ## Step 3: clean up
 
-- Remove `@eslint/js` from your `devDependencies` if you only added it to satisfy this package — since v6.0.1 the config declares it as a direct dependency.
+- Remove `@eslint/js` from your `devDependencies` if you only added it to satisfy this package; since v6.0.1 the config declares it as a direct dependency.
 
 ## What may newly fail
 

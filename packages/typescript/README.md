@@ -31,18 +31,18 @@ export default defineConfig(tsConfig, {
 });
 ```
 
-Everything this package exports is typed with ESLint core's own `Config`, so the same composition typechecks unchanged in an `eslint.config.ts` — no `tseslint.config()`, type assertion, or widening cast.
+Everything this package exports is typed with ESLint core's own `Config`, so the same composition typechecks unchanged in an `eslint.config.ts`: no `tseslint.config()`, type assertion, or widening cast.
 
 ## Type-aware linting
 
-The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), so each file's owning `tsconfig.json` is discovered automatically — you do **not** set `parserOptions.project`. Two requirements follow:
+The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), so each file's owning `tsconfig.json` is discovered automatically; you do **not** set `parserOptions.project`. Two requirements follow:
 
-- Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project — for example a test directory excluded from your build config — must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
+- Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from your build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
 - Set `tsconfigRootDir` (as in Quick start) to anchor resolution at your repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
 
 ## Migrating from `parserOptions.project`
 
-This section covers the parser change alone. For the complete v5 → v6 upgrade — the Node and ESLint floors, the package bump, and post-upgrade cleanup — see [Migrating to v6](../../docs/migrating-to-v6.md).
+This section covers the parser change alone. For the complete v5 → v6 upgrade (the Node and ESLint floors, the package bump, and post-upgrade cleanup), see [Migrating to v6](../../docs/migrating-to-v6.md).
 
 Earlier versions left type-information wiring to the consumer: you set `parserOptions.project` and usually kept a dedicated `tsconfig.eslint.json`. This version supplies `projectService` itself, so:
 
@@ -92,7 +92,7 @@ export default defineConfig(
 | `configs.simpleImportSort` | sorted imports                             |
 | `configs.unicorn`          | `eslint-plugin-unicorn` rules              |
 | `configs.json`             | JSON rules                                 |
-| `configs.json5`            | JSON5 rules — apply _after_ `configs.json` |
+| `configs.json5`            | JSON5 rules (apply _after_ `configs.json`) |
 | `configs.packageJson`      | `package.json` rules                       |
 | `configs.yaml`             | YAML rules                                 |
 
@@ -126,7 +126,7 @@ export default defineConfig(config, {
 });
 ```
 
-`patterns.testFiles` covers JavaScript as well as TypeScript test files. Three of the Vitest rules read type information — `unbound-method`, `valid-title`, and `prefer-describe-function-title` — and each aborts the ESLint run rather than degrading when a file has no parser services, so `createConfig.vitest()` disables all three on JavaScript globs. That makes the scoping above safe whether or not your JavaScript test files get a type-aware parser.
+`patterns.testFiles` covers JavaScript as well as TypeScript test files. Three of the Vitest rules read type information (`unbound-method`, `valid-title`, and `prefer-describe-function-title`), and each aborts the ESLint run rather than degrading when a file has no parser services, so `createConfig.vitest()` disables all three on JavaScript globs. That makes the scoping above safe whether or not your JavaScript test files get a type-aware parser.
 
 | Method                               | Loads                                              |
 | ------------------------------------ | -------------------------------------------------- |
@@ -175,7 +175,7 @@ export default defineConfig({
 
 ## Advisory rule severities
 
-`advisoryRuleSeverities` maps the rules this config sets to `'warn'` because they report style and modernization advice rather than defects — `@typescript-eslint/no-deprecated`, most of the `unicorn` `prefer-*` set, and their neighbours. Rules this config disables outright are not included.
+`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
 
 Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
 

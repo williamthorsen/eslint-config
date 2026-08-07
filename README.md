@@ -52,7 +52,7 @@ Releases are triggered by the **Release** GitHub Actions workflow (manual `workf
 1. The workflow runs [`@williamthorsen/release-kit`](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/release-kit) to analyze commits, bump versions, regenerate CHANGELOGs, and push tags of the form `<workspace>-v<semver>`.
 2. Tag pushes trigger the **Publish** and **Create GitHub Release** workflows.
 
-Don't push release tags by hand — manual tags can desync `package.json` versions, CHANGELOGs, and the commit history that release-kit reads.
+Don't push release tags by hand; manual tags can desync `package.json` versions, CHANGELOGs, and the commit history that release-kit reads.
 
 All packages publish publicly to npm.
 
