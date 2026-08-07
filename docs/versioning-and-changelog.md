@@ -11,8 +11,8 @@ All commits follow the structured format: `{workspace}|{work_type}: {description
 - `basic` - Basic package (`@williamthorsen/eslint-config-basic`)
 - `root` - Changes affecting the monorepo root
 - `strict-lint` - Strict-lint package (`@williamthorsen/strict-lint`)
-- `ts` - TypeScript package (`@williamthorsen/eslint-config-typescript`)
 - `tsconfig` - TSConfig package (`@williamthorsen/tsconfig`)
+- `typescript` - TypeScript package (`@williamthorsen/eslint-config-typescript`); the `ts` alias `scopeAliases` resolves is retained for commits predating the switch and is not used for new ones
 - `*` - Changes affecting multiple workspaces
 
 ### Work types

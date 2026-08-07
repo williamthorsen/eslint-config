@@ -16,7 +16,6 @@ const rules: Linter.RulesRecord = {
 
   // Downgrade or disable overly prescriptive rules
   'unicorn/catch-error-name': 'warn', // 🔴🟠
-  'unicorn/class-member-ordering': 'off', // 🔴⚫ Conflicts with `@typescript-eslint/member-ordering` and most style guides
   'unicorn/consistent-boolean-name': 'off', // 🔴⚫ Prescriptive predicate naming; false-positives on predicate functions
   'unicorn/consistent-class-member-order': 'off', // 🔴⚫ Conflicts with `@typescript-eslint/member-ordering` and most style guides
   'unicorn/consistent-function-scoping': 'warn', // 🔴🟠 Legitimate to co-locate helpers
@@ -27,10 +26,10 @@ const rules: Linter.RulesRecord = {
   'unicorn/max-nested-calls': 'off', // 🔴⚫ Overly prescriptive
   'unicorn/name-replacements': 'off', // 🔴⚫ Abbreviations are allowed
   'unicorn/no-array-callback-reference': 'off', // 🔴⚫ Overly prescriptive
-  'unicorn/no-array-for-each': 'off', // 🔴⚫
   'unicorn/no-array-reduce': 'warn', // 🔴🟠
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
   'unicorn/no-break-in-nested-loop': 'off', // 🔴⚫ Break/continue in nested loops is idiomatic; extracting a function is overkill
+  'unicorn/no-for-each': 'off', // 🔴⚫
   'unicorn/no-lonely-if': 'warn', // 🔴🟠
   'unicorn/no-negated-condition': 'off', // 🔴⚫ Too prescriptive
   'unicorn/no-non-function-verb-prefix': 'off', // 🔴⚫ Flags verb-named holders like the `createConfig` factory map
@@ -59,6 +58,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-number-coercion': 'off', // 🔴⚫ Number() and parseInt() differ; the auto-fix can change behavior
   'unicorn/prefer-number-properties': 'warn', // 🔴🟠
   'unicorn/prefer-query-selector': 'warn', // 🔴🟠
+  'unicorn/prefer-simple-condition-first': 'off', // 🔴⚫ Reorders conditions away from reading order; its unsafe report ships no fix
   'unicorn/prefer-simplified-conditions': 'off', // 🔴⚫ Rewrites guard clauses in ways that can reduce readability
   'unicorn/prefer-spread': 'off', // 🔴⚫ Prefer spread operator over Array.from, Array#concat, Array#{slice,toSpliced} and String#split
   'unicorn/prefer-string-raw': 'warn', // 🔴🟠
