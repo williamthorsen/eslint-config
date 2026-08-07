@@ -40,6 +40,17 @@ export async function lintFixture(composed: readonly Config[], fixture: string):
   return eslint.lintText(fs.readFileSync(filePath, 'utf8'), { filePath });
 }
 
+// The base config enables `projectService` but leaves `tsconfigRootDir` to the consumer. Pointing it at the
+// fixtures dir is what lets a composition with the base resolve the fixture tsconfig, so every type-aware
+// rule runs for real.
+export const typedParserSettings: Config = {
+  languageOptions: {
+    parserOptions: {
+      tsconfigRootDir: fixturesDir,
+    },
+  },
+};
+
 // region | Helpers
 
 // `new ESLint({ overrideConfig })` accepts `Linter.Config[]`, which models `languageOptions` with a

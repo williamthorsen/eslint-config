@@ -1,20 +1,8 @@
-import { type Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
 import { baseConfig } from '../../baseConfig.ts';
 import { factoryCases } from '../test-utils/factoryCases.ts';
-import { fixturesDir, lintFixture } from '../test-utils/lintFixture.ts';
-
-// The base config enables `projectService` but leaves `tsconfigRootDir` to the consumer.
-// Point it at the fixtures dir so composing with the base resolves the fixture tsconfig and
-// exercises every type-aware rule for real.
-const typedParserSettings: Config = {
-  languageOptions: {
-    parserOptions: {
-      tsconfigRootDir: fixturesDir,
-    },
-  },
-};
+import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
 // The first case absorbs the cost of loading its plugin and building the TS program, which on a cold
 // module cache runs to ~9s — well past Vitest's 5s default.
