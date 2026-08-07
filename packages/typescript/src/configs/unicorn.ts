@@ -27,10 +27,10 @@ const rules: Linter.RulesRecord = {
   'unicorn/max-nested-calls': 'off', // 🔴⚫ Overly prescriptive
   'unicorn/name-replacements': 'off', // 🔴⚫ Abbreviations are allowed
   'unicorn/no-array-callback-reference': 'off', // 🔴⚫ Overly prescriptive
-  'unicorn/no-array-for-each': 'off', // 🔴⚫
   'unicorn/no-array-reduce': 'warn', // 🔴🟠
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
   'unicorn/no-break-in-nested-loop': 'off', // 🔴⚫ Break/continue in nested loops is idiomatic; extracting a function is overkill
+  'unicorn/no-for-each': 'off', // 🔴⚫
   'unicorn/no-lonely-if': 'warn', // 🔴🟠
   'unicorn/no-negated-condition': 'off', // 🔴⚫ Too prescriptive
   'unicorn/no-non-function-verb-prefix': 'off', // 🔴⚫ Flags verb-named holders like the `createConfig` factory map
