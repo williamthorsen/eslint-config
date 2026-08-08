@@ -9,7 +9,7 @@ export default defineConfig({
   rootScripts: {
     // Restates nmr's default list to append `verify:kits`.
     'check:strict': ['typecheck', 'fmt:check', 'lint:strict', 'test:coverage', 'verify:kits'],
-    // Only the typescript workspace ships kits, and `rdy` resolves only there.
-    'verify:kits': 'pnpm --filter @williamthorsen/eslint-config-typescript exec rdy verify',
+    'verify:kits':
+      'pnpm --filter @williamthorsen/eslint-config-typescript --filter @williamthorsen/tsconfig exec rdy verify',
   },
 });
