@@ -1,6 +1,36 @@
 import { describe, expect, it } from 'vitest';
 
-import { lowestNodeMajor, readNodeMajor } from '../node-floor.ts';
+import { classifyNodeEsYear, lowestNodeMajor, readNodeMajor } from '../node-floor.ts';
+
+// Stands in for readyup's table, which covers even LTS majors from 18 upward.
+const ES_YEAR_BY_MAJOR: Record<number, string | undefined> = { 18: 'es2022', 20: 'es2023', 22: 'es2024', 24: 'es2025' };
+
+function esYearForMajor(major: number): string | undefined {
+  return ES_YEAR_BY_MAJOR[major];
+}
+
+describe(classifyNodeEsYear, () => {
+  it('reports the year for a major the table covers', () => {
+    expect(classifyNodeEsYear(24, esYearForMajor)).toStrictEqual({ esYear: 'es2025', kind: 'exact' });
+  });
+
+  // A major below every entry implements less than the lowest year the table names.
+  it('reports a major predating the table as under its lowest year', () => {
+    expect(classifyNodeEsYear(16, esYearForMajor)).toStrictEqual({ esYear: 'es2022', kind: 'under' });
+  });
+
+  it('reports a major the table skips as unknown', () => {
+    expect(classifyNodeEsYear(21, esYearForMajor)).toStrictEqual({ kind: 'unknown' });
+  });
+
+  it('reports a major postdating the table as unknown', () => {
+    expect(classifyNodeEsYear(26, esYearForMajor)).toStrictEqual({ kind: 'unknown' });
+  });
+
+  it('reports every major as unknown when the table is empty', () => {
+    expect(classifyNodeEsYear(16, () => undefined)).toStrictEqual({ kind: 'unknown' });
+  });
+});
 
 describe(lowestNodeMajor, () => {
   it('takes the lowest major any floor names', () => {

@@ -21,27 +21,26 @@ import {
   type TsconfigChain,
 } from 'readyup/check-utils';
 
-import {
-  findBaseIndex,
-  findExternalBaseIndexes,
-  isBaseSpecifier,
-  isConsumerOwnedConfig,
-} from '../../src/readiness/base-chain.ts';
+import { isConsumerOwnedConfig } from '../../src/readiness/base-chain.ts';
+import { classifyChain } from '../../src/readiness/classifyChain.ts';
 import { isEsYearAtLeast, readDeclaredEsYear } from '../../src/readiness/es-year.ts';
 import { findRedundantOptions } from '../../src/readiness/findRedundantOptions.ts';
-import { lowestNodeMajor } from '../../src/readiness/node-floor.ts';
+import { classifyNodeEsYear, lowestNodeMajor, type NodeEsYear } from '../../src/readiness/node-floor.ts';
 
 const PACKAGE_NAME = '@williamthorsen/tsconfig';
 const BASE_SPECIFIER = `${PACKAGE_NAME}/tsconfig.base.json`;
 const ADOPTION_URL = 'https://github.com/williamthorsen/eslint-config/tree/main/packages/tsconfig#adopting-the-base';
 
+const NO_BASE_ES_YEAR = `no tsconfig reaches a ${PACKAGE_NAME} base declaring an ES year`;
+const NO_NODE_ES_YEAR = 'no ES year is known for the declared Node floor';
+
 type Adoption =
   | { baseIndex: number; chain: TsconfigChain; kind: 'adopted'; path: string }
-  | { kind: 'external-base'; path: string }
-  | { kind: 'unadopted'; path: string }
-  | { kind: 'uninstalled'; path: string };
+  | { kind: 'external-base' | 'unadopted' | 'uninstalled'; path: string };
 
 type AdoptedTsconfig = Extract<Adoption, { kind: 'adopted' }>;
+
+type FloorVerdict = { detail: string; kind: 'fail' | 'pass' } | { kind: 'skip'; reason: string };
 
 // Held for the life of one `rdy` run, which is one process targeting one project.
 const cache: { adoptions?: Adoption[]; chains: Map<string, TsconfigChain | undefined>; searchDirs?: string[] } = {
@@ -59,15 +58,13 @@ export default defineRdyKit({
           name: `Every workspace tsconfig extends ${PACKAGE_NAME}`,
           skip: skipUnlessSomeTsconfigIsAccountable,
           check: everyTsconfigAdoptsTheBase,
-          fix: `Extend ${BASE_SPECIFIER} from each tsconfig named above. Adoption: ${ADOPTION_URL}`,
-          checks: [
-            {
-              name: 'No tsconfig re-declares an option the base already supplies',
-              severity: 'recommend',
-              check: noRedundantOptions,
-              fix: 'Delete each option named above: the base already supplies it with the same value',
-            },
-          ],
+          fix: `Extend ${BASE_SPECIFIER} from each tsconfig named above, and declare ${PACKAGE_NAME} as a devDependency of each package that names it but cannot resolve it. Adoption: ${ADOPTION_URL}`,
+        },
+        {
+          name: 'No tsconfig re-declares an option the base already supplies',
+          severity: 'recommend',
+          check: noRedundantOptions,
+          fix: 'Delete each option named above: the base already supplies it with the same value',
         },
       ],
     },
@@ -83,7 +80,7 @@ export default defineRdyKit({
         {
           name: "The declared Node floor supports the base's ES year",
           severity: 'error',
-          skip: skipUnlessNodeEsYearKnown,
+          skip: skipUnlessNodeFloorComparable,
           check: nodeFloorSupportsBaseEsYear,
           fix: "Raise engines.node to a major implementing the base's ES year: below it, code that typechecks fails at runtime",
         },
@@ -110,18 +107,10 @@ function classifyTsconfig(path: string): Adoption {
   const chain = readChain(path);
   if (chain === undefined) return { kind: 'unadopted', path };
 
-  // An unresolvable specifier decides before the opt-out carve-out: a config naming the base has
-  // adopted it and failed to install it, which a framework base in the same chain must not excuse.
-  if (chain.unresolvedExtends.some((unresolved) => isBaseSpecifier(unresolved.specifier))) {
-    return { kind: 'uninstalled', path };
-  }
-
-  const baseIndex = findBaseIndex(chain.entries);
-  if (baseIndex !== undefined) return { baseIndex, chain, kind: 'adopted', path };
-
-  return findExternalBaseIndexes(chain.entries).length > 0
-    ? { kind: 'external-base', path }
-    : { kind: 'unadopted', path };
+  const classification = classifyChain(chain);
+  return classification.kind === 'adopted'
+    ? { baseIndex: classification.baseIndex, chain, kind: 'adopted', path }
+    : { kind: classification.kind, path };
 }
 
 /** Lists the Node floors the repo declares, preferring the contract a manifest publishes. */
@@ -161,7 +150,7 @@ function everyEsYearMatchesTheBase(): boolean | CheckOutcome {
       if (declared !== undefined && declared !== baseEsYear) offenders.push(`${entry.path} (${declared})`);
     }
   }
-  if (offenders.length === 0) return { ok: true, detail: `every tsconfig is at ${baseEsYear}` };
+  if (offenders.length === 0) return { ok: true, detail: `every tsconfig extending the base is at ${baseEsYear}` };
   return {
     ok: false,
     detail: `the base sets ${baseEsYear}; declared otherwise in: ${dedupe(offenders).join(', ')}`,
@@ -192,14 +181,42 @@ function findTsconfigs(): string[] {
     .filter((path) => fileExists(path));
 }
 
+/**
+ * Judges the lowest declared Node floor against the ES year the base sets, or names why the two
+ * cannot be compared.
+ */
+function judgeNodeFloor(): FloorVerdict {
+  const baseEsYear = readBaseEsYear();
+  if (baseEsYear === undefined) return { kind: 'skip', reason: NO_BASE_ES_YEAR };
+
+  const nodeEsYear = readNodeEsYear();
+  if (nodeEsYear === undefined) return { kind: 'skip', reason: 'no declared Node floor names a major' };
+
+  // A major the table skips or postdates means unknown, not unsupported: a consumer running ahead of
+  // the table is not in breach.
+  if (nodeEsYear.kind === 'unknown') return { kind: 'skip', reason: NO_NODE_ES_YEAR };
+
+  if (nodeEsYear.kind === 'under') {
+    return isEsYearAtLeast(baseEsYear, nodeEsYear.esYear)
+      ? {
+          detail: `the declared Node floor implements less than ${nodeEsYear.esYear}, below the base's ${baseEsYear}`,
+          kind: 'fail',
+        }
+      : { kind: 'skip', reason: NO_NODE_ES_YEAR };
+  }
+
+  return isEsYearAtLeast(nodeEsYear.esYear, baseEsYear)
+    ? { detail: `the declared Node floor implements ${nodeEsYear.esYear}`, kind: 'pass' }
+    : {
+        detail: `the declared Node floor implements only ${nodeEsYear.esYear}, below the base's ${baseEsYear}`,
+        kind: 'fail',
+      };
+}
+
 /** Fails when the lowest declared Node floor predates the ES year the base sets. */
 function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
-  const baseEsYear = readBaseEsYear();
-  const nodeEsYear = readNodeEsYear();
-  if (baseEsYear === undefined || nodeEsYear === undefined) return true;
-  return isEsYearAtLeast(nodeEsYear, baseEsYear)
-    ? { ok: true, detail: `the declared Node floor implements ${nodeEsYear}` }
-    : { ok: false, detail: `the declared Node floor implements only ${nodeEsYear}, below the base's ${baseEsYear}` };
+  const verdict = judgeNodeFloor();
+  return verdict.kind === 'skip' ? true : { ok: verdict.kind === 'pass', detail: verdict.detail };
 }
 
 /** Fails when a tsconfig re-declares an option the base already supplies with the same value. */
@@ -242,22 +259,20 @@ function readChain(path: string): TsconfigChain | undefined {
  * publishes as a contract; `.tool-versions` describes one dev machine, so it decides only where no
  * manifest declares one.
  */
-function readNodeEsYear(): string | undefined {
+function readNodeEsYear(): NodeEsYear | undefined {
   const major = lowestNodeMajor(declaredNodeFloors());
-  return major === undefined ? undefined : esYearForNodeMajor(major);
+  return major === undefined ? undefined : classifyNodeEsYear(major, esYearForNodeMajor);
 }
 
 /** Skips the ES year check until some chain reaches a base declaring one. */
 function skipUnlessBaseEsYearKnown(): false | string {
-  return readBaseEsYear() === undefined ? `no tsconfig reaches a ${PACKAGE_NAME} base declaring an ES year` : false;
+  return readBaseEsYear() === undefined ? NO_BASE_ES_YEAR : false;
 }
 
 /** Skips the Node floor check where either side of the comparison is unavailable. */
-function skipUnlessNodeEsYearKnown(): false | string {
-  const baseSkip = skipUnlessBaseEsYearKnown();
-  if (baseSkip !== false) return baseSkip;
-  // An unrecognized major means unknown, not unsupported: a consumer ahead of this table is not in breach.
-  return readNodeEsYear() === undefined ? 'no declared Node floor names a major with a known ES year' : false;
+function skipUnlessNodeFloorComparable(): false | string {
+  const verdict = judgeNodeFloor();
+  return verdict.kind === 'skip' ? verdict.reason : false;
 }
 
 /** Skips the adoption check when every tsconfig found extends a base belonging to another package. */

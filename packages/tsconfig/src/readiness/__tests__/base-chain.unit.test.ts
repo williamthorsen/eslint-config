@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { findBaseIndex, findExternalBaseIndexes, isBaseSpecifier, isConsumerOwnedConfig } from '../base-chain.ts';
+import { findBaseIndex, hasExternalBase, isBaseSpecifier, isConsumerOwnedConfig } from '../base-chain.ts';
 import { buildChainEntry } from '../test-utils/buildChainEntry.ts';
 
 describe(findBaseIndex, () => {
@@ -40,8 +40,8 @@ describe(findBaseIndex, () => {
   });
 });
 
-describe(findExternalBaseIndexes, () => {
-  it('lists every entry reached by a package specifier naming another package', () => {
+describe(hasExternalBase, () => {
+  it('is true when an entry was reached by a package specifier naming another package', () => {
     const entries = [
       buildChainEntry({ path: 'packages/web/tsconfig.json' }),
       buildChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
@@ -50,20 +50,22 @@ describe(findExternalBaseIndexes, () => {
         specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
       }),
       buildChainEntry({ path: 'node_modules/astro/tsconfigs/base.json', specifier: 'astro/tsconfigs/base' }),
-      buildChainEntry({ path: 'node_modules/@tsconfig/svelte/tsconfig.json', specifier: '@tsconfig/svelte' }),
     ];
 
-    expect(findExternalBaseIndexes(entries)).toStrictEqual([3, 4]);
+    expect(hasExternalBase(entries)).toBe(true);
   });
 
-  it('returns nothing for a chain of path specifiers alone', () => {
+  it('is false for a chain of path specifiers and this package alone', () => {
     const entries = [
       buildChainEntry({ path: 'packages/api/tsconfig.json' }),
       buildChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
-      buildChainEntry({ path: 'tsconfig.options.json', specifier: './tsconfig.options.json' }),
+      buildChainEntry({
+        path: 'packages/tsconfig/tsconfig.base.json',
+        specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
+      }),
     ];
 
-    expect(findExternalBaseIndexes(entries)).toStrictEqual([]);
+    expect(hasExternalBase(entries)).toBe(false);
   });
 });
 

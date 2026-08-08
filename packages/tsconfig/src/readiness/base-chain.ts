@@ -12,12 +12,11 @@ export function findBaseIndex(entries: readonly TsconfigChainEntry[]): number | 
 }
 
 /**
- * Lists the chain positions of bases belonging to another package. A config restating an option to
- * win against one of these is doing so deliberately, which is what exempts the key from the
- * re-declaration check.
+ * Reports whether a chain reaches a base belonging to another package. A config whose chain carries
+ * one has opted out of this base rather than failed to adopt it.
  */
-export function findExternalBaseIndexes(entries: readonly TsconfigChainEntry[]): number[] {
-  return entries.flatMap((entry, index) => (isExternalBase(entry) ? [index] : []));
+export function hasExternalBase(entries: readonly TsconfigChainEntry[]): boolean {
+  return entries.some((entry) => isExternalBase(entry));
 }
 
 /**
