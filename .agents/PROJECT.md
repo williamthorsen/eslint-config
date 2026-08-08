@@ -20,7 +20,7 @@ This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamtho
 ```bash
 nmr ci           # Build all packages, then run check:strict (matches GitHub Actions)
 nmr check        # typecheck + format check + lint check + tests
-nmr check:strict # typecheck + format check + strict-lint + coverage + agent-file check
+nmr check:strict # typecheck + format check + strict-lint + coverage + kit verification
 nmr build        # Build all packages (or the current package from a workspace dir)
 nmr lint         # eslint --fix; lint:check is the non-mutating variant
 nmr lint:strict  # Run strict-lint over the codebase
@@ -46,6 +46,12 @@ Commit titles are rendered by `describe-change.sh` from `commit.title_format` in
 
 Full reference: `docs/versioning-and-changelog.md`.
 
+## Definition of done
+
+A change that alters anything the readyup kit asserts (a peer range, the projectService posture, the ESLint config conventions a consumer is expected to follow) is not done until `packages/typescript/.readyup/kits/default.ts` reflects it and `rdy compile` has run in that workspace. Where the kit work does not belong in the same change, file a ticket for it before closing the one that prompted it.
+
+Recompiling is the only thing that updates the bundle: the kit inlines the package's peer ranges at compile time, so a peer bump leaves the committed bundle stale with neither recorded hash changing.
+
 ## Code style
 
 - **pnpm command usage convention:**
@@ -55,7 +61,8 @@ Full reference: `docs/versioning-and-changelog.md`.
 
 ## Gotchas
 
-- **`nmr build` is a publishing step, not a prerequisite.** Lint, typecheck, and tests all read `src`. `nmr ci` still runs `build` first so publish-path breakage surfaces early.
+- **The readyup kit spans two trees.** Its predicates live in `packages/typescript/src/readiness/`, where tests and coverage reach them; `.readyup/kits/default.ts` holds only the kit declaration and the filesystem wrappers it composes them into, and `rdy compile` bundles the two. Putting a `__tests__/` under `.readyup/` instead would collect nothing, because tinyglobby does not traverse dot-directories: the files report as zero tests rather than as an error. The kit's own `export default` is required by readyup and is the one place in this repo that carries one. This repo is absent from the `packages` list in `.config/readyup.config.ts` because `eslint.config.ts` imports `packages/typescript/src/` directly: the kit's extends check matches the package specifier as text, which a source-path import does not carry, so listing it would report a standing warning.
+- **`nmr build` is a publishing step, not a prerequisite.** Lint, typecheck, and tests all read `src`. `nmr ci` still runs `build` first so publish-path breakage surfaces early. It is also the only command that clears `noEmit`, so declaration-emit diagnostics (TS2883, TS4023, TS5011) reach no other check: a tree that cannot be published still passes `check:strict`. Run `nmr ci`, not `check:strict`, before pushing.
 - **Don't push release tags manually.** The `Release` workflow is the source of truth; manual tags can desync versions and CHANGELOGs from the actual commit history release-kit analyzes.
 - **Two Vitest configs serve the whole repo.** `vitest.config.ts` and `vitest.root.config.ts` each call the factory from `@williamthorsen/nmr/vitest`; packages carry no config of their own, because Vitest walks up from the run root to find one. The root variant excludes `packages/**`, so `nmr root:test` runs only root-level tests.
 - **Test suites are selected by filename, not by config.** The shared config declares four projects named for the furthest thing a test reaches: `*.tool.test.ts` is `tool`, `*.localhost.test.ts` and `*.remote.test.ts` name tiers this repo has no tests in, and everything else under `__tests__` falls to the `unit` residual. `tool` means a process-scale tool — a linter, compiler, or spawned binary — reached as a process or through its own JavaScript API; both consumer packages declare `eslint` as a peer, so a test that constructs an `ESLint`, a `Linter`, or a `RuleTester` belongs there. Importing a peer for constants or types does not, and neither does mocking one out. `nmr test` runs `unit` and `tool` together, naming the tiers rather than negating the ones it skips, so a tier added in a later release is opt-in. Because `unit` is a residual and the shared config sets `passWithNoTests`, a missing or misspelt tier infix is silent in both directions: the file runs under `unit`, and a fan-out that reached nothing still reports success. Verify a tier change by the file count `nmr test:unit` and `nmr test:tool` each collect, never by a green run.

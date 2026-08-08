@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kits": [
+    {
+      "checklists": [
+        "peers",
+        "config",
+        "projectservice"
+      ],
+      "description": "Alignment checks for a project consuming @williamthorsen/eslint-config-typescript",
+      "name": "default",
+      "path": "kits/default.js",
+      "readyupVersion": "0.24.0",
+      "source": "kits/default.ts",
+      "sourceHash": "e9c61029",
+      "targetHash": "40fda89a"
+    }
+  ]
+}

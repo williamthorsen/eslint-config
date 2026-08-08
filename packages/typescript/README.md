@@ -206,6 +206,30 @@ An unscoped block applies `'warn'` everywhere, including in test files, where th
 | `eslint`     | `>=10`   |
 | `typescript` | `>=5`    |
 
+## Checking your configuration
+
+This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether your project is wired correctly for the version you have installed. It is a migration aid rather than a CI gate: only a failure that stops ESLint loading or running the config is reported as an error, and everything else caps at a warning.
+
+Run it once:
+
+```shell
+pnpm exec rdy run --from npm:@williamthorsen/eslint-config-typescript
+```
+
+Or list it in `.config/readyup.config.ts` to include it whenever you run `rdy run --packages`:
+
+```ts
+import { defineRdyConfig } from 'readyup';
+
+export default defineRdyConfig({
+  packages: ['@williamthorsen/eslint-config-typescript'],
+});
+```
+
+The kit runs at the version resolved from your `node_modules`, so it reports whether your configuration matches that version. It never reports whether that version is current.
+
+The check that your root config extends this package matches the package specifier as text, so a config reaching it through a local re-export or a path alias is reported as not extending it.
+
 ## License
 
 ISC.
