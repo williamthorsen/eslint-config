@@ -40,10 +40,12 @@
     }
   },
   "files": [
+    ".readyup/kits/*.js",
+    ".readyup/manifest.json",
     "dist"
   ],
   "scripts": {
-    "prepublishOnly": "nmr build"
+    "prepublishOnly": "rdy compile && nmr build"
   },
   "dependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "4.7.2",
@@ -67,11 +69,13 @@
     "@typescript-eslint/rule-tester": "8.65.0",
     "@typescript-eslint/utils": "8.65.0",
     "@vitest/eslint-plugin": "1.6.24",
+    "esbuild": "0.28.1",
     "eslint-plugin-jest-dom": "5.7.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
-    "eslint-plugin-testing-library": "7.16.2"
+    "eslint-plugin-testing-library": "7.16.2",
+    "readyup": "0.24.0"
   },
   "peerDependencies": {
     "@typescript-eslint/utils": "^8.59.1",

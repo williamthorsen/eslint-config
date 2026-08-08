@@ -27,6 +27,13 @@ describe('configs entry point', () => {
     expect(Object.keys(configsEntry).toSorted()).toStrictEqual(['configs', 'createConfig', 'default']);
   });
 
+  // A type export is erased at runtime, so naming it here is what keeps it reachable from the barrel.
+  it('exports the config-name union alongside the map it keys', () => {
+    const name: configsEntry.ConfigName = 'typeScript';
+
+    expect(Object.keys(configsEntry.configs)).toContain(name);
+  });
+
   it('exports the same config map as both a named and the default export', () => {
     expect(configsEntry.default).toBe(configsEntry.configs);
   });

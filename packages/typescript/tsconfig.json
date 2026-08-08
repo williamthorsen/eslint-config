@@ -3,6 +3,7 @@
   "extends": "../../tsconfig.json",
   // prettier-ignore
   "include": [
+    ".readyup/**/*.ts",
     "src/**/*.ts",
     "types/**/*.d.ts",
     "*.ts",

@@ -12,7 +12,20 @@ import typeScript from './typescript.ts';
 import unicorn from './unicorn.ts';
 import yaml from './yaml.ts';
 
-export const configs = {
+export type ConfigName =
+  | 'eslintComments'
+  | 'import'
+  | 'javaScript'
+  | 'json'
+  | 'json5'
+  | 'n'
+  | 'packageJson'
+  | 'simpleImportSort'
+  | 'typeScript'
+  | 'unicorn'
+  | 'yaml';
+
+export const configs: Record<ConfigName, Config[]> = {
   eslintComments,
   import: importConfig,
   javaScript,
@@ -24,4 +37,4 @@ export const configs = {
   typeScript,
   unicorn,
   yaml,
-} satisfies Record<string, Config[]>;
+};
