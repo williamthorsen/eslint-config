@@ -8,7 +8,7 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 
 - `packages/typescript/` — `@williamthorsen/eslint-config-typescript`. Sources under `src/`, compiled to `dist/esm/`. Modular submodule exports (`./configs`, `./ignores`, `./plugins`, `./utils`). Custom ESLint rules live in `src/plugins/rules/`.
 - `packages/strict-lint/` — `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
-- `packages/tsconfig/` — `@williamthorsen/tsconfig`. No build step; ships `tsconfig.base.json`, which inlines `@tsconfig/strictest`'s settings and adds the Node/build options it omits. The repo root consumes it via the workspace symlink.
+- `packages/tsconfig/` — `@williamthorsen/tsconfig`. No build step; ships `tsconfig.base.json`, which inlines `@tsconfig/strictest`'s settings and adds the Node/build options it omits, alongside a readyup kit. The repo root consumes it via the workspace symlink. `src/` is never built and never published: it exists so the kit's predicates get tests and coverage.
 - `eslint.config.ts` (repo root) — imports `packages/typescript/src/` directly; needs no build.
 - `.config/nmr.config.ts` — repo-level overrides for the `nmr` script runner.
 - `.config/release-kit.config.ts`, `.config/v11y-check.config.json` — config for the corresponding tools invoked by GitHub Actions reusable workflows.
@@ -48,9 +48,12 @@ Full reference: `docs/versioning-and-changelog.md`.
 
 ## Definition of done
 
-A change that alters anything the readyup kit asserts (a peer range, the projectService posture, the ESLint config conventions a consumer is expected to follow) is not done until `packages/typescript/.readyup/kits/default.ts` reflects it and `rdy compile` has run in that workspace. Where the kit work does not belong in the same change, file a ticket for it before closing the one that prompted it.
+Two workspaces ship a readyup kit. A change that alters anything a kit asserts is not done until that kit's `.readyup/kits/default.ts` reflects it and `rdy compile` has run in its own workspace. Where the kit work does not belong in the same change, file a ticket for it before closing the one that prompted it.
 
-Recompiling is the only thing that updates the bundle: the kit inlines the package's peer ranges at compile time, so a peer bump leaves the committed bundle stale with neither recorded hash changing.
+- **`packages/typescript`** asserts a peer range, the projectService posture, and the ESLint config conventions a consumer is expected to follow.
+- **`packages/tsconfig`** asserts that every workspace tsconfig reaches the base, restates none of the options it supplies, and runs on a Node major implementing its ES year. An edit to `tsconfig.base.json` changes what the kit reports, since the base's own settings are what a consumer is measured against.
+
+Recompiling is the only thing that updates a bundle: the typescript kit inlines that package's peer ranges at compile time, so a peer bump leaves the committed bundle stale with neither recorded hash changing.
 
 ## Code style
 
@@ -61,7 +64,7 @@ Recompiling is the only thing that updates the bundle: the kit inlines the packa
 
 ## Gotchas
 
-- **The readyup kit spans two trees.** Its predicates live in `packages/typescript/src/readiness/`, where tests and coverage reach them; `.readyup/kits/default.ts` holds only the kit declaration and the filesystem wrappers it composes them into, and `rdy compile` bundles the two. Putting a `__tests__/` under `.readyup/` instead would collect nothing, because tinyglobby does not traverse dot-directories: the files report as zero tests rather than as an error. The kit's own `export default` is required by readyup and is the one place in this repo that carries one. This repo is absent from the `packages` list in `.config/readyup.config.ts` because `eslint.config.ts` imports `packages/typescript/src/` directly: the kit's extends check matches the package specifier as text, which a source-path import does not carry, so listing it would report a standing warning.
+- **A readyup kit spans two trees.** Its predicates live in the workspace's `src/readiness/`, where tests and coverage reach them; `.readyup/kits/default.ts` holds only the kit declaration and the filesystem wrappers it composes them into, and `rdy compile` bundles the two. Putting a `__tests__/` under `.readyup/` instead would collect nothing, because tinyglobby does not traverse dot-directories: the files report as zero tests rather than as an error. A kit's `export default` is required by readyup and is the only one either workspace carries. `.config/readyup.config.ts` lists `@williamthorsen/tsconfig`, so the repo runs that kit against itself, and deliberately omits `@williamthorsen/eslint-config-typescript`: `eslint.config.ts` imports `packages/typescript/src/` directly, and that kit's extends check matches the package specifier as text, which a source-path import does not carry, so listing it would report a standing warning.
 - **`nmr build` is a publishing step, not a prerequisite.** Lint, typecheck, and tests all read `src`. `nmr ci` still runs `build` first so publish-path breakage surfaces early. It is also the only command that clears `noEmit`, so declaration-emit diagnostics (TS2883, TS4023, TS5011) reach no other check: a tree that cannot be published still passes `check:strict`. Run `nmr ci`, not `check:strict`, before pushing.
 - **Don't push release tags manually.** The `Release` workflow is the source of truth; manual tags can desync versions and CHANGELOGs from the actual commit history release-kit analyzes.
 - **Two Vitest configs serve the whole repo.** `vitest.config.ts` and `vitest.root.config.ts` each call the factory from `@williamthorsen/nmr/vitest`; packages carry no config of their own, because Vitest walks up from the run root to find one. The root variant excludes `packages/**`, so `nmr root:test` runs only root-level tests.

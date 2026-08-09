@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "kits": [
+    {
+      "checklists": [
+        "adoption",
+        "alignment"
+      ],
+      "description": "Adoption and alignment checks for a project consuming @williamthorsen/tsconfig",
+      "name": "default",
+      "path": "kits/default.js",
+      "readyupVersion": "0.25.0",
+      "source": "kits/default.ts",
+      "sourceHash": "4d0a555c",
+      "targetHash": "4c59a48d"
+    }
+  ]
+}

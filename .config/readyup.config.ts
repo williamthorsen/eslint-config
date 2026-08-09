@@ -5,5 +5,5 @@ export default defineRdyConfig({
     infix: 'internal',
   },
   // The checks in these packages will be run by `rdy run --packages`.
-  packages: ['@williamthorsen/nmr', '@williamthorsen/release-kit', 'v11y-check'],
+  packages: ['@williamthorsen/nmr', '@williamthorsen/release-kit', '@williamthorsen/tsconfig', 'v11y-check'],
 });
