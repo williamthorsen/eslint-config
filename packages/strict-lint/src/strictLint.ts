@@ -1,12 +1,13 @@
 import fs from 'node:fs/promises';
 
-import type { ConfigCascade, ProjectRoot } from '@williamthorsen/toolbelt.filesystem';
+import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 import { ESLint, type Linter } from 'eslint';
 
 import { createCeilingResolver } from './createCeilingResolver.ts';
+import type { StrictLintCascade } from './loadStrictLintConfigs.ts';
 import { parseCliArgs, type ParsedCliArgs } from './parseCliArgs.ts';
 import { promoteSeverities } from './promoteSeverities.ts';
-import type { StrictLintConfig, StrictLintOptions } from './types.ts';
+import type { StrictLintOptions } from './types.ts';
 
 /** Runs strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
@@ -172,7 +173,7 @@ function describeRootSource({ marker, source }: ProjectRoot): string {
 }
 
 /** The project roots the walks landed on, deduplicated: a run spanning one repository reports exactly one. */
-function distinctProjectRoots(cascades: ReadonlyMap<string, ConfigCascade<StrictLintConfig>>): ProjectRoot[] {
+function distinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascade>): ProjectRoot[] {
   const roots = new Map<string, ProjectRoot>();
   for (const cascade of cascades.values()) {
     roots.set(cascade.projectRoot.rootDir, cascade.projectRoot);
@@ -184,7 +185,7 @@ function distinctProjectRoots(cascades: ReadonlyMap<string, ConfigCascade<Strict
  * Collapses the per-directory walks into one entry per distinct outcome. A monorepo resolves one cascade per
  * directory holding linted files, but only a handful of distinct config sets, and the report names those.
  */
-function groupByConfigFiles(cascades: ReadonlyMap<string, ConfigCascade<StrictLintConfig>>): CascadeGroup[] {
+function groupByConfigFiles(cascades: ReadonlyMap<string, StrictLintCascade>): CascadeGroup[] {
   const groups = new Map<string, CascadeGroup>();
   for (const [dir, cascade] of cascades) {
     // Lowest precedence first, matching the order the report prints them in.
@@ -201,7 +202,7 @@ function groupByConfigFiles(cascades: ReadonlyMap<string, ConfigCascade<StrictLi
 }
 
 /** Reports where the ceilings came from, on stderr, so it stays clear of the formatter output. */
-function reportConfigProvenance(cascades: ReadonlyMap<string, ConfigCascade<StrictLintConfig>>): void {
+function reportConfigProvenance(cascades: ReadonlyMap<string, StrictLintCascade>): void {
   if (cascades.size === 0) {
     console.error('strict-lint: no files were linted, so no config was resolved');
     return;

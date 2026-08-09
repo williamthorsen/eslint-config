@@ -1,4 +1,5 @@
 import { type ConfigCascade, loadConfigCascade } from '@williamthorsen/toolbelt.filesystem';
+import { findProjectRoot, type ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 
 import { formatRuleSeverities, isRuleSeverity } from './common/severity.ts';
 import { wrapNativeTsError } from './common/wrapNativeTsError.ts';
@@ -7,20 +8,26 @@ import type { StrictLintConfig } from './types.ts';
 /** The config file strict-lint looks for, relative to each directory level of the walk. */
 export const STRICT_LINT_CONFIG_NAME = '.config/strict-lint.config.ts';
 
+/** A cascade of strict-lint configs, carrying the project root that bounded its ascent. */
+export interface StrictLintCascade extends ConfigCascade<StrictLintConfig> {
+  projectRoot: ProjectRoot;
+}
+
 /**
  * Loads every strict-lint config between `startDir` and the project root, nearest first, stopping at the first one
  * that declares `shouldIgnoreAncestors`. The cascade's provenance rides along so callers can report which files
  * contributed and where the walk was bounded.
  */
-export async function loadStrictLintConfigs(startDir: string): Promise<ConfigCascade<StrictLintConfig>> {
-  const cascade = await loadCascade(startDir);
+export async function loadStrictLintConfigs(startDir: string): Promise<StrictLintCascade> {
+  const projectRoot = findProjectRoot(startDir);
+  const cascade = await loadCascade(startDir, projectRoot.rootDir);
 
   return {
     entries: cascade.entries.map(({ config, dir, filePath }) => {
       assertIsStrictLintConfig(config, filePath);
       return { config, dir, filePath };
     }),
-    projectRoot: cascade.projectRoot,
+    projectRoot,
     stopReason: cascade.stopReason,
   };
 }
@@ -28,12 +35,13 @@ export async function loadStrictLintConfigs(startDir: string): Promise<ConfigCas
 // region | Helpers
 
 /** Runs the cascade, mapping the native-TypeScript failure modes its plain `import()` surfaces. */
-async function loadCascade(startDir: string): Promise<ConfigCascade<unknown>> {
+async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigCascade<unknown>> {
   try {
     return await loadConfigCascade({
       fileNames: [STRICT_LINT_CONFIG_NAME],
       shouldStopAscent: isIgnoringAncestors,
       startDir,
+      stopAtDir,
     });
   } catch (error: unknown) {
     throw wrapNativeTsError(error, STRICT_LINT_CONFIG_NAME) ?? error;

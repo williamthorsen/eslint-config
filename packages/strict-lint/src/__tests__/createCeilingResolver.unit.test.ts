@@ -127,7 +127,7 @@ function cascadeOf(configs: StrictLintConfig[]) {
       filePath: `/project/level-${String(index)}/.config/strict-lint.config.ts`,
     })),
     projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
-    stopReason: 'project-root',
+    stopReason: 'stop-dir',
   };
 }
 
