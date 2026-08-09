@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 8.7.0 — 2026-08-09
+
+### 🎉 Features
+
+- Add a readyup kit that checks consumer lint config (#150)
+
+  Adds a readiness check that reports whether a project's ESLint setup is wired correctly for the version of this config it has installed, and names the change to make where it is not. Only a misconfiguration that stops ESLint running is reported as an error; the rest arrive as warnings and recommendations. Consumers run the checks with `rdy run --from npm:@williamthorsen/eslint-config-typescript`, or list the package in their readyup configuration to include them in a standing run.
+
 ## 8.6.0 — 2026-08-07
 
 ### 🎉 Features

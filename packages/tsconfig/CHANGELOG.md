@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.4.0 — 2026-08-09
+
+### 🎉 Features
+
+- Add a bundled readyup kit that checks tsconfig adoption and alignment (#152)
+
+  Adds a readiness check to `@williamthorsen/tsconfig` that reports, package by package, whether a repo has adopted the base config and stayed aligned with it. A package that extends a framework's own base is reported as having opted out. The Node floor is the only finding that fails the check; the rest is advisory. The check is run with `pnpm exec rdy run --from npm:@williamthorsen/tsconfig`.
+
 ## 0.3.0 — 2026-08-07
 
 ### 🎉 Features
