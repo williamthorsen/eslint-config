@@ -10,10 +10,10 @@
       "description": "Alignment checks for a project consuming @williamthorsen/eslint-config-typescript",
       "name": "default",
       "path": "kits/default.js",
-      "readyupVersion": "0.25.0",
+      "readyupVersion": "0.26.0",
       "source": "kits/default.ts",
-      "sourceHash": "e9c61029",
-      "targetHash": "b0993ba0"
+      "sourceHash": "42392488",
+      "targetHash": "c254e885"
     }
   ]
 }

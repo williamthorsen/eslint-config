@@ -228,7 +228,7 @@ export default defineRdyConfig({
 
 The kit runs at the version resolved from your `node_modules`, so it reports whether your configuration matches that version. It never reports whether that version is current.
 
-The check that your root config extends this package matches the package specifier as text, so a config reaching it through a local re-export or a path alias is reported as not extending it.
+The check that your root config extends this package matches the package specifier as text, or a path into a workspace that provides the package, so a config reaching it through a local re-export or a path alias is reported as not extending it.
 
 ## License
 
