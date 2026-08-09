@@ -5,6 +5,11 @@ allowBuilds:
   esbuild: true
   lefthook: true
 
+catalog:
+  eslint-plugin-n: '18.2.2'
+  readyup: '0.26.0'
+  typescript-eslint: '8.65.0'
+
 peerDependencyRules:
   allowedVersions:
     'eslint-plugin-import>eslint': '>=10'
