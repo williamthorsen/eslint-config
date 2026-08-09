@@ -9,7 +9,9 @@ export default defineConfig({
   rootScripts: {
     // Restates nmr's default list to append `verify:kits`.
     'check:strict': ['typecheck', 'fmt:check', 'lint:strict', 'test:coverage', 'verify:kits'],
+    // `--rebuild` compiles each kit afresh and compares bytes. Without it the check reads only the hashes
+    // recorded in the manifest, which a readyup upgrade leaves untouched while changing the bundle it emits.
     'verify:kits':
-      'pnpm --filter @williamthorsen/eslint-config-typescript --filter @williamthorsen/tsconfig exec rdy verify',
+      'pnpm --filter @williamthorsen/eslint-config-typescript --filter @williamthorsen/tsconfig exec rdy verify --rebuild',
   },
 });

@@ -53,7 +53,7 @@ Two workspaces ship a readyup kit. A change that alters anything a kit asserts i
 - **`packages/typescript`** asserts a peer range, the projectService posture, and the ESLint config conventions a consumer is expected to follow.
 - **`packages/tsconfig`** asserts that every workspace tsconfig reaches the base, restates none of the options it supplies, and runs on a Node major implementing its ES year. An edit to `tsconfig.base.json` changes what the kit reports, since the base's own settings are what a consumer is measured against.
 
-Recompiling is the only thing that updates a bundle: the typescript kit inlines that package's peer ranges at compile time, so a peer bump leaves the committed bundle stale with neither recorded hash changing. A readyup upgrade is the same hazard by another route, since the compiler stamps its own version into the bundle it emits. `rdy verify` compares the recorded hashes against the files on disk and sees neither case; only `rdy verify --rebuild` compiles afresh and compares bytes, and `check:strict` does not pass it.
+Recompiling is the only thing that updates a bundle: the typescript kit inlines that package's peer ranges at compile time, so a peer bump leaves the committed bundle stale with neither recorded hash changing. A readyup upgrade is the same hazard by another route, since the compiler stamps its own version into the bundle it emits. A bare `rdy verify` compares the recorded hashes against the files on disk and sees neither case, so `check:strict` runs `rdy verify --rebuild`, which compiles afresh and compares bytes. When it fails, recompile both kits with `pnpm --filter @williamthorsen/eslint-config-typescript --filter @williamthorsen/tsconfig exec rdy compile`.
 
 ## Code style
 
