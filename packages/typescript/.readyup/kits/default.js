@@ -8,7 +8,6 @@ import { defineRdyKit } from "readyup";
 import {
   compareVersions,
   discoverWorkspaces,
-  fileContains,
   fileExists,
   getJsonValue,
   readFile,
@@ -22,12 +21,11 @@ function declaresParserProject(content) {
   }
   return false;
 }
-function importsFromDirs(content, dirs) {
-  if (dirs.length === 0) return false;
+function importsFromDir(content, dir) {
   for (const match of content.matchAll(/\b(?:from|import|require)\s*\(?\s*['"]([^'"]+)['"]/g)) {
     const specifier = match[1]?.replace(/^\.\//, "");
     if (specifier === void 0 || specifier.startsWith("..")) continue;
-    if (dirs.some((dir) => specifier === dir || specifier.startsWith(`${dir}/`))) return true;
+    if (specifier === dir || specifier.startsWith(`${dir}/`)) return true;
   }
   return false;
 }
@@ -229,10 +227,10 @@ function readPeerRange(name) {
 function rootEslintConfigExtendsThisPackage() {
   const basename = findRootEslintConfig();
   if (basename === void 0) return false;
-  if (fileContains(basename, /@williamthorsen\/eslint-config-typescript/)) return true;
   const content = readFile(basename);
   if (content === void 0) return false;
-  const providerDir = providerWorkspaceDirs().find((dir) => importsFromDirs(content, [dir]));
+  if (content.includes(PACKAGE_NAME)) return true;
+  const providerDir = providerWorkspaceDirs().find((dir) => importsFromDir(content, dir));
   return providerDir === void 0 ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
 }
 function skipUnlessEslintLoadsTypeScript() {

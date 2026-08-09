@@ -13,7 +13,6 @@ import { type CheckOutcome, defineRdyKit, pickJson } from 'readyup';
 import {
   compareVersions,
   discoverWorkspaces,
-  fileContains,
   fileExists,
   getJsonValue,
   readFile,
@@ -22,7 +21,7 @@ import {
 
 import {
   declaresParserProject,
-  importsFromDirs,
+  importsFromDir,
   setsTsconfigRootDir,
 } from '../../src/readiness/eslint-config-contents.ts';
 import {
@@ -228,11 +227,12 @@ function readPeerRange(name: string): string | undefined {
 function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   const basename = findRootEslintConfig();
   if (basename === undefined) return false;
-  if (fileContains(basename, /@williamthorsen\/eslint-config-typescript/)) return true;
 
   const content = readFile(basename);
   if (content === undefined) return false;
-  const providerDir = providerWorkspaceDirs().find((dir) => importsFromDirs(content, [dir]));
+  if (content.includes(PACKAGE_NAME)) return true;
+
+  const providerDir = providerWorkspaceDirs().find((dir) => importsFromDir(content, dir));
   return providerDir === undefined ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
 }
 
