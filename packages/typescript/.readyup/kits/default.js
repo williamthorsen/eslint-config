@@ -1,6 +1,6 @@
 /** @noformat — @generated. Do not edit. Compiled by rdy. */
 /* eslint-disable */
-export const __readyupVersion = "0.25.0";
+export const __readyupVersion = "0.26.0";
 
 
 // .readyup/kits/default.ts
@@ -8,7 +8,6 @@ import { defineRdyKit } from "readyup";
 import {
   compareVersions,
   discoverWorkspaces,
-  fileContains,
   fileExists,
   getJsonValue,
   readFile,
@@ -19,6 +18,14 @@ import {
 function declaresParserProject(content) {
   for (const match of content.matchAll(/parserOptions\s*:\s*\{/g)) {
     if (/\bproject\s*:/.test(braceBlock(content, match.index + match[0].length - 1))) return true;
+  }
+  return false;
+}
+function importsFromDir(content, dir) {
+  for (const match of content.matchAll(/\b(?:from|import|require)\s*\(?\s*['"]([^'"]+)['"]/g)) {
+    const specifier = match[1]?.replace(/^\.\//, "");
+    if (specifier === void 0 || specifier.startsWith("..")) continue;
+    if (specifier === dir || specifier.startsWith(`${dir}/`)) return true;
   }
   return false;
 }
@@ -196,6 +203,9 @@ function noTsconfigEslintJson() {
   if (offenders.length === 0) return true;
   return { ok: false, detail: `tsconfig.eslint.json found: ${offenders.join(", ")}` };
 }
+function providerWorkspaceDirs() {
+  return discoverWorkspaces().filter((workspace) => workspace.name === PACKAGE_NAME).map((workspace) => workspace.dir);
+}
 function readInstalledVersion(name) {
   const cached = installedVersions.get(name);
   if (cached !== void 0 || installedVersions.has(name)) return cached;
@@ -216,7 +226,12 @@ function readPeerRange(name) {
 }
 function rootEslintConfigExtendsThisPackage() {
   const basename = findRootEslintConfig();
-  return basename !== void 0 && fileContains(basename, /@williamthorsen\/eslint-config-typescript/);
+  if (basename === void 0) return false;
+  const content = readFile(basename);
+  if (content === void 0) return false;
+  if (content.includes(PACKAGE_NAME)) return true;
+  const providerDir = providerWorkspaceDirs().find((dir) => importsFromDir(content, dir));
+  return providerDir === void 0 ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
 }
 function skipUnlessEslintLoadsTypeScript() {
   const installed = readInstalledVersion("eslint");

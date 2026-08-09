@@ -13,14 +13,17 @@ import { type CheckOutcome, defineRdyKit, pickJson } from 'readyup';
 import {
   compareVersions,
   discoverWorkspaces,
-  fileContains,
   fileExists,
   getJsonValue,
   readFile,
   readJsonFile,
 } from 'readyup/check-utils';
 
-import { declaresParserProject, setsTsconfigRootDir } from '../../src/readiness/eslint-config-contents.ts';
+import {
+  declaresParserProject,
+  importsFromDir,
+  setsTsconfigRootDir,
+} from '../../src/readiness/eslint-config-contents.ts';
 import {
   dirPath,
   ESLINT_CONFIG_BASENAMES,
@@ -182,6 +185,13 @@ function noTsconfigEslintJson(): boolean | CheckOutcome {
   return { ok: false, detail: `tsconfig.eslint.json found: ${offenders.join(', ')}` };
 }
 
+/** Lists the workspace directories providing this package, which the repo developing it imports by path. */
+function providerWorkspaceDirs(): string[] {
+  return discoverWorkspaces()
+    .filter((workspace) => workspace.name === PACKAGE_NAME)
+    .map((workspace) => workspace.dir);
+}
+
 /**
  * Reads a dependency's installed version, taking the lowest found across the repo's search
  * directories so a workspace resolving an older copy decides the comparison. The result is cached
@@ -209,10 +219,21 @@ function readPeerRange(name: string): string | undefined {
   return typeof range === 'string' ? range : undefined;
 }
 
-/** Reports whether the root eslint config extends this package. */
-function rootEslintConfigExtendsThisPackage(): boolean {
+/**
+ * Reports whether the root eslint config extends this package, by package specifier or by a path
+ * into a workspace providing it. The second route is how the repo developing this package reaches
+ * it, since importing the specifier there would resolve to a build artifact.
+ */
+function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   const basename = findRootEslintConfig();
-  return basename !== undefined && fileContains(basename, /@williamthorsen\/eslint-config-typescript/);
+  if (basename === undefined) return false;
+
+  const content = readFile(basename);
+  if (content === undefined) return false;
+  if (content.includes(PACKAGE_NAME)) return true;
+
+  const providerDir = providerWorkspaceDirs().find((dir) => importsFromDir(content, dir));
+  return providerDir === undefined ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
 }
 
 /** Skips the shadowing check below eslint 10, where a JavaScript config is the only loadable one. */

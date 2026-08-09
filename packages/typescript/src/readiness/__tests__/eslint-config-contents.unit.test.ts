@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { declaresParserProject, setsTsconfigRootDir } from '../eslint-config-contents.ts';
+import { declaresParserProject, importsFromDir, setsTsconfigRootDir } from '../eslint-config-contents.ts';
 
 describe(declaresParserProject, () => {
   it('is true when parserOptions declares project', () => {
@@ -52,6 +52,52 @@ describe(declaresParserProject, () => {
       parserOptions: { project: './tsconfig.json' }`;
 
     expect(declaresParserProject(content)).toBe(true);
+  });
+});
+
+describe(importsFromDir, () => {
+  it('matches a default-with-named import reaching into the directory', () => {
+    const content = `import baseConfig, { createConfig } from './packages/typescript/src/index.ts';`;
+
+    expect(importsFromDir(content, 'packages/typescript')).toBe(true);
+  });
+
+  it('matches a named-only import reaching into the directory', () => {
+    const content = `import { commonIgnores } from './packages/typescript/src/ignores/index.ts';`;
+
+    expect(importsFromDir(content, 'packages/typescript')).toBe(true);
+  });
+
+  it('matches a side-effect import of the directory itself', () => {
+    expect(importsFromDir(`import './packages/typescript';`, 'packages/typescript')).toBe(true);
+  });
+
+  it('matches a dynamic import', () => {
+    expect(importsFromDir(`await import('./packages/typescript/src/index.ts');`, 'packages/typescript')).toBe(true);
+  });
+
+  it('matches a require call', () => {
+    expect(importsFromDir(`require('./packages/typescript/src/index.ts');`, 'packages/typescript')).toBe(true);
+  });
+
+  // Without a separator, the shorter directory name is a prefix of the longer one.
+  it('is false for a directory the specifier merely starts with', () => {
+    const content = `import config from './packages/typescript-utils/src/index.ts';`;
+
+    expect(importsFromDir(content, 'packages/typescript')).toBe(false);
+  });
+
+  // Specifiers resolve against the repo root, above which no workspace can sit.
+  it('is false for a specifier reaching above the repo root', () => {
+    const content = `import config from '../packages/typescript/src/index.ts';`;
+
+    expect(importsFromDir(content, 'packages/typescript')).toBe(false);
+  });
+
+  it('is false for a bare package specifier', () => {
+    const content = `import config from '@williamthorsen/eslint-config-typescript';`;
+
+    expect(importsFromDir(content, 'packages/typescript')).toBe(false);
   });
 });
 

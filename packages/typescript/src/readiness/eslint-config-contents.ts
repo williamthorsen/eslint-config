@@ -10,6 +10,22 @@ export function declaresParserProject(content: string): boolean {
   return false;
 }
 
+/**
+ * Reports whether an eslint config imports from a path inside the given directory. A repo providing
+ * the config package reaches it by source path rather than by package specifier, so the directory of
+ * the workspace providing it stands in for the specifier. Specifiers resolve against the repo root,
+ * where the only config this reads sits; one reaching above the root cannot name a workspace, so it
+ * never matches.
+ */
+export function importsFromDir(content: string, dir: string): boolean {
+  for (const match of content.matchAll(/\b(?:from|import|require)\s*\(?\s*['"]([^'"]+)['"]/g)) {
+    const specifier = match[1]?.replace(/^\.\//, '');
+    if (specifier === undefined || specifier.startsWith('..')) continue;
+    if (specifier === dir || specifier.startsWith(`${dir}/`)) return true;
+  }
+  return false;
+}
+
 /** Reports whether an eslint config anchors the project service with `tsconfigRootDir`. */
 export function setsTsconfigRootDir(content: string): boolean {
   return /tsconfigRootDir\s*:/.test(content);
