@@ -1,7 +1,5 @@
-import assert from 'node:assert';
-
 import { defineConfig } from 'eslint/config';
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 
 import { skyPilot } from '../../plugins/index.ts';
 import { createConfig } from '../createConfig.ts';
@@ -70,7 +68,7 @@ describe('plugins subpath composability with defineConfig', () => {
   it('composes the exported plugin under a plugins key and applies its rules', async () => {
     // `Config['plugins']` is optional, so narrow rather than assert — the repo forbids assertions.
     const skyPilotPlugin = skyPilot.default.configs.recommended.plugins?.['sky-pilot'];
-    assert.ok(skyPilotPlugin, 'the recommended config must register the sky-pilot plugin');
+    assert.exists(skyPilotPlugin, 'the recommended config must register the sky-pilot plugin');
 
     const composed = defineConfig(fixtureWiring, {
       plugins: { 'sky-pilot': skyPilotPlugin },
