@@ -96,8 +96,11 @@ importers:
   packages/strict-lint:
     dependencies:
       '@williamthorsen/toolbelt.filesystem':
-        specifier: 0.2.1
-        version: 0.2.1
+        specifier: 0.3.0
+        version: 0.3.0
+      '@williamthorsen/toolbelt.packaging':
+        specifier: 0.2.0
+        version: 0.2.0
       eslint:
         specifier: '>=10'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -902,10 +905,6 @@ packages:
     resolution: {integrity: sha512-YWDLlZn8XON7gmwk5ZP0VcylLKqB635fLFq/uNSzaIhDFwawQIJjomSACNFSDTbMC3COBpTqisuQXmsDEWqjiQ==}
     engines: {node: '>=24'}
     hasBin: true
-
-  '@williamthorsen/toolbelt.filesystem@0.2.1':
-    resolution: {integrity: sha512-vC+LkLEVBKaTcOsR6G8R0cGPnseX3IC3ZiWeYGuPcwOwypmWb8+CgG/a8P6fhaSU/aqXpszUFB41nTLsEeTyWw==}
-    engines: {node: '>=24.0.0'}
 
   '@williamthorsen/toolbelt.filesystem@0.3.0':
     resolution: {integrity: sha512-LAgacq4EBEtrmXCMUsZ6gslzOGF01HHLluwIQRwuqitdcjqrOMU/kh8GFJTWpWnT77JtFwAb80bGyGCYCz6NWQ==}
@@ -3415,8 +3414,6 @@ snapshots:
       semver: 7.8.5
       yaml: 2.9.0
       zod: 4.4.3
-
-  '@williamthorsen/toolbelt.filesystem@0.2.1': {}
 
   '@williamthorsen/toolbelt.filesystem@0.3.0': {}
 

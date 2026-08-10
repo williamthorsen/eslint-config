@@ -6,9 +6,11 @@ interface CascadeOptions {
   fileNames: readonly string[];
   shouldStopAscent?: ((config: unknown) => boolean) | undefined;
   startDir: string;
+  stopAtDir: string;
 }
 
-const { mockedLoadConfigCascade } = vi.hoisted(() => ({
+const { mockedFindProjectRoot, mockedLoadConfigCascade } = vi.hoisted(() => ({
+  mockedFindProjectRoot: vi.fn<(startDir: string) => unknown>(),
   mockedLoadConfigCascade: vi.fn<(options: CascadeOptions) => Promise<unknown>>(),
 }));
 
@@ -16,11 +18,17 @@ vi.mock('@williamthorsen/toolbelt.filesystem', () => ({
   loadConfigCascade: mockedLoadConfigCascade,
 }));
 
+// The real `findProjectRoot` reaches for `findDirectoryChainMatch`, which the filesystem mock above withholds.
+vi.mock('@williamthorsen/toolbelt.packaging', () => ({
+  findProjectRoot: mockedFindProjectRoot,
+}));
+
 const PROJECT_ROOT = { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' };
 
 describe(loadStrictLintConfigs, () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedFindProjectRoot.mockReturnValue(PROJECT_ROOT);
   });
 
   it('searches for the strict-lint config file from the given directory', async () => {
@@ -57,6 +65,15 @@ describe(loadStrictLintConfigs, () => {
     const { entries } = await loadStrictLintConfigs('/project/packages/pkg');
 
     expect(entries).toStrictEqual([]);
+  });
+
+  it('bounds the ascent at the project root of the starting directory', async () => {
+    withCascadeEntries([]);
+
+    await loadStrictLintConfigs('/project/packages/pkg');
+
+    expect(mockedFindProjectRoot).toHaveBeenCalledWith('/project/packages/pkg');
+    expect(mockedLoadConfigCascade).toHaveBeenCalledWith(expect.objectContaining({ stopAtDir: '/project' }));
   });
 
   it('passes the cascade provenance through to the caller', async () => {
@@ -204,11 +221,10 @@ describe(loadStrictLintConfigs, () => {
 /** Make the mocked cascade resolve with an entry per directory, in the nearest-first order the real one produces. */
 function withCascadeEntries(
   configsByDir: Array<[dir: string, config: unknown]>,
-  stopReason: 'predicate' | 'project-root' = 'project-root',
+  stopReason: 'predicate' | 'stop-dir' = 'stop-dir',
 ): void {
   mockedLoadConfigCascade.mockResolvedValue({
     entries: configsByDir.map(([dir, config]) => ({ config, dir, filePath: configPathIn(dir) })),
-    projectRoot: PROJECT_ROOT,
     stopReason,
   });
 }

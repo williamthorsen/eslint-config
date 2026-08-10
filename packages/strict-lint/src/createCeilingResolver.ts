@@ -1,13 +1,13 @@
 import path from 'node:path';
 
-import type { ConfigCascade, ConfigEntry } from '@williamthorsen/toolbelt.filesystem';
+import type { ConfigEntry } from '@williamthorsen/toolbelt.filesystem';
 
-import { loadStrictLintConfigs } from './loadStrictLintConfigs.ts';
+import { loadStrictLintConfigs, type StrictLintCascade } from './loadStrictLintConfigs.ts';
 import type { MaxSeverityMap, StrictLintConfig } from './types.ts';
 
 /** Resolves the ceilings governing a linted file, retaining every cascade it walked so `--debug` can report them. */
 export interface CeilingResolver {
-  getCascades: () => ReadonlyMap<string, ConfigCascade<StrictLintConfig>>;
+  getCascades: () => ReadonlyMap<string, StrictLintCascade>;
   resolveFor: (filePath: string) => Promise<MaxSeverityMap>;
 }
 
@@ -17,10 +17,10 @@ export interface CeilingResolver {
  * memo holds the in-flight promise rather than its result, so concurrent lookups never start a second walk.
  */
 export function createCeilingResolver(overrides: MaxSeverityMap = {}): CeilingResolver {
-  const cascadesByDir = new Map<string, ConfigCascade<StrictLintConfig>>();
+  const cascadesByDir = new Map<string, StrictLintCascade>();
   const ceilingsByDir = new Map<string, Promise<MaxSeverityMap>>();
 
-  function getCascades(): ReadonlyMap<string, ConfigCascade<StrictLintConfig>> {
+  function getCascades(): ReadonlyMap<string, StrictLintCascade> {
     return cascadesByDir;
   }
 

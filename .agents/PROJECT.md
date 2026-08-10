@@ -42,7 +42,6 @@ Commit titles are rendered by `describe-change.sh` from `commit.title_format` in
 
 - **`--scope`:** `root`, `strict-lint`, `tsconfig`, `typescript`, or `*` for changes spanning multiple workspaces. Pass `typescript`, never the `ts` alias; `.config/release-kit.config.ts` resolves `ts` only so that the commits predating the switch keep resolving.
 - **`--type`:** see the work-types table in `docs/versioning-and-changelog.md`. Append `!` after the type for breaking changes (e.g., `feat!`); `drop` always carries it.
-- **Separation rule:** `deps` is always its own commit. Never mix dependency updates with `feat`/`refactor`/etc. — release-kit categorizes by type, so mixed commits land in the wrong section. The one carve-out is an `@tsconfig/strictest` bump that changes settings, which must carry the mirrored `tsconfig.base.json` edit; see Gotchas.
 
 Full reference: `docs/versioning-and-changelog.md`.
 

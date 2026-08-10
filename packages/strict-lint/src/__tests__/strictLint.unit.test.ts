@@ -546,7 +546,7 @@ function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintRes
 }
 
 /** A cascade carrying one entry per config, nearest first, bounded by a marker-identified project root. */
-function cascadeOf(configs: StrictLintConfig[], stopReason: 'predicate' | 'project-root' = 'project-root') {
+function cascadeOf(configs: StrictLintConfig[], stopReason: 'predicate' | 'stop-dir' = 'stop-dir') {
   return {
     entries: configs.map((config, index) => ({
       config,
