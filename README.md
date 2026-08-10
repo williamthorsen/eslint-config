@@ -32,7 +32,7 @@ Run from the repo root to fan out across all workspaces, or from a workspace dir
 nmr ci            # build + check:strict (mirrors GitHub Actions)
 nmr build         # build all packages (or current package from a workspace dir)
 nmr check         # typecheck + format check + lint check + tests
-nmr check:strict  # typecheck + format check + strict-lint + coverage + agent-file check
+nmr check:strict  # typecheck + format check + strict-lint + coverage + kit verification
 nmr lint          # eslint --fix
 nmr lint:check    # eslint without fix
 nmr lint:strict   # strict-lint
