@@ -44,16 +44,7 @@ Add `!` after the work type to indicate breaking changes: `ts|feat!: Remove depr
 
 ## Work type rules
 
-### Clean separation principle
-
-- **Dependencies are always separate**: `deps` commits contain only dependency changes
-- **No mixing**: `feat`, `refactor`, etc. should never include dependency updates
 - **Hierarchy for multi-type commits**: `feat` > `refactor` > `tests` > `docs`
-
-### Examples
-
-- ✅ `ts|feat: Add new linting rule` + separate `ts|deps: Upgrade ESLint to v9`
-- ❌ `ts|feat: Add new rule and upgrade ESLint` (should be two commits)
 
 ## Changelog categories
 
