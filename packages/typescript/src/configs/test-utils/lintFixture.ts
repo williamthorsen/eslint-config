@@ -1,10 +1,10 @@
-import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 
 import { ESLint, type Linter } from 'eslint';
 import { type Config } from 'eslint/config';
 import tseslint from 'typescript-eslint';
+import { assert } from 'vitest';
 
 // Fixtures live outside `src` so the build neither compiles nor publishes them, and Vitest never collects
 // the two that are deliberately named `*.test.*`.
@@ -35,7 +35,7 @@ export async function lintFixture(composed: readonly Config[], fixture: string):
 
   // ESLint skips a file that no config's `files` glob matches, reporting a single notice in place of
   // any rule output. Results from a skipped file satisfy assertions without exercising the config.
-  assert.ok(!(await eslint.isPathIgnored(filePath)), `no composed config matches ${fixture}`);
+  assert.isFalse(await eslint.isPathIgnored(filePath), `no composed config matches ${fixture}`);
 
   return eslint.lintText(fs.readFileSync(filePath, 'utf8'), { filePath });
 }
