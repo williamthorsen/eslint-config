@@ -15,18 +15,9 @@ A pnpm-workspace monorepo of flat ESLint 9+ configurations and tooling published
 
 ## Commands
 
-This repo uses [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamthorsen/nmr) as its script runner. Most commands come from nmr's built-in registries; only project-specific overrides live in `.config/nmr.config.ts`. From the repo root, commands fan out across all workspaces; from a workspace directory, they target that package only.
+This repo runs on [`@williamthorsen/nmr`](https://www.npmjs.com/package/@williamthorsen/nmr); a bare `nmr` lists every command and the shell command it resolves to, and `.config/nmr.config.ts` holds the repo-level overrides. Scope follows the working directory: from the repo root a command fans out across every workspace; from a workspace directory it targets that package alone.
 
-```bash
-nmr ci           # Build all packages, then run check:strict (matches GitHub Actions)
-nmr check        # typecheck + format check + lint check + tests
-nmr check:strict # typecheck + format check + strict-lint + coverage + kit verification
-nmr build        # Build all packages (or the current package from a workspace dir)
-nmr lint         # eslint --fix; lint:check is the non-mutating variant
-nmr lint:strict  # Run strict-lint over the codebase
-nmr test         # vitest, the unit and tool tiers (test:unit and test:tool run one alone)
-nmr upgrade      # Report available dependency upgrades (add --write to apply)
-```
+Iterate with `nmr check`, and run `nmr ci` before pushing. `nmr ci` adds a recursive build, `strict-lint` in place of `eslint`, coverage, and a fresh compile of both kits, so it is the slow gate rather than the inner loop. It is also the only one that catches declaration-emit diagnostics, lint warnings, coverage shortfalls, and a stale kit bundle.
 
 Releases are triggered via the **Release** GitHub Actions workflow (`workflow_dispatch`), which uses release-kit to bump versions, regenerate CHANGELOGs, and push tags. Tag pushes (`<workspace>-v<semver>`) then trigger the **Publish** and **Create GitHub Release** workflows. Don't push release tags by hand.
 
