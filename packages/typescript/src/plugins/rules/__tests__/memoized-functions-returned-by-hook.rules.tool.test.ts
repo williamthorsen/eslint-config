@@ -29,7 +29,7 @@ ruleTester.run('memoized-functions-returned-by-hook', rule, {
       errors: [{ messageId: 'memoizedFunctionsReturnedByHook' }],
     },
     {
-      // Firing: the VariableDeclarator entry point — an arrow-function hook returning an object literal
+      // Firing: the VariableDeclarator entry point, an arrow-function hook returning an object literal
       code: 'const useThing = () => ({ onClick: () => {} });',
       errors: [{ messageId: 'memoizedFunctionsReturnedByHook' }],
     },

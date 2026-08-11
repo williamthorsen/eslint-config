@@ -80,7 +80,7 @@ function collectEdges(sourceFile: ts.SourceFile): ModuleEdges {
 }
 
 // The module specifier of a statement that pulls in runtime code, or `undefined` when the statement
-// is not a runtime import/export-from — including fully type-only ones, which are erased on compile.
+// is not a runtime import/export-from (including fully type-only ones, which are erased on compile).
 function runtimeModuleSpecifier(statement: ts.Statement): string | undefined {
   if (ts.isImportDeclaration(statement)) {
     if (!isRuntimeImport(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) {
