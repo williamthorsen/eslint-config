@@ -61,8 +61,10 @@ The default export bundles configs for the following surfaces:
 | Cross-cutting  | all code files                 | `eslint-comments`, `import`, `n`, `simple-import-sort`, `unicorn` |
 | JSON / JSON5   | `**/*.{json,json5}`            | `jsonc`                                                           |
 | YAML           | `**/*.{yaml,yml}`              | `yml`                                                             |
-| `package.json` | `**/package.json`              | `package-json` (recommended + stylistic)                          |
+| `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)   |
 | Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed                                   |
+
+Every `package.json` must declare `author` and `engines`. One that publishes must also declare `bugs`, `homepage`, and `keywords`, and may not depend on a local `file:` or `link:` path.
 
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so spec files don't fight the type checker. Declaration files (`*.d.ts`) have `import/no-duplicates` turned off.
 
