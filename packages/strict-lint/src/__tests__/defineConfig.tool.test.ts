@@ -29,8 +29,8 @@ describe(defineConfig, () => {
 
   it('loads under native type stripping with no other module beside it', () => {
     // Config files import this module from their own directory, where nothing else of the package resolves. Copied
-    // alone into an empty directory, any specifier it retains fails to load — including an inline `import { type … }`,
-    // whose specifier Node keeps and tsc elides.
+    // alone into an empty directory, any specifier it retains fails to load (including an inline `import { type … }`,
+    // whose specifier Node keeps and tsc elides).
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-config-entry-'));
     try {
       const copy = path.join(dir, path.basename(MODULE_PATH));

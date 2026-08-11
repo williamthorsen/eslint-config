@@ -138,7 +138,7 @@ function formatViolations(pkg: string, violations: Violation[]): string {
   }
   const lines = violations.map((violation) => {
     const remedy = violation.status === 'devDependencies' ? 'move it to dependencies' : 'add it to dependencies';
-    return `  - ${violation.packageName} (${violation.status}), imported by ${violation.importers.join(', ')} — ${remedy}`;
+    return `  - ${violation.packageName} (${violation.status}), imported by ${violation.importers.join(', ')}: ${remedy}`;
   });
   return `packages/${pkg}: eager configs import modules not declared as a dependency or peerDependency:\n${lines.join('\n')}`;
 }

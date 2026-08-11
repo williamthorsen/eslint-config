@@ -31,7 +31,7 @@
     // Without this, `lib` follows `target` into the `.full` variant, admitting DOM globals.
     // `ESNext.Disposable` carries the explicit-resource-management declarations; no numbered lib has them.
     "lib": ["ES2025", "ESNext.Disposable"],
-    // Default is `ES2022` with `Bundler` resolution — wrong for published Node packages.
+    // Default is `ES2022` with `Bundler` resolution: wrong for published Node packages.
     "module": "NodeNext",
     // Files with no import or export would otherwise be scripts sharing global scope.
     "moduleDetection": "force",

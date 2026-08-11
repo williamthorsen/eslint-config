@@ -5,7 +5,7 @@ import { factoryCases } from '../test-utils/factoryCases.ts';
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
 // The first case absorbs the cost of loading its plugin and building the TS program, which on a cold
-// module cache runs to ~9s — well past Vitest's 5s default.
+// module cache runs to ~9s, well past Vitest's 5s default.
 const COLD_START_TIMEOUT_MS = 20_000;
 
 describe('createConfig preset load smoke tests', () => {

@@ -54,7 +54,7 @@ export const typedParserSettings: Config = {
 // region | Helpers
 
 // `new ESLint({ overrideConfig })` accepts `Linter.Config[]`, which models `languageOptions` with a
-// nominally-incompatible index signature. Bridge only at that constructor — never on the factory
+// nominally-incompatible index signature. Bridge only at that constructor; never on the factory
 // results, whose assignability to `Config[]` is what the composability suite proves.
 function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above

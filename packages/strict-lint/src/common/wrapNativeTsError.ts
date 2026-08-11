@@ -1,6 +1,6 @@
 /**
- * Maps Node's two native-TypeScript failure modes — syntax type stripping cannot erase, and a TypeScript extension on
- * a runtime where stripping is disabled — to actionable errors, or returns undefined when the error is unrelated and
+ * Maps Node's two native-TypeScript failure modes (syntax type stripping cannot erase, and a TypeScript extension on
+ * a runtime where stripping is disabled) to actionable errors, or returns undefined when the error is unrelated and
  * should propagate as-is. The config cascade reaches Node's loader with no runtime pre-check of its own, so an
  * unsupported runtime surfaces here as an unknown extension rather than as a dedicated diagnostic.
  */
