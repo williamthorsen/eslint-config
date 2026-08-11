@@ -70,6 +70,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-type-error': 'warn', // 🔴🟠 Prefer a TypeError when an error is thrown while checking `typeof`
   'unicorn/prevent-abbreviations': 'off', // 🔴⚫
   'unicorn/require-array-sort-compare': 'off', // 🔴⚫ Disallows cases when the default sort is desired
+  'unicorn/single-line-block-comment-style': 'off', // 🔴⚫ Stylistic
   'unicorn/switch-case-braces': ['error', 'avoid'], // Avoid braces in switch cases unless scope is needed.
   'unicorn/text-encoding-identifier-case': 'warn', // 🔴🟠
 };

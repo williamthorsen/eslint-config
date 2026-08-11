@@ -9,10 +9,10 @@
       "description": "Adoption and alignment checks for a project consuming @williamthorsen/tsconfig",
       "name": "default",
       "path": "kits/default.js",
-      "readyupVersion": "0.26.0",
+      "readyupVersion": "0.27.0",
       "source": "kits/default.ts",
       "sourceHash": "4d0a555c",
-      "targetHash": "9b5ff930"
+      "targetHash": "c478ceff"
     }
   ]
 }

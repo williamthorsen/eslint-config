@@ -24,7 +24,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "4.1.10",
     "@williamthorsen/eslint-config-typescript": "workspace:*",
-    "@williamthorsen/nmr": "0.29.0",
+    "@williamthorsen/nmr": "0.30.0",
     "@williamthorsen/release-kit": "10.3.1",
     "@williamthorsen/strict-lint": "workspace:*",
     "@williamthorsen/tsconfig": "workspace:*",
@@ -44,7 +44,7 @@
     "vitest": "4.1.10",
     "zod": "4.4.3"
   },
-  "packageManager": "pnpm@11.19.0",
+  "packageManager": "pnpm@11.20.0",
   "engines": {
     "node": ">=24"
   }
