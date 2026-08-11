@@ -7,13 +7,15 @@ const config: Config[] = [
   {
     files: ['**/package.json'],
     rules: {
-      // Empty `keywords` arrays are used as intentional placeholders
-      'package-json/no-empty-fields': 'off',
-      // Not all packages in the monorepo require a repository field
-      'package-json/require-repository': 'off',
-      // sideEffects is not needed for ESLint config packages
-      'package-json/require-sideEffects': 'off',
-      // Peer dependencies need not be duplicated in devDependencies
+      // Each rule below takes its default options, which is what sorts them into two tiers: `require-author` and
+      // `require-engines` bind every package, while the rest exempt private ones through `ignorePrivate`.
+      'package-json/no-local-dependencies': 'error',
+      'package-json/require-author': 'error',
+      'package-json/require-bugs': 'error',
+      'package-json/require-engines': 'error',
+      'package-json/require-homepage': 'error',
+      'package-json/require-keywords': 'error',
+      // Peers hoisted to a workspace root are not duplicated in the consuming package's devDependencies
       'package-json/specify-peers-locally': 'off',
     },
   },
