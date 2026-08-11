@@ -11,8 +11,10 @@ const compliantManifest: Record<string, unknown> = {
   keywords: ['subject'],
   homepage: 'https://example.com/subject#readme',
   bugs: { url: 'https://example.com/subject/issues' },
+  repository: { type: 'git', url: 'git+https://example.com/subject.git' },
   license: 'ISC',
   author: 'Subject Author <author@example.com>',
+  sideEffects: false,
   engines: { node: '>=24' },
 };
 
@@ -75,6 +77,32 @@ describe('the ban on local dependency paths', () => {
     const reported = await lintManifest({ ...compliantManifest, dependencies: { '@scope/other': 'workspace:*' } });
 
     expect(reported).not.toContain('package-json/no-local-dependencies');
+  });
+
+  it('reports a bare relative path, which the rule treats as local alongside the protocols', async () => {
+    const reported = await lintManifest({ ...compliantManifest, dependencies: { '@scope/other': '../other' } });
+
+    expect(reported).toContain('package-json/no-local-dependencies');
+  });
+});
+
+describe('rules the preset supplies and this config no longer suppresses', () => {
+  it('reject an empty field on a private manifest, which no-empty-fields binds as much as a publishable one', async () => {
+    const reported = await lintManifest({ ...compliantManifest, keywords: [], private: true });
+
+    expect(reported).toContain('package-json/no-empty-fields');
+  });
+
+  it('require a repository of a publishable manifest', async () => {
+    const reported = await lintManifest(omitFields(compliantManifest, ['repository']));
+
+    expect(reported).toContain('package-json/require-repository');
+  });
+
+  it('require sideEffects of a publishable manifest', async () => {
+    const reported = await lintManifest(omitFields(compliantManifest, ['sideEffects']));
+
+    expect(reported).toContain('package-json/require-sideEffects');
   });
 });
 
