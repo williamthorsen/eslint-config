@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.5.0 — 2026-08-11
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Require author, engines, and publish metadata in package.json (#162)
+
+  Adds six `package-json` rules to `@williamthorsen/eslint-config-typescript` and removes three overrides that suppressed rules the plugin's `recommended` preset supplies. Every `package.json` must now declare `author` and `engines` and carry no empty field; one that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not take a dependency on a local path. `specify-peers-locally` is the only rule the config still disables.
+
+### 🐛 Bug fixes
+
+- Accept a source-path import in the kit's extends check (#155)
+
+  Fixes an issue where the readiness check bundled with `@williamthorsen/eslint-config-typescript` reported that this repo's root ESLint config did not extend the package. The kit now accepts that an import via the workspace path is equivalent.
+
+### 🤖 Agentic support
+
+- Update AGENTS.md (#161)
+
+  Updates project guidance in AGENTS.md. In particular, most information about the `nmr` task runner has been removed in deference to the guidance bundled with `nmr` itself. `nmr check` is now promoted as the usual check in place of the much slower, and usually unnecessary, `nmr ci`.
+
 ## 0.4.0 — 2026-08-09
 
 ### 🎉 Features

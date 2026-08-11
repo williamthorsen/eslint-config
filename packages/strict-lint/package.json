@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/strict-lint",
-  "version": "9.4.0",
+  "version": "10.0.0",
   "description": "Strict linting for ESLint projects",
   "keywords": [
     "cli",
