@@ -2,7 +2,11 @@
   "name": "@williamthorsen/strict-lint",
   "version": "9.4.0",
   "description": "Strict linting for ESLint projects",
-  "keywords": [],
+  "keywords": [
+    "cli",
+    "eslint",
+    "lint"
+  ],
   "homepage": "https://github.com/williamthorsen/eslint-config/tree/main/packages/strict-lint#readme",
   "bugs": {
     "url": "https://github.com/williamthorsen/eslint-config/issues"
@@ -14,6 +18,9 @@
   },
   "license": "ISC",
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
+  "sideEffects": [
+    "dist/esm/bin/*.js"
+  ],
   "type": "module",
   "exports": {
     ".": {

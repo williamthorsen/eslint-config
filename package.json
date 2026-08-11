@@ -3,7 +3,6 @@
   "version": "5.12.2",
   "private": true,
   "description": "ESLint configs monorepo",
-  "keywords": [],
   "homepage": "https://github.com/williamthorsen/eslint-config#readme",
   "bugs": {
     "url": "https://github.com/williamthorsen/eslint-config/issues"
