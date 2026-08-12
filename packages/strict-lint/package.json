@@ -45,6 +45,9 @@
     "@williamthorsen/toolbelt.filesystem": "0.4.0",
     "@williamthorsen/toolbelt.packaging": "0.3.0"
   },
+  "devDependencies": {
+    "eslint": "catalog:"
+  },
   "peerDependencies": {
     "eslint": ">=10"
   },
