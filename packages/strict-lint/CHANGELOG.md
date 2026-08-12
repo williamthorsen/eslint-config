@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 11.0.0 — 2026-08-12
+
+### 🎉 Features
+
+- Add an init command that scaffolds a config file (#163)
+
+  Adds `strict-lint init`, which scaffolds a `.config/strict-lint.config.ts` in the working directory. `--dry-run` reports without writing, `--force` replaces a diverged config, and a config already matching the template is left untouched and reported as up to date. A locally installed package is not required; the command can be run via `npx @williamthorsen/strict-lint init`.
+
+  Separately, the help flag (`-h` or `--help`) is now usable both with the bare `strict-lint` command and its `strict-lint init` subcommand.
+
+- 🚨 **Breaking:** Enforce package-json/specify-peers-locally (#165)
+
+  Enforces `package-json/specify-peers-locally`. Every peer dependency a package declares must also appear in its own `devDependencies`; in a pnpm workspace a catalog entry satisfies it without repeating the version.
+
+  Migration: A consumer relying on the workspace root's hoisting or on pnpm's `autoInstallPeers` to resolve its peers gets new errors until each peer is declared locally.
+
 ## 10.0.0 — 2026-08-11
 
 ### 🎉 Features

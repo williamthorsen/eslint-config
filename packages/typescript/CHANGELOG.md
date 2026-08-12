@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 10.0.0 — 2026-08-12
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Enforce package-json/specify-peers-locally (#165)
+
+  Enforces `package-json/specify-peers-locally`. Every peer dependency a package declares must also appear in its own `devDependencies`; in a pnpm workspace a catalog entry satisfies it without repeating the version.
+
+  Migration: A consumer relying on the workspace root's hoisting or on pnpm's `autoInstallPeers` to resolve its peers gets new errors until each peer is declared locally.
+
 ## 9.0.0 — 2026-08-11
 
 ### 🎉 Features
