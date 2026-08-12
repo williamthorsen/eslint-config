@@ -3,6 +3,7 @@ import path from 'node:path';
 import { type FileReconciliation, reconcileFile } from '@williamthorsen/toolbelt.filesystem';
 import { findProjectRoot } from '@williamthorsen/toolbelt.packaging';
 
+import { describeRootSource } from '../common/describeRootSource.ts';
 import { STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
 import { showInitUsage } from '../usage.ts';
 import { canResolveStrictLint } from './canResolveStrictLint.ts';
@@ -14,7 +15,7 @@ import { parseInitArgs } from './parseInitArgs.ts';
  * The command never refuses: a target the package cannot be imported from still gets its config, plus the install
  * step that would make the config load.
  */
-export function runInit(argv: string[]): number {
+export function runInit(argv: string[], targetDir: string): number {
   const { isDryRun, shouldOverwrite, shouldShowHelp } = parseInitArgs(argv);
 
   if (shouldShowHelp) {
@@ -22,7 +23,6 @@ export function runInit(argv: string[]): number {
     return 0;
   }
 
-  const targetDir = process.cwd();
   const filePath = path.join(targetDir, STRICT_LINT_CONFIG_NAME);
 
   const reconciliation = reconcileFile(filePath, CONFIG_TEMPLATE, {
@@ -48,9 +48,11 @@ export function runInit(argv: string[]): number {
 
 /** Reports where the config sits in the cascade, which is what tells the reader which files its ceilings govern. */
 function reportProjectRoot(targetDir: string): void {
-  const { marker, rootDir } = findProjectRoot(targetDir);
-  const attribution = marker === null ? '' : ` (found by ${marker})`;
-  console.info(`Ceilings merge from the project root at ${rootDir}${attribution} down to each linted file.`);
+  const projectRoot = findProjectRoot(targetDir);
+  const attribution = describeRootSource(projectRoot);
+  console.info(
+    `Ceilings merge from the project root at ${projectRoot.rootDir} (${attribution}) down to each linted file.`,
+  );
 }
 
 /** Reports what the write did, in the outcome vocabulary `reconcileFile` returns. */

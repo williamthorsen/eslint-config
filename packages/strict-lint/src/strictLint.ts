@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 import { ESLint, type Linter } from 'eslint';
 
+import { describeRootSource } from './common/describeRootSource.ts';
 import { createCeilingResolver } from './createCeilingResolver.ts';
 import type { StrictLintCascade } from './loadStrictLintConfigs.ts';
 import { parseCliArgs, type ParsedCliArgs } from './parseCliArgs.ts';
@@ -168,14 +169,6 @@ function describeDirs(dirs: readonly string[]): string {
   const shown = dirs.slice(0, MAX_REPORTED_DIRS).join(', ');
   const remaining = dirs.length - MAX_REPORTED_DIRS;
   return remaining > 0 ? `${shown} (and ${String(remaining)} more)` : shown;
-}
-
-/** How the project root was chosen: by a marker file, or by one of the fallbacks. */
-function describeRootSource({ marker, source }: ProjectRoot): string {
-  if (marker !== null) {
-    return `marker: ${marker}`;
-  }
-  return source === 'package-json' ? 'nearest package.json' : 'no project marker; using the start directory';
 }
 
 /** The project roots the walks landed on, deduplicated: a run spanning one repository reports exactly one. */
