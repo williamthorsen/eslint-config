@@ -15,8 +15,6 @@ const config: Config[] = [
       'package-json/require-engines': 'error',
       'package-json/require-homepage': 'error',
       'package-json/require-keywords': 'error',
-      // Peers hoisted to a workspace root are not duplicated in the consuming package's devDependencies
-      'package-json/specify-peers-locally': 'off',
     },
   },
 ];

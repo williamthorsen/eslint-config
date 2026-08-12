@@ -64,7 +64,7 @@ The default export bundles configs for the following surfaces:
 | `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)   |
 | Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed                                   |
 
-Every `package.json` must declare `author` and `engines`, and may not carry an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not take a dependency on a local path (`file:`, `link:`, or a relative path).
+Every `package.json` must declare `author` and `engines`, and may not carry an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not take a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency a package declares must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
 
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so spec files don't fight the type checker. Declaration files (`*.d.ts`) have `import/no-duplicates` turned off.
 
@@ -203,10 +203,11 @@ An unscoped block applies `'warn'` everywhere, including in test files, where th
 
 ## Peer dependencies
 
-| Dependency   | Required |
-| ------------ | -------- |
-| `eslint`     | `>=10`   |
-| `typescript` | `>=5`    |
+| Dependency                 | Required  |
+| -------------------------- | --------- |
+| `@typescript-eslint/utils` | `^8.59.1` |
+| `eslint`                   | `>=10`    |
+| `typescript`               | `>=5`     |
 
 ## Checking your configuration
 
