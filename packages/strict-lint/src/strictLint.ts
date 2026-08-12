@@ -3,11 +3,13 @@ import fs from 'node:fs/promises';
 import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 import { ESLint, type Linter } from 'eslint';
 
+import { describeRootSource } from './common/describeRootSource.ts';
 import { createCeilingResolver } from './createCeilingResolver.ts';
 import type { StrictLintCascade } from './loadStrictLintConfigs.ts';
 import { parseCliArgs, type ParsedCliArgs } from './parseCliArgs.ts';
 import { promoteSeverities } from './promoteSeverities.ts';
 import type { StrictLintOptions } from './types.ts';
+import { showUsage } from './usage.ts';
 
 /** Runs strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
@@ -39,6 +41,11 @@ async function doLint(
   args: string[],
 ): Promise<{ text: string; errorCount: number }> {
   const parsed = parseCliArgs(args);
+
+  if (parsed.shouldShowHelp) {
+    showUsage();
+    return { text: '', errorCount: 0 };
+  }
 
   // The walk is anchored at each linted file, matching how ESLint resolves its own config.
   const ceilings = createCeilingResolver(options?.maxSeverity);
@@ -162,14 +169,6 @@ function describeDirs(dirs: readonly string[]): string {
   const shown = dirs.slice(0, MAX_REPORTED_DIRS).join(', ');
   const remaining = dirs.length - MAX_REPORTED_DIRS;
   return remaining > 0 ? `${shown} (and ${String(remaining)} more)` : shown;
-}
-
-/** How the project root was chosen: by a marker file, or by one of the fallbacks. */
-function describeRootSource({ marker, source }: ProjectRoot): string {
-  if (marker !== null) {
-    return `marker: ${marker}`;
-  }
-  return source === 'package-json' ? 'nearest package.json' : 'no project marker; using the start directory';
 }
 
 /** The project roots the walks landed on, deduplicated: a run spanning one repository reports exactly one. */
