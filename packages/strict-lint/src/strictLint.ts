@@ -8,6 +8,7 @@ import type { StrictLintCascade } from './loadStrictLintConfigs.ts';
 import { parseCliArgs, type ParsedCliArgs } from './parseCliArgs.ts';
 import { promoteSeverities } from './promoteSeverities.ts';
 import type { StrictLintOptions } from './types.ts';
+import { showUsage } from './usage.ts';
 
 /** Runs strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
@@ -39,6 +40,11 @@ async function doLint(
   args: string[],
 ): Promise<{ text: string; errorCount: number }> {
   const parsed = parseCliArgs(args);
+
+  if (parsed.shouldShowHelp) {
+    showUsage();
+    return { text: '', errorCount: 0 };
+  }
 
   // The walk is anchored at each linted file, matching how ESLint resolves its own config.
   const ceilings = createCeilingResolver(options?.maxSeverity);

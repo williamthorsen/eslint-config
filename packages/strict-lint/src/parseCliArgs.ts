@@ -14,6 +14,7 @@ export interface ParsedCliArgs {
   outputFile: string | undefined;
   configPath: string | undefined;
   debug: boolean;
+  shouldShowHelp: boolean;
 }
 
 /** Parse process.argv-style arguments into ESLint constructor options and metadata. */
@@ -37,6 +38,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
       'warn-ignored': { type: 'boolean' },
       config: { type: 'string', short: 'c' },
       debug: { type: 'boolean', default: false },
+      help: { type: 'boolean', short: 'h', default: false },
       stats: { type: 'boolean', default: false },
       flag: { type: 'string', multiple: true },
       concurrency: { type: 'string' },
@@ -136,6 +138,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     outputFile: values['output-file'],
     configPath: values.config,
     debug: values.debug,
+    shouldShowHelp: values.help,
   };
 }
 

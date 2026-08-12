@@ -36,7 +36,7 @@ Warnings that name no rule keep the severity ESLint gave them. ESLint reports tw
 
 ## Configuration
 
-Create `.config/strict-lint.config.ts` at or above the files you lint to declare your ceilings:
+Scaffold a config with [`strict-lint init`](#scaffolding-a-config), or create `.config/strict-lint.config.ts` at or above the files you lint by hand:
 
 ```ts
 // .config/strict-lint.config.ts
@@ -52,6 +52,26 @@ export default defineConfig({
 ```
 
 The strict-lint config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not. This restriction applies to `.config/strict-lint.config.ts` alone; your ESLint config is loaded by ESLint through jiti, which transpiles rather than strips, and accepts any TypeScript.
+
+### Scaffolding a config
+
+`strict-lint init` writes a starter config for you:
+
+```shell
+strict-lint init
+```
+
+It writes into the directory you run it from rather than into the project root, so ceilings are scoped by where you run it: `cd packages/pkg && strict-lint init` gives that package a config of its own. The command reports both the path it wrote and the project root the cascade merges down from, so you can see which files the new ceilings will govern.
+
+An existing config is left untouched unless `--force` is passed, and one whose contents already match is reported as up to date rather than rewritten.
+
+| Flag         | Description                                      |
+| ------------ | ------------------------------------------------ |
+| `--dry-run`  | Report what would be written, without writing it |
+| `--force`    | Overwrite an existing config                     |
+| `-h, --help` | Show the command's help                          |
+
+The scaffolded config imports `@williamthorsen/strict-lint/config`, so the command checks whether the package can be imported from that directory and prints an install step when it cannot. It never refuses on that account: `npx @williamthorsen/strict-lint init` scaffolds first and installs after.
 
 ### Ceiling values
 
@@ -143,14 +163,16 @@ Configs above it contribute nothing and are never imported, so their module-leve
 
 ```
 strict-lint [options] [file|dir|glob...]
+strict-lint init [options]
 ```
 
-`strict-lint` accepts the same arguments as `eslint`. Positional arguments default to `.` (lint the current directory).
+`strict-lint` accepts the same arguments as `eslint`. Positional arguments default to `.` (lint the current directory). `init` is a command in first position alone, so `strict-lint ./init` still lints a path of that name; see [Scaffolding a config](#scaffolding-a-config) for its flags.
 
 | Option                         | Description                                                                  |
 | ------------------------------ | ---------------------------------------------------------------------------- |
 | `-c, --config <path>`          | Path to your ESLint config file                                              |
 | `--debug`                      | Report strict-lint's own config resolution on stderr                         |
+| `-h, --help`                   | Show usage for both modes                                                    |
 | `--rule <name:severity>`       | Override a single rule (repeatable). Severity: `off` \| `warn` \| `error`.   |
 | `--fix`                        | Auto-fix problems                                                            |
 | `--fix-dry-run`                | Compute fixes but do not write                                               |
