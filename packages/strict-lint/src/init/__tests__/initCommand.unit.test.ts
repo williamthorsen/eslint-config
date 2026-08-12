@@ -99,6 +99,26 @@ describe(runInit, () => {
     expect(reported.info()).toContain('Overwrote');
   });
 
+  it('reports the overwrite it would make under --dry-run --force', () => {
+    const dir = makeTree();
+    writeConfig(dir, 'export default {};\n');
+    const reported = captureConsole();
+
+    expect(runInit(['--dry-run', '--force'], dir)).toBe(0);
+    expect(readConfig(dir)).toBe('export default {};\n');
+    expect(reported.info()).toContain('Would overwrite');
+  });
+
+  // A directory where the config belongs exists for `existsSync` and throws for `readFileSync`.
+  it('names the reason when the existing config cannot be read', () => {
+    const dir = makeTree();
+    fs.mkdirSync(path.join(dir, STRICT_LINT_CONFIG_NAME), { recursive: true });
+    const reported = captureConsole();
+
+    expect(runInit([], dir)).toBe(0);
+    expect(reported.info()).toContain('could not be read');
+  });
+
   // `reconcileFile` compares before it consults the conflict policy, so `--force` reports no write it did not make.
   it.each([[[]], [['--force']]])('reports an unchanged config as up to date, given %j', (argv) => {
     const dir = makeTree();
