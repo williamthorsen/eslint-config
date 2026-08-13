@@ -12,5 +12,9 @@ export default defineConfig({
     // If you lint with @williamthorsen/eslint-config-typescript, its \`advisoryRuleSeverities\`
     // export is a ready-made set of ceilings: maxSeverity: { ...advisoryRuleSeverities }
   },
+
+  // Import the configs your ESLint config extends and name them here, as values, to be told
+  // which of your own rules merely repeat what they already apply:
+  // sharedConfigs: [baseConfig, await createConfig.vitest()],
 });
 `;
