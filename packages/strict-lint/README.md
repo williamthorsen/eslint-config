@@ -202,7 +202,7 @@ That is what an undeclared source looks like. `defineConfig` rebuilds the elemen
 What the check does not do:
 
 - **No repeat of a whole shared element.** An element of your config matching one of the shared configs in both scope and rules is taken for that shared element and never compared, so copying one wholesale goes unreported.
-- **No partial repeat.** A rule reports only where it repeats on every file your own config sets it for. A rule you set at two scopes, one restoring what the other turned off, is load-bearing at both and passes unreported.
+- **No partial repeat, and no whole-config guarantee.** A rule reports only where it repeats on every file _this run linted_ that your own config sets it for, and never where your own config gives that rule more than one value. A rule you set at two scopes, one restoring what the other turned off, is load-bearing at both and passes unreported. The denominator is the run's files rather than every file your config governs, so a run over part of your project measures against less than a full one does.
 - **No source location.** It reads resolved configuration rather than source text, so it names the rule and the config file, never the line.
 - **No editor feedback.** It is a command-line check, not a lint rule, so there is no on-save squiggle and no removal suggestion.
 - **One ESLint config per run.** The config is resolved once at the working directory, so a monorepo giving each package its own `eslint.config.*` is not covered.

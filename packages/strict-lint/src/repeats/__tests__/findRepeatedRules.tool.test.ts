@@ -95,6 +95,44 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([]);
   });
 
+  it('passes over a rule the consumer gives two values, even when the run lints one scope alone', async () => {
+    // Linting only `src/bin` makes the narrow entry the only one the run sees, so the file counts agree; the broad
+    // entry it restores still governs everything else, and both stay load-bearing.
+    const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
+    const consumer: Linter.Config[] = [
+      ...shared,
+      { files: ['**/*.ts'], rules: { 'no-console': 'off' } },
+      { files: ['src/bin/**/*.ts'], rules: { 'no-console': 'error' } },
+    ];
+
+    const report = await findRepeatedRules({
+      consumerElements: consumer,
+      cwd: process.cwd(),
+      filePaths: ['src/bin/cli.ts'],
+      sharedElements: shared,
+    });
+
+    expect(report.repeatedRules).toStrictEqual([]);
+  });
+
+  it('reports a rule the consumer sets at two disjoint scopes to one value', async () => {
+    const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-eval': 'error' } }];
+    const consumer: Linter.Config[] = [
+      ...shared,
+      { files: ['src/**/*.ts'], rules: { 'no-eval': 'error' } },
+      { files: ['test/**/*.ts'], rules: { 'no-eval': 'error' } },
+    ];
+
+    const report = await findRepeatedRules({
+      consumerElements: consumer,
+      cwd: process.cwd(),
+      filePaths: ['src/app.ts', 'test/app.ts'],
+      sharedElements: shared,
+    });
+
+    expect(report.repeatedRules).toStrictEqual([{ fileCount: 2, ruleId: 'no-eval' }]);
+  });
+
   it('reports a rule that repeats on every file the consumer sets it for', async () => {
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
     const consumer: Linter.Config[] = [...shared, { files: ['src/bin/**/*.ts'], rules: { 'no-console': 'error' } }];

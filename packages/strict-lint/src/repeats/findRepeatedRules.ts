@@ -65,9 +65,11 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
   }
 
   // A rule repeating on only some of the files the consumer sets it for is load-bearing on the rest, so deleting the
-  // entry that repeats would change them. Only a rule redundant everywhere the consumer sets it is safe to report.
+  // entry that repeats would change them. Only a rule redundant everywhere the consumer sets it is safe to report,
+  // and a contested rule never is: the file counts agree whenever the run happens to lint one scope alone.
+  const contested = findContestedRules(own);
   const repeatedRules = [...repeatFileCounts]
-    .filter(([ruleId, fileCount]) => fileCount === ownFileCounts.get(ruleId))
+    .filter(([ruleId, fileCount]) => fileCount === ownFileCounts.get(ruleId) && !contested.has(ruleId))
     .map(([ruleId, fileCount]) => ({ fileCount, ruleId }))
     .toSorted((a, b) => a.ruleId.localeCompare(b.ruleId));
 
@@ -79,6 +81,25 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
 /** Builds an instance resolving one side of the comparison, with the whole config's plugin registrations beneath it. */
 function createInstance(cwd: string, scaffold: Linter.Config[], side: readonly Linter.Config[]): ESLint {
   return new ESLint({ baseConfig: [...scaffold, ...side], cwd, overrideConfigFile: true });
+}
+
+/**
+ * The rules the consumer's own elements configure to more than one value. Whether such a rule is redundant turns on
+ * which element wins for a given file, which the files one run happens to lint cannot settle.
+ */
+function findContestedRules(own: readonly Linter.Config[]): Set<string> {
+  const valuesByRule = new Map<string, unknown[]>();
+  for (const element of own) {
+    const entries = Object.entries(element.rules ?? {});
+    for (const [ruleId, value] of entries) {
+      const values = valuesByRule.get(ruleId) ?? [];
+      if (values.every((seen) => !isDeepStrictEqual(seen, value))) {
+        values.push(value);
+      }
+      valuesByRule.set(ruleId, values);
+    }
+  }
+  return new Set([...valuesByRule].filter(([, values]) => values.length > 1).map(([ruleId]) => ruleId));
 }
 
 /** Names an element for a diagnostic, falling back to the keys it carries when it has no name. */
