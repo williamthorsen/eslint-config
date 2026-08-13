@@ -8,6 +8,7 @@ const {
   mockedLoadStrictLintConfigs,
   mockedWriteFile,
   mockEslintConstructor,
+  mockFindConfigFile,
   mockFormat,
   mockGetErrorResults,
   mockLintFiles,
@@ -17,6 +18,7 @@ const {
   mockedLoadStrictLintConfigs: vi.fn(),
   mockedWriteFile: vi.fn().mockResolvedValue(undefined),
   mockEslintConstructor: vi.fn(),
+  mockFindConfigFile: vi.fn().mockResolvedValue(undefined),
   mockFormat: vi.fn().mockResolvedValue(''),
   mockGetErrorResults: vi.fn(),
   mockLintFiles: vi.fn().mockResolvedValue([]),
@@ -24,7 +26,8 @@ const {
   mockOutputFixes: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('../loadStrictLintConfigs.ts', () => ({
+vi.mock(import('../loadStrictLintConfigs.ts'), async (importOriginal) => ({
+  ...(await importOriginal()),
   loadStrictLintConfigs: mockedLoadStrictLintConfigs,
 }));
 
@@ -38,6 +41,7 @@ vi.mock('eslint', () => {
     ESLint: class {
       static outputFixes = mockOutputFixes;
       static getErrorResults = mockGetErrorResults;
+      findConfigFile = mockFindConfigFile;
       lintFiles = mockLintFiles;
       loadFormatter = mockLoadFormatter;
       constructor(options: unknown) {
@@ -239,6 +243,24 @@ describe(strictLint, () => {
       await strictLint({ baseConfig: [{ rules: {} }] });
 
       expect(process.exit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('repeated-rule check', () => {
+    it('does no work when no strict-lint config names a shared config', async () => {
+      withStrictLintConfigs({ maxSeverity: {} });
+
+      await strictLint();
+
+      expect(mockFindConfigFile).not.toHaveBeenCalled();
+    });
+
+    it('reads the ESLint config once a strict-lint config names a shared config', async () => {
+      withStrictLintConfigs({ sharedConfigs: [[{ rules: { 'some-rule': 'error' } }]] });
+
+      await strictLint();
+
+      expect(mockFindConfigFile).toHaveBeenCalled();
     });
   });
 

@@ -10,6 +10,12 @@ export type MaxSeverityMap = Record<string, Linter.RuleSeverity | undefined>;
 
 export interface StrictLintConfig {
   maxSeverity?: MaxSeverityMap;
+  /**
+   * The configs the ESLint config extends, passed as values rather than named as a package. A name resolves through
+   * `exports` and can load a second instance of a module the ESLint config already imported, against which no
+   * comparison holds. Absent, strict-lint runs no repeated-rule check.
+   */
+  sharedConfigs?: Array<Linter.Config | Linter.Config[]>;
   /** Bound the upward search at this config's directory, so configs above it do not apply and are never imported. */
   shouldIgnoreAncestors?: boolean;
 }

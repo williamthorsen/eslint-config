@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { loadStrictLintConfigs, STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
+import { loadStrictLintConfigs, resolveSharedConfigs, STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
 
 interface CascadeOptions {
   fileNames: readonly string[];
@@ -143,6 +143,21 @@ describe(loadStrictLintConfigs, () => {
         config: { shouldIgnoreAncestors: 'yes' },
         message: `Expected shouldIgnoreAncestors in "${configPathIn('/project')}" to be a boolean`,
       },
+      {
+        name: 'sharedConfigs is not an array',
+        config: { sharedConfigs: { rules: {} } },
+        message: `Expected sharedConfigs in "${configPathIn('/project')}" to be an array`,
+      },
+      {
+        name: 'a sharedConfigs entry is a package name rather than a config value',
+        config: { sharedConfigs: ['@some/shared-config'] },
+        message: `Expected sharedConfigs[0] in "${configPathIn('/project')}" to be a config object or an array of them, got "@some/shared-config"`,
+      },
+      {
+        name: 'a sharedConfigs entry holds a non-config among its elements',
+        config: { sharedConfigs: [[{ rules: {} }, 'not-a-config']] },
+        message: `Expected sharedConfigs[0] in "${configPathIn('/project')}" to be a config object or an array of them, got "not-a-config"`,
+      },
     ])('rejects when $name', async ({ config, message }) => {
       withCascadeEntries([['/project', config]]);
 
@@ -213,6 +228,46 @@ describe(loadStrictLintConfigs, () => {
 
       await expect(loadStrictLintConfigs('/project')).rejects.toBe(failure);
     });
+  });
+});
+
+describe(resolveSharedConfigs, () => {
+  const nearer = { rules: { 'nearer-rule': 'error' } };
+  const farther = { rules: { 'farther-rule': 'error' } };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedFindProjectRoot.mockReturnValue(PROJECT_ROOT);
+  });
+
+  it('flattens config arrays and bare config objects into one element list', async () => {
+    withCascadeEntries([['/project', { sharedConfigs: [[nearer], farther] }]]);
+
+    expect(resolveSharedConfigs(await loadStrictLintConfigs('/project'))).toStrictEqual([nearer, farther]);
+  });
+
+  it('takes the nearest declaration outright rather than merging it with a farther one', async () => {
+    withCascadeEntries([
+      ['/project/packages/pkg', { sharedConfigs: [nearer] }],
+      ['/project', { sharedConfigs: [farther] }],
+    ]);
+
+    expect(resolveSharedConfigs(await loadStrictLintConfigs('/project/packages/pkg'))).toStrictEqual([nearer]);
+  });
+
+  it('reaches past a level that declares none', async () => {
+    withCascadeEntries([
+      ['/project/packages/pkg', { maxSeverity: {} }],
+      ['/project', { sharedConfigs: [farther] }],
+    ]);
+
+    expect(resolveSharedConfigs(await loadStrictLintConfigs('/project/packages/pkg'))).toStrictEqual([farther]);
+  });
+
+  it('resolves to no elements when no level declares any', async () => {
+    withCascadeEntries([['/project', {}]]);
+
+    expect(resolveSharedConfigs(await loadStrictLintConfigs('/project'))).toStrictEqual([]);
   });
 });
 

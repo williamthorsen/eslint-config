@@ -26,7 +26,8 @@ Every warning emitted by your ESLint config becomes an error and fails the run, 
 
 1. Runs ESLint via the Node API, letting it resolve a config for each linted file just as a plain `eslint` run does, or pinning one config for the whole run via `--config <path>`.
 2. Rewrites every reported warning to an error, except those whose `maxSeverity` ceiling sits below `error`.
-3. Exits non-zero on any errors.
+3. Reports any rule your own config merely repeats from the shared configs you named, if you named any.
+4. Exits non-zero on any errors.
 
 `maxSeverity` is the resolved set of ceilings, computed by merging, in increasing precedence, every `.config/strict-lint.config.ts` from the project root down to the directory of the file being linted, then any `maxSeverity` passed programmatically. No rule is exempt from promotion unless one of those sources says so.
 
@@ -158,6 +159,53 @@ Configs above it contribute nothing and are never imported, so their module-leve
 #### Seeing what applied
 
 `strict-lint --debug` writes the resolved project root, the marker that chose it, and every config file that contributed (in the order they merge) to stderr. Because ceilings resolve per file, it reports one block per distinct set of config files, naming the directories that set governs, rather than one block per directory. It reports strict-lint's own resolution; it does not enable ESLint's internal debug logging.
+
+### Flagging repeated rules
+
+A config often repeats a rule setting that the shared config it extends already applies. The repetition is invisible: it looks like configuration, it survives upgrades, and it pins the rule at a setting the shared config may since have changed.
+
+Name the configs your ESLint config extends, and `strict-lint` reports the rules your own config merely repeats:
+
+```ts
+// .config/strict-lint.config.ts
+import baseConfig, { createConfig } from '@williamthorsen/eslint-config-typescript';
+import { defineConfig } from '@williamthorsen/strict-lint/config';
+
+export default defineConfig({
+  sharedConfigs: [baseConfig, await createConfig.vitest()],
+});
+```
+
+Findings go to stderr, and change no problem count and no exit code, so a repeat is reported without failing the run:
+
+```
+strict-lint: eslint.config.ts repeats the shared config for 1 rule:
+strict-lint:   n/no-extraneous-import (11 files)
+```
+
+Without `sharedConfigs`, the check does no work.
+
+After linting, strict-lint resolves the rules governing each linted file twice: once over the elements it attributes to the configs you named, and once over your own. A rule both resolve to the same value is a repeat. `'error'`, `2`, and `['error']` count as one value, while differing options count as an override and pass unreported, as does a rule the shared config never sets for that file. ESLint performs the glob expansion and the `files` scoping, because the question is asked per real file rather than reconstructed from patterns.
+
+Pass values rather than a package name. A name resolves through the package's `exports` field and can load a second instance of a module your ESLint config already imported; nothing in it would match, and the check would report nothing at all. Import the specifier your ESLint config imports.
+
+Declare every shared source, factory calls included. An element strict-lint cannot attribute to either side stops the check, which names what it could not sort rather than guessing:
+
+```
+strict-lint: shared-config check skipped: 3 config elements could not be sorted
+strict-lint:   UserConfig[0] > UserConfig[0] > vitest/all
+strict-lint: name the config each extends in sharedConfigs
+```
+
+That is what an undeclared source looks like. `defineConfig` rebuilds the elements it reaches through `extends`, so an expansion of a config you did not name matches nothing strict-lint holds. Add it to `sharedConfigs` and the check runs.
+
+What the check does not do:
+
+- **No repeat of a whole shared element.** An element of your config matching one of the shared configs in both scope and rules is taken for that shared element and never compared, so copying one wholesale goes unreported.
+- **No partial repeat, and no whole-config guarantee.** A rule reports only where it repeats on every file _this run linted_ that your own config sets it for, and never where your own config gives that rule more than one value. A rule you set at two scopes, one restoring what the other turned off, is load-bearing at both and passes unreported. The denominator is the run's files rather than every file your config governs, so a run over part of your project measures against less than a full one does.
+- **No source location.** It reads resolved configuration rather than source text, so it names the rule and the config file, never the line.
+- **No editor feedback.** It is a command-line check, not a lint rule, so there is no on-save squiggle and no removal suggestion.
+- **One ESLint config per run.** The config is resolved once at the working directory, so a monorepo giving each package its own `eslint.config.*` is not covered.
 
 ## CLI reference
 
