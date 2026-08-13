@@ -176,7 +176,7 @@ export default defineConfig({
 });
 ```
 
-Findings go to stderr, and change no problem count and no exit code, so a repeat reports without failing a build:
+Findings go to stderr, and change no problem count and no exit code, so a repeat is reported without failing the run:
 
 ```
 strict-lint: eslint.config.ts repeats the shared config for 1 rule:
