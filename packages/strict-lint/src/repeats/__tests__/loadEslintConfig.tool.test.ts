@@ -49,6 +49,22 @@ describe(loadEslintConfig, () => {
     });
   });
 
+  it('reads a lone config object, which ESLint takes as a one-element array', async () => {
+    await withTempConfig("export default { rules: { 'no-eval': 'error' } };", async (filePath) => {
+      const load = await loadEslintConfig(REPO_ROOT, filePath);
+
+      expect(load).toStrictEqual({ elements: [{ rules: { 'no-eval': 'error' } }], filePath, status: 'loaded' });
+    });
+  }, 30_000);
+
+  it('reports a function default export, which ESLint rejects before any lint runs', async () => {
+    await withTempConfig('export default () => [{ rules: {} }];', async (filePath) => {
+      const load = await loadEslintConfig(REPO_ROOT, filePath);
+
+      expect(load.status).toBe('unreadable');
+    });
+  }, 30_000);
+
   it('reports no config when the search finds none', async () => {
     const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'strict-lint-'));
 
@@ -61,6 +77,18 @@ describe(loadEslintConfig, () => {
 });
 
 // region | Helpers
+
+/** Runs the body against a config module written outside the repository, so no fixture config is authored in it. */
+async function withTempConfig(source: string, body: (filePath: string) => Promise<void>): Promise<void> {
+  const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'strict-lint-'));
+  const filePath = path.join(dir, 'eslint.config.mjs');
+  fs.writeFileSync(filePath, source, 'utf8');
+  try {
+    await body(filePath);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
 
 /** Narrows a load to its loaded form, so a case can read the fields only that form carries. */
 function assertLoaded(
