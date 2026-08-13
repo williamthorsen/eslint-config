@@ -2,6 +2,7 @@ import { type ConfigCascade, loadConfigCascade } from '@williamthorsen/toolbelt.
 import { findProjectRoot, type ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 import type { Linter } from 'eslint';
 
+import { isRecord } from './common/isRecord.ts';
 import { formatRuleSeverities, isRuleSeverity } from './common/severity.ts';
 import { wrapNativeTsError } from './common/wrapNativeTsError.ts';
 import type { StrictLintConfig } from './types.ts';
@@ -114,10 +115,6 @@ function assertIsSharedConfigs(value: unknown, filePath: string): void {
       }
     }
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /** Renders a rejected value for a diagnostic, so an object reports its shape rather than `[object Object]`. */

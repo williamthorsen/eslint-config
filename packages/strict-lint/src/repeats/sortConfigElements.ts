@@ -21,7 +21,7 @@ export function sortConfigElements(
   sharedElements: readonly Linter.Config[],
 ): SortedConfigElements {
   const sharedIdentities = new Set(sharedElements);
-  const sharedRuleSets = sharedElements.map((element) => element.rules).filter((rules) => rules !== undefined);
+  const sharedRuleBearers = sharedElements.filter((element) => element.rules !== undefined);
 
   const own: Linter.Config[] = [];
   const unsortable: Linter.Config[] = [];
@@ -30,12 +30,11 @@ export function sortConfigElements(
     if (element.rules === undefined || sharedIdentities.has(element)) {
       continue;
     }
-    // `defineConfig` rebuilds the elements it reaches through `extends`, so an expansion of a shared config matches by
-    // neither reference nor name. Its `rules` object survives the rebuild intact, which is what identifies it.
-    if (sharedRuleSets.some((rules) => isDeepStrictEqual(rules, element.rules))) {
+    const isExpansion = hasExtendsLabel(element);
+    if (sharedRuleBearers.some((shared) => isRestatementOf(element, shared, isExpansion))) {
       continue;
     }
-    if (hasExtendsLabel(element)) {
+    if (isExpansion) {
       unsortable.push(element);
     } else {
       own.push(element);
@@ -50,6 +49,24 @@ export function sortConfigElements(
 /** Whether the element carries a name `defineConfig` generated while expanding an `extends`. */
 function hasExtendsLabel(element: Linter.Config): boolean {
   return typeof element.name === 'string' && element.name.includes(EXTENDS_LABEL_SEPARATOR);
+}
+
+/**
+ * Whether a consumer element restates a shared one rather than configuring anything of the consumer's own.
+ *
+ * An expansion is matched on its `rules` alone: `defineConfig` rebuilds what it reaches through `extends`, merging the
+ * extending config's scope into each element, so the scope it carries is the consumer's while the rules are the shared
+ * config's. Every other element must match scope too, or a literal that narrows a shared setting to a subset of its
+ * files would be taken for the shared element itself and never compared.
+ */
+function isRestatementOf(element: Linter.Config, shared: Linter.Config, isExpansion: boolean): boolean {
+  if (!isDeepStrictEqual(element.rules, shared.rules)) {
+    return false;
+  }
+  return (
+    isExpansion ||
+    (isDeepStrictEqual(element.files, shared.files) && isDeepStrictEqual(element.ignores, shared.ignores))
+  );
 }
 
 // endregion | Helpers

@@ -2,6 +2,7 @@ import { isDeepStrictEqual } from 'node:util';
 
 import { ESLint, type Linter } from 'eslint';
 
+import { isRecord } from '../common/isRecord.ts';
 import { buildPluginScaffold } from './buildPluginScaffold.ts';
 import { sortConfigElements } from './sortConfigElements.ts';
 
@@ -44,7 +45,8 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
   const ownLint = createInstance(cwd, scaffold, own);
   const sharedLint = createInstance(cwd, scaffold, sharedElements);
 
-  const fileCountsByRule = new Map<string, number>();
+  const ownFileCounts = new Map<string, number>();
+  const repeatFileCounts = new Map<string, number>();
   const resolved = await Promise.all(
     filePaths.map(async (filePath) => ({
       own: await resolveRules(ownLint, filePath),
@@ -53,15 +55,19 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
   );
   for (const { own: ownRules, shared: sharedRules } of resolved) {
     for (const [ruleId, value] of Object.entries(ownRules)) {
+      ownFileCounts.set(ruleId, (ownFileCounts.get(ruleId) ?? 0) + 1);
       // A resolved rule is always an array, so `undefined` is the shared side leaving the rule unset.
       const sharedValue = sharedRules[ruleId];
       if (sharedValue !== undefined && isDeepStrictEqual(value, sharedValue)) {
-        fileCountsByRule.set(ruleId, (fileCountsByRule.get(ruleId) ?? 0) + 1);
+        repeatFileCounts.set(ruleId, (repeatFileCounts.get(ruleId) ?? 0) + 1);
       }
     }
   }
 
-  const repeatedRules = [...fileCountsByRule]
+  // A rule repeating on only some of the files the consumer sets it for is load-bearing on the rest, so deleting the
+  // entry that repeats would change them. Only a rule redundant everywhere the consumer sets it is safe to report.
+  const repeatedRules = [...repeatFileCounts]
+    .filter(([ruleId, fileCount]) => fileCount === ownFileCounts.get(ruleId))
     .map(([ruleId, fileCount]) => ({ fileCount, ruleId }))
     .toSorted((a, b) => a.ruleId.localeCompare(b.ruleId));
 
@@ -78,10 +84,6 @@ function createInstance(cwd: string, scaffold: Linter.Config[], side: readonly L
 /** Names an element for a diagnostic, falling back to the keys it carries when it has no name. */
 function describeElement(element: Linter.Config): string {
   return element.name ?? `unnamed config carrying ${Object.keys(element).toSorted().join(', ')}`;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /**

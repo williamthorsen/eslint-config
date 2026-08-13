@@ -75,6 +75,49 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([{ fileCount: 1, ruleId: 'some/no-widgets' }]);
   });
 
+  it('passes over a rule that repeats on only some of the files the consumer sets it for', async () => {
+    // The narrow entry restores what the broad one turned off, so it matches the shared value on `src/bin/cli.ts`
+    // alone. Neither entry is removable, and reporting the rule would name a load-bearing one.
+    const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
+    const consumer: Linter.Config[] = [
+      ...shared,
+      { files: ['**/*.ts'], rules: { 'no-console': 'off' } },
+      { files: ['src/bin/**/*.ts'], rules: { 'no-console': 'error' } },
+    ];
+
+    const report = await findRepeatedRules({
+      consumerElements: consumer,
+      cwd: process.cwd(),
+      filePaths: ['src/app.ts', 'src/lib.ts', 'src/bin/cli.ts'],
+      sharedElements: shared,
+    });
+
+    expect(report.repeatedRules).toStrictEqual([]);
+  });
+
+  it('reports a rule that repeats on every file the consumer sets it for', async () => {
+    const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
+    const consumer: Linter.Config[] = [...shared, { files: ['src/bin/**/*.ts'], rules: { 'no-console': 'error' } }];
+
+    const report = await findRepeatedRules({
+      consumerElements: consumer,
+      cwd: process.cwd(),
+      filePaths: ['src/app.ts', 'src/lib.ts', 'src/bin/cli.ts'],
+      sharedElements: shared,
+    });
+
+    expect(report.repeatedRules).toStrictEqual([{ fileCount: 1, ruleId: 'no-console' }]);
+  });
+
+  it('reports a repeat a consumer literal narrows to a subset of the shared scope', async () => {
+    const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-eval': 'error' } }];
+    const consumer: Linter.Config[] = [...shared, { files: ['src/**/*.ts'], rules: { 'no-eval': 'error' } }];
+
+    const report = await compare(shared, consumer);
+
+    expect(report.repeatedRules).toStrictEqual([{ fileCount: 1, ruleId: 'no-eval' }]);
+  });
+
   describe('an extends expansion', () => {
     // `defineConfig` rebuilds what it reaches through `extends`, so these cases run against a real expansion rather
     // than a hand-written label: the format changing upstream fails this suite instead of degrading the sort silently.

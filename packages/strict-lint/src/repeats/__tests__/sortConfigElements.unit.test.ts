@@ -21,6 +21,33 @@ describe(sortConfigElements, () => {
     expect(sorted).toStrictEqual({ own: [], unsortable: [] });
   });
 
+  it('keeps a literal that narrows a shared setting to a subset of its files', () => {
+    const shared: Linter.Config = { files: ['**/*.ts'], rules: { 'no-eval': 'error' } };
+    const narrowed: Linter.Config = { files: ['src/**/*.ts'], rules: { 'no-eval': 'error' } };
+
+    const sorted = sortConfigElements([narrowed], [shared]);
+
+    expect(sorted).toStrictEqual({ own: [narrowed], unsortable: [] });
+  });
+
+  it('keeps a literal that differs from a shared element only by its ignores', () => {
+    const shared: Linter.Config = { files: ['**/*.ts'], rules: { 'no-eval': 'error' } };
+    const narrowed: Linter.Config = { files: ['**/*.ts'], ignores: ['src/bin/**'], rules: { 'no-eval': 'error' } };
+
+    const sorted = sortConfigElements([narrowed], [shared]);
+
+    expect(sorted).toStrictEqual({ own: [narrowed], unsortable: [] });
+  });
+
+  it('drops an unlabelled element matching a shared one in both scope and rules, as a spread factory result does', () => {
+    const shared: Linter.Config = { files: ['**/*.test.ts'], rules: { 'some/rule': 'error' } };
+    const respread: Linter.Config = { files: ['**/*.test.ts'], rules: { 'some/rule': 'error' } };
+
+    const sorted = sortConfigElements([respread], [shared]);
+
+    expect(sorted).toStrictEqual({ own: [], unsortable: [] });
+  });
+
   it('keeps a consumer literal as the consumer own', () => {
     const literal: Linter.Config = { files: ['**/*.ts'], rules: { 'no-eval': 'error' } };
 
