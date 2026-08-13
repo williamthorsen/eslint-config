@@ -133,6 +133,24 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([{ fileCount: 2, ruleId: 'no-eval' }]);
   });
 
+  it('reports a rule the consumer sets at two disjoint scopes in two severity forms', async () => {
+    const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-eval': 'error' } }];
+    const consumer: Linter.Config[] = [
+      ...shared,
+      { files: ['src/**/*.ts'], rules: { 'no-eval': 'error' } },
+      { files: ['test/**/*.ts'], rules: { 'no-eval': ['error'] } },
+    ];
+
+    const report = await findRepeatedRules({
+      consumerElements: consumer,
+      cwd: process.cwd(),
+      filePaths: ['src/app.ts', 'test/app.ts'],
+      sharedElements: shared,
+    });
+
+    expect(report.repeatedRules).toStrictEqual([{ fileCount: 2, ruleId: 'no-eval' }]);
+  });
+
   it('reports a rule that repeats on every file the consumer sets it for', async () => {
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
     const consumer: Linter.Config[] = [...shared, { files: ['src/bin/**/*.ts'], rules: { 'no-console': 'error' } }];

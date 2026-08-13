@@ -3,6 +3,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { ESLint, type Linter } from 'eslint';
 
 import { isRecord } from '../common/isRecord.ts';
+import { isRuleSeverity, toSeverityNumber } from '../common/severity.ts';
 import { buildPluginScaffold } from './buildPluginScaffold.ts';
 import { sortConfigElements } from './sortConfigElements.ts';
 
@@ -78,9 +79,23 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
 
 // region | Helpers
 
+/**
+ * Reduces a rule entry to `[severity, ...options]` with a numeric severity, which is the form two entries have to
+ * share before a comparison can tell one setting from two. ESLint applies the same reduction to what it resolves.
+ */
+function canonicalizeRuleEntry(entry: unknown): unknown[] {
+  const [severity, ...options] = isUnknownArray(entry) ? entry : [entry];
+  return [isRuleSeverity(severity) ? toSeverityNumber(severity) : severity, ...options];
+}
+
 /** Builds an instance resolving one side of the comparison, with the whole config's plugin registrations beneath it. */
 function createInstance(cwd: string, scaffold: Linter.Config[], side: readonly Linter.Config[]): ESLint {
   return new ESLint({ baseConfig: [...scaffold, ...side], cwd, overrideConfigFile: true });
+}
+
+/** Names an element for a diagnostic, falling back to the keys it carries when it has no name. */
+function describeElement(element: Linter.Config): string {
+  return element.name ?? `unnamed config carrying ${Object.keys(element).toSorted().join(', ')}`;
 }
 
 /**
@@ -91,7 +106,8 @@ function findContestedRules(own: readonly Linter.Config[]): Set<string> {
   const valuesByRule = new Map<string, unknown[]>();
   for (const element of own) {
     const entries = Object.entries(element.rules ?? {});
-    for (const [ruleId, value] of entries) {
+    for (const [ruleId, entry] of entries) {
+      const value = canonicalizeRuleEntry(entry);
       const values = valuesByRule.get(ruleId) ?? [];
       if (values.every((seen) => !isDeepStrictEqual(seen, value))) {
         values.push(value);
@@ -102,9 +118,9 @@ function findContestedRules(own: readonly Linter.Config[]): Set<string> {
   return new Set([...valuesByRule].filter(([, values]) => values.length > 1).map(([ruleId]) => ruleId));
 }
 
-/** Names an element for a diagnostic, falling back to the keys it carries when it has no name. */
-function describeElement(element: Linter.Config): string {
-  return element.name ?? `unnamed config carrying ${Object.keys(element).toSorted().join(', ')}`;
+/** Whether a value is an array, narrowing to `unknown[]` where `Array.isArray` narrows to `any[]`. */
+function isUnknownArray(value: unknown): value is unknown[] {
+  return Array.isArray(value);
 }
 
 /**

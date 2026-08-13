@@ -24,6 +24,13 @@ export function allowsPromotion(ceiling: Linter.RuleSeverity | undefined): boole
   return ceiling === undefined || PROMOTING_CEILINGS.has(ceiling);
 }
 
+const SEVERITY_NUMBERS: Record<'error' | 'off' | 'warn', 0 | 1 | 2> = { error: 2, off: 0, warn: 1 };
+
+/** The numeric form of a severity, so a setting written `'error'` and one written `2` compare as one value. */
+export function toSeverityNumber(severity: Linter.RuleSeverity): 0 | 1 | 2 {
+  return typeof severity === 'number' ? severity : SEVERITY_NUMBERS[severity];
+}
+
 /** Renders the accepted vocabulary for a diagnostic, as `"off", "warn", "error", 0, 1, or 2`. */
 export function formatRuleSeverities(): string {
   const rendered = RULE_SEVERITIES.map((severity) => (typeof severity === 'string' ? `"${severity}"` : severity));
