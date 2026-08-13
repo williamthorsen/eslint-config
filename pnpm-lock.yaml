@@ -51,8 +51,8 @@ importers:
         specifier: workspace:*
         version: link:packages/tsconfig
       codeassembly:
-        specifier: 0.8.0
-        version: 0.8.0
+        specifier: 0.9.0
+        version: 0.9.0
       eslint:
         specifier: 'catalog:'
         version: 10.8.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -921,8 +921,8 @@ packages:
   '@vitest/utils@4.1.10':
     resolution: {integrity: sha512-fy9am/HWxbaGt/Sawrp90vt6Y6jQwf1RX77cz3uwoJwJVMli/e1IEwRPnMNJ7vKfPTwo0diXifkpPvwH9v7nGA==}
 
-  '@williamthorsen/kb@0.5.0':
-    resolution: {integrity: sha512-xfoLqOwfedtj4jzl4/JqJjZerfZZiAOcmEiFIh3zwtFA4Twf2QRTHuZc4ylS+PSHZ63cGMr6VsZQ0Tpngnq1IA==}
+  '@williamthorsen/kb@0.6.0':
+    resolution: {integrity: sha512-9c3sCtf90NfMCZjAJGwsrPymmKMi2qxYkUmx5tfyqOPaScW7U7I+aIO1U9SkwttE/mmWZbPWzO+285T5/K80nA==}
     engines: {node: '>=24'}
     hasBin: true
 
@@ -1123,12 +1123,12 @@ packages:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
     engines: {node: '>=12'}
 
-  codeassembly-lifecycle@0.3.0:
-    resolution: {integrity: sha512-po6xU8f1UqzjbO4walh99CiNWET1q7XDEACUSnl87AAeYqXxHoaLODMYqZziFM18BsPH7gEjzH6sagNSmPjyUg==}
+  codeassembly-lifecycle@0.4.0:
+    resolution: {integrity: sha512-JxzORj9u1jDMNbIxT+KqtksQRTj3CZYlewwHMSp+qSRUOxV8AnVU56sC4MD3eO2Nv3eNqGnt8sj2dvPNC3MM+w==}
     engines: {node: '>=24'}
 
-  codeassembly@0.8.0:
-    resolution: {integrity: sha512-sRNvqGWiZxFxBfBCTHKe5gQhiuzo4iw2432XYCkYI+Xq2H0znHf3UTngent7XNBrgCDzyh+ZABSmPgLSH5sNtg==}
+  codeassembly@0.9.0:
+    resolution: {integrity: sha512-/v2JoEOVI6jRYhjjnWuyCz4ozKBNQ2WdaVySbuQJw4v/gLVlOBsRpk59Pj5wA79X4td9O9i0cBPqEPxXwnL+Uw==}
     engines: {node: '>=24'}
     hasBin: true
 
@@ -3506,8 +3506,9 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
 
-  '@williamthorsen/kb@0.5.0':
+  '@williamthorsen/kb@0.6.0':
     dependencies:
+      '@williamthorsen/toolbelt.errors': 0.3.0
       picomatch: 4.0.5
       yaml: 2.9.0
       zod: 4.4.3
@@ -3733,12 +3734,13 @@ snapshots:
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
 
-  codeassembly-lifecycle@0.3.0: {}
+  codeassembly-lifecycle@0.4.0: {}
 
-  codeassembly@0.8.0:
+  codeassembly@0.9.0:
     dependencies:
-      '@williamthorsen/kb': 0.5.0
-      codeassembly-lifecycle: 0.3.0
+      '@williamthorsen/kb': 0.6.0
+      '@williamthorsen/toolbelt.errors': 0.3.0
+      codeassembly-lifecycle: 0.4.0
       ulid: 3.0.2
       yaml: 2.9.0
       zod: 4.4.3

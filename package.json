@@ -27,7 +27,7 @@
     "@williamthorsen/release-kit": "10.3.1",
     "@williamthorsen/strict-lint": "workspace:*",
     "@williamthorsen/tsconfig": "workspace:*",
-    "codeassembly": "0.8.0",
+    "codeassembly": "0.9.0",
     "eslint": "catalog:",
     "eslint-plugin-n": "catalog:",
     "globals": "17.9.0",
