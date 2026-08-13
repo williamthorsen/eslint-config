@@ -48,6 +48,15 @@ describe(sortConfigElements, () => {
     expect(sorted).toStrictEqual({ own: [], unsortable: [] });
   });
 
+  it('keeps a literal that differs from a shared element only by its basePath', () => {
+    const shared: Linter.Config = { basePath: 'packages/a', files: ['**/*.ts'], rules: { 'no-eval': 'error' } };
+    const elsewhere: Linter.Config = { basePath: 'packages/b', files: ['**/*.ts'], rules: { 'no-eval': 'error' } };
+
+    const sorted = sortConfigElements([elsewhere], [shared]);
+
+    expect(sorted).toStrictEqual({ own: [elsewhere], unsortable: [] });
+  });
+
   it('keeps a consumer literal as the consumer own', () => {
     const literal: Linter.Config = { files: ['**/*.ts'], rules: { 'no-eval': 'error' } };
 

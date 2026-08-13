@@ -2,6 +2,9 @@ import { isDeepStrictEqual } from 'node:util';
 
 import type { Linter } from 'eslint';
 
+/** The keys deciding which files a config element governs, and so whether two elements say the same thing. */
+const SCOPE_KEYS = ['basePath', 'files', 'ignores'] as const;
+
 /** The separator `defineConfig` places between the segments of a name it generates while expanding `extends`. */
 const EXTENDS_LABEL_SEPARATOR = ' > ';
 
@@ -63,10 +66,7 @@ function isRestatementOf(element: Linter.Config, shared: Linter.Config, isExpans
   if (!isDeepStrictEqual(element.rules, shared.rules)) {
     return false;
   }
-  return (
-    isExpansion ||
-    (isDeepStrictEqual(element.files, shared.files) && isDeepStrictEqual(element.ignores, shared.ignores))
-  );
+  return isExpansion || SCOPE_KEYS.every((key) => isDeepStrictEqual(element[key], shared[key]));
 }
 
 // endregion | Helpers

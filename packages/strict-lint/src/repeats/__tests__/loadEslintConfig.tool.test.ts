@@ -78,6 +78,15 @@ describe(loadEslintConfig, () => {
 
 // region | Helpers
 
+/** Narrows a load to its loaded form, so a case can read the fields only that form carries. */
+function assertLoaded(
+  load: Awaited<ReturnType<typeof loadEslintConfig>>,
+): asserts load is Extract<Awaited<ReturnType<typeof loadEslintConfig>>, { status: 'loaded' }> {
+  if (load.status !== 'loaded') {
+    throw new Error(`Expected a loaded config, got "${load.status}"`);
+  }
+}
+
 /** Runs the body against a config module written outside the repository, so no fixture config is authored in it. */
 async function withTempConfig(source: string, body: (filePath: string) => Promise<void>): Promise<void> {
   const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'strict-lint-'));
@@ -87,15 +96,6 @@ async function withTempConfig(source: string, body: (filePath: string) => Promis
     await body(filePath);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
-  }
-}
-
-/** Narrows a load to its loaded form, so a case can read the fields only that form carries. */
-function assertLoaded(
-  load: Awaited<ReturnType<typeof loadEslintConfig>>,
-): asserts load is Extract<Awaited<ReturnType<typeof loadEslintConfig>>, { status: 'loaded' }> {
-  if (load.status !== 'loaded') {
-    throw new Error(`Expected a loaded config, got "${load.status}"`);
   }
 }
 
