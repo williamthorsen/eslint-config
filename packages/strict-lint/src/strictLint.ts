@@ -5,9 +5,12 @@ import { ESLint, type Linter } from 'eslint';
 
 import { describeRootSource } from './common/describeRootSource.ts';
 import { createCeilingResolver } from './createCeilingResolver.ts';
-import type { StrictLintCascade } from './loadStrictLintConfigs.ts';
+import { loadStrictLintConfigs, resolveSharedConfigs, type StrictLintCascade } from './loadStrictLintConfigs.ts';
 import { parseCliArgs, type ParsedCliArgs } from './parseCliArgs.ts';
 import { promoteSeverities } from './promoteSeverities.ts';
+import { findRepeatedRules } from './repeats/findRepeatedRules.ts';
+import { loadEslintConfig } from './repeats/loadEslintConfig.ts';
+import { reportRepeatedRules } from './repeats/reportRepeatedRules.ts';
 import type { StrictLintOptions } from './types.ts';
 import { showUsage } from './usage.ts';
 
@@ -62,6 +65,8 @@ async function doLint(
   if (parsed.debug) {
     reportConfigProvenance(ceilings.getCascades());
   }
+
+  await checkForRepeatedRules(options, parsed, promotedResults);
 
   // Write fixes to files unless --fix-dry-run was specified
   if (!parsed.fixDryRun) {
@@ -164,6 +169,36 @@ function buildOverrideConfig(
   return configs;
 }
 
+/**
+ * Compares the consumer's own config against the configs it extends, when a strict-lint config names them. The walk
+ * is its own rather than the ceiling resolver's: ceilings answer a per-file question and are memoized by directory,
+ * while one run has one ESLint config to measure.
+ */
+async function checkForRepeatedRules(
+  options: StrictLintOptions | undefined,
+  parsed: ParsedCliArgs,
+  results: ESLint.LintResult[],
+): Promise<void> {
+  const cwd = process.cwd();
+  const sharedElements = resolveSharedConfigs(await loadStrictLintConfigs(cwd));
+  if (sharedElements.length === 0) {
+    return;
+  }
+
+  const consumer = await resolveConsumerConfig(options, parsed, cwd);
+  if (consumer === undefined) {
+    return;
+  }
+
+  const report = await findRepeatedRules({
+    consumerElements: consumer.elements,
+    cwd,
+    filePaths: results.map((result) => result.filePath),
+    sharedElements,
+  });
+  reportRepeatedRules(report, consumer.name);
+}
+
 /** Names the directories a cascade governs, collapsing a long tail into a count so one group stays one line. */
 function describeDirs(dirs: readonly string[]): string {
   const shown = dirs.slice(0, MAX_REPORTED_DIRS).join(', ');
@@ -224,6 +259,26 @@ function reportConfigProvenance(cascades: ReadonlyMap<string, StrictLintCascade>
       console.error('strict-lint: ascent stopped by shouldIgnoreAncestors');
     }
   }
+}
+
+/** The config to measure against the shared one: the caller's own when it passed one, otherwise the config file. */
+async function resolveConsumerConfig(
+  options: StrictLintOptions | undefined,
+  parsed: ParsedCliArgs,
+  cwd: string,
+): Promise<{ elements: Linter.Config[]; name: string } | undefined> {
+  if (options?.baseConfig) {
+    return { elements: options.baseConfig, name: 'the base config passed programmatically' };
+  }
+
+  const load = await loadEslintConfig(cwd, parsed.configPath);
+  if (load.status === 'loaded') {
+    return { elements: load.elements, name: load.filePath };
+  }
+  if (load.status === 'unreadable') {
+    console.error(`strict-lint: shared-config check skipped: cannot read ${load.filePath}, because ${load.problem}`);
+  }
+  return undefined;
 }
 
 /** Determines the lint targets: CLI positionals, then programmatic patterns, then the current directory. */
