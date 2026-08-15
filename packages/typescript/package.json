@@ -60,7 +60,7 @@
     "eslint-plugin-unicorn": "73.0.0",
     "eslint-plugin-yml": "3.8.1",
     "globals": "17.9.0",
-    "jsonc-eslint-parser": "3.2.0",
+    "jsonc-eslint-parser": "3.3.0",
     "typescript-eslint": "catalog:",
     "yaml-eslint-parser": "2.1.0"
   },
