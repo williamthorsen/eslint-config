@@ -7,12 +7,45 @@
         "alignment"
       ],
       "description": "Adoption and alignment checks for a project consuming @williamthorsen/tsconfig",
+      "esbuildVersion": "0.28.2",
+      "inputs": [
+        {
+          "hash": "4d0a555c",
+          "kind": "module",
+          "path": "kits/default.ts"
+        },
+        {
+          "hash": "7e083072",
+          "kind": "module",
+          "path": "../src/readiness/base-chain.ts"
+        },
+        {
+          "hash": "86555b6e",
+          "kind": "module",
+          "path": "../src/readiness/classifyChain.ts"
+        },
+        {
+          "hash": "723d4694",
+          "kind": "module",
+          "path": "../src/readiness/es-year.ts"
+        },
+        {
+          "hash": "ad9c010d",
+          "kind": "module",
+          "path": "../src/readiness/findRedundantOptions.ts"
+        },
+        {
+          "hash": "c58c0ba9",
+          "kind": "module",
+          "path": "../src/readiness/node-floor.ts"
+        }
+      ],
       "name": "default",
       "path": "kits/default.js",
-      "readyupVersion": "0.27.0",
+      "readyupVersion": "0.31.0",
       "source": "kits/default.ts",
       "sourceHash": "4d0a555c",
-      "targetHash": "c478ceff"
+      "targetHash": "d89ce07c"
     }
   ]
 }

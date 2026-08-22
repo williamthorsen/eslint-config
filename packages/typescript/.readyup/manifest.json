@@ -8,12 +8,43 @@
         "projectservice"
       ],
       "description": "Alignment checks for a project consuming @williamthorsen/eslint-config-typescript",
+      "esbuildVersion": "0.28.2",
+      "inputs": [
+        {
+          "hash": "ab1bed78",
+          "kind": "module",
+          "path": "kits/default.ts"
+        },
+        {
+          "hash": "74b3ee92",
+          "kind": "inline",
+          "path": "../package.json",
+          "paths": [
+            "peerDependencies"
+          ]
+        },
+        {
+          "hash": "6253f13a",
+          "kind": "module",
+          "path": "../src/readiness/eslint-config-contents.ts"
+        },
+        {
+          "hash": "b24c78e9",
+          "kind": "module",
+          "path": "../src/readiness/eslint-config-paths.ts"
+        },
+        {
+          "hash": "d75d159a",
+          "kind": "module",
+          "path": "../src/readiness/readVersionFloor.ts"
+        }
+      ],
       "name": "default",
       "path": "kits/default.js",
-      "readyupVersion": "0.27.0",
+      "readyupVersion": "0.31.0",
       "source": "kits/default.ts",
       "sourceHash": "ab1bed78",
-      "targetHash": "f9b150a9"
+      "targetHash": "b8df62d2"
     }
   ]
 }
