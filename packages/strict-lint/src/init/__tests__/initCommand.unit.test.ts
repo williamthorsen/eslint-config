@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
+import { disposeOnTestFinished, listConsoleLines, silenceConsole } from '@williamthorsen/toolbelt.vitest/candidate';
+import { afterAll, describe, expect, it } from 'vitest';
 
 import { STRICT_LINT_CONFIG_NAME } from '../../loadStrictLintConfigs.ts';
 import { CONFIG_TEMPLATE } from '../configTemplate.ts';
@@ -13,10 +14,6 @@ const ROOT_MARKER = 'pnpm-lock.yaml';
 const createdDirs: string[] = [];
 
 describe(runInit, () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   afterAll(() => {
     for (const dir of createdDirs) {
       fs.rmSync(dir, { force: true, recursive: true });
@@ -153,11 +150,11 @@ describe(runInit, () => {
 
 /** Silences the console and returns accessors for everything written to each stream since. */
 function captureConsole(): { error: () => string; info: () => string } {
-  const errors: string[] = [];
-  const infos: string[] = [];
-  vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => void errors.push(args.map(String).join(' ')));
-  vi.spyOn(console, 'info').mockImplementation((...args: unknown[]) => void infos.push(args.map(String).join(' ')));
-  return { error: () => errors.join('\n'), info: () => infos.join('\n') };
+  const silenced = disposeOnTestFinished(silenceConsole(['error', 'info']));
+  return {
+    error: () => listConsoleLines(silenced.error).join('\n'),
+    info: () => listConsoleLines(silenced.info).join('\n'),
+  };
 }
 
 /** A throwaway tree, carrying a project-root marker unless one is withheld to exercise the fallback. */

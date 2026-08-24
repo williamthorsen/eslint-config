@@ -1,12 +1,9 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { disposeOnTestFinished, listConsoleLines, silenceConsole } from '@williamthorsen/toolbelt.vitest/candidate';
+import { describe, expect, it } from 'vitest';
 
 import { reportRepeatedRules } from '../reportRepeatedRules.ts';
 
 describe(reportRepeatedRules, () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it('names the config, the rules it repeats, and how many files each covers', () => {
     const lines = capture({
       repeatedRules: [
@@ -42,12 +39,9 @@ describe(reportRepeatedRules, () => {
 
 /** The stderr lines a report writes. */
 function capture(report: Parameters<typeof reportRepeatedRules>[0]): string[] {
-  const lines: string[] = [];
-  vi.spyOn(console, 'error').mockImplementation((line: unknown) => {
-    lines.push(String(line));
-  });
+  const silenced = disposeOnTestFinished(silenceConsole(['error']));
   reportRepeatedRules(report, 'eslint.config.ts');
-  return lines;
+  return listConsoleLines(silenced.error);
 }
 
 // endregion | Helpers
