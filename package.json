@@ -26,6 +26,7 @@
     "@williamthorsen/nmr": "0.33.0",
     "@williamthorsen/release-kit": "10.4.3",
     "@williamthorsen/strict-lint": "workspace:*",
+    "@williamthorsen/toolbelt.vitest": "catalog:",
     "@williamthorsen/tsconfig": "workspace:*",
     "codeassembly": "0.10.0",
     "eslint": "catalog:",
