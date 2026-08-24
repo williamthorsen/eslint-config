@@ -46,6 +46,8 @@
     "@williamthorsen/toolbelt.packaging": "0.5.2"
   },
   "devDependencies": {
+    "@williamthorsen/toolbelt.testing": "0.4.0",
+    "@williamthorsen/toolbelt.vitest": "catalog:",
     "eslint": "catalog:"
   },
   "peerDependencies": {

@@ -1,12 +1,9 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { disposeOnTestFinished, listConsoleLines, silenceConsole } from '@williamthorsen/toolbelt.vitest/candidate';
+import { describe, expect, it } from 'vitest';
 
 import { showInitUsage, showUsage } from '../usage.ts';
 
 describe(showUsage, () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it.each([['strict-lint [options] [file|dir|glob...]'], ['strict-lint init [options]']])(
     'names the `%s` mode',
     (invocation) => {
@@ -28,10 +25,6 @@ describe(showUsage, () => {
 });
 
 describe(showInitUsage, () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it.each([['--dry-run'], ['--force'], ['-h, --help']])('documents %s', (flag) => {
     const reported = captureInfo();
 
@@ -45,9 +38,8 @@ describe(showInitUsage, () => {
 
 /** Silences `console.info` and returns an accessor for everything written to it since. */
 function captureInfo(): () => string {
-  const lines: string[] = [];
-  vi.spyOn(console, 'info').mockImplementation((...args: unknown[]) => void lines.push(args.map(String).join(' ')));
-  return () => lines.join('\n');
+  const silenced = disposeOnTestFinished(silenceConsole(['info']));
+  return () => listConsoleLines(silenced.info).join('\n');
 }
 
 // endregion | Helpers

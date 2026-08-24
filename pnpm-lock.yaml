@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@williamthorsen/toolbelt.vitest':
+      specifier: 0.6.0
+      version: 0.6.0
     eslint:
       specifier: 10.8.1
       version: 10.8.1
@@ -47,6 +50,9 @@ importers:
       '@williamthorsen/strict-lint':
         specifier: workspace:*
         version: link:packages/strict-lint
+      '@williamthorsen/toolbelt.vitest':
+        specifier: 'catalog:'
+        version: 0.6.0(vitest@4.1.10)
       '@williamthorsen/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
@@ -105,6 +111,12 @@ importers:
         specifier: 0.5.2
         version: 0.5.2
     devDependencies:
+      '@williamthorsen/toolbelt.testing':
+        specifier: 0.4.0
+        version: 0.4.0
+      '@williamthorsen/toolbelt.vitest':
+        specifier: 'catalog:'
+        version: 0.6.0(vitest@4.1.10)
       eslint:
         specifier: 'catalog:'
         version: 10.8.1(jiti@2.7.0)(supports-color@7.2.0)
@@ -988,6 +1000,16 @@ packages:
   '@williamthorsen/toolbelt.packaging@0.5.2':
     resolution: {integrity: sha512-IMU8WV6iMOqvJMnMJOk5z2CPtBxg5GiOZM81ySDTHTz0oQfUdCM16vwrqWyMGITnRVUs0oZXnHYQbI2JNaTrKA==}
     engines: {node: '>=24.0.0'}
+
+  '@williamthorsen/toolbelt.testing@0.4.0':
+    resolution: {integrity: sha512-oN+cYfZLUJDL5uh2jqX1aVJgUBKVIHGYuqvypYR6A2GvXivjyW6YA+0kbbEQw6yPxlRXReswzNr0+EG1y3/tLA==}
+    engines: {node: '>=24.0.0'}
+
+  '@williamthorsen/toolbelt.vitest@0.6.0':
+    resolution: {integrity: sha512-4ckXLBi0jtR4BwNaAcpBbEJtBpf/wX5JC/EVQupT6ZDBGLi9F2jvkmMV3QBaFsyMjzckAL7N4oQEfa/CDfYdJA==}
+    engines: {node: '>=24.0.0'}
+    peerDependencies:
+      vitest: ^4.0.0
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -3589,6 +3611,12 @@ snapshots:
   '@williamthorsen/toolbelt.packaging@0.5.2':
     dependencies:
       '@williamthorsen/toolbelt.filesystem': 0.8.0
+
+  '@williamthorsen/toolbelt.testing@0.4.0': {}
+
+  '@williamthorsen/toolbelt.vitest@0.6.0(vitest@4.1.10)':
+    dependencies:
+      vitest: 4.1.10(@types/node@24.13.3)(@vitest/coverage-v8@4.1.10)(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.0))
 
   acorn-jsx@5.3.2(acorn@8.18.0):
     dependencies:

@@ -1,5 +1,14 @@
+import { captureError, pointArgvAt } from '@williamthorsen/toolbelt.testing/candidate';
+import {
+  disposeOnTestFinished,
+  listConsoleLines,
+  type MockedProcessExit,
+  ProcessExitError,
+  silenceConsole,
+  throwOnProcessExit,
+} from '@williamthorsen/toolbelt.vitest/candidate';
 import type { ESLint, Linter } from 'eslint';
-import { afterEach, beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import { strictLint } from '../strictLint.ts';
 import type { StrictLintConfig } from '../types.ts';
@@ -53,13 +62,13 @@ vi.mock('eslint', () => {
 });
 
 describe(strictLint, () => {
-  const originalArgv = process.argv;
-  let exitSpy: MockInstance<typeof process.exit>;
+  let exitMock: MockedProcessExit;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    exitSpy = mockExit();
-    process.argv = ['node', 'strict-lint'];
+    exitMock = disposeOnTestFinished(throwOnProcessExit());
+    // Without a pointed argv the parser reads Vitest's own, whose arguments it takes for lint patterns.
+    disposeOnTestFinished(pointArgvAt([]));
     withStrictLintConfigs();
     mockFormat.mockResolvedValue('');
     mockLintFiles.mockResolvedValue([]);
@@ -72,11 +81,6 @@ describe(strictLint, () => {
     );
   });
 
-  afterEach(() => {
-    exitSpy.mockRestore();
-    process.argv = originalArgv;
-  });
-
   describe('config resolution', () => {
     it('leaves config discovery to ESLint, so each linted file resolves its own', async () => {
       await strictLint();
@@ -85,7 +89,7 @@ describe(strictLint, () => {
     });
 
     it('pins ESLint to the config named by --config', async () => {
-      process.argv = ['node', 'strict-lint', '--config', '/project/custom.config.ts'];
+      using _argv = pointArgvAt(['--config', '/project/custom.config.ts']);
 
       await strictLint();
 
@@ -105,7 +109,7 @@ describe(strictLint, () => {
     });
 
     it('layers programmatic rule overrides below CLI ones', async () => {
-      process.argv = ['node', 'strict-lint', '--rule', 'cli-rule: error'];
+      using _argv = pointArgvAt(['--rule', 'cli-rule: error']);
 
       await strictLint({ ruleOverrides: { 'programmatic-rule': 'warn' } });
 
@@ -127,7 +131,7 @@ describe(strictLint, () => {
     it('promotes a warning that no ceiling caps', async () => {
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
 
-      await strictLint();
+      await captureError(ProcessExitError, () => strictLint());
 
       expect(reportedSeverities()).toStrictEqual([2]);
     });
@@ -159,7 +163,7 @@ describe(strictLint, () => {
         buildResult({ filePath: '/open/a.ts', messages: [buildMessage('some-rule', 1)] }),
       ]);
 
-      await strictLint();
+      await captureError(ProcessExitError, () => strictLint());
 
       expect(reportedSeverities()).toStrictEqual([1, 2]);
     });
@@ -167,34 +171,34 @@ describe(strictLint, () => {
 
   describe('promotion ordering', () => {
     it('promotes before --quiet filters, so a promoted problem survives the filter', async () => {
-      process.argv = ['node', 'strict-lint', '--quiet'];
+      using _argv = pointArgvAt(['--quiet']);
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
 
-      await strictLint();
+      const error = await captureError(ProcessExitError, () => strictLint());
 
       // Filtering first would drop the warning before it was ever promoted, and report nothing.
       expect(reportedSeverities()).toStrictEqual([2]);
-      expect(process.exit).toHaveBeenCalledWith(1);
+      expect(error.code).toBe(1);
     });
 
     it('counts a promoted problem as an error rather than a warning for --max-warnings', async () => {
-      process.argv = ['node', 'strict-lint', '--max-warnings', '0'];
+      using _argv = pointArgvAt(['--max-warnings', '0']);
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
 
-      await strictLint();
+      await captureError(ProcessExitError, () => strictLint());
 
       // The rule promoted, so no warning remains to breach the threshold; the error alone fails the run.
       expect(formattedText()).not.toContain('too many warnings');
     });
 
     it('counts a capped problem as a warning for --max-warnings', async () => {
-      process.argv = ['node', 'strict-lint', '--max-warnings', '0'];
+      using _argv = pointArgvAt(['--max-warnings', '0']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
 
-      await strictLint();
+      const error = await captureError(ProcessExitError, () => strictLint());
 
-      expect(process.exit).toHaveBeenCalledWith(1);
+      expect(error.code).toBe(1);
     });
 
     it('promotes results served from cache identically, since it spans the whole returned array', async () => {
@@ -204,7 +208,7 @@ describe(strictLint, () => {
         buildResult({ filePath: '/project/fresh.ts', messages: [buildMessage('some-rule', 1)] }),
       ]);
 
-      await strictLint();
+      await captureError(ProcessExitError, () => strictLint());
 
       expect(reportedSeverities()).toStrictEqual([2, 2]);
     });
@@ -218,31 +222,30 @@ describe(strictLint, () => {
     });
 
     it('accepts --concurrency when ESLint resolves the config itself', async () => {
-      process.argv = ['node', 'strict-lint', '--concurrency', 'auto'];
+      using _argv = pointArgvAt(['--concurrency', 'auto']);
 
       await strictLint();
 
       expect(constructedWith()).toMatchObject({ concurrency: 'auto' });
-      expect(process.exit).not.toHaveBeenCalled();
+      expect(exitMock.spy).not.toHaveBeenCalled();
     });
 
     it('rejects --concurrency alongside a programmatic baseConfig, naming the option at fault', async () => {
-      process.argv = ['node', 'strict-lint', '--concurrency', 'auto'];
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      using _argv = pointArgvAt(['--concurrency', 'auto']);
+      using silenced = silenceConsole(['error']);
 
-      await strictLint({ baseConfig: [{ rules: {} }] });
+      const error = await captureError(ProcessExitError, () => strictLint({ baseConfig: [{ rules: {} }] }));
 
-      expect(String(errorSpy.mock.calls[0]?.[0])).toContain('baseConfig');
-      expect(process.exit).toHaveBeenCalledWith(1);
-      errorSpy.mockRestore();
+      expect(listConsoleLines(silenced.error).join('\n')).toContain('baseConfig');
+      expect(error.code).toBe(1);
     });
 
     it('allows a programmatic baseConfig when concurrency is off', async () => {
-      process.argv = ['node', 'strict-lint', '--concurrency', 'off'];
+      using _argv = pointArgvAt(['--concurrency', 'off']);
 
       await strictLint({ baseConfig: [{ rules: {} }] });
 
-      expect(process.exit).not.toHaveBeenCalled();
+      expect(exitMock.spy).not.toHaveBeenCalled();
     });
   });
 
@@ -265,16 +268,12 @@ describe(strictLint, () => {
   });
 
   describe('--debug provenance', () => {
-    let errorSpy: MockInstance<typeof console.error>;
+    let errorSpy: MockInstance;
 
     beforeEach(() => {
-      process.argv = ['node', 'strict-lint', '--debug'];
-      errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      disposeOnTestFinished(pointArgvAt(['--debug']));
+      errorSpy = disposeOnTestFinished(silenceConsole(['error'])).error;
       mockLintFiles.mockResolvedValue([buildResult({ filePath: '/project/a.ts' })]);
-    });
-
-    afterEach(() => {
-      errorSpy.mockRestore();
     });
 
     it('names the project root and every contributing config file, lowest precedence first', async () => {
@@ -334,7 +333,7 @@ describe(strictLint, () => {
     });
 
     it('stays silent when --debug is absent', async () => {
-      process.argv = ['node', 'strict-lint'];
+      using _argv = pointArgvAt([]);
 
       await strictLint();
 
@@ -343,7 +342,7 @@ describe(strictLint, () => {
 
     /** The lines the run wrote to stderr. */
     function reportedLines(): string[] {
-      return errorSpy.mock.calls.map(([line]) => String(line));
+      return listConsoleLines(errorSpy);
     }
   });
 
@@ -353,7 +352,7 @@ describe(strictLint, () => {
 
       await strictLint();
 
-      expect(process.exit).not.toHaveBeenCalled();
+      expect(exitMock.spy).not.toHaveBeenCalled();
     });
 
     it('exits 0 when only capped warnings are reported', async () => {
@@ -362,31 +361,32 @@ describe(strictLint, () => {
 
       await strictLint();
 
-      expect(process.exit).not.toHaveBeenCalled();
+      expect(exitMock.spy).not.toHaveBeenCalled();
     });
 
     it('exits 1 when errors are reported', async () => {
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 2)] })]);
 
-      await strictLint();
+      const error = await captureError(ProcessExitError, () => strictLint());
 
-      expect(process.exit).toHaveBeenCalledWith(1);
+      expect(error.code).toBe(1);
+      // A second call would mean the first was caught and re-raised by the handler for the lint's own failures.
+      expect(exitMock.spy).toHaveBeenCalledTimes(1);
     });
 
     it('exits 1 when doLint throws an error', async () => {
+      using _silenced = silenceConsole(['error']);
       mockLintFiles.mockRejectedValueOnce(new Error('lint failure'));
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-      await strictLint();
+      const error = await captureError(ProcessExitError, () => strictLint());
 
-      expect(process.exit).toHaveBeenCalledWith(1);
-      errorSpy.mockRestore();
+      expect(error.code).toBe(1);
     });
   });
 
   describe('CLI behavior', () => {
     it('uses CLI positionals as lint patterns', async () => {
-      process.argv = ['node', 'strict-lint', 'src/', 'lib/'];
+      using _argv = pointArgvAt(['src/', 'lib/']);
 
       await strictLint();
 
@@ -400,7 +400,7 @@ describe(strictLint, () => {
     });
 
     it('prefers CLI positionals over programmatic patterns', async () => {
-      process.argv = ['node', 'strict-lint', 'cli-path/'];
+      using _argv = pointArgvAt(['cli-path/']);
 
       await strictLint({ patterns: ['programmatic-path/'] });
 
@@ -414,7 +414,7 @@ describe(strictLint, () => {
     });
 
     it('suppresses outputFixes when --fix-dry-run is specified', async () => {
-      process.argv = ['node', 'strict-lint', '--fix-dry-run'];
+      using _argv = pointArgvAt(['--fix-dry-run']);
 
       await strictLint();
 
@@ -422,7 +422,7 @@ describe(strictLint, () => {
     });
 
     it('calls outputFixes when --fix is specified without --fix-dry-run', async () => {
-      process.argv = ['node', 'strict-lint', '--fix'];
+      using _argv = pointArgvAt(['--fix']);
 
       await strictLint();
 
@@ -430,7 +430,7 @@ describe(strictLint, () => {
     });
 
     it('leaves the fix output intact for outputFixes to write', async () => {
-      process.argv = ['node', 'strict-lint', '--fix'];
+      using _argv = pointArgvAt(['--fix']);
       mockLintFiles.mockResolvedValue([buildResult({ output: 'fixed source' })]);
 
       await strictLint();
@@ -445,27 +445,27 @@ describe(strictLint, () => {
     });
 
     it('exits 1 when warnings exceed --max-warnings threshold', async () => {
-      process.argv = ['node', 'strict-lint', '--max-warnings', '2'];
+      using _argv = pointArgvAt(['--max-warnings', '2']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);
 
-      await strictLint();
+      const error = await captureError(ProcessExitError, () => strictLint());
 
-      expect(process.exit).toHaveBeenCalledWith(1);
+      expect(error.code).toBe(1);
     });
 
     it('does not exit when warnings are within --max-warnings threshold', async () => {
-      process.argv = ['node', 'strict-lint', '--max-warnings', '5'];
+      using _argv = pointArgvAt(['--max-warnings', '5']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);
 
       await strictLint();
 
-      expect(process.exit).not.toHaveBeenCalled();
+      expect(exitMock.spy).not.toHaveBeenCalled();
     });
 
     it('loads the specified formatter when --format is provided', async () => {
-      process.argv = ['node', 'strict-lint', '--format', 'json'];
+      using _argv = pointArgvAt(['--format', 'json']);
 
       await strictLint();
 
@@ -473,7 +473,7 @@ describe(strictLint, () => {
     });
 
     it('writes formatted output to file when --output-file is specified', async () => {
-      process.argv = ['node', 'strict-lint', '--output-file', 'results.txt'];
+      using _argv = pointArgvAt(['--output-file', 'results.txt']);
       mockFormat.mockResolvedValueOnce('formatted output');
 
       await strictLint();
@@ -482,25 +482,20 @@ describe(strictLint, () => {
     });
 
     it('exits 1 when --rule specifies an invalid severity', async () => {
-      process.argv = ['node', 'strict-lint', '--rule', 'no-console: typo'];
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      using _argv = pointArgvAt(['--rule', 'no-console: typo']);
+      using _silenced = silenceConsole(['error']);
 
-      await strictLint();
+      const error = await captureError(ProcessExitError, () => strictLint());
 
-      expect(process.exit).toHaveBeenCalledWith(1);
-      errorSpy.mockRestore();
+      expect(error.code).toBe(1);
     });
   });
 
   describe('stdout output', () => {
-    let infoSpy: MockInstance<typeof console.info>;
+    let infoSpy: MockInstance;
 
     beforeEach(() => {
-      infoSpy = vi.spyOn(console, 'info').mockImplementation(() => undefined);
-    });
-
-    afterEach(() => {
-      infoSpy.mockRestore();
+      infoSpy = disposeOnTestFinished(silenceConsole(['info'])).info;
     });
 
     it('writes nothing when the formatter reports a clean run as an empty string', async () => {
@@ -521,23 +516,23 @@ describe(strictLint, () => {
     });
 
     it('writes the --max-warnings message alone when the formatter produced no output', async () => {
-      process.argv = ['node', 'strict-lint', '--quiet', '--max-warnings', '0'];
+      using _argv = pointArgvAt(['--quiet', '--max-warnings', '0']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);
       mockFormat.mockResolvedValue('');
 
-      await strictLint();
+      await captureError(ProcessExitError, () => strictLint());
 
       expect(infoSpy).toHaveBeenCalledWith('ESLint found too many warnings (maximum: 0).');
     });
 
     it('separates the --max-warnings message from the report the formatter produced', async () => {
-      process.argv = ['node', 'strict-lint', '--max-warnings', '0'];
+      using _argv = pointArgvAt(['--max-warnings', '0']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);
       mockFormat.mockResolvedValue('report\n');
 
-      await strictLint();
+      await captureError(ProcessExitError, () => strictLint());
 
       expect(infoSpy).toHaveBeenCalledWith('report\n\nESLint found too many warnings (maximum: 0).');
     });
@@ -598,14 +593,6 @@ function formattedText(): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
-}
-
-/**
- * Stop `process.exit` from terminating the run, leaving it a spy the tests assert calls against. The implementation
- * comes from `vi.fn`, whose type parameter satisfies the `never` return without a type assertion, which this repo bans.
- */
-function mockExit(): MockInstance<typeof process.exit> {
-  return vi.spyOn(process, 'exit').mockImplementation(vi.fn<(code?: string | number | null) => never>());
 }
 
 /** The severities the run handed the formatter, which is what it reports. */

@@ -16,18 +16,26 @@ import { showUsage } from './usage.ts';
 
 /** Runs strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
-  const args = process.argv.slice(2);
+  const { text, errorCount } = await runLint(options);
+
+  // An empty formatter result means a clean run, which `console.info` would emit as a blank line. The guard keys
+  // on the text, not the problem count, because a clean run is `[]` from `json` and a full document from `html`.
+  if (text) {
+    console.info(text);
+  }
+  if (errorCount > 0) {
+    process.exit(1);
+  }
+  return text;
+}
+
+/**
+ * Runs the lint, reporting and exiting where it failed outright. The exit that ends a completed-but-failing run stays
+ * with the caller, so it is not caught by the handler for the lint's own failures.
+ */
+async function runLint(options: StrictLintOptions | undefined): Promise<{ text: string; errorCount: number }> {
   try {
-    const { text, errorCount } = await doLint(options, args);
-    // An empty formatter result means a clean run, which `console.info` would emit as a blank line. The guard keys
-    // on the text, not the problem count, because a clean run is `[]` from `json` and a full document from `html`.
-    if (text) {
-      console.info(text);
-    }
-    if (errorCount > 0) {
-      process.exit(1);
-    }
-    return text;
+    return await doLint(options, process.argv.slice(2));
   } catch (error: unknown) {
     console.error(error);
     process.exit(1);
