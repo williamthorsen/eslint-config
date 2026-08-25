@@ -23,9 +23,34 @@ ruleTester.run('no-unpublished-barrel', rule, {
       filename: fixtureFile('string-exports', 'src/index.ts'),
     },
     {
+      // Non-firing: a subpath pattern publishes every path its `*` spans, `/` included
+      code: "export * from './a.ts';",
+      filename: fixtureFile('pattern-exports', 'src/configs/nested/index.ts'),
+    },
+    {
+      // Non-firing: a literal target beside a pattern still matches on its own
+      code: "export * from './a.ts';",
+      filename: fixtureFile('pattern-exports', 'src/index.ts'),
+    },
+    {
+      // Non-firing: a trailing-slash folder mapping publishes everything below it
+      code: "export * from './a.ts';",
+      filename: fixtureFile('folder-exports', 'src/configs/index.ts'),
+    },
+    {
+      // Non-firing: `exports` names this one, and it is what the manifest publishes
+      code: "export * from './a.ts';",
+      filename: fixtureFile('exports-with-legacy-main', 'src/index.ts'),
+    },
+    {
       // Non-firing: a package publishing through `main` alone still has an entry point
       code: "export * from './a.ts';",
       filename: fixtureFile('legacy-main', 'src/index.ts'),
+    },
+    {
+      // Non-firing: `types` names the declaration entry the same manifest publishes
+      code: "export * from './a.ts';",
+      filename: fixtureFile('legacy-main', 'src/index.d.ts'),
     },
     {
       // Non-firing: `module` names the entry point where a manifest declares neither `exports` nor `main`
@@ -146,6 +171,24 @@ ruleTester.run('no-unpublished-barrel', rule, {
       // Firing: `main` names one entry point, not every path below it
       code: "export * from './a.ts';",
       filename: fixtureFile('legacy-main', 'src/utils/index.ts'),
+      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+    },
+    {
+      // Firing: `main` is inert wherever `exports` is present, so its target is not published
+      code: "export * from './a.ts';",
+      filename: fixtureFile('exports-with-legacy-main', 'src/legacy/index.ts'),
+      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/legacy/index.js' } }],
+    },
+    {
+      // Firing: a subpath pattern covers what it spans and no more
+      code: "export * from './a.ts';",
+      filename: fixtureFile('pattern-exports', 'src/utils/index.ts'),
+      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+    },
+    {
+      // Firing: a folder mapping covers its own prefix and no more
+      code: "export * from './a.ts';",
+      filename: fixtureFile('folder-exports', 'src/utils/index.ts'),
       errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
     },
     {

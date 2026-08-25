@@ -27,7 +27,6 @@ const defaultOptions: Options = { outDir: 'dist/esm', sourceDir: 'src' };
 // Test scaffolding ships nothing, so a barrel under one of these has no entry point to sit at.
 const scaffoldingDirs = new Set(['__fixtures__', '__mocks__', '__tests__', 'test-utils']);
 
-// A hand-written declaration file is already an emitted form, so `toEmittedPath` leaves its extension alone.
 const emittedExtensions = new Map([
   ['.cts', '.cjs'],
   ['.jsx', '.js'],
@@ -72,7 +71,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
         context.report({ loc: node.loc.start, messageId: 'unbuiltBarrel', data: { sourceDir: options.sourceDir } });
         return;
       }
-      if (!manifest.publishedTargets.has(target)) {
+      if (!isPublished(target, manifest.publishedTargets)) {
         context.report({ loc: node.loc.start, messageId: 'unpublishedBarrel', data: { target } });
       }
     },
@@ -97,11 +96,14 @@ function collectImportedNames(program: TSESTree.Program): Set<string> {
 
 /**
  * Collects the paths the manifest publishes. `exports` is authoritative wherever it is present; the legacy
- * fields name the entry points of a package that predates it.
+ * fields name the entry points of a package that predates it, `types` among them because a declaration file
+ * reaches this rule with its extension intact.
  */
 function collectPublishedTargets(manifest: Record<string, unknown>): Set<string> {
   const declared =
-    manifest['exports'] === undefined ? [manifest['main'], manifest['module'], manifest['bin']] : manifest['exports'];
+    manifest['exports'] === undefined
+      ? [manifest['bin'], manifest['main'], manifest['module'], manifest['types']]
+      : manifest['exports'];
 
   return new Set(collectStrings(declared).map(normalizeTarget));
 }
@@ -122,6 +124,25 @@ function collectStrings(value: unknown): string[] {
     return Object.values(value).flatMap((item) => collectStrings(item));
   }
   return [];
+}
+
+/**
+ * Returns true if the published target covers the path the build emits. A `*` stands for any run of
+ * characters, `/` included, as Node's subpath patterns do, and a target ending in `/` covers everything
+ * below it.
+ */
+function coversTarget(published: string, target: string): boolean {
+  if (published.endsWith('/')) {
+    return target.startsWith(published);
+  }
+  if (!published.includes('*')) {
+    return published === target;
+  }
+  return new RegExp(`^${published.split('*').map(escapeRegExp).join('.*')}$`).test(target);
+}
+
+function escapeRegExp(text: string): string {
+  return text.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
 }
 
 /** Returns the manifest governing the directory, memoizing every directory the walk visits. */
@@ -194,6 +215,16 @@ function isImportedLocal(specifier: TSESTree.ExportSpecifier, importedNames: Rea
   return specifier.local.type === AST_NODE_TYPES.Identifier && importedNames.has(specifier.local.name);
 }
 
+/** Returns true if any target the manifest publishes covers the path the build emits. */
+function isPublished(target: string, publishedTargets: ReadonlySet<string>): boolean {
+  for (const published of publishedTargets) {
+    if (coversTarget(published, target)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -244,7 +275,10 @@ function splitDir(dir: string): string[] {
     .filter((segment) => !['', '.'].includes(segment));
 }
 
-/** Rewrites a built path's extension to the one the compiler emits for it. */
+/**
+ * Rewrites a built path's extension to the one the compiler emits for it. A declaration file is already an
+ * emitted form, so it keeps the extension it has.
+ */
 function toEmittedPath(builtPath: string): string {
   if (/\.d\.[cm]?ts$/.test(builtPath)) {
     return builtPath;

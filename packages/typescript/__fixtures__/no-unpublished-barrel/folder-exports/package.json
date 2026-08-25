@@ -1,0 +1,7 @@
+{
+  "name": "@fixtures/folder-exports",
+  "private": true,
+  "exports": {
+    "./configs/": "./dist/esm/configs/"
+  }
+}
