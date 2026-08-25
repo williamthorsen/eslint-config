@@ -130,7 +130,7 @@ importers:
         specifier: 0.28.2
         version: 0.28.2
       readyup:
-        specifier: 0.33.0
+        specifier: 'catalog:'
         version: 0.33.0(esbuild@0.28.2)
 
   packages/typescript:

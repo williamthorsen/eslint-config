@@ -87,7 +87,7 @@ function readVersionFloor(range) {
 // .readyup/kits/default.ts
 var PACKAGE_NAME = "@williamthorsen/eslint-config-typescript";
 var MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-from-parseroptionsproject`;
-var PEER_RANGES = { "peerDependencies": { "@typescript-eslint/utils": "^8.59.1", "eslint": ">=10", "typescript": ">=5" } };
+var PEER_RANGES = { "peerDependencies": { "@typescript-eslint/utils": "^8.59.1", "eslint": ">=10", "readyup": ">=0.33.0", "typescript": ">=5" } };
 var ESLINT_TYPESCRIPT_FLOOR = "10.0.0";
 var installedVersions = /* @__PURE__ */ new Map();
 var default_default = defineRdyKit({

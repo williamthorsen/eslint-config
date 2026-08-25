@@ -83,7 +83,13 @@
   "peerDependencies": {
     "@typescript-eslint/utils": "^8.59.1",
     "eslint": ">=10",
+    "readyup": ">=0.33.0",
     "typescript": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "readyup": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=24"
