@@ -1,0 +1,14 @@
+{
+  "name": "@fixtures/conditional-exports",
+  "private": true,
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/esm/index.d.ts"
+    },
+    "./configs": {
+      "import": "./dist/esm/configs/index.js",
+      "types": "./dist/esm/configs/index.d.ts"
+    }
+  }
+}

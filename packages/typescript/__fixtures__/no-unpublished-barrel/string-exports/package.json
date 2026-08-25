@@ -1,0 +1,5 @@
+{
+  "name": "@fixtures/string-exports",
+  "private": true,
+  "exports": "./dist/esm/index.js"
+}

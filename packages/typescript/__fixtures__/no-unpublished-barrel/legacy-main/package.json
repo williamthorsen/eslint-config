@@ -1,0 +1,5 @@
+{
+  "name": "@fixtures/legacy-main",
+  "private": true,
+  "main": "./dist/esm/index.js"
+}

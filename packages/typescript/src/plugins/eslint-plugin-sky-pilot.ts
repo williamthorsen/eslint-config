@@ -3,6 +3,7 @@ import type { Config } from 'eslint/config';
 
 import { ensurePluginRules } from '../utils/ensurePluginRules.ts';
 import noUndefinedWithNumberRule from './rules/no-undefined-with-number.ts';
+import noUnpublishedBarrelRule from './rules/no-unpublished-barrel.ts';
 import noUnusedMapRule from './rules/no-unused-map.ts';
 import preferFunctionDeclarationRule from './rules/prefer-function-declaration.ts';
 
@@ -13,6 +14,7 @@ const skyPilotPlugin: ESLint.Plugin = {
   },
   rules: ensurePluginRules({
     'no-undefined-with-number': noUndefinedWithNumberRule,
+    'no-unpublished-barrel': noUnpublishedBarrelRule,
     'no-unused-map': noUnusedMapRule,
     'prefer-function-declaration': preferFunctionDeclarationRule,
   }),
@@ -27,6 +29,7 @@ const configs: { recommended: Config; strict: Config } = {
     },
     rules: {
       'sky-pilot/no-undefined-with-number': 'error',
+      'sky-pilot/no-unpublished-barrel': 'warn',
       'sky-pilot/no-unused-map': 'warn',
       'sky-pilot/prefer-function-declaration': 'warn',
     },
@@ -37,6 +40,7 @@ const configs: { recommended: Config; strict: Config } = {
     },
     rules: {
       'sky-pilot/no-undefined-with-number': 'error',
+      'sky-pilot/no-unpublished-barrel': 'error',
       'sky-pilot/no-unused-map': 'error',
       'sky-pilot/prefer-function-declaration': 'error',
     },
