@@ -43,7 +43,7 @@ type AdoptedTsconfig = Extract<Adoption, { kind: 'adopted' }>;
 type FloorVerdict = { detail: string; kind: 'fail' | 'pass' } | { kind: 'skip'; reason: string };
 
 // Held for the life of one `rdy` run, which is one process targeting one project.
-const cache: { adoptions?: Adoption[]; chains: Map<string, TsconfigChain | undefined>; searchDirs?: string[] } = {
+const cache: { adoptions?: Adoption[]; chains: Map<string, TsconfigChain | undefined> } = {
   chains: new Map(),
 };
 
@@ -286,8 +286,7 @@ function skipUnlessSomeTsconfigIsAccountable(): false | string {
 
 /** Lists the directories that may hold a tsconfig: the repo root and every workspace. */
 function tsconfigSearchDirs(): string[] {
-  cache.searchDirs ??= [...new Set(['.', ...discoverWorkspaces().map((workspace) => workspace.dir)])];
-  return cache.searchDirs;
+  return discoverWorkspaces().map((workspace) => workspace.dir);
 }
 
 // endregion | Helpers

@@ -177,7 +177,7 @@ function comparePeer(name) {
   return { floor, installed, kind: "comparable", range };
 }
 function eslintConfigSearchDirs() {
-  return [.../* @__PURE__ */ new Set([".", ...discoverWorkspaces().map((workspace) => workspace.dir)])];
+  return discoverWorkspaces().map((workspace) => workspace.dir);
 }
 function findEslintConfigs() {
   return eslintConfigCandidates(eslintConfigSearchDirs()).filter((configPath) => fileExists(configPath));
