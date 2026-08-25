@@ -1,0 +1,8 @@
+{
+  "name": "@fixtures/exports-with-legacy-main",
+  "private": true,
+  "exports": {
+    ".": "./dist/esm/index.js"
+  },
+  "main": "./dist/esm/legacy/index.js"
+}

@@ -68,6 +68,49 @@ Every `package.json` must declare `author` and `engines`, and may not carry an e
 
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so spec files don't fight the type checker. Declaration files (`*.d.ts`) have `import/no-duplicates` turned off.
 
+## Custom rules (`sky-pilot`)
+
+Four rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
+
+| Rule                                    | `recommended` | `strict` | Enforces                                                                     |
+| --------------------------------------- | ------------- | -------- | ---------------------------------------------------------------------------- |
+| `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`. |
+| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                        |
+| `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.          |
+| `sky-pilot/prefer-function-declaration` | `warn`        | `error`  | An untyped function-valued variable is written as a function declaration.    |
+
+`advisoryRuleSeverities` exempts none of these, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each warning to an error: they report defects rather than style advice.
+
+`createConfig.react()` adds a fifth rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
+
+### `sky-pilot/no-unpublished-barrel`
+
+Reports a file whose body holds only imports and re-exports (a barrel) unless the package publishes that module. Importing one symbol through a barrel loads every module the barrel re-exports, so a barrel earns its place at a package's entry point and nowhere else.
+
+The exemption is computed from the linted file's own manifest, so a consuming repo configures nothing. The rule finds the nearest ancestor `package.json`, collects every string appearing anywhere in its `exports` value, and leaves the file alone when the path its build emits is among them. Matching the strings rather than the keys covers the bare-string form (`"exports": "./dist/esm/index.js"`) and the conditional-object form alike, and needs no list of condition names. A collected target containing `*` covers every path the `*` spans, `/` included, as Node's subpath patterns do, and one ending in `/` covers everything below it.
+
+Where the manifest declares no `exports`, the legacy `bin`, `main`, `module`, and `types` fields name the published paths in its place. A manifest declaring none of them publishes nothing, so every barrel under it is reported: this is the application repository, where no barrel has an entry point to sit at. A file with no ancestor `package.json` at all is reported by nothing, an absent manifest being an absence of information rather than a statement that the package publishes nothing.
+
+Mapping a source path onto the path the build emits is the one input the manifest does not supply. It comes from an option, which defaults to the layout this package itself uses:
+
+```js
+export default defineConfig(config, {
+  rules: {
+    'sky-pilot/no-unpublished-barrel': ['warn', { outDir: 'dist/esm', sourceDir: 'src' }],
+  },
+});
+```
+
+A mapping that does not match the build reports every published entry point rather than going quiet, and the message names the path it computed, so the setting to correct is visible in the report.
+
+A file under `__fixtures__`, `__mocks__`, `__tests__`, or `test-utils` is exempt, since test scaffolding ships nothing. A barrel at a vendor boundary, a directory holding the only permitted import site for an external dependency, takes an inline disable comment naming that boundary:
+
+```ts
+/* eslint-disable sky-pilot/no-unpublished-barrel -- the sole permitted import site for the vendor SDK */
+```
+
+`unicorn/no-barrel-files` detects the same files, but it takes no options, so exempting an entry point through it would mean a glob list in every consuming repo. This config leaves it off.
+
 ## Granular config access
 
 The default export is the catch-all "everything on" preset. For à la carte composition, import individual configs:

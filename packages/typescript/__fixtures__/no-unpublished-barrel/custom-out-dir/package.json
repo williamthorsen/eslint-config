@@ -1,0 +1,7 @@
+{
+  "name": "@fixtures/custom-out-dir",
+  "private": true,
+  "exports": {
+    ".": "./build/index.js"
+  }
+}

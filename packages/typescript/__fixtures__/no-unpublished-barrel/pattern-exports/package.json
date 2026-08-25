@@ -1,0 +1,8 @@
+{
+  "name": "@fixtures/pattern-exports",
+  "private": true,
+  "exports": {
+    ".": "./dist/esm/index.js",
+    "./configs/*": "./dist/esm/configs/*.js"
+  }
+}

@@ -28,6 +28,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-array-callback-reference': 'off', // 🔴⚫ Overly prescriptive
   'unicorn/no-array-reduce': 'warn', // 🔴🟠
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
+  'unicorn/no-barrel-files': 'off', // ⚫⚫ Superseded by sky-pilot/no-unpublished-barrel, which exempts a published entry point
   'unicorn/no-break-in-nested-loop': 'off', // 🔴⚫ Break/continue in nested loops is idiomatic; extracting a function is overkill
   'unicorn/no-for-each': 'off', // 🔴⚫
   'unicorn/no-lonely-if': 'warn', // 🔴🟠
