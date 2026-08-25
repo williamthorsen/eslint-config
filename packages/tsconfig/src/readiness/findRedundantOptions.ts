@@ -20,7 +20,7 @@ export function findRedundantOptions(entries: readonly TsconfigChainEntry[], bas
   const baseOptions = entries[baseIndex]?.compilerOptions;
   if (baseOptions === undefined) return [];
 
-  const exempt = dependencyDeclaredKeys(entries, baseIndex);
+  const exempt = collectDependencyDeclaredKeys(entries, baseIndex);
   const redundant: RedundantOption[] = [];
   for (const entry of entries.slice(0, baseIndex)) {
     if (!isConsumerOwnedConfig(entry.path)) continue;
@@ -35,7 +35,7 @@ export function findRedundantOptions(entries: readonly TsconfigChainEntry[], bas
 // region | Helpers
 
 /** Collects every option key a config shipped by a dependency declares, this package's base aside. */
-function dependencyDeclaredKeys(entries: readonly TsconfigChainEntry[], baseIndex: number): Set<string> {
+function collectDependencyDeclaredKeys(entries: readonly TsconfigChainEntry[], baseIndex: number): Set<string> {
   const keys = new Set<string>();
   for (const [index, entry] of entries.entries()) {
     if (index === baseIndex || isConsumerOwnedConfig(entry.path)) continue;

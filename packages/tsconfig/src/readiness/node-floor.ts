@@ -28,7 +28,7 @@ export function classifyNodeEsYear(
  * Reduces declared Node floors to the lowest major they name. The weakest link decides: a repo runs
  * on the oldest Node any of its packages admits.
  */
-export function lowestNodeMajor(floors: readonly string[]): number | undefined {
+export function findLowestNodeMajor(floors: readonly string[]): number | undefined {
   const majors = floors.flatMap((floor) => {
     const major = readNodeMajor(floor);
     return major === undefined ? [] : [major];
