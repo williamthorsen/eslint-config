@@ -18,7 +18,7 @@ import { showUsage } from './usage.ts';
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
   const { text, errorCount } = await runLint(options);
 
-  // An empty formatter result means a clean run, which `console.info` would emit as a blank line. The guard keys
+  // An empty formatter result means a clean run, which `console.info` would emit as a blank line.The guard keys
   // on the text, not the problem count, because a clean run is `[]` from `json` and a full document from `html`.
   if (text) {
     console.info(text);
@@ -120,9 +120,9 @@ const SEVERITY_MAP: Record<string, Linter.RuleSeverity> = {
 };
 
 /**
- * Rejects the one combination no options shape can satisfy. An in-memory config holds plugin objects, and ESLint
- * clones its options to reach worker threads. Left to ESLint the failure names `overrideConfig`, an option the
- * programmatic caller never passed.
+ * Rejects the one combination no options shape can satisfy.
+ * An in-memory config holds plugin objects, and ESLint clones its options to reach worker threads.
+ * Left to ESLint the failure names `overrideConfig`, an option the programmatic caller never passed.
  */
 function assertConcurrencyIsOff(concurrency: ESLint.Options['concurrency']): void {
   if (concurrency === undefined || concurrency === 'off') {
@@ -178,9 +178,9 @@ function buildOverrideConfig(
 }
 
 /**
- * Compares the consumer's own config against the configs it extends, when a strict-lint config names them. The walk
- * is its own rather than the ceiling resolver's: ceilings answer a per-file question and are memoized by directory,
- * while one run has one ESLint config to measure.
+ * Compares the consumer's own config against the configs it extends, when a strict-lint config names them.
+ * The walk is its own rather than the ceiling resolver's: Ceilings answer a per-file question and are memoized by
+ * directory, while one run has one ESLint config to measure.
  */
 async function checkForRepeatedRules(
   options: StrictLintOptions | undefined,
@@ -234,7 +234,7 @@ function groupByConfigFiles(cascades: ReadonlyMap<string, StrictLintCascade>): C
   return groups.values().toArray();
 }
 
-/** The project roots the walks landed on, deduplicated: a run spanning one repository reports exactly one. */
+/** The project roots the walks landed on, deduplicated: A run spanning one repository reports exactly one. */
 function listDistinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascade>): ProjectRoot[] {
   const roots = new Map<string, ProjectRoot>();
   for (const cascade of cascades.values()) {

@@ -6,8 +6,8 @@ const NODE_MAJOR_CEILING = 99;
 export type NodeEsYear = { esYear: string; kind: 'exact' } | { esYear: string; kind: 'under' } | { kind: 'unknown' };
 
 /**
- * Classifies the ES year a Node major implements, against a table covering only some majors. A major
- * the table skips or postdates is unknown; one below every major it holds is not, since it predates
+ * Classifies the ES year a Node major implements, against a table covering only some majors.
+ * A major the table skips or postdates is unknown; one below every major it holds is not, since it predates
  * the table's lowest entry and so implements strictly less than that entry's year.
  */
 export function classifyNodeEsYear(
@@ -25,8 +25,8 @@ export function classifyNodeEsYear(
 }
 
 /**
- * Reduces declared Node floors to the lowest major they name. The weakest link decides: a repo runs
- * on the oldest Node any of its packages admits.
+ * Reduces declared Node floors to the lowest major they name.
+ * The weakest link decides: A repo runs on the oldest Node any of its packages admits.
  */
 export function findLowestNodeMajor(floors: readonly string[]): number | undefined {
   const majors = floors.flatMap((floor) => {
@@ -37,8 +37,8 @@ export function findLowestNodeMajor(floors: readonly string[]): number | undefin
 }
 
 /**
- * Reads the major version a Node floor names, such as `24`, `24.5`, or `v22.11.0`. A comparator or
- * an alias yields `undefined` rather than an invented major.
+ * Reads the major version a Node floor names, such as `24`, `24.5`, or `v22.11.0`.
+ * A comparator or an alias yields `undefined`.
  */
 export function readNodeMajor(floor: string): number | undefined {
   const major = NODE_MAJOR.exec(floor.trim())?.[1];

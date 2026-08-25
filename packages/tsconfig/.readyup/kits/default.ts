@@ -235,10 +235,7 @@ function noRedundantOptions(): boolean | CheckOutcome {
   return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(', ')}` };
 }
 
-/**
- * Reads the ES year from the base's own chain entry, so the comparison tracks the version the
- * consumer extends rather than a constant compiled into this kit.
- */
+/** Reads the ES year from the base's own chain entry, so the comparison tracks the version the consumer extends. */
 function readBaseEsYear(): string | undefined {
   for (const adoption of listAdoptedTsconfigs()) {
     const baseOptions = adoption.chain.entries[adoption.baseIndex]?.compilerOptions;
@@ -255,9 +252,9 @@ function readChain(path: string): TsconfigChain | undefined {
 }
 
 /**
- * Reads the ES year the repo's declared Node floor implements. `engines.node` is the floor a package
- * publishes as a contract; `.tool-versions` describes one dev machine, so it decides only where no
- * manifest declares one.
+ * Reads the ES year the repo's declared Node floor implements.
+ * `engines.node` is the floor a package publishes as a contract;
+ * `.tool-versions` describes one dev machine, so it decides only where no manifest declares one.
  */
 function readNodeEsYear(): NodeEsYear | undefined {
   const major = findLowestNodeMajor(listDeclaredNodeFloors());
