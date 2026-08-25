@@ -214,15 +214,6 @@ function describeDirs(dirs: readonly string[]): string {
   return remaining > 0 ? `${shown} (and ${String(remaining)} more)` : shown;
 }
 
-/** The project roots the walks landed on, deduplicated: a run spanning one repository reports exactly one. */
-function distinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascade>): ProjectRoot[] {
-  const roots = new Map<string, ProjectRoot>();
-  for (const cascade of cascades.values()) {
-    roots.set(cascade.projectRoot.rootDir, cascade.projectRoot);
-  }
-  return roots.values().toArray();
-}
-
 /**
  * Collapses the per-directory walks into one entry per distinct outcome. A monorepo resolves one cascade per
  * directory holding linted files, but only a handful of distinct config sets, and the report names those.
@@ -243,6 +234,15 @@ function groupByConfigFiles(cascades: ReadonlyMap<string, StrictLintCascade>): C
   return groups.values().toArray();
 }
 
+/** The project roots the walks landed on, deduplicated: a run spanning one repository reports exactly one. */
+function listDistinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascade>): ProjectRoot[] {
+  const roots = new Map<string, ProjectRoot>();
+  for (const cascade of cascades.values()) {
+    roots.set(cascade.projectRoot.rootDir, cascade.projectRoot);
+  }
+  return roots.values().toArray();
+}
+
 /** Reports where the ceilings came from, on stderr, so it stays clear of the formatter output. */
 function reportConfigProvenance(cascades: ReadonlyMap<string, StrictLintCascade>): void {
   if (cascades.size === 0) {
@@ -250,7 +250,7 @@ function reportConfigProvenance(cascades: ReadonlyMap<string, StrictLintCascade>
     return;
   }
 
-  for (const projectRoot of distinctProjectRoots(cascades)) {
+  for (const projectRoot of listDistinctProjectRoots(cascades)) {
     console.error(`strict-lint: project root ${projectRoot.rootDir} (${describeRootSource(projectRoot)})`);
   }
 
