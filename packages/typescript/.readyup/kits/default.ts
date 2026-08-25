@@ -146,7 +146,7 @@ function comparePeer(name: string): PeerComparison {
 
 /** Lists the directories that may hold an eslint config: the repo root and every workspace. */
 function eslintConfigSearchDirs(): string[] {
-  return [...new Set(['.', ...discoverWorkspaces().map((workspace) => workspace.dir)])];
+  return discoverWorkspaces().map((workspace) => workspace.dir);
 }
 
 /** Lists every eslint config present across the repo's search directories. */

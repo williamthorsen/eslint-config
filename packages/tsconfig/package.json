@@ -36,7 +36,15 @@
   "devDependencies": {
     "@tsconfig/strictest": "2.0.8",
     "esbuild": "0.28.2",
-    "readyup": "0.33.0"
+    "readyup": "catalog:"
+  },
+  "peerDependencies": {
+    "readyup": ">=0.33.0"
+  },
+  "peerDependenciesMeta": {
+    "readyup": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=24"

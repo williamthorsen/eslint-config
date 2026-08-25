@@ -203,11 +203,14 @@ An unscoped block applies `'warn'` everywhere, including in test files, where th
 
 ## Peer dependencies
 
-| Dependency                 | Required  |
-| -------------------------- | --------- |
-| `@typescript-eslint/utils` | `^8.59.1` |
-| `eslint`                   | `>=10`    |
-| `typescript`               | `>=5`     |
+| Dependency                 | Required   |
+| -------------------------- | ---------- |
+| `@typescript-eslint/utils` | `^8.59.1`  |
+| `eslint`                   | `>=10`     |
+| `readyup`                  | `>=0.33.0` |
+| `typescript`               | `>=5`      |
+
+`readyup` is optional, needed only to run the readiness kit described below.
 
 ## Checking your configuration
 
@@ -228,6 +231,8 @@ export default defineRdyConfig({
   packages: ['@williamthorsen/eslint-config-typescript'],
 });
 ```
+
+The kit needs readyup 0.33.0 or later. Below that, readyup does not report the repo root among a monorepo's workspaces, so the kit checks every member package and leaves the root unchecked.
 
 The kit runs at the version resolved from your `node_modules`, so it reports whether your configuration matches that version. It never reports whether that version is current.
 

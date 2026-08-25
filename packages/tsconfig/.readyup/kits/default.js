@@ -300,8 +300,7 @@ function skipUnlessSomeTsconfigIsAccountable() {
   return classified.some((adoption) => adoption.kind !== "external-base") ? false : "every workspace tsconfig extends a base belonging to another package";
 }
 function tsconfigSearchDirs() {
-  cache.searchDirs ??= [.../* @__PURE__ */ new Set([".", ...discoverWorkspaces().map((workspace) => workspace.dir)])];
-  return cache.searchDirs;
+  return discoverWorkspaces().map((workspace) => workspace.dir);
 }
 export {
   default_default as default
