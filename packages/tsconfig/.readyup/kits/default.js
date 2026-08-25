@@ -76,7 +76,7 @@ import { isDeepStrictEqual } from "node:util";
 function findRedundantOptions(entries, baseIndex) {
   const baseOptions = entries[baseIndex]?.compilerOptions;
   if (baseOptions === void 0) return [];
-  const exempt = dependencyDeclaredKeys(entries, baseIndex);
+  const exempt = collectDependencyDeclaredKeys(entries, baseIndex);
   const redundant = [];
   for (const entry of entries.slice(0, baseIndex)) {
     if (!isConsumerOwnedConfig(entry.path)) continue;
@@ -87,7 +87,7 @@ function findRedundantOptions(entries, baseIndex) {
   }
   return redundant;
 }
-function dependencyDeclaredKeys(entries, baseIndex) {
+function collectDependencyDeclaredKeys(entries, baseIndex) {
   const keys = /* @__PURE__ */ new Set();
   for (const [index, entry] of entries.entries()) {
     if (index === baseIndex || isConsumerOwnedConfig(entry.path)) continue;
@@ -107,7 +107,7 @@ function classifyNodeEsYear(major, esYearForMajor) {
   const lowestEsYear = esYearForMajor(lowestKnown);
   return lowestEsYear === void 0 ? { kind: "unknown" } : { esYear: lowestEsYear, kind: "under" };
 }
-function lowestNodeMajor(floors) {
+function findLowestNodeMajor(floors) {
   const majors = floors.flatMap((floor) => {
     const major = readNodeMajor(floor);
     return major === void 0 ? [] : [major];
@@ -175,9 +175,6 @@ var default_default = defineRdyKit({
     }
   ]
 });
-function adoptedTsconfigs() {
-  return classifyAdoptions().filter((adoption) => adoption.kind === "adopted");
-}
 function classifyAdoptions() {
   cache.adoptions ??= findTsconfigs().map((path) => classifyTsconfig(path));
   return cache.adoptions;
@@ -188,28 +185,14 @@ function classifyTsconfig(path) {
   const classification = classifyChain(chain);
   return classification.kind === "adopted" ? { baseIndex: classification.baseIndex, chain, kind: "adopted", path } : { kind: classification.kind, path };
 }
-function declaredNodeFloors() {
-  const engineFloors = tsconfigSearchDirs().flatMap((dir) => {
-    const manifest = readJsonFile(dirPath(dir, "package.json"));
-    if (manifest === void 0) return [];
-    const floor = readEnginesNodeFloor(manifest);
-    return floor.kind === "found" ? [floor.floor] : [];
-  });
-  if (engineFloors.length > 0) return engineFloors;
-  const toolVersionsFloor = readToolVersionsNode();
-  return toolVersionsFloor === void 0 ? [] : [toolVersionsFloor];
-}
 function dedupe(values) {
   return [...new Set(values)];
-}
-function dirPath(dir, basename) {
-  return dir === "." ? basename : `${dir}/${basename}`;
 }
 function everyEsYearMatchesTheBase() {
   const baseEsYear = readBaseEsYear();
   if (baseEsYear === void 0) return true;
   const offenders = [];
-  for (const adoption of adoptedTsconfigs()) {
+  for (const adoption of listAdoptedTsconfigs()) {
     for (const entry of adoption.chain.entries.slice(0, adoption.baseIndex)) {
       if (!isConsumerOwnedConfig(entry.path)) continue;
       const declared = readDeclaredEsYear(entry.compilerOptions);
@@ -226,8 +209,8 @@ function everyTsconfigAdoptsTheBase() {
   const accountable = classifyAdoptions().filter((adoption) => adoption.kind !== "external-base");
   const adopted = accountable.filter((adoption) => adoption.kind === "adopted");
   const progress = { type: "fraction", passedCount: adopted.length, count: accountable.length };
-  const uninstalled = pathsOfKind(accountable, "uninstalled");
-  const unadopted = pathsOfKind(accountable, "unadopted");
+  const uninstalled = listPathsOfKind(accountable, "uninstalled");
+  const unadopted = listPathsOfKind(accountable, "unadopted");
   if (uninstalled.length === 0 && unadopted.length === 0) return { ok: true, progress };
   const details = [
     uninstalled.length > 0 ? `${PACKAGE_NAME} is named but not installed in: ${uninstalled.join(", ")}` : void 0,
@@ -236,7 +219,7 @@ function everyTsconfigAdoptsTheBase() {
   return { ok: false, detail: details.join("; "), progress };
 }
 function findTsconfigs() {
-  return tsconfigSearchDirs().map((dir) => dirPath(dir, "tsconfig.json")).filter((path) => fileExists(path));
+  return listTsconfigSearchDirs().map((dir) => resolveDirPath(dir, "tsconfig.json")).filter((path) => fileExists(path));
 }
 function judgeNodeFloor() {
   const baseEsYear = readBaseEsYear();
@@ -255,12 +238,32 @@ function judgeNodeFloor() {
     kind: "fail"
   };
 }
+function listAdoptedTsconfigs() {
+  return classifyAdoptions().filter((adoption) => adoption.kind === "adopted");
+}
+function listDeclaredNodeFloors() {
+  const engineFloors = listTsconfigSearchDirs().flatMap((dir) => {
+    const manifest = readJsonFile(resolveDirPath(dir, "package.json"));
+    if (manifest === void 0) return [];
+    const floor = readEnginesNodeFloor(manifest);
+    return floor.kind === "found" ? [floor.floor] : [];
+  });
+  if (engineFloors.length > 0) return engineFloors;
+  const toolVersionsFloor = readToolVersionsNode();
+  return toolVersionsFloor === void 0 ? [] : [toolVersionsFloor];
+}
+function listPathsOfKind(classified, kind) {
+  return classified.filter((adoption) => adoption.kind === kind).map((adoption) => adoption.path);
+}
+function listTsconfigSearchDirs() {
+  return discoverWorkspaces().map((workspace) => workspace.dir);
+}
 function nodeFloorSupportsBaseEsYear() {
   const verdict = judgeNodeFloor();
   return verdict.kind === "skip" ? true : { ok: verdict.kind === "pass", detail: verdict.detail };
 }
 function noRedundantOptions() {
-  const offenders = adoptedTsconfigs().flatMap(
+  const offenders = listAdoptedTsconfigs().flatMap(
     (adoption) => findRedundantOptions(adoption.chain.entries, adoption.baseIndex).map(
       (redundant) => `${redundant.path} (${redundant.key})`
     )
@@ -268,11 +271,8 @@ function noRedundantOptions() {
   if (offenders.length === 0) return true;
   return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(", ")}` };
 }
-function pathsOfKind(classified, kind) {
-  return classified.filter((adoption) => adoption.kind === kind).map((adoption) => adoption.path);
-}
 function readBaseEsYear() {
-  for (const adoption of adoptedTsconfigs()) {
+  for (const adoption of listAdoptedTsconfigs()) {
     const baseOptions = adoption.chain.entries[adoption.baseIndex]?.compilerOptions;
     const esYear = baseOptions === void 0 ? void 0 : readDeclaredEsYear(baseOptions);
     if (esYear !== void 0) return esYear;
@@ -284,8 +284,11 @@ function readChain(path) {
   return cache.chains.get(path);
 }
 function readNodeEsYear() {
-  const major = lowestNodeMajor(declaredNodeFloors());
+  const major = findLowestNodeMajor(listDeclaredNodeFloors());
   return major === void 0 ? void 0 : classifyNodeEsYear(major, esYearForNodeMajor);
+}
+function resolveDirPath(dir, basename) {
+  return dir === "." ? basename : `${dir}/${basename}`;
 }
 function skipUnlessBaseEsYearKnown() {
   return readBaseEsYear() === void 0 ? NO_BASE_ES_YEAR : false;
@@ -298,9 +301,6 @@ function skipUnlessSomeTsconfigIsAccountable() {
   const classified = classifyAdoptions();
   if (classified.length === 0) return "no workspace tsconfig was found";
   return classified.some((adoption) => adoption.kind !== "external-base") ? false : "every workspace tsconfig extends a base belonging to another package";
-}
-function tsconfigSearchDirs() {
-  return discoverWorkspaces().map((workspace) => workspace.dir);
 }
 export {
   default_default as default
