@@ -28,10 +28,26 @@ ruleTester.run('no-unpublished-barrel', rule, {
       filename: fixtureFile('legacy-main', 'src/index.ts'),
     },
     {
+      // Non-firing: `module` names the entry point where a manifest declares neither `exports` nor `main`
+      code: "export * from './a.ts';",
+      filename: fixtureFile('legacy-module-and-bin', 'src/index.ts'),
+    },
+    {
+      // Non-firing: a `bin` target is published like any other
+      code: "export * from './a.ts';",
+      filename: fixtureFile('legacy-module-and-bin', 'src/bin/tool.ts'),
+    },
+    {
       // Non-firing: the option maps the source onto a build directory other than the default
       code: "export * from './a.ts';",
       filename: fixtureFile('custom-out-dir', 'src/index.ts'),
       options: [{ outDir: 'build' }],
+    },
+    {
+      // Non-firing: the option also moves the source directory the mapping strips
+      code: "export * from './a.ts';",
+      filename: fixtureFile('string-exports', 'lib/index.ts'),
+      options: [{ sourceDir: 'lib' }],
     },
     {
       // Non-firing: fixture scaffolding ships nothing
@@ -66,6 +82,11 @@ ruleTester.run('no-unpublished-barrel', rule, {
     {
       // Non-firing: a source-less export naming a binding the file defines is not a re-export
       code: "import { a } from './a.ts';\nconst b = 2;\nexport { a, b };",
+      filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
+    },
+    {
+      // Non-firing: the same holds for a hoisted local, which the export declaration precedes
+      code: "import { a } from './a.ts';\nexport { a, helper };\nfunction helper() {}",
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
     },
     {
@@ -106,6 +127,12 @@ ruleTester.run('no-unpublished-barrel', rule, {
     {
       // Firing: a default re-export below the published entry points
       code: "import a from './a.ts';\nexport default a;",
+      filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
+      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+    },
+    {
+      // Firing: a type expression wrapping the re-exported default is unwrapped before the check
+      code: "import a from './a.ts';\nexport default a!;",
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
       errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
     },
