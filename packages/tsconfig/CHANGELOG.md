@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.6.0 — 2026-08-26
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Declare readyup as an optional peer of both kit-shipping packages (#179)
+
+  Declares `readyup` as an optional peer dependency of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, with a `>=0.33.0` floor. Both packages ship readiness kits that run against the consumer's own readyup, and below 0.33.0 that readyup omits the repo root from a monorepo's workspace list, so the kits check every member package and leave the root unchecked.
+
+  Both kits now take readyup's workspace list directly, dropping the root literal each carried to compensate for the older behavior.
+
+  Migration: A consumer running `rdy` against either kit upgrades `readyup` to 0.33.0 or later.
+
+### ♻️ Refactoring
+
+- Align function names with naming conventions (#181)
+
+  Renames functions in the `tsconfig`, `eslint-config-typescript`, and `strict-lint` workspaces to align with naming conventions.
+
 ## 0.5.0 — 2026-08-11
 
 ### 🎉 Features

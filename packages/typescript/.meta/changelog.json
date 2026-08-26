@@ -1,5 +1,40 @@
 [
   {
+    "version": "11.0.0",
+    "date": "2026-08-26",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Declare readyup as an optional peer of both kit-shipping packages (#179)",
+            "body": "Declares `readyup` as an optional peer dependency of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, with a `>=0.33.0` floor. Both packages ship readiness kits that run against the consumer's own readyup, and below 0.33.0 that readyup omits the repo root from a monorepo's workspace list, so the kits check every member package and leave the root unchecked.\n\nBoth kits now take readyup's workspace list directly, dropping the root literal each carried to compensate for the older behavior.\n\nMigration: A consumer running `rdy` against either kit upgrades `readyup` to 0.33.0 or later.",
+            "breaking": true,
+            "hash": "e6e178f74c13f5aec33636c75b2b1f640b42c7b6"
+          },
+          {
+            "description": "Add no-unpublished-barrel rule to the sky-pilot plugin (#180)",
+            "body": "Adds `sky-pilot/no-unpublished-barrel` to `@williamthorsen/eslint-config-typescript`. The rule reports a file whose body holds only imports and re-exports, unless the package publishes the module to which the file compiles. The rule has a severity of `warn` in the plugin's `recommended` preset, which the TypeScript config extends, and `error` in `strict`.\n\nMigration: A consumer whose repository holds a barrel outside a published entry point gets a new report on upgrade.",
+            "breaking": true,
+            "hash": "48fe10c551baada15f463725dfb475c956952165"
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Align function names with naming conventions (#181)",
+            "body": "Renames functions in the `tsconfig`, `eslint-config-typescript`, and `strict-lint` workspaces to align with naming conventions.",
+            "hash": "48a7ee85c2498887d750cab38ab2fdb44c1b7e06"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "10.0.0",
     "date": "2026-08-12",
     "sections": [

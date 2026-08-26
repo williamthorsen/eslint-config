@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## 11.1.0 — 2026-08-26
+
+### 🎉 Features
+
+- Report lint rules that repeat the shared config (#166)
+
+  `strict-lint` gains an optional check for dead entries in an ESLint config -- that is, rules that can merely duplicate rules set by shared configs that the config extends. Naming the shared configs in `.config/strict-lint.config.ts` enables the check. Findings are advisory and do not trigger a non-zero exit code.
+
+### ♻️ Refactoring
+
+- Replace strict-lint's hand-rolled test mocks with toolbelt helpers (#175)
+
+  Replaces the hand-rolled `process.exit`, `process.argv`, and console mocks in `@williamthorsen/strict-lint`'s tests with shared helpers from `@williamthorsen/toolbelt.vitest` and `@williamthorsen/toolbelt.testing`. Both packages join `packages/strict-lint` as devDependencies. The mocked exit now throws instead of returning, so a test ends at the exit, just as a real run does.
+
+  Narrows `strictLint`'s `try` to the lint itself. The function exits for two reasons: The lint found errors, or the lint crashed. Both exits used to sit inside one `try`. The `catch` written for a crash therefore caught the exit that reports errors, logged it as a crash, and exited again. Under a throwing mock, the tests would have measured that second exit.
+
+- Align function names with naming conventions (#181)
+
+  Renames functions in the `tsconfig`, `eslint-config-typescript`, and `strict-lint` workspaces to align with naming conventions.
+
 ## 11.0.0 — 2026-08-12
 
 ### 🎉 Features

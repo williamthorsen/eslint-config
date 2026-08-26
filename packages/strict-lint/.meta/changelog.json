@@ -1,5 +1,38 @@
 [
   {
+    "version": "11.1.0",
+    "date": "2026-08-26",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Report lint rules that repeat the shared config (#166)",
+            "body": "`strict-lint` gains an optional check for dead entries in an ESLint config -- that is, rules that can merely duplicate rules set by shared configs that the config extends. Naming the shared configs in `.config/strict-lint.config.ts` enables the check. Findings are advisory and do not trigger a non-zero exit code.",
+            "hash": "4e6c91bfb2c7fe57e6faf994988b21a43f4b0a18"
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Replace strict-lint's hand-rolled test mocks with toolbelt helpers (#175)",
+            "body": "Replaces the hand-rolled `process.exit`, `process.argv`, and console mocks in `@williamthorsen/strict-lint`'s tests with shared helpers from `@williamthorsen/toolbelt.vitest` and `@williamthorsen/toolbelt.testing`. Both packages join `packages/strict-lint` as devDependencies. The mocked exit now throws instead of returning, so a test ends at the exit, just as a real run does.\n\nNarrows `strictLint`'s `try` to the lint itself. The function exits for two reasons: The lint found errors, or the lint crashed. Both exits used to sit inside one `try`. The `catch` written for a crash therefore caught the exit that reports errors, logged it as a crash, and exited again. Under a throwing mock, the tests would have measured that second exit.",
+            "hash": "a121f19a7f0517dfc20fd41eac78c0bf38e26261"
+          },
+          {
+            "description": "Align function names with naming conventions (#181)",
+            "body": "Renames functions in the `tsconfig`, `eslint-config-typescript`, and `strict-lint` workspaces to align with naming conventions.",
+            "hash": "48a7ee85c2498887d750cab38ab2fdb44c1b7e06"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "11.0.0",
     "date": "2026-08-12",
     "sections": [

@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## 11.0.0 — 2026-08-26
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Declare readyup as an optional peer of both kit-shipping packages (#179)
+
+  Declares `readyup` as an optional peer dependency of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, with a `>=0.33.0` floor. Both packages ship readiness kits that run against the consumer's own readyup, and below 0.33.0 that readyup omits the repo root from a monorepo's workspace list, so the kits check every member package and leave the root unchecked.
+
+  Both kits now take readyup's workspace list directly, dropping the root literal each carried to compensate for the older behavior.
+
+  Migration: A consumer running `rdy` against either kit upgrades `readyup` to 0.33.0 or later.
+
+- 🚨 **Breaking:** Add no-unpublished-barrel rule to the sky-pilot plugin (#180)
+
+  Adds `sky-pilot/no-unpublished-barrel` to `@williamthorsen/eslint-config-typescript`. The rule reports a file whose body holds only imports and re-exports, unless the package publishes the module to which the file compiles. The rule has a severity of `warn` in the plugin's `recommended` preset, which the TypeScript config extends, and `error` in `strict`.
+
+  Migration: A consumer whose repository holds a barrel outside a published entry point gets a new report on upgrade.
+
+### ♻️ Refactoring
+
+- Align function names with naming conventions (#181)
+
+  Renames functions in the `tsconfig`, `eslint-config-typescript`, and `strict-lint` workspaces to align with naming conventions.
+
 ## 10.0.0 — 2026-08-12
 
 ### 🎉 Features
