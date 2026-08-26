@@ -86,19 +86,22 @@ Five rules ship in this config's own plugin. The TypeScript config enables them,
 
 ### `sky-pilot/no-floating-disposable`
 
-Reports a call or `new` expression whose result is discarded and whose type carries `Symbol.dispose` or `Symbol.asyncDispose`. Such a result does nothing unless it is bound: the resource is acquired and never released, and nothing else reports the mistake, since the call typechecks. The message names `using` or `await using` to match the type.
+Reports a call or `new` expression whose result is discarded and whose type carries `Symbol.dispose` or `Symbol.asyncDispose`. Such a result does nothing unless it is bound: the resource is acquired and never released, and nothing else reports the mistake, since the call typechecks. The message names `using` or `await using` to match the type. An awaited call is read through the `await`, so a discarded `Promise<AsyncDisposable>` reports as well.
 
 ```ts
 captureOutput(); // reported: the capture is installed and never removed
 using captured = captureOutput(); // fine
+
+await openHandle(); // reported: `openHandle` returns a Promise<AsyncDisposable>
+await using handle = await openHandle(); // fine
 ```
 
 The rule reads types, so it reports nothing where the parser supplies no TypeScript program.
 
 Three narrowings keep it off correct code:
 
-- A signature declaring `this` as its return type chains a call onto a resource rather than creating one, so `server.listen(3000)` is left alone even though a `net.Server` is async-disposable.
-- A callee returning the same resource it was handed has taken over disposing it. That is the shape of a registrar such as `<T extends Disposable>(resource: T): T`, whose caller has passed ownership on. A callee returning a different resource still reports.
+- A call whose type is its receiver's chains onto a resource the caller already holds, so `server.listen(3000)` is left alone even though a `net.Server` is async-disposable. Reading the type rather than the `this` annotation covers a fluent method whose return type is inferred.
+- A call whose type is identical to one of its argument types has passed ownership on rather than acquired anything. That is the shape of a registrar such as `<T extends Disposable>(resource: T): T`. Both of these compare types, not resources, so a callee that builds a fresh resource while declaring the type it received on both sides is skipped too.
 - An `allow` option names callees whose disposable result is discarded on purpose. It matches the callee's final name, so `timers.setTimeout` matches alongside `setTimeout`, and it adds to the defaults rather than replacing them:
 
 ```js

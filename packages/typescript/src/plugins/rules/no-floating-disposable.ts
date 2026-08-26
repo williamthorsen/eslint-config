@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
-import ts from 'typescript';
+import type ts from 'typescript';
 
 type MessageId = 'floatingDisposable';
 
@@ -26,18 +26,15 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
   const allow = new Set([...defaultAllow, ...(context.options[0]?.allow ?? [])]);
 
   const checkResourceExpression: TSESLint.RuleFunction<ResourceExpression> = (node) => {
+    const discarded = readDiscardedExpression(node);
     const calleeName = readCalleeName(node);
-    if (!isResultDiscarded(node) || (calleeName !== undefined && allow.has(calleeName))) {
+    if (discarded === undefined || (calleeName !== undefined && allow.has(calleeName))) {
       return;
     }
 
-    const type = services.getTypeAtLocation(node);
+    const type = services.getTypeAtLocation(discarded);
     const keyword = readDisposalKeyword(type, checker);
-    if (
-      keyword === undefined ||
-      isThisReturning(node, services, checker) ||
-      isOwnershipPassthrough(node, type, services)
-    ) {
+    if (keyword === undefined || isReceiverType(node, type, services) || isOwnershipPassthrough(node, type, services)) {
       return;
     }
 
@@ -67,9 +64,9 @@ function getTypedServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<
 }
 
 /**
- * Returns true if the expression yields the same resource it was handed, as `<T extends Disposable>(resource: T): T`
+ * Returns true if the expression yields the type of one of its arguments, as `<T extends Disposable>(resource: T): T`
  * does. Such a callee registers the resource's disposal elsewhere, so the caller has passed ownership on rather than
- * acquired it. A callee returning a different resource is still the caller's to bind.
+ * acquired it.
  */
 function isOwnershipPassthrough(node: ResourceExpression, type: ts.Type, services: TypedServices): boolean {
   return node.arguments.some(
@@ -78,27 +75,13 @@ function isOwnershipPassthrough(node: ResourceExpression, type: ts.Type, service
 }
 
 /**
- * Returns true if the expression sits in statement position, where its result is discarded; every other position
- * consumes the value. An optional chain (`resource?.acquire();`) interposes a `ChainExpression` before the
- * `ExpressionStatement`. A `void` operator interposes a `UnaryExpression` instead, which is what makes it the
- * deliberate-discard escape hatch.
+ * Returns true if the expression yields the type of the receiver it was called on. Such a method chains onto a
+ * resource the caller already holds, as `server.listen(port)` does, rather than acquiring one. Reading the type
+ * covers a method whose `this` return is inferred as well as one that annotates it.
  */
-function isResultDiscarded(node: ResourceExpression): boolean {
-  const parent = node.parent.type === AST_NODE_TYPES.ChainExpression ? node.parent.parent : node.parent;
-  return parent.type === AST_NODE_TYPES.ExpressionStatement;
-}
-
-/**
- * Returns true if the resolved signature declares `this` as its return type. Such a method chains a call onto an
- * existing resource, as `server.listen(port)` does, rather than creating one the caller owns.
- */
-function isThisReturning(node: ResourceExpression, services: TypedServices, checker: ts.TypeChecker): boolean {
-  const tsNode = services.esTreeNodeToTSNodeMap.get(node);
-  if (!ts.isCallExpression(tsNode) && !ts.isNewExpression(tsNode)) {
-    return false;
-  }
-  const declaration = checker.getResolvedSignature(tsNode)?.declaration;
-  return declaration !== undefined && 'type' in declaration && declaration.type?.kind === ts.SyntaxKind.ThisType;
+function isReceiverType(node: ResourceExpression, type: ts.Type, services: TypedServices): boolean {
+  const { callee } = node;
+  return callee.type === AST_NODE_TYPES.MemberExpression && services.getTypeAtLocation(callee.object) === type;
 }
 
 /** Returns the name the `allow` list matches against: the callee itself, or the property of a member call. */
@@ -115,6 +98,24 @@ function readCalleeName(node: ResourceExpression): string | undefined {
     return callee.property.name;
   }
   return undefined;
+}
+
+/**
+ * Returns the expression whose value a statement discards, or undefined where the result is consumed. An optional
+ * chain interposes a `ChainExpression` between the call and the statement, and `await` an `AwaitExpression`; the
+ * outermost of them carries the value that goes unused, and an awaited promise carries the resource rather than the
+ * promise wrapping it. A `void` operator interposes a `UnaryExpression` instead, which is what makes it the
+ * deliberate-discard escape hatch.
+ */
+function readDiscardedExpression(node: ResourceExpression): TSESTree.Expression | undefined {
+  let expression: TSESTree.Expression = node;
+  if (expression.parent.type === AST_NODE_TYPES.ChainExpression) {
+    expression = expression.parent;
+  }
+  if (expression.parent.type === AST_NODE_TYPES.AwaitExpression) {
+    expression = expression.parent;
+  }
+  return expression.parent.type === AST_NODE_TYPES.ExpressionStatement ? expression : undefined;
 }
 
 /**

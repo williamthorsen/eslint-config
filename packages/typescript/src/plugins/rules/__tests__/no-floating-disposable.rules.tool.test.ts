@@ -18,8 +18,12 @@ typedRuleTester.run('no-floating-disposable', rule, {
     'declare function acquire(): Disposable; declare function register(resource: Disposable): void; register(acquire());',
     // Non-firing: result returned to the caller, whose resource it becomes
     'declare function acquire(): Disposable; function make() { return acquire(); }',
+    // Non-firing: an async resource bound through an awaited promise
+    'declare function open(): Promise<AsyncDisposable>; async function run() { await using resource = await open(); }',
     // Non-firing: a `this`-returning method chains onto a resource rather than creating one
     'declare class Server { [Symbol.asyncDispose](): Promise<void>; listen(port: number): this } declare const server: Server; server.listen(3000);',
+    // Non-firing: a fluent method whose `this` return is inferred rather than annotated
+    "class Pool { [Symbol.dispose]() {} add(item: string) { return this; } } declare const pool: Pool; pool.add('x');",
     // Non-firing: a callee returning the resource it was handed has taken ownership of disposing it
     'declare function acquire(): Disposable; declare function keep<T extends Disposable>(resource: T): T; keep(acquire());',
     // Non-firing: a callee in the default `allow` list
@@ -36,6 +40,8 @@ typedRuleTester.run('no-floating-disposable', rule, {
       code: 'declare function setTimeout(handler: () => void, ms: number): Disposable; setTimeout(() => {}, 100);',
       options: [{ allow: ['track'] }],
     },
+    // Non-firing: the narrowing compares types, so a wrapper declaring its argument's type on both sides is skipped
+    'declare function acquire(): Disposable; declare function clone(inner: Disposable): Disposable; clone(acquire());',
     // Non-firing: the result is not a resource
     'declare function open(): { close(): void }; open();',
     // Non-firing: a union mixing a resource with a plain value is left alone
@@ -50,6 +56,11 @@ typedRuleTester.run('no-floating-disposable', rule, {
     {
       // Firing: an async resource names the keyword that binds it
       code: 'declare function acquireAsync(): AsyncDisposable; acquireAsync();',
+      errors: [{ messageId: 'floatingDisposable', data: { keyword: 'await using' } }],
+    },
+    {
+      // Firing: an awaited promise carries the resource, which the statement then drops
+      code: 'declare function open(): Promise<AsyncDisposable>; async function run() { await open(); }',
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'await using' } }],
     },
     {
