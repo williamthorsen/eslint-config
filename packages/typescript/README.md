@@ -70,10 +70,11 @@ Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `
 
 ## Custom rules (`sky-pilot`)
 
-Four rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
+Five rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
 
 | Rule                                    | `recommended` | `strict` | Enforces                                                                     |
 | --------------------------------------- | ------------- | -------- | ---------------------------------------------------------------------------- |
+| `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable result is bound with `using`, not discarded.                    |
 | `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`. |
 | `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                        |
 | `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.          |
@@ -81,7 +82,45 @@ Four rules ship in this config's own plugin. The TypeScript config enables them,
 
 `advisoryRuleSeverities` exempts none of these, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each warning to an error: they report defects rather than style advice.
 
-`createConfig.react()` adds a fifth rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
+`createConfig.react()` adds a sixth rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
+
+### `sky-pilot/no-floating-disposable`
+
+Reports a call or `new` expression whose result is discarded and whose type carries `Symbol.dispose` or `Symbol.asyncDispose`. Such a result does nothing unless it is bound: the resource is acquired and never released, and nothing else reports the mistake, since the call typechecks. The message names `using` or `await using` to match the type.
+
+```ts
+captureOutput(); // reported: the capture is installed and never removed
+using captured = captureOutput(); // fine
+```
+
+The rule reads types, so it reports nothing where the parser supplies no TypeScript program.
+
+Three narrowings keep it off correct code:
+
+- A signature declaring `this` as its return type chains a call onto a resource rather than creating one, so `server.listen(3000)` is left alone even though a `net.Server` is async-disposable.
+- A callee returning the same resource it was handed has taken over disposing it. That is the shape of a registrar such as `<T extends Disposable>(resource: T): T`, whose caller has passed ownership on. A callee returning a different resource still reports.
+- An `allow` option names callees whose disposable result is discarded on purpose. It matches the callee's final name, so `timers.setTimeout` matches alongside `setTimeout`, and it adds to the defaults rather than replacing them:
+
+```js
+export default defineConfig(config, {
+  rules: {
+    'sky-pilot/no-floating-disposable': ['warn', { allow: ['registerHandle'] }],
+  },
+});
+```
+
+The defaults are `setImmediate`, `setInterval`, and `setTimeout`: Node's timer globals return a `Timeout` implementing `Symbol.dispose`, so a bare `setTimeout(fn, ms);` would otherwise report.
+
+A deliberate discard is marked with `void`, or with an inline disable carrying its reason:
+
+```ts
+void captureOutput();
+
+// eslint-disable-next-line sky-pilot/no-floating-disposable -- the pool disposes this handle
+acquireHandle();
+```
+
+typescript-eslint's `no-misused-disposable` covers more ground, a resource bound to a plain `const` that never leaves its scope included, but it is [still in draft](https://github.com/typescript-eslint/typescript-eslint/pull/12659). This rule reports the discarded case alone, which is the part that needs no escape analysis.
 
 ### `sky-pilot/no-unpublished-barrel`
 
