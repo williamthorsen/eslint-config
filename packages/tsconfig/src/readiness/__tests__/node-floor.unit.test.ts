@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { classifyNodeEsYear, lowestNodeMajor, readNodeMajor } from '../node-floor.ts';
+import { classifyNodeEsYear, findLowestNodeMajor, readNodeMajor } from '../node-floor.ts';
 
 // Stands in for readyup's table, which covers even LTS majors from 18 upward.
 const ES_YEAR_BY_MAJOR: Record<number, string | undefined> = { 18: 'es2022', 20: 'es2023', 22: 'es2024', 24: 'es2025' };
@@ -32,18 +32,18 @@ describe(classifyNodeEsYear, () => {
   });
 });
 
-describe(lowestNodeMajor, () => {
+describe(findLowestNodeMajor, () => {
   it('takes the lowest major any floor names', () => {
-    expect(lowestNodeMajor(['24', '22.11.0', '24.5'])).toBe(22);
+    expect(findLowestNodeMajor(['24', '22.11.0', '24.5'])).toBe(22);
   });
 
   it('ignores a floor naming no major', () => {
-    expect(lowestNodeMajor(['lts/*', '24'])).toBe(24);
+    expect(findLowestNodeMajor(['lts/*', '24'])).toBe(24);
   });
 
   it('returns undefined when no floor names a major', () => {
-    expect(lowestNodeMajor([])).toBeUndefined();
-    expect(lowestNodeMajor(['system', 'lts/*'])).toBeUndefined();
+    expect(findLowestNodeMajor([])).toBeUndefined();
+    expect(findLowestNodeMajor(['system', 'lts/*'])).toBeUndefined();
   });
 });
 

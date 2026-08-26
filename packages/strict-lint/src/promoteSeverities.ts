@@ -33,30 +33,17 @@ function countFixableBySeverity(messages: ReadonlyArray<Linter.LintMessage>, sev
 }
 
 /**
- * The severity a message carries once promotion has run: `error` where it is a warning no ceiling caps, and its
- * original severity otherwise. A message naming no rule keeps its severity, because `maxSeverity` is keyed by rule
- * name and promoting one would raise an error no ceiling could ever exempt. ESLint reports both the ignored-file
- * notice and the unused `eslint-disable` directive that way.
- */
-function promotedSeverity(
-  message: Pick<Linter.LintMessage, 'ruleId' | 'severity'>,
-  ceilings: MaxSeverityMap,
-): ReportedSeverity {
-  if (message.severity !== WARNING || message.ruleId === null) {
-    return message.severity;
-  }
-  return allowsPromotion(ceilings[message.ruleId]) ? ERROR : WARNING;
-}
-
-/**
  * Promotes one result's messages and restates its counts. `output` is left alone: a fix is independent of the
  * severity that reported it, and `ESLint.outputFixes` reads that field to write files.
  */
 function promoteResult(result: ESLint.LintResult, ceilings: MaxSeverityMap): ESLint.LintResult {
-  const messages = result.messages.map((message) => ({ ...message, severity: promotedSeverity(message, ceilings) }));
+  const messages = result.messages.map((message) => ({
+    ...message,
+    severity: resolvePromotedSeverity(message, ceilings),
+  }));
   const suppressedMessages = result.suppressedMessages.map((message) => ({
     ...message,
-    severity: promotedSeverity(message, ceilings),
+    severity: resolvePromotedSeverity(message, ceilings),
   }));
 
   return {
@@ -68,6 +55,22 @@ function promoteResult(result: ESLint.LintResult, ceilings: MaxSeverityMap): ESL
     fixableErrorCount: countFixableBySeverity(messages, ERROR),
     fixableWarningCount: countFixableBySeverity(messages, WARNING),
   };
+}
+
+/**
+ * The severity a message carries once promotion has run: `error` where it is a warning no ceiling caps, and its
+ * original severity otherwise. A message naming no rule keeps its severity, because `maxSeverity` is keyed by rule
+ * name and promoting one would raise an error no ceiling could ever exempt. ESLint reports both the ignored-file
+ * notice and the unused `eslint-disable` directive that way.
+ */
+function resolvePromotedSeverity(
+  message: Pick<Linter.LintMessage, 'ruleId' | 'severity'>,
+  ceilings: MaxSeverityMap,
+): ReportedSeverity {
+  if (message.severity !== WARNING || message.ruleId === null) {
+    return message.severity;
+  }
+  return allowsPromotion(ceilings[message.ruleId]) ? ERROR : WARNING;
 }
 
 // endregion | Helpers

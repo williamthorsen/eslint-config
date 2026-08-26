@@ -1,11 +1,6 @@
-/** Resolves a directory-relative path, treating the repo root ('.') as bare. */
-export function dirPath(dir: string, basename: string): string {
-  return dir === '.' ? basename : `${dir}/${basename}`;
-}
-
 /**
- * Every basename an ESLint loader resolves, in the order it resolves them. A JavaScript basename
- * precedes its TypeScript sibling, which is what makes a shadowed config silently inert.
+ * Every basename an ESLint loader resolves, in the order it resolves them.
+ * A JavaScript basename precedes its TypeScript sibling, which is what makes a shadowed config silently inert.
  */
 export const ESLINT_CONFIG_BASENAMES = [
   'eslint.config.js',
@@ -16,22 +11,21 @@ export const ESLINT_CONFIG_BASENAMES = [
   'eslint.config.cts',
 ];
 
-/** Lists every path an eslint config could occupy across the given directories. */
-export function eslintConfigCandidates(dirs: readonly string[]): string[] {
-  return dirs.flatMap((dir) => ESLINT_CONFIG_BASENAMES.map((basename) => dirPath(dir, basename)));
-}
-
 /** Reports whether an eslint config path names a TypeScript config. */
 export function isTypeScriptEslintConfig(configPath: string): boolean {
   return /\.[cm]?ts$/.test(configPath);
 }
 
+/** Lists every path an eslint config could occupy across the given directories. */
+export function listEslintConfigCandidates(dirs: readonly string[]): string[] {
+  return dirs.flatMap((dir) => ESLINT_CONFIG_BASENAMES.map((basename) => resolveDirPath(dir, basename)));
+}
+
 /**
- * Lists the directories holding both a JavaScript and a TypeScript eslint config. The loader
- * resolves the JavaScript basename first, so the TypeScript sibling that extends this package
- * never runs.
+ * Lists the directories holding both a JavaScript and a TypeScript eslint config.
+ * The loader resolves the JavaScript basename first, so the TypeScript sibling that extends this package never runs.
  */
-export function shadowedEslintConfigDirs(eslintConfigPaths: readonly string[]): string[] {
+export function listShadowedEslintConfigDirs(eslintConfigPaths: readonly string[]): string[] {
   const seen = new Map<string, { js: boolean; ts: boolean }>();
   for (const configPath of eslintConfigPaths) {
     const slash = configPath.lastIndexOf('/');
@@ -42,4 +36,9 @@ export function shadowedEslintConfigDirs(eslintConfigPaths: readonly string[]): 
     seen.set(dir, found);
   }
   return [...seen].filter(([, found]) => found.js && found.ts).map(([dir]) => dir);
+}
+
+/** Resolves a directory-relative path, treating the repo root ('.') as bare. */
+export function resolveDirPath(dir: string, basename: string): string {
+  return dir === '.' ? basename : `${dir}/${basename}`;
 }

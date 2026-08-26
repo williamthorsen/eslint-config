@@ -25,7 +25,7 @@ import { isConsumerOwnedConfig } from '../../src/readiness/base-chain.ts';
 import { classifyChain } from '../../src/readiness/classifyChain.ts';
 import { isEsYearAtLeast, readDeclaredEsYear } from '../../src/readiness/es-year.ts';
 import { findRedundantOptions } from '../../src/readiness/findRedundantOptions.ts';
-import { classifyNodeEsYear, lowestNodeMajor, type NodeEsYear } from '../../src/readiness/node-floor.ts';
+import { classifyNodeEsYear, findLowestNodeMajor, type NodeEsYear } from '../../src/readiness/node-floor.ts';
 
 const PACKAGE_NAME = '@williamthorsen/tsconfig';
 const BASE_SPECIFIER = `${PACKAGE_NAME}/tsconfig.base.json`;
@@ -91,11 +91,6 @@ export default defineRdyKit({
 
 // region | Helpers
 
-/** Lists the tsconfigs that reach the base, each with the chain that reached it. */
-function adoptedTsconfigs(): AdoptedTsconfig[] {
-  return classifyAdoptions().filter((adoption) => adoption.kind === 'adopted');
-}
-
 /** Classifies every workspace tsconfig by how it reaches, or fails to reach, this package's base. */
 function classifyAdoptions(): Adoption[] {
   cache.adoptions ??= findTsconfigs().map((path) => classifyTsconfig(path));
@@ -113,28 +108,9 @@ function classifyTsconfig(path: string): Adoption {
     : { kind: classification.kind, path };
 }
 
-/** Lists the Node floors the repo declares, preferring the contract a manifest publishes. */
-function declaredNodeFloors(): string[] {
-  const engineFloors = tsconfigSearchDirs().flatMap((dir) => {
-    const manifest = readJsonFile(dirPath(dir, 'package.json'));
-    if (manifest === undefined) return [];
-    const floor = readEnginesNodeFloor(manifest);
-    return floor.kind === 'found' ? [floor.floor] : [];
-  });
-  if (engineFloors.length > 0) return engineFloors;
-
-  const toolVersionsFloor = readToolVersionsNode();
-  return toolVersionsFloor === undefined ? [] : [toolVersionsFloor];
-}
-
 /** Removes repeats while keeping first-seen order, so a shared config is named once. */
 function dedupe(values: readonly string[]): string[] {
   return [...new Set(values)];
-}
-
-/** Resolves a directory-relative path, treating the repo root ('.') as bare. */
-function dirPath(dir: string, basename: string): string {
-  return dir === '.' ? basename : `${dir}/${basename}`;
 }
 
 /** Fails when a consumer's own tsconfig declares an ES year that departs from the base's. */
@@ -143,7 +119,7 @@ function everyEsYearMatchesTheBase(): boolean | CheckOutcome {
   if (baseEsYear === undefined) return true;
 
   const offenders: string[] = [];
-  for (const adoption of adoptedTsconfigs()) {
+  for (const adoption of listAdoptedTsconfigs()) {
     for (const entry of adoption.chain.entries.slice(0, adoption.baseIndex)) {
       if (!isConsumerOwnedConfig(entry.path)) continue;
       const declared = readDeclaredEsYear(entry.compilerOptions);
@@ -163,8 +139,8 @@ function everyTsconfigAdoptsTheBase(): boolean | CheckOutcome {
   const adopted = accountable.filter((adoption) => adoption.kind === 'adopted');
   const progress: Progress = { type: 'fraction', passedCount: adopted.length, count: accountable.length };
 
-  const uninstalled = pathsOfKind(accountable, 'uninstalled');
-  const unadopted = pathsOfKind(accountable, 'unadopted');
+  const uninstalled = listPathsOfKind(accountable, 'uninstalled');
+  const unadopted = listPathsOfKind(accountable, 'unadopted');
   if (uninstalled.length === 0 && unadopted.length === 0) return { ok: true, progress };
 
   const details = [
@@ -176,8 +152,8 @@ function everyTsconfigAdoptsTheBase(): boolean | CheckOutcome {
 
 /** Lists every workspace tsconfig present, the repo root included. */
 function findTsconfigs(): string[] {
-  return tsconfigSearchDirs()
-    .map((dir) => dirPath(dir, 'tsconfig.json'))
+  return listTsconfigSearchDirs()
+    .map((dir) => resolveDirPath(dir, 'tsconfig.json'))
     .filter((path) => fileExists(path));
 }
 
@@ -213,6 +189,35 @@ function judgeNodeFloor(): FloorVerdict {
       };
 }
 
+/** Lists the tsconfigs that reach the base, each with the chain that reached it. */
+function listAdoptedTsconfigs(): AdoptedTsconfig[] {
+  return classifyAdoptions().filter((adoption) => adoption.kind === 'adopted');
+}
+
+/** Lists the Node floors the repo declares, preferring the contract a manifest publishes. */
+function listDeclaredNodeFloors(): string[] {
+  const engineFloors = listTsconfigSearchDirs().flatMap((dir) => {
+    const manifest = readJsonFile(resolveDirPath(dir, 'package.json'));
+    if (manifest === undefined) return [];
+    const floor = readEnginesNodeFloor(manifest);
+    return floor.kind === 'found' ? [floor.floor] : [];
+  });
+  if (engineFloors.length > 0) return engineFloors;
+
+  const toolVersionsFloor = readToolVersionsNode();
+  return toolVersionsFloor === undefined ? [] : [toolVersionsFloor];
+}
+
+/** Lists the paths of the classified tsconfigs of one kind. */
+function listPathsOfKind(classified: readonly Adoption[], kind: Adoption['kind']): string[] {
+  return classified.filter((adoption) => adoption.kind === kind).map((adoption) => adoption.path);
+}
+
+/** Lists the directories that may hold a tsconfig: the repo root and every workspace. */
+function listTsconfigSearchDirs(): string[] {
+  return discoverWorkspaces().map((workspace) => workspace.dir);
+}
+
 /** Fails when the lowest declared Node floor predates the ES year the base sets. */
 function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
   const verdict = judgeNodeFloor();
@@ -221,7 +226,7 @@ function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
 
 /** Fails when a tsconfig re-declares an option the base already supplies with the same value. */
 function noRedundantOptions(): boolean | CheckOutcome {
-  const offenders = adoptedTsconfigs().flatMap((adoption) =>
+  const offenders = listAdoptedTsconfigs().flatMap((adoption) =>
     findRedundantOptions(adoption.chain.entries, adoption.baseIndex).map(
       (redundant) => `${redundant.path} (${redundant.key})`,
     ),
@@ -230,17 +235,9 @@ function noRedundantOptions(): boolean | CheckOutcome {
   return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(', ')}` };
 }
 
-/** Lists the paths of the classified tsconfigs of one kind. */
-function pathsOfKind(classified: readonly Adoption[], kind: Adoption['kind']): string[] {
-  return classified.filter((adoption) => adoption.kind === kind).map((adoption) => adoption.path);
-}
-
-/**
- * Reads the ES year from the base's own chain entry, so the comparison tracks the version the
- * consumer extends rather than a constant compiled into this kit.
- */
+/** Reads the ES year from the base's own chain entry, so the comparison tracks the version the consumer extends. */
 function readBaseEsYear(): string | undefined {
-  for (const adoption of adoptedTsconfigs()) {
+  for (const adoption of listAdoptedTsconfigs()) {
     const baseOptions = adoption.chain.entries[adoption.baseIndex]?.compilerOptions;
     const esYear = baseOptions === undefined ? undefined : readDeclaredEsYear(baseOptions);
     if (esYear !== undefined) return esYear;
@@ -255,13 +252,18 @@ function readChain(path: string): TsconfigChain | undefined {
 }
 
 /**
- * Reads the ES year the repo's declared Node floor implements. `engines.node` is the floor a package
- * publishes as a contract; `.tool-versions` describes one dev machine, so it decides only where no
- * manifest declares one.
+ * Reads the ES year the repo's declared Node floor implements.
+ * `engines.node` is the floor a package publishes as a contract;
+ * `.tool-versions` describes one dev machine, so it decides only where no manifest declares one.
  */
 function readNodeEsYear(): NodeEsYear | undefined {
-  const major = lowestNodeMajor(declaredNodeFloors());
+  const major = findLowestNodeMajor(listDeclaredNodeFloors());
   return major === undefined ? undefined : classifyNodeEsYear(major, esYearForNodeMajor);
+}
+
+/** Resolves a directory-relative path, treating the repo root ('.') as bare. */
+function resolveDirPath(dir: string, basename: string): string {
+  return dir === '.' ? basename : `${dir}/${basename}`;
 }
 
 /** Skips the ES year check until some chain reaches a base declaring one. */
@@ -282,11 +284,6 @@ function skipUnlessSomeTsconfigIsAccountable(): false | string {
   return classified.some((adoption) => adoption.kind !== 'external-base')
     ? false
     : 'every workspace tsconfig extends a base belonging to another package';
-}
-
-/** Lists the directories that may hold a tsconfig: the repo root and every workspace. */
-function tsconfigSearchDirs(): string[] {
-  return discoverWorkspaces().map((workspace) => workspace.dir);
 }
 
 // endregion | Helpers

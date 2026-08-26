@@ -25,10 +25,10 @@ import {
   setsTsconfigRootDir,
 } from '../../src/readiness/eslint-config-contents.ts';
 import {
-  dirPath,
   ESLINT_CONFIG_BASENAMES,
-  eslintConfigCandidates,
-  shadowedEslintConfigDirs,
+  listEslintConfigCandidates,
+  listShadowedEslintConfigDirs,
+  resolveDirPath,
 } from '../../src/readiness/eslint-config-paths.ts';
 import { readVersionFloor } from '../../src/readiness/readVersionFloor.ts';
 
@@ -144,19 +144,26 @@ function comparePeer(name: string): PeerComparison {
   return { floor, installed, kind: 'comparable', range };
 }
 
-/** Lists the directories that may hold an eslint config: the repo root and every workspace. */
-function eslintConfigSearchDirs(): string[] {
-  return discoverWorkspaces().map((workspace) => workspace.dir);
-}
-
 /** Lists every eslint config present across the repo's search directories. */
 function findEslintConfigs(): string[] {
-  return eslintConfigCandidates(eslintConfigSearchDirs()).filter((configPath) => fileExists(configPath));
+  return listEslintConfigCandidates(listEslintConfigSearchDirs()).filter((configPath) => fileExists(configPath));
 }
 
 /** Resolves the root eslint config as the loader does, taking the first basename in precedence order. */
 function findRootEslintConfig(): string | undefined {
   return ESLINT_CONFIG_BASENAMES.find((basename) => fileExists(basename));
+}
+
+/** Lists the directories that may hold an eslint config: the repo root and every workspace. */
+function listEslintConfigSearchDirs(): string[] {
+  return discoverWorkspaces().map((workspace) => workspace.dir);
+}
+
+/** Lists the workspace directories providing this package, which the repo developing it imports by path. */
+function listProviderWorkspaceDirs(): string[] {
+  return discoverWorkspaces()
+    .filter((workspace) => workspace.name === PACKAGE_NAME)
+    .map((workspace) => workspace.dir);
 }
 
 /** Fails when an eslint config still declares parserOptions.project, naming the offenders. */
@@ -171,25 +178,18 @@ function noLegacyParserProject(): boolean | CheckOutcome {
 
 /** Fails when a JavaScript eslint config shadows a TypeScript one, naming the directories. */
 function noShadowedEslintConfig(): boolean | CheckOutcome {
-  const dirs = shadowedEslintConfigDirs(findEslintConfigs());
+  const dirs = listShadowedEslintConfigDirs(findEslintConfigs());
   if (dirs.length === 0) return true;
   return { ok: false, detail: `a JavaScript config shadows a TypeScript one in: ${dirs.join(', ')}` };
 }
 
 /** Fails when a tsconfig.eslint.json remains, naming the offenders. */
 function noTsconfigEslintJson(): boolean | CheckOutcome {
-  const offenders = eslintConfigSearchDirs()
-    .map((dir) => dirPath(dir, 'tsconfig.eslint.json'))
+  const offenders = listEslintConfigSearchDirs()
+    .map((dir) => resolveDirPath(dir, 'tsconfig.eslint.json'))
     .filter((configPath) => fileExists(configPath));
   if (offenders.length === 0) return true;
   return { ok: false, detail: `tsconfig.eslint.json found: ${offenders.join(', ')}` };
-}
-
-/** Lists the workspace directories providing this package, which the repo developing it imports by path. */
-function providerWorkspaceDirs(): string[] {
-  return discoverWorkspaces()
-    .filter((workspace) => workspace.name === PACKAGE_NAME)
-    .map((workspace) => workspace.dir);
 }
 
 /**
@@ -202,8 +202,8 @@ function readInstalledVersion(name: string): string | undefined {
   if (cached !== undefined || installedVersions.has(name)) return cached;
 
   let lowest: string | undefined;
-  for (const dir of eslintConfigSearchDirs()) {
-    const manifest = readJsonFile(dirPath(dir, `node_modules/${name}/package.json`));
+  for (const dir of listEslintConfigSearchDirs()) {
+    const manifest = readJsonFile(resolveDirPath(dir, `node_modules/${name}/package.json`));
     if (manifest === undefined) continue;
     const version = getJsonValue(manifest, 'version');
     if (typeof version !== 'string') continue;
@@ -232,7 +232,7 @@ function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   if (content === undefined) return false;
   if (content.includes(PACKAGE_NAME)) return true;
 
-  const providerDir = providerWorkspaceDirs().find((dir) => importsFromDir(content, dir));
+  const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
   return providerDir === undefined ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
 }
 

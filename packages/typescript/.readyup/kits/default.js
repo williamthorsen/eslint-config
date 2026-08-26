@@ -17,7 +17,7 @@ import {
 // src/readiness/eslint-config-contents.ts
 function declaresParserProject(content) {
   for (const match of content.matchAll(/parserOptions\s*:\s*\{/g)) {
-    if (/\bproject\s*:/.test(braceBlock(content, match.index + match[0].length - 1))) return true;
+    if (/\bproject\s*:/.test(extractBraceBlock(content, match.index + match[0].length - 1))) return true;
   }
   return false;
 }
@@ -32,7 +32,7 @@ function importsFromDir(content, dir) {
 function setsTsconfigRootDir(content) {
   return /tsconfigRootDir\s*:/.test(content);
 }
-function braceBlock(content, openIndex) {
+function extractBraceBlock(content, openIndex) {
   let depth = 0;
   for (let i = openIndex; i < content.length; i += 1) {
     if (content[i] === "{") depth += 1;
@@ -45,9 +45,6 @@ function braceBlock(content, openIndex) {
 }
 
 // src/readiness/eslint-config-paths.ts
-function dirPath(dir, basename) {
-  return dir === "." ? basename : `${dir}/${basename}`;
-}
 var ESLINT_CONFIG_BASENAMES = [
   "eslint.config.js",
   "eslint.config.mjs",
@@ -56,13 +53,13 @@ var ESLINT_CONFIG_BASENAMES = [
   "eslint.config.mts",
   "eslint.config.cts"
 ];
-function eslintConfigCandidates(dirs) {
-  return dirs.flatMap((dir) => ESLINT_CONFIG_BASENAMES.map((basename) => dirPath(dir, basename)));
-}
 function isTypeScriptEslintConfig(configPath) {
   return /\.[cm]?ts$/.test(configPath);
 }
-function shadowedEslintConfigDirs(eslintConfigPaths) {
+function listEslintConfigCandidates(dirs) {
+  return dirs.flatMap((dir) => ESLINT_CONFIG_BASENAMES.map((basename) => resolveDirPath(dir, basename)));
+}
+function listShadowedEslintConfigDirs(eslintConfigPaths) {
   const seen = /* @__PURE__ */ new Map();
   for (const configPath of eslintConfigPaths) {
     const slash = configPath.lastIndexOf("/");
@@ -73,6 +70,9 @@ function shadowedEslintConfigDirs(eslintConfigPaths) {
     seen.set(dir, found);
   }
   return [...seen].filter(([, found]) => found.js && found.ts).map(([dir]) => dir);
+}
+function resolveDirPath(dir, basename) {
+  return dir === "." ? basename : `${dir}/${basename}`;
 }
 
 // src/readiness/readVersionFloor.ts
@@ -176,14 +176,17 @@ function comparePeer(name) {
   if (installed === void 0) return { kind: "unknown", reason: `${name} is not installed` };
   return { floor, installed, kind: "comparable", range };
 }
-function eslintConfigSearchDirs() {
-  return discoverWorkspaces().map((workspace) => workspace.dir);
-}
 function findEslintConfigs() {
-  return eslintConfigCandidates(eslintConfigSearchDirs()).filter((configPath) => fileExists(configPath));
+  return listEslintConfigCandidates(listEslintConfigSearchDirs()).filter((configPath) => fileExists(configPath));
 }
 function findRootEslintConfig() {
   return ESLINT_CONFIG_BASENAMES.find((basename) => fileExists(basename));
+}
+function listEslintConfigSearchDirs() {
+  return discoverWorkspaces().map((workspace) => workspace.dir);
+}
+function listProviderWorkspaceDirs() {
+  return discoverWorkspaces().filter((workspace) => workspace.name === PACKAGE_NAME).map((workspace) => workspace.dir);
 }
 function noLegacyParserProject() {
   const offenders = findEslintConfigs().filter((configPath) => {
@@ -194,24 +197,21 @@ function noLegacyParserProject() {
   return { ok: false, detail: `parserOptions.project found in: ${offenders.join(", ")}` };
 }
 function noShadowedEslintConfig() {
-  const dirs = shadowedEslintConfigDirs(findEslintConfigs());
+  const dirs = listShadowedEslintConfigDirs(findEslintConfigs());
   if (dirs.length === 0) return true;
   return { ok: false, detail: `a JavaScript config shadows a TypeScript one in: ${dirs.join(", ")}` };
 }
 function noTsconfigEslintJson() {
-  const offenders = eslintConfigSearchDirs().map((dir) => dirPath(dir, "tsconfig.eslint.json")).filter((configPath) => fileExists(configPath));
+  const offenders = listEslintConfigSearchDirs().map((dir) => resolveDirPath(dir, "tsconfig.eslint.json")).filter((configPath) => fileExists(configPath));
   if (offenders.length === 0) return true;
   return { ok: false, detail: `tsconfig.eslint.json found: ${offenders.join(", ")}` };
-}
-function providerWorkspaceDirs() {
-  return discoverWorkspaces().filter((workspace) => workspace.name === PACKAGE_NAME).map((workspace) => workspace.dir);
 }
 function readInstalledVersion(name) {
   const cached = installedVersions.get(name);
   if (cached !== void 0 || installedVersions.has(name)) return cached;
   let lowest;
-  for (const dir of eslintConfigSearchDirs()) {
-    const manifest = readJsonFile(dirPath(dir, `node_modules/${name}/package.json`));
+  for (const dir of listEslintConfigSearchDirs()) {
+    const manifest = readJsonFile(resolveDirPath(dir, `node_modules/${name}/package.json`));
     if (manifest === void 0) continue;
     const version = getJsonValue(manifest, "version");
     if (typeof version !== "string") continue;
@@ -230,7 +230,7 @@ function rootEslintConfigExtendsThisPackage() {
   const content = readFile(basename);
   if (content === void 0) return false;
   if (content.includes(PACKAGE_NAME)) return true;
-  const providerDir = providerWorkspaceDirs().find((dir) => importsFromDir(content, dir));
+  const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
   return providerDir === void 0 ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
 }
 function skipUnlessEslintLoadsTypeScript() {
