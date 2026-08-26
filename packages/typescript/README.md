@@ -87,7 +87,9 @@ Four rules ship in this config's own plugin. The TypeScript config enables them,
 
 Reports a file whose body holds only imports and re-exports (a barrel) unless the package publishes that module. Importing one symbol through a barrel loads every module the barrel re-exports, so a barrel earns its place at a package's entry point and nowhere else.
 
-The exemption is computed from the linted file's own manifest, so a consuming repo configures nothing. The rule finds the nearest ancestor `package.json`, collects every string appearing anywhere in its `exports` value, and leaves the file alone when the path its build emits is among them. Matching the strings rather than the keys covers the bare-string form (`"exports": "./dist/esm/index.js"`) and the conditional-object form alike, and needs no list of condition names. A collected target containing `*` covers every path the `*` spans, `/` included, as Node's subpath patterns do, and one ending in `/` covers everything below it.
+The exemption is computed from the linted file's own manifest, so a consuming repo configures nothing. The rule finds the nearest ancestor `package.json`, collects every string appearing anywhere in its `exports` value, and leaves the file alone when either the path its build emits or the file's own package-relative path is among them. Matching the strings rather than the keys covers the bare-string form (`"exports": "./dist/esm/index.js"`) and the conditional-object form alike, and needs no list of condition names. A collected target containing `*` covers every path the `*` spans, `/` included, as Node's subpath patterns do, and one ending in `/` covers everything below it.
+
+That second match is what reaches a package publishing source instead of a build. A manifest naming `./src/mod.ts` states that `src/mod.ts` is an entry point, and no source-to-build mapping could say the same, since the mapping always rewrites the extension. The match disregards `sourceDir`, so a package with no source directory publishes `./mod.ts` the same way, and it matches by the rules above, so a `*` or trailing-slash target spans source paths as it spans built ones.
 
 Where the manifest declares no `exports`, the legacy `bin`, `main`, `module`, and `types` fields name the published paths in its place. A manifest declaring none of them publishes nothing, so every barrel under it is reported: this is the application repository, where no barrel has an entry point to sit at. A file with no ancestor `package.json` at all is reported by nothing, an absent manifest being an absence of information rather than a statement that the package publishes nothing.
 
@@ -101,7 +103,7 @@ export default defineConfig(config, {
 });
 ```
 
-A mapping that does not match the build reports every published entry point rather than going quiet, and the message names the path it computed, so the setting to correct is visible in the report.
+A mapping that does not match the build reports every published entry point rather than going quiet, and the message names both the path it computed and the file's own, so the setting to correct is visible in the report. A package that publishes source needs no such setting, its entry points matching by their own paths.
 
 A file under `__fixtures__`, `__mocks__`, `__tests__`, or `test-utils` is exempt, since test scaffolding ships nothing. A barrel at a vendor boundary, a directory holding the only permitted import site for an external dependency, takes an inline disable comment naming that boundary:
 

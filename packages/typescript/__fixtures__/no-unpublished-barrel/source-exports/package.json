@@ -1,0 +1,9 @@
+{
+  "name": "@fixtures/source-exports",
+  "private": true,
+  "exports": {
+    ".": "./src/mod.ts",
+    "./configs/*": "./src/configs/*.ts",
+    "./internal/": "./src/internal/"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "@fixtures/root-source-exports",
+  "private": true,
+  "exports": "./mod.ts"
+}
