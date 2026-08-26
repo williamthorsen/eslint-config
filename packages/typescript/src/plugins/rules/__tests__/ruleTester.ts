@@ -14,14 +14,17 @@ RuleTester.it = it;
 // eslint-disable-next-line unicorn/prefer-export-from -- re-export follows the static-hook wiring above
 export { RuleTester };
 
-// Builds a tester for type-aware rules, which need a TS program. `allowDefaultProject` type-checks the
-// inline code against the fixture `tsconfig.json`.
+// Builds a tester for type-aware rules, which need a TS program. `allowDefaultProject` routes the inline code to
+// the default project, and `defaultProject` names the fixture `tsconfig.json` as that project. Without the second,
+// the code lands in an inferred project carrying TypeScript's own defaults, where the fixture's `lib` never applies
+// and `Symbol.dispose` does not resolve.
 export function createTypedRuleTester(): RuleTester {
   return new RuleTester({
     languageOptions: {
       parserOptions: {
         projectService: {
           allowDefaultProject: ['*.ts*'],
+          defaultProject: 'tsconfig.json',
         },
         tsconfigRootDir: path.join(import.meta.dirname, '../../../../__fixtures__/rules'),
       },
