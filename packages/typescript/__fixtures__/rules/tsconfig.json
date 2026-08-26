@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["ES2024"],
+    "lib": ["ES2024", "ESNext.Disposable"],
     "types": [],
   },
-  "include": [],
+  "include": ["anchor.ts"],
 }
