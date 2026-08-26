@@ -1,5 +1,7 @@
 import path from 'node:path';
 
+import type { TestCaseError } from '@typescript-eslint/rule-tester';
+
 import rule from '../no-unpublished-barrel.ts';
 import { RuleTester } from './ruleTester.ts';
 
@@ -36,6 +38,26 @@ ruleTester.run('no-unpublished-barrel', rule, {
       // Non-firing: a trailing-slash folder mapping publishes everything below it
       code: "export * from './a.ts';",
       filename: fixtureFile('folder-exports', 'src/configs/index.ts'),
+    },
+    {
+      // Non-firing: a target naming the file's own source path publishes the source rather than a build of it
+      code: "export * from './a.ts';",
+      filename: fixtureFile('source-exports', 'src/mod.ts'),
+    },
+    {
+      // Non-firing: a source-path pattern spans what a built-path pattern does, `/` included
+      code: "export * from './a.ts';",
+      filename: fixtureFile('source-exports', 'src/configs/nested/index.ts'),
+    },
+    {
+      // Non-firing: a trailing-slash mapping onto source covers everything below it, as one onto a build does
+      code: "export * from './a.ts';",
+      filename: fixtureFile('source-exports', 'src/internal/index.ts'),
+    },
+    {
+      // Non-firing: a named source path is published wherever it sits, `sourceDir` notwithstanding
+      code: "export * from './a.ts';",
+      filename: fixtureFile('root-source-exports', 'mod.ts'),
     },
     {
       // Non-firing: `exports` names this one, and it is what the manifest publishes
@@ -135,78 +157,98 @@ ruleTester.run('no-unpublished-barrel', rule, {
       // Firing: a barrel below the published entry points
       code: "export * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+      errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
       // Firing: detection is by content, so a re-export hub under any name reports
       code: "export type * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/types.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/types.js' } }],
+      errors: [buildUnpublishedError('src/types.ts', 'dist/esm/types.js')],
     },
     {
       // Firing: the named re-export form reports like the star form
       code: "export { a } from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+      errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
       // Firing: a default re-export below the published entry points
       code: "import a from './a.ts';\nexport default a;",
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+      errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
       // Firing: a type expression wrapping the re-exported default is unwrapped before the check
       code: "import a from './a.ts';\nexport default a!;",
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+      errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
       // Firing: a manifest naming no entry point publishes nothing
       code: "export * from './a.ts';",
       filename: fixtureFile('no-entries', 'src/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/index.js' } }],
+      errors: [buildUnpublishedError('src/index.ts', 'dist/esm/index.js')],
     },
     {
       // Firing: `main` names one entry point, not every path below it
       code: "export * from './a.ts';",
       filename: fixtureFile('legacy-main', 'src/utils/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+      errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
       // Firing: `main` is inert wherever `exports` is present, so its target is not published
       code: "export * from './a.ts';",
       filename: fixtureFile('exports-with-legacy-main', 'src/legacy/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/legacy/index.js' } }],
+      errors: [buildUnpublishedError('src/legacy/index.ts', 'dist/esm/legacy/index.js')],
     },
     {
       // Firing: a subpath pattern covers what it spans and no more
       code: "export * from './a.ts';",
       filename: fixtureFile('pattern-exports', 'src/utils/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+      errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
       // Firing: a folder mapping covers its own prefix and no more
       code: "export * from './a.ts';",
       filename: fixtureFile('folder-exports', 'src/utils/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/utils/index.js' } }],
+      errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
+    },
+    {
+      // Firing: publishing source exempts the paths named and no others
+      code: "export * from './a.ts';",
+      filename: fixtureFile('source-exports', 'src/utils/index.ts'),
+      errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
       // Firing: a mapping the package does not build to reports its own entry point, loudly
       code: "export * from './a.ts';",
       filename: fixtureFile('custom-out-dir', 'src/index.ts'),
-      errors: [{ messageId: 'unpublishedBarrel', data: { target: 'dist/esm/index.js' } }],
+      errors: [buildUnpublishedError('src/index.ts', 'dist/esm/index.js')],
     },
     {
       // Firing: a file outside the source directory is never built, so nothing publishes it
       code: "export * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'scripts/index.ts'),
-      errors: [{ messageId: 'unbuiltBarrel', data: { sourceDir: 'src' } }],
+      errors: [{ messageId: 'unbuiltBarrel', data: { sourceDir: 'src', sourcePath: 'scripts/index.ts' } }],
+    },
+    {
+      // Firing: publishing one source path leaves every other path in the package unbuilt and unpublished
+      code: "export * from './a.ts';",
+      filename: fixtureFile('root-source-exports', 'helpers/index.ts'),
+      errors: [{ messageId: 'unbuiltBarrel', data: { sourceDir: 'src', sourcePath: 'helpers/index.ts' } }],
     },
   ],
 });
 
 // region | Helper functions
+
+/**
+ * Builds the error an `unpublishedBarrel` case expects. Both paths are stated literally rather than derived
+ * from the rule's own mapping.
+ */
+function buildUnpublishedError(sourcePath: string, target: string): TestCaseError<'unpublishedBarrel'> {
+  return { messageId: 'unpublishedBarrel', data: { sourcePath, target } };
+}
 
 /** Builds the path of a file inside one of this rule's fixture packages. */
 function fixtureFile(fixturePackage: string, relativePath: string): string {

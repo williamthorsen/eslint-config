@@ -64,15 +64,28 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
         return;
       }
 
+      // A manifest naming the file's own path publishes the source rather than a build of it.
+      if (isPublished(relativePath, manifest.publishedTargets)) {
+        return;
+      }
+
       const options = { ...defaultOptions, ...context.options[0] };
       const target = toPublishedTarget(relativePath, options);
 
       if (target === undefined) {
-        context.report({ loc: node.loc.start, messageId: 'unbuiltBarrel', data: { sourceDir: options.sourceDir } });
+        context.report({
+          loc: node.loc.start,
+          messageId: 'unbuiltBarrel',
+          data: { sourceDir: options.sourceDir, sourcePath: relativePath },
+        });
         return;
       }
       if (!isPublished(target, manifest.publishedTargets)) {
-        context.report({ loc: node.loc.start, messageId: 'unpublishedBarrel', data: { target } });
+        context.report({
+          loc: node.loc.start,
+          messageId: 'unpublishedBarrel',
+          data: { sourcePath: relativePath, target },
+        });
       }
     },
   };
@@ -127,9 +140,8 @@ function collectStrings(value: unknown): string[] {
 }
 
 /**
- * Returns true if the published target covers the path the build emits. A `*` stands for any run of
- * characters, `/` included, as Node's subpath patterns do, and a target ending in `/` covers everything
- * below it.
+ * Returns true if the published target covers the path. A `*` stands for any run of characters, `/`
+ * included, as Node's subpath patterns do, and a target ending in `/` covers everything below it.
  */
 function coversTarget(published: string, target: string): boolean {
   if (published.endsWith('/')) {
@@ -215,7 +227,7 @@ function isImportedLocal(specifier: TSESTree.ExportSpecifier, importedNames: Rea
   return specifier.local.type === AST_NODE_TYPES.Identifier && importedNames.has(specifier.local.name);
 }
 
-/** Returns true if any target the manifest publishes covers the path the build emits. */
+/** Returns true if any target the manifest publishes covers the path. */
 function isPublished(target: string, publishedTargets: ReadonlySet<string>): boolean {
   for (const published of publishedTargets) {
     if (coversTarget(published, target)) {
@@ -337,9 +349,9 @@ const ruleDefinition = {
     ],
     messages: {
       unbuiltBarrel:
-        'Barrel outside a published entry point: this file is outside `{{sourceDir}}`, so the build emits no module for it. Import the defining modules directly.',
+        'Barrel outside a published entry point: this file is outside `{{sourceDir}}`, so the build emits no module for it, and the nearest package.json publishes no `{{sourcePath}}`. Import the defining modules directly, or publish this module.',
       unpublishedBarrel:
-        'Barrel outside a published entry point: the nearest package.json publishes no `{{target}}`. Import the defining modules directly, or publish this module.',
+        'Barrel outside a published entry point: the nearest package.json publishes neither `{{target}}` nor `{{sourcePath}}`. Import the defining modules directly, or publish this module.',
     },
   },
   create,
