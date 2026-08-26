@@ -23,7 +23,7 @@ export function listEslintConfigCandidates(dirs: readonly string[]): string[] {
 
 /**
  * Lists the directories holding both a JavaScript and a TypeScript eslint config.
- * he loader resolves the JavaScript basename first, so the TypeScript sibling that extends this package never runs.
+ * The loader resolves the JavaScript basename first, so the TypeScript sibling that extends this package never runs.
  */
 export function listShadowedEslintConfigDirs(eslintConfigPaths: readonly string[]): string[] {
   const seen = new Map<string, { js: boolean; ts: boolean }>();

@@ -29,7 +29,7 @@
           "path": "../src/readiness/eslint-config-contents.ts"
         },
         {
-          "hash": "f0c19e94",
+          "hash": "665ce59f",
           "kind": "module",
           "path": "../src/readiness/eslint-config-paths.ts"
         },
