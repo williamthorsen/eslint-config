@@ -7,7 +7,7 @@ import skyPilotReact from '../eslint-plugin-sky-pilot-react.ts';
 // registered in that preset's `plugins`, or ESLint cannot resolve the rule at load time.
 // This guards the class of bug where a preset references a plugin under the wrong key.
 interface Preset {
-  plugins?: Record<string, unknown>;
+  plugins?: Record<string, { rules?: Record<string, unknown> | undefined }>;
   rules?: Record<string, unknown>;
 }
 
@@ -30,4 +30,17 @@ describe('custom plugin preset integrity', () => {
       expect(registeredPrefixes).toContain(prefix);
     }
   });
+
+  // Adding a rule means editing the plugin's `rules` map and each preset separately. One left out of a preset ships
+  // disabled under it, which no other check would report.
+  it.each(presetCases)(
+    `$pluginName "$presetName" enables every rule the plugin registers`,
+    ({ pluginName, preset }) => {
+      const registeredRules = Object.keys(preset.plugins?.[pluginName]?.rules ?? {});
+      const enabledRules = Object.keys(preset.rules ?? {}).map((ruleId) => ruleId.slice(ruleId.indexOf('/') + 1));
+
+      expect(registeredRules.length).toBeGreaterThan(0);
+      expect(enabledRules.toSorted()).toStrictEqual(registeredRules.toSorted());
+    },
+  );
 });
