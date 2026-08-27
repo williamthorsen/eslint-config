@@ -1,18 +1,34 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import type ts from 'typescript';
 
-type MessageId = 'floatingDisposable';
+type MessageId = 'bindWithKeyword' | 'floatingDisposable' | 'unboundDisposable';
 
 interface Options {
   allow: string[];
+  checkDeclarations: boolean;
 }
 
+type EnclosingFunction = TSESTree.ArrowFunctionExpression | TSESTree.FunctionDeclaration | TSESTree.FunctionExpression;
+type ReferenceIdentifier = TSESTree.Identifier | TSESTree.JSXIdentifier;
 type ResourceExpression = TSESTree.CallExpression | TSESTree.NewExpression;
 type TypedServices = NonNullable<ReturnType<typeof getTypedServicesOrNull>>;
+
+const blockNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
+  AST_NODE_TYPES.BlockStatement,
+  AST_NODE_TYPES.Program,
+  AST_NODE_TYPES.StaticBlock,
+  AST_NODE_TYPES.SwitchCase,
+]);
 
 // Callees whose disposable result is routinely discarded on purpose. Node's timer globals return a `Timeout`, which
 // implements `Symbol.dispose`, so every `setTimeout(fn, ms);` statement would otherwise report.
 const defaultAllow: readonly string[] = ['setImmediate', 'setInterval', 'setTimeout'];
+
+const functionNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
+  AST_NODE_TYPES.ArrowFunctionExpression,
+  AST_NODE_TYPES.FunctionDeclaration,
+  AST_NODE_TYPES.FunctionExpression,
+]);
 
 const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (context) => {
   const services = getTypedServicesOrNull(context);
@@ -24,6 +40,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
 
   const checker = services.program.getTypeChecker();
   const allow = new Set([...defaultAllow, ...(context.options[0]?.allow ?? [])]);
+  const checkDeclarations = context.options[0]?.checkDeclarations ?? true;
 
   const checkResourceExpression: TSESLint.RuleFunction<ResourceExpression> = (node) => {
     const discarded = readDiscardedExpression(node);
@@ -41,13 +58,81 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
     context.report({ node, messageId: 'floatingDisposable', data: { keyword } });
   };
 
+  const checkDeclarator: TSESLint.RuleFunction<TSESTree.VariableDeclarator> = (node) => {
+    const declaration = node.parent;
+    const { init } = node;
+    if (
+      !checkDeclarations ||
+      init === null ||
+      node.id.type !== AST_NODE_TYPES.Identifier ||
+      declaration.kind === 'await using' ||
+      declaration.kind === 'using'
+    ) {
+      return;
+    }
+
+    const acquisition = readAcquisitionExpression(init);
+    if (acquisition === undefined) {
+      return;
+    }
+
+    const calleeName = readCalleeName(acquisition);
+    if (calleeName !== undefined && allow.has(calleeName)) {
+      return;
+    }
+
+    // The initializer carries the resource, so an awaited promise reads as the resource rather than the promise.
+    const type = services.getTypeAtLocation(init);
+    const keyword = readDisposalKeyword(type, checker);
+    if (
+      keyword === undefined ||
+      isReceiverType(acquisition, type, services) ||
+      isOwnershipPassthrough(acquisition, type, services) ||
+      !isScopeBound(node, context.sourceCode)
+    ) {
+      return;
+    }
+
+    context.report({
+      node,
+      messageId: 'unboundDisposable',
+      data: { keyword, kind: declaration.kind },
+      suggest: readRebindSuggestions(node, declaration, keyword, context.sourceCode),
+    });
+  };
+
   return {
     CallExpression: checkResourceExpression,
     NewExpression: checkResourceExpression,
+    VariableDeclarator: checkDeclarator,
   };
 };
 
 // region | Helper functions
+
+/** Returns the nearest statement list enclosing the node, which is the scope a `using` binding would be released at. */
+function findEnclosingBlock(node: TSESTree.Node): TSESTree.Node | undefined {
+  let current: TSESTree.Node | undefined = node.parent;
+  while (current !== undefined) {
+    if (blockNodeTypes.has(current.type)) {
+      return current;
+    }
+    current = current.parent;
+  }
+  return undefined;
+}
+
+/** Returns the nearest function enclosing the node, or undefined where the node sits at module or class level. */
+function findEnclosingFunction(node: TSESTree.Node): EnclosingFunction | undefined {
+  let current: TSESTree.Node | undefined = node.parent;
+  while (current !== undefined) {
+    if (isEnclosingFunction(current)) {
+      return current;
+    }
+    current = current.parent;
+  }
+  return undefined;
+}
 
 /**
  * Returns type-aware parser services, or null when the parser supplies none or the configuration provides no program.
@@ -61,6 +146,38 @@ function getTypedServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<
   } catch {
     return null;
   }
+}
+
+/** Returns true if the identifier is the object of a member expression, which reads or drives the resource in place. */
+function isContainedUse(identifier: ReferenceIdentifier): boolean {
+  const { parent } = identifier;
+  return parent.type === AST_NODE_TYPES.MemberExpression && parent.object === identifier;
+}
+
+/**
+ * Returns true if the identifier is the object of a `Symbol.dispose` or `Symbol.asyncDispose` access. Code that
+ * releases the resource by hand is correct; preferring `using` over a hand-written `finally` belongs to
+ * `unicorn/prefer-dispose`, which reads the disposal call this rule only has to recognize.
+ */
+function isDisposalAccess(identifier: ReferenceIdentifier): boolean {
+  const { parent } = identifier;
+  if (parent.type !== AST_NODE_TYPES.MemberExpression || !parent.computed || parent.object !== identifier) {
+    return false;
+  }
+
+  const { property } = parent;
+  return (
+    property.type === AST_NODE_TYPES.MemberExpression &&
+    property.object.type === AST_NODE_TYPES.Identifier &&
+    property.object.name === 'Symbol' &&
+    property.property.type === AST_NODE_TYPES.Identifier &&
+    (property.property.name === 'asyncDispose' || property.property.name === 'dispose')
+  );
+}
+
+/** Returns true if the node is a function whose body a resource's references would be captured in. */
+function isEnclosingFunction(node: TSESTree.Node): node is EnclosingFunction {
+  return functionNodeTypes.has(node.type);
 }
 
 /**
@@ -82,6 +199,64 @@ function isOwnershipPassthrough(node: ResourceExpression, type: ts.Type, service
 function isReceiverType(node: ResourceExpression, type: ts.Type, services: TypedServices): boolean {
   const { callee } = node;
   return callee.type === AST_NODE_TYPES.MemberExpression && services.getTypeAtLocation(callee.object) === type;
+}
+
+/**
+ * Returns true if the declared resource belongs to the scope that declares it, which is what makes `using` the
+ * binding it calls for. Every reference must be a member access sitting in the declaring block and function: a
+ * return, an argument, an assignment, or a literal element all hand the resource somewhere that outlives this scope,
+ * where releasing it at the scope's end would be wrong. Requiring the declaring block covers a `var`, whose binding
+ * a caller may read past the block a `using` would be released at.
+ */
+function isScopeBound(declarator: TSESTree.VariableDeclarator, sourceCode: TSESLint.SourceCode): boolean {
+  const block = findEnclosingBlock(declarator);
+
+  // A module-scope resource is released at the end of module evaluation, before any importer runs.
+  if (block === undefined || block.type === AST_NODE_TYPES.Program) {
+    return false;
+  }
+
+  const [variable] = sourceCode.getDeclaredVariables(declarator);
+  if (variable === undefined) {
+    return false;
+  }
+
+  const declaringFunction = findEnclosingFunction(declarator);
+  return variable.references.every((reference) => {
+    // The declarator's own binding is a write that every declaration carries.
+    if (reference.init === true) {
+      return true;
+    }
+
+    const { identifier } = reference;
+    return (
+      !reference.isWrite() &&
+      findEnclosingFunction(identifier) === declaringFunction &&
+      isWithin(identifier, block) &&
+      isContainedUse(identifier) &&
+      !isDisposalAccess(identifier)
+    );
+  });
+}
+
+/** Returns true if the node's source range falls inside the container's. */
+function isWithin(node: TSESTree.Node, container: TSESTree.Node): boolean {
+  return node.range[0] >= container.range[0] && node.range[1] <= container.range[1];
+}
+
+/**
+ * Returns the call or `new` expression an initializer acquires its value from, or undefined where the initializer is
+ * not an acquisition site. An alias or a property read carries a resource some other expression already acquired.
+ */
+function readAcquisitionExpression(init: TSESTree.Expression): ResourceExpression | undefined {
+  let expression: TSESTree.Expression = init;
+  while (expression.type === AST_NODE_TYPES.AwaitExpression || expression.type === AST_NODE_TYPES.ChainExpression) {
+    expression = expression.type === AST_NODE_TYPES.AwaitExpression ? expression.argument : expression.expression;
+  }
+
+  return expression.type === AST_NODE_TYPES.CallExpression || expression.type === AST_NODE_TYPES.NewExpression
+    ? expression
+    : undefined;
 }
 
 /** Returns the name the `allow` list matches against: the callee itself, or the property of a member call. */
@@ -149,26 +324,63 @@ function readDisposalKeyword(type: ts.Type, checker: ts.TypeChecker): 'await usi
   }
 }
 
+/**
+ * Returns the suggestion that rebinds the declaration keyword, or an empty array where no valid edit exists. A
+ * declaration holding several declarators would bind its siblings too, and `await using` needs an enclosing `async`
+ * function to appear in.
+ */
+function readRebindSuggestions(
+  declarator: TSESTree.VariableDeclarator,
+  declaration: TSESTree.VariableDeclaration,
+  keyword: 'await using' | 'using',
+  sourceCode: TSESLint.SourceCode,
+): TSESLint.ReportSuggestionArray<MessageId> {
+  if (declaration.declarations.length > 1) {
+    return [];
+  }
+  if (keyword === 'await using' && findEnclosingFunction(declarator)?.async !== true) {
+    return [];
+  }
+
+  const token = sourceCode.getFirstToken(declaration);
+  if (token === null || token.value !== declaration.kind) {
+    return [];
+  }
+
+  return [
+    {
+      messageId: 'bindWithKeyword',
+      data: { keyword },
+      fix: (fixer) => fixer.replaceText(token, keyword),
+    },
+  ];
+}
+
 // endregion | Helper functions
 
 const ruleDefinition = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Disallow discarding a disposable resource instead of binding it with `using`',
+      description: 'Disallow leaving a disposable resource unbound by `using`',
     },
+    hasSuggestions: true,
     schema: [
       {
         type: 'object',
         properties: {
           allow: { type: 'array', items: { type: 'string' } },
+          checkDeclarations: { type: 'boolean' },
         },
         additionalProperties: false,
       },
     ],
     messages: {
+      bindWithKeyword: 'Bind with `{{keyword}}`.',
       floatingDisposable:
         'Discarded disposable resource. Bind the result with `{{keyword}}`, or mark the discard with `void`.',
+      unboundDisposable:
+        'Resource is acquired and never disposed. Bind it with `{{keyword}}` instead of `{{kind}}`, so it is released when the scope ends.',
     },
   },
   create,

@@ -4,6 +4,12 @@ import { createTypedRuleTester, RuleTester } from './ruleTester.ts';
 // Disposability is a type property, so every case here needs the tester backed by a TS program.
 const typedRuleTester = createTypedRuleTester();
 
+// A declaration case has to sit inside a function: module and global scope are exempt, and the tester's code is
+// top-level.
+const capture = 'interface Capture extends Disposable { lines: string[] } declare function acquire(): Capture;';
+const asyncCapture =
+  'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function acquireAsync(): AsyncCapture;';
+
 typedRuleTester.run('no-floating-disposable', rule, {
   valid: [
     // Non-firing: bound with `using`
@@ -12,8 +18,6 @@ typedRuleTester.run('no-floating-disposable', rule, {
     'declare function acquireAsync(): AsyncDisposable; async function run() { await using resource = acquireAsync(); }',
     // Non-firing: `void` marks a deliberate discard
     'declare function acquire(): Disposable; void acquire();',
-    // Non-firing: result assigned to a variable
-    'declare function acquire(): Disposable; const resource = acquire();',
     // Non-firing: result passed as a call argument
     'declare function acquire(): Disposable; declare function register(resource: Disposable): void; register(acquire());',
     // Non-firing: result returned to the caller, whose resource it becomes
@@ -46,6 +50,47 @@ typedRuleTester.run('no-floating-disposable', rule, {
     'declare function open(): { close(): void }; open();',
     // Non-firing: a union mixing a resource with a plain value is left alone
     'declare function acquire(): Disposable | string; acquire();',
+
+    // -- Declarations --
+
+    // Non-firing: the declared resource is returned, so it becomes the caller's
+    `${capture} function make() { const captured = acquire(); return captured; }`,
+    // Non-firing: the declared resource is passed on as an argument
+    `${capture} declare function register(resource: Capture): void; function run() { const captured = acquire(); register(captured); }`,
+    // Non-firing: the declared resource is assigned onward
+    `${capture} declare let sink: Capture; function run() { const captured = acquire(); sink = captured; }`,
+    // Non-firing: the declared resource leaves inside an object literal
+    `${capture} declare function send(payload: unknown): void; function run() { const captured = acquire(); send({ captured }); }`,
+    // Non-firing: a reassigned binding, which `using` could not hold
+    `${capture} function run() { let captured = acquire(); captured = acquire(); }`,
+    // Non-firing: a closure may outlive the block it captures the resource in
+    `${capture} function run() { const captured = acquire(); return () => captured.lines; }`,
+    // Non-firing: a module-scope resource is released at the end of module evaluation, before an importer runs
+    `${capture} const captured = acquire(); captured.lines;`,
+    // Non-firing: an exported resource, which module scope already exempts
+    `${capture} export const captured = acquire();`,
+    // Non-firing: the resource is released by hand
+    `${capture} function run() { const captured = acquire(); try { captured.lines; } finally { captured[Symbol.dispose](); } }`,
+    // Non-firing: a destructuring declarator binds no resource to rebind
+    `${capture} function run() { const { lines } = acquire(); return lines; }`,
+    // Non-firing: a `var` read past the block a `using` would be released at
+    `${capture} function run() { { var captured = acquire(); } captured.lines; }`,
+    // Non-firing: an initializer that is not an acquisition site carries a resource acquired elsewhere
+    `${capture} function run() { using held = acquire(); const alias = held; alias.lines; }`,
+    // Non-firing: the declaration half turned off
+    {
+      code: `${capture} function run() { const captured = acquire(); captured.lines; }`,
+      options: [{ checkDeclarations: false }],
+    },
+    // Non-firing: the `allow` list reaches a declaration too
+    {
+      code: `${capture} function run() { const captured = acquire(); captured.lines; }`,
+      options: [{ allow: ['acquire'] }],
+    },
+    // Non-firing: ownership passthrough reaches a declaration too
+    `${capture} declare function keep<T extends Disposable>(resource: T): T; function run() { const captured = keep(acquire()); captured.lines; }`,
+    // Non-firing: a fluent call yields the receiver's type rather than a new resource
+    'declare class Server { [Symbol.asyncDispose](): Promise<void>; listen(port: number): this } declare const server: Server; function run() { const listening = server.listen(3000); listening.listen(3001); }',
   ],
   invalid: [
     {
@@ -88,6 +133,157 @@ typedRuleTester.run('no-floating-disposable', rule, {
       code: 'declare function acquire(): Disposable; [1].forEach(() => { acquire(); });',
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'using' } }],
     },
+
+    // -- Declarations --
+
+    {
+      // Firing: the resource is read in place and never released
+      code: `${capture} function run() { const captured = acquire(); captured.lines; }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} function run() { using captured = acquire(); captured.lines; }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a resource nothing reads still leaks
+      code: `${capture} function run() { const captured = acquire(); }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} function run() { using captured = acquire(); }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a `let` binding, rebound to the same keyword the type calls for
+      code: `${capture} function run() { let captured = acquire(); captured.lines; }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'let' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} function run() { using captured = acquire(); captured.lines; }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a `var` whose references all sit inside the block a `using` would be released at
+      code: `${capture} function run() { { var captured = acquire(); captured.lines; } }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'var' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} function run() { { using captured = acquire(); captured.lines; } }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a nested block is a scope of its own
+      code: `${capture} function run() { if (true) { const captured = acquire(); captured.lines; } }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} function run() { if (true) { using captured = acquire(); captured.lines; } }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a constructed resource bound to a declaration
+      code: 'class TempDir { [Symbol.dispose](): void {} path = ""; } function run() { const dir = new TempDir(); dir.path; }',
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output:
+                'class TempDir { [Symbol.dispose](): void {} path = ""; } function run() { using dir = new TempDir(); dir.path; }',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: an async resource inside an `async` function, where `await using` compiles
+      code: `${asyncCapture} async function run() { const captured = acquireAsync(); captured.lines; }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'await using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'await using' },
+              output: `${asyncCapture} async function run() { await using captured = acquireAsync(); captured.lines; }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: an awaited promise carries the resource the declaration then holds
+      code: 'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function open(): Promise<AsyncCapture>; async function run() { const captured = await open(); captured.lines; }',
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'await using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'await using' },
+              output:
+                'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function open(): Promise<AsyncCapture>; async function run() { await using captured = await open(); captured.lines; }',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing with no suggestion: `await using` needs an enclosing `async` function, which this one is not
+      code: `${asyncCapture} function run() { const captured = acquireAsync(); captured.lines; }`,
+      errors: [{ messageId: 'unboundDisposable', data: { keyword: 'await using', kind: 'const' }, suggestions: [] }],
+    },
+    {
+      // Firing with no suggestion: rebinding the keyword would bind the sibling declarator too
+      code: `${capture} function run() { const captured = acquire(), count = 1; captured.lines; count; }`,
+      errors: [{ messageId: 'unboundDisposable', data: { keyword: 'using', kind: 'const' }, suggestions: [] }],
+    },
   ],
 });
 
@@ -99,6 +295,7 @@ untypedRuleTester.run('no-floating-disposable (no program)', rule, {
   valid: [
     'declare function acquire(): Disposable; acquire();',
     'declare class TempDir { [Symbol.dispose](): void } new TempDir();',
+    'declare function acquire(): Disposable; function run() { const resource = acquire(); resource.lines; }',
   ],
   invalid: [],
 });
