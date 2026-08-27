@@ -24,7 +24,7 @@
           ]
         },
         {
-          "hash": "6689d9ba",
+          "hash": "b66305f5",
           "kind": "module",
           "path": "../src/readiness/eslint-config-contents.ts"
         },
@@ -44,7 +44,7 @@
       "readyupVersion": "0.33.0",
       "source": "kits/default.ts",
       "sourceHash": "d6aa3899",
-      "targetHash": "983def5d"
+      "targetHash": "f7f64951"
     }
   ]
 }

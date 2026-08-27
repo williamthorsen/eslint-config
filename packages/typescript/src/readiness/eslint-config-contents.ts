@@ -94,32 +94,38 @@ function listNextSettingsBlocks(content: string): string[] {
   return blocks;
 }
 
-/**
- * Lists the string literals a `rootDir` key is assigned, across the bare and array forms. Requiring
- * the value to open with a quote or a bracket is what excludes an expression: a literal appearing
- * inside one, as in `path.join(import.meta.dirname, 'app')`, is an argument rather than the value.
- */
+/** Lists the string literals a `rootDir` key is assigned, discarding every value that is not one. */
 function listRootDirLiterals(block: string): string[] {
-  const array = /\brootDir\s*:\s*\[[^\]]*\]/.exec(block);
-  if (array !== null) return listStringLiterals(array[0]);
-
-  const single = /\brootDir\s*:\s*(['"`])[^'"`]*\1/.exec(block);
-  return single === null ? [] : listStringLiterals(single[0]);
+  const literals: string[] = [];
+  for (const value of listRootDirValues(block)) {
+    const literal = readStringLiteral(value);
+    if (literal !== undefined) literals.push(literal);
+  }
+  return literals;
 }
 
 /**
- * Lists the string literals in a snippet, discarding an interpolated template, whose text is not the
- * path it resolves to.
+ * Lists the values a `rootDir` key is assigned, one per entry where the value is an array. Each is
+ * the value's own text, so the reader below judges an entry on its whole extent rather than on
+ * whatever it contains.
  */
-function listStringLiterals(snippet: string): string[] {
-  const values: string[] = [];
-  for (const match of snippet.matchAll(/(['"`])([^'"`]*)\1/g)) {
-    const [, quote, value] = match;
-    if (value === undefined) continue;
-    if (quote === '`' && value.includes('${')) continue;
-    values.push(value);
-  }
-  return values;
+function listRootDirValues(block: string): string[] {
+  const array = /\brootDir\s*:\s*\[([^\]]*)\]/.exec(block);
+  if (array !== null) return (array[1] ?? '').split(',');
+
+  const bare = /\brootDir\s*:\s*([^,}]*)/.exec(block);
+  return bare?.[1] === undefined ? [] : [bare[1]];
+}
+
+/**
+ * Reads a value that is wholly a string literal, or nothing where it is an expression such as
+ * `path.join(import.meta.dirname, 'app')`, whose argument is not the value. An interpolated template
+ * likewise reads as nothing, its text not being the path it resolves to.
+ */
+function readStringLiteral(value: string): string | undefined {
+  const [, quote, literal] = /^\s*(['"`])([^'"`]*)\1\s*$/.exec(value) ?? [];
+  if (literal === undefined) return undefined;
+  return quote === '`' && literal.includes('${') ? undefined : literal;
 }
 
 // endregion | Helpers

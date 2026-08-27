@@ -64,20 +64,23 @@ function listNextSettingsBlocks(content) {
   return blocks;
 }
 function listRootDirLiterals(block) {
-  const array = /\brootDir\s*:\s*\[[^\]]*\]/.exec(block);
-  if (array !== null) return listStringLiterals(array[0]);
-  const single = /\brootDir\s*:\s*(['"`])[^'"`]*\1/.exec(block);
-  return single === null ? [] : listStringLiterals(single[0]);
-}
-function listStringLiterals(snippet) {
-  const values = [];
-  for (const match of snippet.matchAll(/(['"`])([^'"`]*)\1/g)) {
-    const [, quote, value] = match;
-    if (value === void 0) continue;
-    if (quote === "`" && value.includes("${")) continue;
-    values.push(value);
+  const literals = [];
+  for (const value of listRootDirValues(block)) {
+    const literal = readStringLiteral(value);
+    if (literal !== void 0) literals.push(literal);
   }
-  return values;
+  return literals;
+}
+function listRootDirValues(block) {
+  const array = /\brootDir\s*:\s*\[([^\]]*)\]/.exec(block);
+  if (array !== null) return (array[1] ?? "").split(",");
+  const bare = /\brootDir\s*:\s*([^,}]*)/.exec(block);
+  return bare?.[1] === void 0 ? [] : [bare[1]];
+}
+function readStringLiteral(value) {
+  const [, quote, literal] = /^\s*(['"`])([^'"`]*)\1\s*$/.exec(value) ?? [];
+  if (literal === void 0) return void 0;
+  return quote === "`" && literal.includes("${") ? void 0 : literal;
 }
 
 // src/readiness/eslint-config-paths.ts

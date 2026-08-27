@@ -333,7 +333,7 @@ The kit runs at the version resolved from your `node_modules`, so it reports whe
 
 The check that your root config extends this package matches the package specifier as text, or a path into a workspace that provides the package, so a config reaching it through a local re-export or a path alias is reported as not extending it.
 
-The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. A config reaching the factory through a local re-export names neither, so the check goes silent there rather than reporting a wrong failure.
+The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. A config reaching the factory through a local re-export names neither, so one that also sets no `rootDir` goes unreported rather than reporting a wrong failure. One that does set it is still judged on the value it writes.
 
 ## License
 

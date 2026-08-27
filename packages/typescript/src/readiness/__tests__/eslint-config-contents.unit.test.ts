@@ -82,7 +82,7 @@ describe(enablesNextPlugin, () => {
   });
 
   // A local re-export names neither the factory call nor the plugin, so the config reads as not
-  // reaching the plugin and the check that consumes this goes inert.
+  // reaching it; a config that sets settings.next.rootDir is still judged on the value it writes.
   it('is false for a config reaching the factory through a local re-export', () => {
     const content = `import { next } from '../config/eslint-presets.ts';`;
 
@@ -171,6 +171,25 @@ describe(listRelativeNextRootDirs, () => {
   // an absolute directory.
   it('is empty for a literal nested inside a call expression', () => {
     const content = `settings: { next: { rootDir: path.join(import.meta.dirname, 'app') } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  // The array form exists for the multi-app shape, where each entry is anchored by a call.
+  it('is empty for an array whose every entry is a call expression', () => {
+    const content = `settings: { next: { rootDir: [path.join(import.meta.dirname, 'apps/web'), path.join(import.meta.dirname, 'apps/admin')] } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  it('reports only the literal entry of an array mixing a call expression with one', () => {
+    const content = `settings: { next: { rootDir: [path.join(import.meta.dirname, 'apps/web'), 'apps/admin'] } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual(['apps/admin']);
+  });
+
+  it('is empty for an array entry that is an interpolated template', () => {
+    const content = 'settings: { next: { rootDir: [`${import.meta.dirname}/apps/web`] } }';
 
     expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
   });
