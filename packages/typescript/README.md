@@ -327,7 +327,7 @@ export default defineRdyConfig({
 });
 ```
 
-The kit needs readyup 0.33.0 or later. Below that, readyup does not report the repo root among a monorepo's workspaces, so the kit checks every member package and leaves the root unchecked.
+The `readyup >=0.33.0` peer names the version the kit is developed and tested against. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
 
 The kit runs at the version resolved from your `node_modules`, so it reports whether your configuration matches that version. It never reports whether that version is current.
 

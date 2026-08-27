@@ -25,6 +25,7 @@ import { isConsumerOwnedConfig } from '../../src/readiness/base-chain.ts';
 import { classifyChain } from '../../src/readiness/classifyChain.ts';
 import { isEsYearAtLeast, readDeclaredEsYear } from '../../src/readiness/es-year.ts';
 import { findRedundantOptions } from '../../src/readiness/findRedundantOptions.ts';
+import { listSearchDirs } from '../../src/readiness/listSearchDirs.ts';
 import { classifyNodeEsYear, findLowestNodeMajor, type NodeEsYear } from '../../src/readiness/node-floor.ts';
 
 const PACKAGE_NAME = '@williamthorsen/tsconfig';
@@ -215,7 +216,7 @@ function listPathsOfKind(classified: readonly Adoption[], kind: Adoption['kind']
 
 /** Lists the directories that may hold a tsconfig: the repo root and every workspace. */
 function listTsconfigSearchDirs(): string[] {
-  return discoverWorkspaces().map((workspace) => workspace.dir);
+  return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 
 /** Fails when the lowest declared Node floor predates the ES year the base sets. */

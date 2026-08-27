@@ -11,7 +11,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "d6aa3899",
+          "hash": "371af333",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -34,6 +34,11 @@
           "path": "../src/readiness/eslint-config-paths.ts"
         },
         {
+          "hash": "30178e5c",
+          "kind": "module",
+          "path": "../src/readiness/listSearchDirs.ts"
+        },
+        {
           "hash": "d75d159a",
           "kind": "module",
           "path": "../src/readiness/readVersionFloor.ts"
@@ -43,8 +48,8 @@
       "path": "kits/default.js",
       "readyupVersion": "0.33.0",
       "source": "kits/default.ts",
-      "sourceHash": "d6aa3899",
-      "targetHash": "f7f64951"
+      "sourceHash": "371af333",
+      "targetHash": "b5b52a60"
     }
   ]
 }

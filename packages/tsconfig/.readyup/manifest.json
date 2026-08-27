@@ -10,7 +10,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "8988b5dc",
+          "hash": "defbbe48",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -35,6 +35,11 @@
           "path": "../src/readiness/findRedundantOptions.ts"
         },
         {
+          "hash": "30178e5c",
+          "kind": "module",
+          "path": "../src/readiness/listSearchDirs.ts"
+        },
+        {
           "hash": "31b0fbf5",
           "kind": "module",
           "path": "../src/readiness/node-floor.ts"
@@ -44,8 +49,8 @@
       "path": "kits/default.js",
       "readyupVersion": "0.33.0",
       "source": "kits/default.ts",
-      "sourceHash": "8988b5dc",
-      "targetHash": "eac2f4f5"
+      "sourceHash": "defbbe48",
+      "targetHash": "605ae0d1"
     }
   ]
 }

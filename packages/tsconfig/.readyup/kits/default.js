@@ -96,6 +96,11 @@ function collectDependencyDeclaredKeys(entries, baseIndex) {
   return keys;
 }
 
+// src/readiness/listSearchDirs.ts
+function listSearchDirs(workspaceDirs) {
+  return [.../* @__PURE__ */ new Set([".", ...workspaceDirs])];
+}
+
 // src/readiness/node-floor.ts
 var NODE_MAJOR = /^v?(\d+)(?:[.\s]|$)/;
 var NODE_MAJOR_CEILING = 99;
@@ -256,7 +261,7 @@ function listPathsOfKind(classified, kind) {
   return classified.filter((adoption) => adoption.kind === kind).map((adoption) => adoption.path);
 }
 function listTsconfigSearchDirs() {
-  return discoverWorkspaces().map((workspace) => workspace.dir);
+  return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 function nodeFloorSupportsBaseEsYear() {
   const verdict = judgeNodeFloor();
