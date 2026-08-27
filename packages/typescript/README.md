@@ -123,8 +123,8 @@ export default defineConfig(config, {
 
 Three narrowings apply to both shapes:
 
-- A call whose type is its receiver's chains onto a resource the caller already holds, so `server.listen(3000)` is left alone even though a `net.Server` is async-disposable. Reading the type rather than the `this` annotation covers a fluent method whose return type is inferred.
-- A call whose type is identical to one of its argument types has passed ownership on rather than acquired anything. That is the shape of a registrar such as `<T extends Disposable>(resource: T): T`. Both of these compare types, not resources, so a callee that builds a fresh resource while declaring the type it received on both sides is skipped too.
+- A call that yields its own receiver chains onto a resource the caller already holds, so `server.listen(3000)` is left alone even though a `net.Server` is async-disposable. Either a signature declaring `this` as its return type or a call whose type is the receiver's own qualifies, so a fluent method is covered whether it annotates `this`, annotates its own class type, or leaves the return inferred. The declaration is taken at its word, so a method that builds a fresh resource while declaring one of those returns is skipped too.
+- A call whose type is identical to one of its argument types has passed ownership on rather than acquired anything. That is the shape of a registrar such as `<T extends Disposable>(resource: T): T`. The comparison is of types, not resources, so a callee that builds a fresh resource while declaring the type it received on both sides is skipped too.
 - An `allow` option names callees whose disposable result is discarded on purpose. It matches the callee's final name, so `timers.setTimeout` matches alongside `setTimeout`, and it adds to the defaults rather than replacing them:
 
 ```js
