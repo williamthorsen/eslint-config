@@ -4,8 +4,8 @@ import { createTypedRuleTester, RuleTester } from './ruleTester.ts';
 // Disposability is a type property, so every case here needs the tester backed by a TS program.
 const typedRuleTester = createTypedRuleTester();
 
-// A declaration case has to sit inside a function: module and global scope are exempt, and the tester's code is
-// top-level.
+// A declaration case needs an enclosing block: The `Program` body is exempt, and the tester's code is top-level,
+// so a case written bare passes as valid without exercising the rule.
 const capture = 'interface Capture extends Disposable { lines: string[] } declare function acquire(): Capture;';
 const asyncCapture =
   'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function acquireAsync(): AsyncCapture;';
