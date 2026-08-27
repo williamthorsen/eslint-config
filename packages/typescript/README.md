@@ -235,6 +235,14 @@ export default defineConfig(config, ...(await createConfig.react()), {
 });
 ```
 
+`createConfig.next()` leaves `settings.next.rootDir` to you, and `no-html-link-for-pages` needs it to be absolute. The plugin globs the value against the working directory, and falls back to that directory where the setting is absent. Under either, a repo linted from anywhere but the app's own directory finds no pages directory, and the rule stops running without failing the lint run:
+
+```js
+export default defineConfig(config, ...(await createConfig.next()), {
+  settings: { next: { rootDir: import.meta.dirname } },
+});
+```
+
 ## File patterns
 
 For composing your own scoped configs without re-deriving the globs:
@@ -324,6 +332,8 @@ The kit needs readyup 0.33.0 or later. Below that, readyup does not report the r
 The kit runs at the version resolved from your `node_modules`, so it reports whether your configuration matches that version. It never reports whether that version is current.
 
 The check that your root config extends this package matches the package specifier as text, or a path into a workspace that provides the package, so a config reaching it through a local re-export or a path alias is reported as not extending it.
+
+The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. A config reaching the factory through a local re-export names neither, so the check goes silent there rather than reporting a wrong failure.
 
 ## License
 

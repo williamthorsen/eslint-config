@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { declaresParserProject, importsFromDir, setsTsconfigRootDir } from '../eslint-config-contents.ts';
+import {
+  declaresParserProject,
+  enablesNextPlugin,
+  importsFromDir,
+  listRelativeNextRootDirs,
+  setsNextRootDir,
+  setsTsconfigRootDir,
+} from '../eslint-config-contents.ts';
 
 describe(declaresParserProject, () => {
   it('is true when parserOptions declares project', () => {
@@ -55,6 +62,34 @@ describe(declaresParserProject, () => {
   });
 });
 
+describe(enablesNextPlugin, () => {
+  it('is true for the factory this package exposes', () => {
+    const content = `export default defineConfig(config, ...(await createConfig.next()));`;
+
+    expect(enablesNextPlugin(content)).toBe(true);
+  });
+
+  it('is true for a direct import of the plugin', () => {
+    const content = `import nextEslintPlugin from '@next/eslint-plugin-next';`;
+
+    expect(enablesNextPlugin(content)).toBe(true);
+  });
+
+  it('is false for another factory on the same object', () => {
+    const content = `export default defineConfig(config, ...(await createConfig.react()));`;
+
+    expect(enablesNextPlugin(content)).toBe(false);
+  });
+
+  // A local re-export names neither the factory call nor the plugin, so the config reads as not
+  // reaching the plugin and the check that consumes this goes inert.
+  it('is false for a config reaching the factory through a local re-export', () => {
+    const content = `import { next } from '../config/eslint-presets.ts';`;
+
+    expect(enablesNextPlugin(content)).toBe(false);
+  });
+});
+
 describe(importsFromDir, () => {
   it('matches a default-with-named import reaching into the directory', () => {
     const content = `import baseConfig, { createConfig } from './packages/typescript/src/index.ts';`;
@@ -98,6 +133,101 @@ describe(importsFromDir, () => {
     const content = `import config from '@williamthorsen/eslint-config-typescript';`;
 
     expect(importsFromDir(content, 'packages/typescript')).toBe(false);
+  });
+});
+
+describe(listRelativeNextRootDirs, () => {
+  it('reports a bare relative value', () => {
+    const content = `export default [{ settings: { next: { rootDir: '.' } } }];`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual(['.']);
+  });
+
+  it('reports only the relative entry of a mixed array', () => {
+    const content = `settings: { next: { rootDir: [import.meta.dirname, 'packages/nextjs'] } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual(['packages/nextjs']);
+  });
+
+  it('is empty when every array entry is absolute', () => {
+    const content = `settings: { next: { rootDir: ['/repo/packages/web', '/repo/packages/admin'] } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  it('is empty for a bare absolute value', () => {
+    const content = `settings: { next: { rootDir: '/repo/packages/nextjs' } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  it('is empty for the expression the fix recommends', () => {
+    const content = `settings: { next: { rootDir: import.meta.dirname } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  // The literal is an argument to the call rather than the value, and the call resolves it against
+  // an absolute directory.
+  it('is empty for a literal nested inside a call expression', () => {
+    const content = `settings: { next: { rootDir: path.join(import.meta.dirname, 'app') } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  // An interpolated template's text is not the path it resolves to, so reading it as one would
+  // report an absolute value as relative.
+  it('is empty for an interpolated template', () => {
+    const content = 'settings: { next: { rootDir: `${import.meta.dirname}/app` } }';
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  it('is empty for a rootDir key outside a next block', () => {
+    const content = `settings: { react: { rootDir: 'packages/nextjs' } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  it('is empty for a next block outside settings', () => {
+    const content = `export default { next: { rootDir: 'packages/nextjs' } };`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
+  });
+
+  it('reports across two settings blocks', () => {
+    const content = `settings: { next: { rootDir: 'packages/web' } }
+      settings: { next: { rootDir: 'packages/admin' } }`;
+
+    expect(listRelativeNextRootDirs(content)).toStrictEqual(['packages/web', 'packages/admin']);
+  });
+});
+
+describe(setsNextRootDir, () => {
+  it('is true for a literal value', () => {
+    const content = `settings: { next: { rootDir: 'packages/nextjs' } }`;
+
+    expect(setsNextRootDir(content)).toBe(true);
+  });
+
+  // A value no literal reader can judge still counts as set, so a config anchoring it correctly
+  // reports a pass rather than a missing setting.
+  it('is true for an expression value', () => {
+    const content = `settings: { next: { rootDir: import.meta.dirname } }`;
+
+    expect(setsNextRootDir(content)).toBe(true);
+  });
+
+  it('is false when the next block sets another key', () => {
+    const content = `settings: { next: { pagesDir: 'pages' } }`;
+
+    expect(setsNextRootDir(content)).toBe(false);
+  });
+
+  it('is false for a rootDir key outside a next block', () => {
+    const content = `settings: { react: { rootDir: 'packages/nextjs' } }`;
+
+    expect(setsNextRootDir(content)).toBe(false);
   });
 });
 
