@@ -15,11 +15,15 @@ import {
 } from "readyup/check-utils";
 
 // src/readiness/eslint-config-contents.ts
+import { isAbsolute } from "node:path";
 function declaresParserProject(content) {
   for (const match of content.matchAll(/parserOptions\s*:\s*\{/g)) {
     if (/\bproject\s*:/.test(extractBraceBlock(content, match.index + match[0].length - 1))) return true;
   }
   return false;
+}
+function enablesNextPlugin(content) {
+  return /createConfig\s*\.\s*next\s*\(/.test(content) || content.includes("@next/eslint-plugin-next");
 }
 function importsFromDir(content, dir) {
   for (const match of content.matchAll(/\b(?:from|import|require)\s*\(?\s*['"]([^'"]+)['"]/g)) {
@@ -28,6 +32,12 @@ function importsFromDir(content, dir) {
     if (specifier === dir || specifier.startsWith(`${dir}/`)) return true;
   }
   return false;
+}
+function listRelativeNextRootDirs(content) {
+  return listNextSettingsBlocks(content).flatMap((block) => listRootDirLiterals(block)).filter((value) => !isAbsolute(value));
+}
+function setsNextRootDir(content) {
+  return listNextSettingsBlocks(content).some((block) => /\brootDir\s*:/.test(block));
 }
 function setsTsconfigRootDir(content) {
   return /tsconfigRootDir\s*:/.test(content);
@@ -42,6 +52,35 @@ function extractBraceBlock(content, openIndex) {
     }
   }
   return "";
+}
+function listNextSettingsBlocks(content) {
+  const blocks = [];
+  for (const settingsMatch of content.matchAll(/settings\s*:\s*\{/g)) {
+    const settings = extractBraceBlock(content, settingsMatch.index + settingsMatch[0].length - 1);
+    for (const nextMatch of settings.matchAll(/\bnext\s*:\s*\{/g)) {
+      blocks.push(extractBraceBlock(settings, nextMatch.index + nextMatch[0].length - 1));
+    }
+  }
+  return blocks;
+}
+function listRootDirLiterals(block) {
+  const literals = [];
+  for (const value of listRootDirValues(block)) {
+    const literal = readStringLiteral(value);
+    if (literal !== void 0) literals.push(literal);
+  }
+  return literals;
+}
+function listRootDirValues(block) {
+  const array = /\brootDir\s*:\s*\[([^\]]*)\]/.exec(block);
+  if (array !== null) return (array[1] ?? "").split(",");
+  const bare = /\brootDir\s*:\s*([^,}]*)/.exec(block);
+  return bare?.[1] === void 0 ? [] : [bare[1]];
+}
+function readStringLiteral(value) {
+  const [, quote, literal] = /^\s*(['"`])([^'"`]*)\1\s*$/.exec(value) ?? [];
+  if (literal === void 0) return void 0;
+  return quote === "`" && literal.includes("${") ? void 0 : literal;
 }
 
 // src/readiness/eslint-config-paths.ts
@@ -139,6 +178,19 @@ var default_default = defineRdyKit({
           name: "An eslint config anchors the project service with tsconfigRootDir",
           check: tsconfigRootDirAnchored,
           fix: "Set parserOptions.tsconfigRootDir (import.meta.dirname) in the root eslint config, so type-aware linting resolves from the repo root rather than the working directory"
+        },
+        {
+          name: "An eslint config sets settings.next.rootDir",
+          skip: skipUnlessNextRootDirApplies,
+          check: nextRootDirSet,
+          fix: "Set settings.next.rootDir (import.meta.dirname) in the eslint config reaching the Next plugin: unset, it falls back to the working directory, and no-html-link-for-pages stops running wherever that holds no pages directory",
+          checks: [
+            {
+              name: "Every settings.next.rootDir is absolute",
+              check: nextRootDirsAbsolute,
+              fix: "Replace each relative settings.next.rootDir with an absolute path (import.meta.dirname): the plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched"
+            }
+          ]
         }
       ]
     },
@@ -185,14 +237,36 @@ function findRootEslintConfig() {
 function listEslintConfigSearchDirs() {
   return discoverWorkspaces().map((workspace) => workspace.dir);
 }
+function listEslintConfigsMatching(matches) {
+  return findEslintConfigs().filter((configPath) => {
+    const content = readFile(configPath);
+    return content !== void 0 && matches(content);
+  });
+}
 function listProviderWorkspaceDirs() {
   return discoverWorkspaces().filter((workspace) => workspace.name === PACKAGE_NAME).map((workspace) => workspace.dir);
 }
-function noLegacyParserProject() {
-  const offenders = findEslintConfigs().filter((configPath) => {
+function nextRootDirsAbsolute() {
+  const offenders = findEslintConfigs().flatMap((configPath) => {
     const content = readFile(configPath);
-    return content !== void 0 && declaresParserProject(content);
+    if (content === void 0) return [];
+    const relative = listRelativeNextRootDirs(content);
+    return relative.length === 0 ? [] : [`${configPath} (${relative.join(", ")})`];
   });
+  if (offenders.length === 0) return true;
+  return { ok: false, detail: `settings.next.rootDir is relative in ${offenders.join(", ")}` };
+}
+function nextRootDirSet() {
+  const setting = listEslintConfigsMatching(setsNextRootDir);
+  if (setting.length > 0) return { ok: true, detail: `settings.next.rootDir is set in ${setting.join(", ")}` };
+  const reaching = listEslintConfigsMatching(enablesNextPlugin);
+  return {
+    ok: false,
+    detail: `The Next plugin is reached in ${reaching.join(", ")} and no eslint config sets settings.next.rootDir`
+  };
+}
+function noLegacyParserProject() {
+  const offenders = listEslintConfigsMatching(declaresParserProject);
   if (offenders.length === 0) return true;
   return { ok: false, detail: `parserOptions.project found in: ${offenders.join(", ")}` };
 }
@@ -238,16 +312,17 @@ function skipUnlessEslintLoadsTypeScript() {
   if (installed === void 0) return "eslint is not installed";
   return compareVersions(installed, ESLINT_TYPESCRIPT_FLOOR) >= 0 ? false : "eslint is below 10, which cannot load a TypeScript eslint config";
 }
+function skipUnlessNextRootDirApplies() {
+  if (listEslintConfigsMatching(enablesNextPlugin).length > 0) return false;
+  if (listEslintConfigsMatching(setsNextRootDir).length > 0) return false;
+  return "No eslint config reaches the Next plugin or sets settings.next.rootDir";
+}
 function skipUnlessPeerComparable(name) {
   const comparison = comparePeer(name);
   return comparison.kind === "comparable" ? false : comparison.reason;
 }
 function tsconfigRootDirAnchored() {
-  const anchored = findEslintConfigs().some((configPath) => {
-    const content = readFile(configPath);
-    return content !== void 0 && setsTsconfigRootDir(content);
-  });
-  if (anchored) return true;
+  if (listEslintConfigsMatching(setsTsconfigRootDir).length > 0) return true;
   return { ok: false, detail: "no eslint config sets parserOptions.tsconfigRootDir" };
 }
 export {

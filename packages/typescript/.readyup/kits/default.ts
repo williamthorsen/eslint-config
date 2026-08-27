@@ -21,7 +21,10 @@ import {
 
 import {
   declaresParserProject,
+  enablesNextPlugin,
   importsFromDir,
+  listRelativeNextRootDirs,
+  setsNextRootDir,
   setsTsconfigRootDir,
 } from '../../src/readiness/eslint-config-contents.ts';
 import {
@@ -96,6 +99,19 @@ export default defineRdyKit({
           check: tsconfigRootDirAnchored,
           fix: 'Set parserOptions.tsconfigRootDir (import.meta.dirname) in the root eslint config, so type-aware linting resolves from the repo root rather than the working directory',
         },
+        {
+          name: 'An eslint config sets settings.next.rootDir',
+          skip: skipUnlessNextRootDirApplies,
+          check: nextRootDirSet,
+          fix: 'Set settings.next.rootDir (import.meta.dirname) in the eslint config reaching the Next plugin: unset, it falls back to the working directory, and no-html-link-for-pages stops running wherever that holds no pages directory',
+          checks: [
+            {
+              name: 'Every settings.next.rootDir is absolute',
+              check: nextRootDirsAbsolute,
+              fix: 'Replace each relative settings.next.rootDir with an absolute path (import.meta.dirname): the plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched',
+            },
+          ],
+        },
       ],
     },
     {
@@ -159,6 +175,14 @@ function listEslintConfigSearchDirs(): string[] {
   return discoverWorkspaces().map((workspace) => workspace.dir);
 }
 
+/** Lists the eslint configs whose content matches the given predicate, skipping any that cannot be read. */
+function listEslintConfigsMatching(matches: (content: string) => boolean): string[] {
+  return findEslintConfigs().filter((configPath) => {
+    const content = readFile(configPath);
+    return content !== undefined && matches(content);
+  });
+}
+
 /** Lists the workspace directories providing this package, which the repo developing it imports by path. */
 function listProviderWorkspaceDirs(): string[] {
   return discoverWorkspaces()
@@ -166,12 +190,32 @@ function listProviderWorkspaceDirs(): string[] {
     .map((workspace) => workspace.dir);
 }
 
+/** Fails when an eslint config sets a relative settings.next.rootDir, naming the offenders and their values. */
+function nextRootDirsAbsolute(): boolean | CheckOutcome {
+  const offenders = findEslintConfigs().flatMap((configPath) => {
+    const content = readFile(configPath);
+    if (content === undefined) return [];
+    const relative = listRelativeNextRootDirs(content);
+    return relative.length === 0 ? [] : [`${configPath} (${relative.join(', ')})`];
+  });
+  if (offenders.length === 0) return true;
+  return { ok: false, detail: `settings.next.rootDir is relative in ${offenders.join(', ')}` };
+}
+
+/** Fails when an eslint config reaches the Next plugin and none sets settings.next.rootDir. */
+function nextRootDirSet(): boolean | CheckOutcome {
+  const setting = listEslintConfigsMatching(setsNextRootDir);
+  if (setting.length > 0) return { ok: true, detail: `settings.next.rootDir is set in ${setting.join(', ')}` };
+  const reaching = listEslintConfigsMatching(enablesNextPlugin);
+  return {
+    ok: false,
+    detail: `The Next plugin is reached in ${reaching.join(', ')} and no eslint config sets settings.next.rootDir`,
+  };
+}
+
 /** Fails when an eslint config still declares parserOptions.project, naming the offenders. */
 function noLegacyParserProject(): boolean | CheckOutcome {
-  const offenders = findEslintConfigs().filter((configPath) => {
-    const content = readFile(configPath);
-    return content !== undefined && declaresParserProject(content);
-  });
+  const offenders = listEslintConfigsMatching(declaresParserProject);
   if (offenders.length === 0) return true;
   return { ok: false, detail: `parserOptions.project found in: ${offenders.join(', ')}` };
 }
@@ -245,6 +289,17 @@ function skipUnlessEslintLoadsTypeScript(): false | string {
     : 'eslint is below 10, which cannot load a TypeScript eslint config';
 }
 
+/**
+ * Skips the next.rootDir checks where no eslint config reaches the Next plugin and none sets the
+ * value. The trigger is the union of the two, so a config reaching the plugin through a local
+ * re-export is still judged on the value it writes.
+ */
+function skipUnlessNextRootDirApplies(): false | string {
+  if (listEslintConfigsMatching(enablesNextPlugin).length > 0) return false;
+  if (listEslintConfigsMatching(setsNextRootDir).length > 0) return false;
+  return 'No eslint config reaches the Next plugin or sets settings.next.rootDir';
+}
+
 /** Skips a peer floor check when either side of the comparison is unavailable. */
 function skipUnlessPeerComparable(name: string): false | string {
   const comparison = comparePeer(name);
@@ -253,11 +308,7 @@ function skipUnlessPeerComparable(name: string): false | string {
 
 /** Passes when any eslint config anchors the project service with tsconfigRootDir. */
 function tsconfigRootDirAnchored(): boolean | CheckOutcome {
-  const anchored = findEslintConfigs().some((configPath) => {
-    const content = readFile(configPath);
-    return content !== undefined && setsTsconfigRootDir(content);
-  });
-  if (anchored) return true;
+  if (listEslintConfigsMatching(setsTsconfigRootDir).length > 0) return true;
   return { ok: false, detail: 'no eslint config sets parserOptions.tsconfigRootDir' };
 }
 
