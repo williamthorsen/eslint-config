@@ -28,6 +28,16 @@ typedRuleTester.run('no-floating-disposable', rule, {
     'declare class Server { [Symbol.asyncDispose](): Promise<void>; listen(port: number): this } declare const server: Server; server.listen(3000);',
     // Non-firing: a fluent method whose `this` return is inferred rather than annotated
     "class Pool { [Symbol.dispose]() {} add(item: string) { return this; } } declare const pool: Pool; pool.add('x');",
+    // Non-firing: a `this` return whose receiver is an aliased union, whose instantiation drops the alias
+    'declare class A1 { [Symbol.asyncDispose](): Promise<void>; close(): this } declare class A2 { [Symbol.asyncDispose](): Promise<void>; close(): this } type AliasedPair = A1 | A2; declare const paired: AliasedPair; paired.close();',
+    // Non-firing: a `this` return across a union whose instantiation subtype-reduces a constituent away
+    'declare class Base { [Symbol.asyncDispose](): Promise<void>; close(): this } declare class Secure extends Base { secure: true } declare const server: Base | Secure; server.close();',
+    // Non-firing: a `this` return on an intersection alias, whose instantiation expands structurally
+    'type Procedure = (...args: any[]) => any; type Constructable = new (...args: any[]) => any; interface Instance<T extends Procedure | Constructable> { [Symbol.dispose](): void; mockClear(): this } type Mocked<T extends Procedure | Constructable = Procedure> = Instance<T> & T; declare const mocked: Mocked<Procedure | Constructable>; mocked.mockClear();',
+    // Non-firing: an inferred `this` return whose receiver is an aliased union
+    "class Left { [Symbol.dispose]() {} add(item: string) { return this; } } declare class Right { [Symbol.dispose](): void; add(item: string): this } type AliasedAdders = Left | Right; declare const adders: AliasedAdders; adders.add('x');",
+    // Non-firing: a fluent method annotated with its own class type rather than `this`
+    'declare class Fluent { [Symbol.dispose](): void; reset(): Fluent } declare const fluent: Fluent; fluent.reset();',
     // Non-firing: a callee returning the resource it was handed has taken ownership of disposing it
     'declare function acquire(): Disposable; declare function keep<T extends Disposable>(resource: T): T; keep(acquire());',
     // Non-firing: a callee in the default `allow` list
@@ -126,6 +136,11 @@ typedRuleTester.run('no-floating-disposable', rule, {
     {
       // Firing: a member call outside the `allow` list
       code: 'declare const factory: { acquire(): Disposable }; factory.acquire();',
+      errors: [{ messageId: 'floatingDisposable', data: { keyword: 'using' } }],
+    },
+    {
+      // Firing: an aliased-union receiver whose method returns a fresh resource rather than `this`
+      code: 'declare class Handle { [Symbol.dispose](): void } declare class F1 { open(): Handle } declare class F2 { open(): Handle } type Factories = F1 | F2; declare const factories: Factories; factories.open();',
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'using' } }],
     },
     {

@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
-import type ts from 'typescript';
+import ts from 'typescript';
 
 type MessageId = 'bindWithKeyword' | 'floatingDisposable' | 'unboundDisposable';
 
@@ -51,7 +51,11 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
 
     const type = services.getTypeAtLocation(discarded);
     const keyword = readDisposalKeyword(type, checker);
-    if (keyword === undefined || isReceiverType(node, type, services) || isOwnershipPassthrough(node, type, services)) {
+    if (
+      keyword === undefined ||
+      isReceiverType(node, type, services, checker) ||
+      isOwnershipPassthrough(node, type, services)
+    ) {
       return;
     }
 
@@ -86,7 +90,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
     const keyword = readDisposalKeyword(type, checker);
     if (
       keyword === undefined ||
-      isReceiverType(acquisition, type, services) ||
+      isReceiverType(acquisition, type, services, checker) ||
       isOwnershipPassthrough(acquisition, type, services) ||
       !isScopeBound(node, context.sourceCode)
     ) {
@@ -188,13 +192,23 @@ function isOwnershipPassthrough(node: ResourceExpression, type: ts.Type, service
 }
 
 /**
- * Returns true if the expression yields the type of the receiver it was called on. Such a method chains onto a
- * resource the caller already holds, as `server.listen(port)` does, rather than acquiring one. Reading the type
- * covers a method whose `this` return is inferred as well as one that annotates it.
+ * Returns true if the call yields the receiver it was called on. Such a method chains onto a resource the caller
+ * already holds, as `server.listen(port)` does, rather than acquiring one. Two tests answer it: the call's type is
+ * the receiver's own, which covers a fluent method annotated with its own class type; or the signature declares
+ * `this`, which holds wherever instantiating `this` yields a type object distinct from the receiver's.
  */
-function isReceiverType(node: ResourceExpression, type: ts.Type, services: TypedServices): boolean {
+function isReceiverType(
+  node: ResourceExpression,
+  type: ts.Type,
+  services: TypedServices,
+  checker: ts.TypeChecker,
+): boolean {
   const { callee } = node;
-  return callee.type === AST_NODE_TYPES.MemberExpression && services.getTypeAtLocation(callee.object) === type;
+  if (callee.type !== AST_NODE_TYPES.MemberExpression) {
+    return false;
+  }
+
+  return services.getTypeAtLocation(callee.object) === type || returnsThisType(node, services, checker);
 }
 
 /**
@@ -363,6 +377,27 @@ function readRebindSuggestions(
       fix: (fixer) => fixer.replaceText(token, keyword),
     },
   ];
+}
+
+/**
+ * Returns true if the call resolves to a signature whose declared return type is the `this` type, which returns the
+ * receiver by construction whatever the receiver's own type is. The signature is re-derived from its declaration
+ * because the resolved signature has already substituted the receiver for `this`, leaving nothing to recognize.
+ */
+function returnsThisType(node: ResourceExpression, services: TypedServices, checker: ts.TypeChecker): boolean {
+  const signature = checker.getResolvedSignature(services.esTreeNodeToTSNodeMap.get(node));
+  const declaration = signature?.declaration;
+  if (declaration === undefined || declaration.kind === ts.SyntaxKind.JSDocSignature) {
+    return false;
+  }
+
+  const declared = checker.getSignatureFromDeclaration(declaration);
+  if (declared === undefined) {
+    return false;
+  }
+
+  const returnType = checker.getReturnTypeOfSignature(declared);
+  return returnType.isTypeParameter() && 'isThisType' in returnType && returnType.isThisType === true;
 }
 
 // endregion | Helper functions
