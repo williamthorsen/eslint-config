@@ -112,24 +112,20 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
 
 /** Returns the nearest statement list enclosing the node, which is the scope a `using` binding would be released at. */
 function findEnclosingBlock(node: TSESTree.Node): TSESTree.Node | undefined {
-  let current: TSESTree.Node | undefined = node.parent;
-  while (current !== undefined) {
-    if (blockNodeTypes.has(current.type)) {
-      return current;
+  for (const ancestor of listAncestors(node)) {
+    if (blockNodeTypes.has(ancestor.type)) {
+      return ancestor;
     }
-    current = current.parent;
   }
   return undefined;
 }
 
 /** Returns the nearest function enclosing the node, or undefined where the node sits at module or class level. */
 function findEnclosingFunction(node: TSESTree.Node): EnclosingFunction | undefined {
-  let current: TSESTree.Node | undefined = node.parent;
-  while (current !== undefined) {
-    if (isEnclosingFunction(current)) {
-      return current;
+  for (const ancestor of listAncestors(node)) {
+    if (isEnclosingFunction(ancestor)) {
+      return ancestor;
     }
-    current = current.parent;
   }
   return undefined;
 }
@@ -242,6 +238,19 @@ function isScopeBound(declarator: TSESTree.VariableDeclarator, sourceCode: TSESL
 /** Returns true if the node's source range falls inside the container's. */
 function isWithin(node: TSESTree.Node, container: TSESTree.Node): boolean {
   return node.range[0] >= container.range[0] && node.range[1] <= container.range[1];
+}
+
+/**
+ * Yields the node's ancestors, nearest first, ending at the `Program` it is rooted in. The walk stops there rather
+ * than on an absent parent: ESLint sets the `Program`'s parent to `null`, which `TSESTree.Node['parent']` declares
+ * non-nullable, so a walk guarding on the parent reads as unnecessary to the type checker and throws at the root.
+ */
+function* listAncestors(node: TSESTree.Node): Generator<TSESTree.Node> {
+  let current: TSESTree.Node = node;
+  while (current.type !== AST_NODE_TYPES.Program) {
+    current = current.parent;
+    yield current;
+  }
 }
 
 /**

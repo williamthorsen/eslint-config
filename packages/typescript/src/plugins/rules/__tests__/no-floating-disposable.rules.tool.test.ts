@@ -284,6 +284,97 @@ typedRuleTester.run('no-floating-disposable', rule, {
       code: `${capture} function run() { const captured = acquire(), count = 1; captured.lines; count; }`,
       errors: [{ messageId: 'unboundDisposable', data: { keyword: 'using', kind: 'const' }, suggestions: [] }],
     },
+    {
+      // Firing: a block at module level is a scope of its own, and the walk to an enclosing function finds none
+      code: `${capture} declare const flag: boolean; if (flag) { const captured = acquire(); captured.lines; }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} declare const flag: boolean; if (flag) { using captured = acquire(); captured.lines; }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a bare block at module level
+      code: `${capture} { const captured = acquire(); captured.lines; }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} { using captured = acquire(); captured.lines; }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a loop body at module level
+      code: `${capture} for (const size of [1]) { const captured = acquire(); captured.lines; }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} for (const size of [1]) { using captured = acquire(); captured.lines; }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a `try` block at module level
+      code: `${capture} try { const captured = acquire(); captured.lines; } finally {}`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} try { using captured = acquire(); captured.lines; } finally {}`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a class static block, which exits like any other block
+      code: `${capture} class Runner { static { const captured = acquire(); captured.lines; } }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} class Runner { static { using captured = acquire(); captured.lines; } }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: `checkDeclarations` scopes to the declaration half, leaving the discarded half reporting
+      code: 'declare function acquire(): Disposable; acquire();',
+      options: [{ checkDeclarations: false }],
+      errors: [{ messageId: 'floatingDisposable', data: { keyword: 'using' } }],
+    },
   ],
 });
 
