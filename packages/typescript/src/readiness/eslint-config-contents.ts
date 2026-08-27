@@ -105,9 +105,9 @@ function listRootDirLiterals(block: string): string[] {
 }
 
 /**
- * Lists the values a `rootDir` key is assigned, one per entry where the value is an array. Each is
- * the value's own text, so the reader below judges an entry on its whole extent rather than on
- * whatever it contains.
+ * Lists the candidate `rootDir` values in a block: an array's bracket body split on commas, or a
+ * bare value's text up to the next comma or brace. A comma inside an entry splits it, so the reader
+ * below admits a candidate only where its whole extent is a string literal.
  */
 function listRootDirValues(block: string): string[] {
   const array = /\brootDir\s*:\s*\[([^\]]*)\]/.exec(block);
