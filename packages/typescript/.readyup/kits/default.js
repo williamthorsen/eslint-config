@@ -114,6 +114,11 @@ function resolveDirPath(dir, basename) {
   return dir === "." ? basename : `${dir}/${basename}`;
 }
 
+// src/readiness/listSearchDirs.ts
+function listSearchDirs(workspaceDirs) {
+  return [.../* @__PURE__ */ new Set([".", ...workspaceDirs])];
+}
+
 // src/readiness/readVersionFloor.ts
 var SINGLE_COMPARATOR = /^(?:>=|\^|~)?(\d+)(?:\.(\d+))?(?:\.(\d+))?$/;
 function readVersionFloor(range) {
@@ -235,7 +240,7 @@ function findRootEslintConfig() {
   return ESLINT_CONFIG_BASENAMES.find((basename) => fileExists(basename));
 }
 function listEslintConfigSearchDirs() {
-  return discoverWorkspaces().map((workspace) => workspace.dir);
+  return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 function listEslintConfigsMatching(matches) {
   return findEslintConfigs().filter((configPath) => {

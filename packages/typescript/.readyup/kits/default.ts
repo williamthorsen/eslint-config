@@ -33,6 +33,7 @@ import {
   listShadowedEslintConfigDirs,
   resolveDirPath,
 } from '../../src/readiness/eslint-config-paths.ts';
+import { listSearchDirs } from '../../src/readiness/listSearchDirs.ts';
 import { readVersionFloor } from '../../src/readiness/readVersionFloor.ts';
 
 const PACKAGE_NAME = '@williamthorsen/eslint-config-typescript';
@@ -172,7 +173,7 @@ function findRootEslintConfig(): string | undefined {
 
 /** Lists the directories that may hold an eslint config: the repo root and every workspace. */
 function listEslintConfigSearchDirs(): string[] {
-  return discoverWorkspaces().map((workspace) => workspace.dir);
+  return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 
 /** Lists the eslint configs whose content matches the given predicate, skipping any that cannot be read. */

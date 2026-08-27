@@ -90,7 +90,7 @@ export default defineRdyConfig({
 });
 ```
 
-The kit needs readyup 0.33.0 or later, declared as an optional peer. Below that, readyup does not report the repo root among a monorepo's workspaces, so the kit checks every member package and leaves the root unchecked.
+The `readyup >=0.33.0` optional peer names the version the kit is developed and tested against. The kit runs below it too: readyup does not report the repo root among a monorepo's workspaces until 0.33.0, so the kit supplies the root itself and sweeps every member package alongside it.
 
 The kit walks each workspace tsconfig's `extends` chain and reports four things:
 
