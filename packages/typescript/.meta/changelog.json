@@ -1,5 +1,50 @@
 [
   {
+    "version": "12.0.0",
+    "date": "2026-08-27",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Add no-floating-disposable rule to the sky-pilot plugin (#185)",
+            "body": "Adds `sky-pilot/no-floating-disposable` to `@williamthorsen/eslint-config-typescript`. The rule reports a discarded call or `new` expression whose type is disposable, so a resource that needs `using` to be released is not left unbound; nothing else reports the mistake, since the call typechecks. Severity is `warn` in the plugin's `recommended` preset, which the TypeScript config extends, and `error` in `strict`.\n\nMigration: Fix or suppress any violations surfaced by the new rule.",
+            "breaking": true,
+            "hash": "5abfe450c096b31aaac3522f4da6d210d97a939b"
+          },
+          {
+            "description": "Add readiness checks that next.rootDir is set and absolute (#186)",
+            "body": "Adds two checks to `@williamthorsen/eslint-config-typescript`'s readiness kit: that an eslint config reaching `@next/eslint-plugin-next` sets `settings.next.rootDir`, and that every value it sets is absolute.",
+            "hash": "1e50cec5de82921e94f07c8970311b0517b145b6"
+          },
+          {
+            "description": "Report a disposable resource bound to a plain declaration (#188)",
+            "body": "Extends `sky-pilot/no-floating-disposable` to report a disposable resource bound to a plain `const`, `let`, or `var` that never leaves the scope declaring it. A suggestion rewrites the declaration keyword to `using` or `await using`.\r\n\r\nA declaration is left alone where `using` would be the wrong binding: the resource escapes its scope, it sits at module or global scope, it is released by hand, or a `var` is read past its block. `checkDeclarations: false` drops the declaration half and keeps the discarded one.\r\n\r\nMigration: Fix or suppress any violations the declaration half surfaces.",
+            "breaking": true,
+            "hash": "95c5c1699932e7257efcdbbfd4e955acd945361a"
+          }
+        ]
+      },
+      {
+        "title": "🐛 Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Stop no-unpublished-barrel from reporting a source-path entry point (#184)",
+            "body": "Fixes an issue where `sky-pilot/no-unpublished-barrel` reported the entry point of a package that publishes source rather than a build.",
+            "hash": "eb4d4b281a89d986aa66add9484c65126666e3fa"
+          },
+          {
+            "description": "Restore the repo root to both readiness kits' search directories (#187)",
+            "body": "Fixes an issue where the readiness kits in `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript` skipped the repo root in a monorepo running readyup below 0.33.0. Each kit now supplies the root itself, so the sweep is whole under any readyup version.",
+            "hash": "c24387a327ff68172fa1b26ec9b5c4c3f5a76013"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "11.0.0",
     "date": "2026-08-26",
     "sections": [

@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## 12.0.0 — 2026-08-27
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Add no-floating-disposable rule to the sky-pilot plugin (#185)
+
+  Adds `sky-pilot/no-floating-disposable` to `@williamthorsen/eslint-config-typescript`. The rule reports a discarded call or `new` expression whose type is disposable, so a resource that needs `using` to be released is not left unbound; nothing else reports the mistake, since the call typechecks. Severity is `warn` in the plugin's `recommended` preset, which the TypeScript config extends, and `error` in `strict`.
+
+  Migration: Fix or suppress any violations surfaced by the new rule.
+
+- Add readiness checks that next.rootDir is set and absolute (#186)
+
+  Adds two checks to `@williamthorsen/eslint-config-typescript`'s readiness kit: that an eslint config reaching `@next/eslint-plugin-next` sets `settings.next.rootDir`, and that every value it sets is absolute.
+
+- 🚨 **Breaking:** Report a disposable resource bound to a plain declaration (#188)
+
+  Extends `sky-pilot/no-floating-disposable` to report a disposable resource bound to a plain `const`, `let`, or `var` that never leaves the scope declaring it. A suggestion rewrites the declaration keyword to `using` or `await using`.
+
+  A declaration is left alone where `using` would be the wrong binding: the resource escapes its scope, it sits at module or global scope, it is released by hand, or a `var` is read past its block. `checkDeclarations: false` drops the declaration half and keeps the discarded one.
+
+  Migration: Fix or suppress any violations the declaration half surfaces.
+
+### 🐛 Bug fixes
+
+- Stop no-unpublished-barrel from reporting a source-path entry point (#184)
+
+  Fixes an issue where `sky-pilot/no-unpublished-barrel` reported the entry point of a package that publishes source rather than a build.
+
+- Restore the repo root to both readiness kits' search directories (#187)
+
+  Fixes an issue where the readiness kits in `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript` skipped the repo root in a monorepo running readyup below 0.33.0. Each kit now supplies the root itself, so the sweep is whole under any readyup version.
+
 ## 11.0.0 — 2026-08-26
 
 ### 🎉 Features

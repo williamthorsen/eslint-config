@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.6.1 — 2026-08-27
+
+### 🐛 Bug fixes
+
+- Restore the repo root to both readiness kits' search directories (#187)
+
+  Fixes an issue where the readiness kits in `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript` skipped the repo root in a monorepo running readyup below 0.33.0. Each kit now supplies the root itself, so the sweep is whole under any readyup version.
+
 ## 0.6.0 — 2026-08-26
 
 ### 🎉 Features
