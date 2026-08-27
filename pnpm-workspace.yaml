@@ -9,7 +9,7 @@ catalog:
   '@williamthorsen/toolbelt.vitest': '0.6.0'
   eslint: '10.8.1'
   eslint-plugin-n: '18.3.0'
-  readyup: '0.33.0'
+  readyup: '0.34.0'
   typescript: '6.0.3'
   typescript-eslint: '8.67.0'
 
