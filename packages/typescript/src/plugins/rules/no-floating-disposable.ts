@@ -92,7 +92,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
       keyword === undefined ||
       isReceiverType(acquisition, type, services, checker) ||
       isOwnershipPassthrough(acquisition, type, services) ||
-      !isScopeBound(node, context.sourceCode)
+      !isScopeBound(node, context.sourceCode, services)
     ) {
       return;
     }
@@ -155,6 +155,27 @@ function isContainedUse(identifier: ReferenceIdentifier): boolean {
 }
 
 /**
+ * Returns true if the reference is the receiver of a call taking a function argument, reached directly or through a
+ * property, as `child.on(event, listener)` and `child.stdout.on(...)` are. Such a call schedules work the declaring
+ * block does not contain, so releasing the resource at the block's end would cut the callback off. No signature says
+ * whether an argument is invoked during the call or retained for later, so a synchronous higher-order call such as
+ * `lines.forEach(...)` qualifies too.
+ */
+function isContinuationRegistration(identifier: ReferenceIdentifier, services: TypedServices): boolean {
+  let node: TSESTree.Node = identifier;
+  while (node.parent.type === AST_NODE_TYPES.MemberExpression && node.parent.object === node) {
+    node = node.parent;
+  }
+
+  const { parent } = node;
+  return (
+    parent.type === AST_NODE_TYPES.CallExpression &&
+    parent.callee === node &&
+    parent.arguments.some((argument) => isPossiblyFunction(argument, services))
+  );
+}
+
+/**
  * Returns true if the identifier is the object of a `Symbol.dispose` or `Symbol.asyncDispose` access. Code that
  * releases the resource by hand is correct; preferring `using` over a hand-written `finally` belongs to
  * `unicorn/prefer-dispose`, which reads the disposal call this rule only has to recognize.
@@ -192,6 +213,19 @@ function isOwnershipPassthrough(node: ResourceExpression, type: ts.Type, service
 }
 
 /**
+ * Returns true if the argument may be a function. A spread's elements carry no node to read a type from, and `any`
+ * withholds the answer, so both count: a resource wrongly reported costs more than one wrongly exempted.
+ */
+function isPossiblyFunction(argument: TSESTree.CallExpressionArgument, services: TypedServices): boolean {
+  if (argument.type === AST_NODE_TYPES.SpreadElement) {
+    return true;
+  }
+
+  const type = services.getTypeAtLocation(argument);
+  return (type.flags & ts.TypeFlags.Any) !== 0 || type.getCallSignatures().length > 0;
+}
+
+/**
  * Returns true if the call yields the receiver it was called on. Such a method chains onto a resource the caller
  * already holds, as `server.listen(port)` does, rather than acquiring one. Two tests answer it: the call's type is
  * the receiver's own, which covers a fluent method annotated with its own class type; or the signature declares
@@ -216,9 +250,14 @@ function isReceiverType(
  * binding it calls for. Every reference must be a member access sitting in the declaring block and function: a
  * return, an argument, an assignment, or a literal element all hand the resource somewhere that outlives this scope,
  * where releasing it at the scope's end would be wrong. Requiring the declaring block covers a `var`, whose binding
- * a caller may read past the block a `using` would be released at.
+ * a caller may read past the block a `using` would be released at. A reference registering a continuation disqualifies
+ * the declaration too, the resource then being finished by the callback rather than by the block returning.
  */
-function isScopeBound(declarator: TSESTree.VariableDeclarator, sourceCode: TSESLint.SourceCode): boolean {
+function isScopeBound(
+  declarator: TSESTree.VariableDeclarator,
+  sourceCode: TSESLint.SourceCode,
+  services: TypedServices,
+): boolean {
   const block = findEnclosingBlock(declarator);
 
   // A module-scope resource is released at the end of module evaluation, before any importer runs.
@@ -244,7 +283,8 @@ function isScopeBound(declarator: TSESTree.VariableDeclarator, sourceCode: TSESL
       findEnclosingFunction(identifier) === declaringFunction &&
       isWithin(identifier, block) &&
       isContainedUse(identifier) &&
-      !isDisposalAccess(identifier)
+      !isDisposalAccess(identifier) &&
+      !isContinuationRegistration(identifier, services)
     );
   });
 }

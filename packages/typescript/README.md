@@ -137,9 +137,10 @@ export default defineConfig(config, {
 
 The defaults are `setImmediate`, `setInterval`, and `setTimeout`: Node's timer globals return a `Timeout` implementing `Symbol.dispose`, so a bare `setTimeout(fn, ms);` would otherwise report.
 
-A declaration is left alone in four further cases, each one a place where `using` would be the wrong binding:
+A declaration is left alone in five further cases, each one a place where `using` would be the wrong binding:
 
-- **The resource escapes.** A variable that is returned, passed as an argument, assigned onward, placed in a literal, reassigned, or read from a nested function belongs to something outliving the declaring scope. Only a member access on the resource itself keeps the declaration reportable.
+- **The resource escapes.** A variable that is returned, passed as an argument, assigned onward, placed in a literal, reassigned, or read from a nested function belongs to something outliving the declaring scope. Only a member access on the resource itself can keep the declaration reportable.
+- **It is handed a callback.** A call on the resource, or on one of its properties, that takes a function argument schedules work the block does not contain, as `child.on('close', resolve)` and `child.stdout.on('data', collect)` do; `using` would release the resource before the callback runs. The argument is recognized by its type, so a named handler counts alongside an inline arrow. No signature distinguishes a retained listener from a synchronous higher-order call, so `captured.lines.forEach(...)` leaves the declaration alone too, and one such reference is enough to do it. An argument whose type withholds the answer, a spread or an `any`, is taken to be one.
 - **It sits at module or global scope.** `using` releases a module-level resource at the end of module evaluation, before any importer runs, so a singleton declared there must keep its `const`.
 - **It is released by hand.** A `Symbol.dispose` or `Symbol.asyncDispose` call on the variable already frees the resource. Preferring `using` over a hand-written `finally` belongs to `unicorn/prefer-dispose`.
 - **A `var` is read past its block.** `using` is block-scoped, so rebinding one would leave the later read out of scope.
