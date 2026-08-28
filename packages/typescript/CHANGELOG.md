@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 12.0.1 — 2026-08-28
+
+### 🐛 Bug fixes
+
+- Stop no-floating-disposable reporting a call that returns its receiver (#191)
+
+  Fixes a false positive in `sky-pilot/no-floating-disposable`, which demanded a `using` binding for a call that returns its own receiver and so acquires nothing to release. The rule now recognizes a receiver-returning call from its signature rather than by comparing types, so the exemption holds whatever type the checker resolves for the receiver.
+
+- Stop no-floating-disposable reporting a resource handed a callback (#192)
+
+  Fixes an issue where `sky-pilot/no-floating-disposable` flagged a resource that is still in use after its block ends, such as a child process or an event emitter driven by listeners. The `using` rebind it suggested disposed the resource before those listeners ran, so taking the suggestion broke working code.
+
+  The rule now leaves alone any resource that is handed a callback. The signal is deliberately broad: it also covers a callback that runs immediately, so a few genuine leaks now go unreported.
+
 ## 12.0.0 — 2026-08-27
 
 ### 🎉 Features
