@@ -9,6 +9,10 @@ const typedRuleTester = createTypedRuleTester();
 const capture = 'interface Capture extends Disposable { lines: string[] } declare function acquire(): Capture;';
 const asyncCapture =
   'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function acquireAsync(): AsyncCapture;';
+// `on` returns `this` so a chained registration typechecks; `stdout` and the optional `stderr` reach a second `on`
+// through a property.
+const child =
+  'declare class Stream { on(event: string, listener: () => void): void } declare class Child { [Symbol.dispose](): void; on(event: string, listener: () => void): this; stdout: Stream; stderr?: Stream } declare function spawn(): Child;';
 
 typedRuleTester.run('no-floating-disposable', rule, {
   valid: [
@@ -101,6 +105,23 @@ typedRuleTester.run('no-floating-disposable', rule, {
     `${capture} declare function keep<T extends Disposable>(resource: T): T; function run() { const captured = keep(acquire()); captured.lines; }`,
     // Non-firing: a fluent call yields the receiver's type rather than a new resource
     'declare class Server { [Symbol.asyncDispose](): Promise<void>; listen(port: number): this } declare const server: Server; function run() { const listening = server.listen(3000); listening.listen(3001); }',
+    // Non-firing: a listener the resource is handed, which finishes it rather than the block returning
+    `${child} function run() { const proc = spawn(); proc.on('close', () => {}); }`,
+    // Non-firing: a named handler, the argument being recognized by its type rather than its syntax
+    `${child} declare const settle: () => void; function run() { const proc = spawn(); proc.on('error', settle); }`,
+    // Non-firing: a listener reached through a property of the resource
+    `${child} function run() { const proc = spawn(); proc.stdout.on('data', () => {}); }`,
+    // Non-firing: a listener reached through an optional-chained property
+    `${child} function run() { const proc = spawn(); proc.stderr?.on('data', () => {}); }`,
+    // Non-firing: a spread argument, whose elements carry no node to read a type from
+    `${child} declare const handlers: [string, () => void]; function run() { const proc = spawn(); proc.on(...handlers); }`,
+    // Non-firing: an `any` argument, which withholds whether it is a function
+    `${child} declare const handler: any; function run() { const proc = spawn(); proc.on('data', handler); }`,
+    // Non-firing: chained registration, which matches at the inner call
+    `${child} declare const settle: () => void; function run() { const proc = spawn(); proc.on('a', settle).on('b', settle); }`,
+    // Non-firing: no signature separates a retained listener from a synchronous higher-order call, so a resource
+    // handed a callback through `forEach` is left alone as one handed a listener is
+    `${capture} declare function record(line: string): void; function run() { const captured = acquire(); captured.lines.forEach(record); }`,
   ],
   invalid: [
     {
@@ -379,6 +400,40 @@ typedRuleTester.run('no-floating-disposable', rule, {
               messageId: 'bindWithKeyword',
               data: { keyword: 'using' },
               output: `${capture} class Runner { static { using captured = acquire(); captured.lines; } }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: the resource sits in argument position, so the call taking a function is not one it receives
+      code: `${capture} declare function expectLines(lines: string[], assert: () => void): void; function run() { const captured = acquire(); expectLines(captured.lines, () => {}); }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} declare function expectLines(lines: string[], assert: () => void): void; function run() { using captured = acquire(); expectLines(captured.lines, () => {}); }`,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      // Firing: a call on the resource that takes no function argument
+      code: `${capture} function run() { const captured = acquire(); captured.lines.join(','); }`,
+      errors: [
+        {
+          messageId: 'unboundDisposable',
+          data: { keyword: 'using', kind: 'const' },
+          suggestions: [
+            {
+              messageId: 'bindWithKeyword',
+              data: { keyword: 'using' },
+              output: `${capture} function run() { using captured = acquire(); captured.lines.join(','); }`,
             },
           ],
         },
