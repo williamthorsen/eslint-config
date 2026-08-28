@@ -125,7 +125,7 @@ Three narrowings apply to both shapes:
 
 - A call that yields its own receiver chains onto a resource the caller already holds, so `server.listen(3000)` is left alone even though a `net.Server` is async-disposable. Either a signature declaring `this` as its return type or a call whose type is the receiver's own qualifies, so a fluent method is covered whether it annotates `this`, annotates its own class type, or leaves the return inferred. The declaration is taken at its word, so a method that builds a fresh resource while declaring one of those returns is skipped too.
 - A call whose type is identical to one of its argument types has passed ownership on rather than acquired anything. That is the shape of a registrar such as `<T extends Disposable>(resource: T): T`. The comparison is of types, not resources, so a callee that builds a fresh resource while declaring the type it received on both sides is skipped too.
-- An `allow` option names callees whose disposable result is discarded on purpose. It matches the callee's final name, so `timers.setTimeout` matches alongside `setTimeout`, and it adds to the defaults rather than replacing them:
+- An `allow` option names callees the rule leaves alone, whether the result is discarded on purpose or is not a resource at all. It matches the callee's final name, so `timers.setTimeout` matches alongside `setTimeout`, and it adds to the defaults rather than replacing them:
 
 ```js
 export default defineConfig(config, {
@@ -135,7 +135,7 @@ export default defineConfig(config, {
 });
 ```
 
-The defaults are `setImmediate`, `setInterval`, and `setTimeout`: Node's timer globals return a `Timeout` implementing `Symbol.dispose`, so a bare `setTimeout(fn, ms);` would otherwise report.
+The defaults cover two families. Node's timer globals, `setImmediate`, `setInterval`, and `setTimeout`, return a `Timeout` implementing `Symbol.dispose`, so a bare `setTimeout(fn, ms);` would otherwise report a resource whose discard is the point. `node:crypto`'s stream factories, `createCipheriv`, `createDecipheriv`, `createHash`, `createHmac`, `createSign`, and `createVerify`, return a `Transform` or `Writable`, inheriting `Symbol.asyncDispose` from the stream base while owning no descriptor, socket, process, or lock: nothing is released, so nothing needs binding.
 
 A declaration is left alone in five further cases, each one a place where `using` would be the wrong binding:
 

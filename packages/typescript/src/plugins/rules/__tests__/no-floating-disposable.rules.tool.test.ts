@@ -13,6 +13,10 @@ const asyncCapture =
 // through a property.
 const child =
   'declare class Stream { on(event: string, listener: () => void): void } declare class Child { [Symbol.dispose](): void; on(event: string, listener: () => void): this; stdout: Stream; stderr?: Stream } declare function spawn(): Child;';
+// A `node:crypto` stream, async-disposable by inheritance from the stream base and owning nothing that needs releasing.
+const digest = 'declare class Digest { [Symbol.asyncDispose](): Promise<void>; digest(): string }';
+// A stream that does own a descriptor, standing for `fs.createWriteStream`.
+const fileStream = 'declare class FileStream { [Symbol.asyncDispose](): Promise<void>; bytesWritten: number }';
 
 typedRuleTester.run('no-floating-disposable', rule, {
   valid: [
@@ -58,6 +62,12 @@ typedRuleTester.run('no-floating-disposable', rule, {
       code: 'declare function setTimeout(handler: () => void, ms: number): Disposable; setTimeout(() => {}, 100);',
       options: [{ allow: ['track'] }],
     },
+    // Non-firing: every `node:crypto` factory returning a stream subclass is in the default `allow` list
+    ...['createCipheriv', 'createDecipheriv', 'createHash', 'createHmac', 'createSign', 'createVerify'].map(
+      (name) => `${digest} declare function ${name}(): Digest; ${name}();`,
+    ),
+    // Non-firing: a crypto factory reached through the module object, which the `allow` list matches by property name
+    `${digest} declare const crypto: { createHash(algorithm: string): Digest }; crypto.createHash('sha256');`,
     // Non-firing: the narrowing compares types, so a wrapper declaring its argument's type on both sides is skipped
     'declare function acquire(): Disposable; declare function clone(inner: Disposable): Disposable; clone(acquire());',
     // Non-firing: the result is not a resource
@@ -101,6 +111,8 @@ typedRuleTester.run('no-floating-disposable', rule, {
       code: `${capture} function run() { const captured = acquire(); captured.lines; }`,
       options: [{ allow: ['acquire'] }],
     },
+    // Non-firing: a default-allowed crypto factory bound to a plain declaration
+    `${digest} declare function createHash(algorithm: string): Digest; function run() { const hash = createHash('sha256'); return hash.digest(); }`,
     // Non-firing: ownership passthrough reaches a declaration too
     `${capture} declare function keep<T extends Disposable>(resource: T): T; function run() { const captured = keep(acquire()); captured.lines; }`,
     // Non-firing: a fluent call yields the receiver's type rather than a new resource
@@ -158,6 +170,11 @@ typedRuleTester.run('no-floating-disposable', rule, {
       // Firing: a member call outside the `allow` list
       code: 'declare const factory: { acquire(): Disposable }; factory.acquire();',
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'using' } }],
+    },
+    {
+      // Firing: a stream that owns a descriptor, whose factory the crypto entries do not reach
+      code: `${fileStream} declare function createWriteStream(path: string): FileStream; createWriteStream('out.txt');`,
+      errors: [{ messageId: 'floatingDisposable', data: { keyword: 'await using' } }],
     },
     {
       // Firing: an aliased-union receiver whose method returns a fresh resource rather than `this`
@@ -313,6 +330,11 @@ typedRuleTester.run('no-floating-disposable', rule, {
     {
       // Firing with no suggestion: `await using` needs an enclosing `async` function, which this one is not
       code: `${asyncCapture} function run() { const captured = acquireAsync(); captured.lines; }`,
+      errors: [{ messageId: 'unboundDisposable', data: { keyword: 'await using', kind: 'const' }, suggestions: [] }],
+    },
+    {
+      // Firing with no suggestion: an owning stream bound to a declaration, in a function no `await using` can appear in
+      code: `${fileStream} declare function createWriteStream(path: string): FileStream; function run() { const out = createWriteStream('out.txt'); out.bytesWritten; }`,
       errors: [{ messageId: 'unboundDisposable', data: { keyword: 'await using', kind: 'const' }, suggestions: [] }],
     },
     {
