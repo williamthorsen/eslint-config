@@ -36,6 +36,23 @@ describe(assertCasesTypecheck, () => {
     expect(() => assertCasesTypecheck('no-floating-disposable', tests)).toThrow(/invalid\[0\]\.output: missing\(\);/);
   });
 
+  it('holds each pass of a multi-pass fixer output to the program', () => {
+    const tests: RunTests<'floatingDisposable', []> = {
+      invalid: [
+        {
+          code: `${acquire} acquire();`,
+          errors: [{ messageId: 'floatingDisposable' }],
+          output: [`${acquire} void acquire();`, 'missing();'],
+        },
+      ],
+      valid: [],
+    };
+
+    expect(() => assertCasesTypecheck('no-floating-disposable', tests)).toThrow(
+      /invalid\[0\]\.output\[1\]: missing\(\);/,
+    );
+  });
+
   it('holds a suggestion output to the program', () => {
     const tests: RunTests<'floatingDisposable', []> = {
       invalid: [
