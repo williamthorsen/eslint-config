@@ -34,15 +34,15 @@ export function createTypedRuleTester(): RuleTester {
   });
 }
 
-// region | Helpers
-
-// Renders the offending cases as one failure message.
-function formatCaseTypeErrors(ruleName: string, errors: readonly CaseTypeError[]): string {
+// Renders the offending cases as the one message a failing suite reports.
+export function formatCaseTypeErrors(ruleName: string, errors: readonly CaseTypeError[]): string {
   const details = errors.map((error) =>
     [`${error.label}: ${error.code}`, ...error.messages.map((message) => `  ${message}`)].join('\n'),
   );
   return `${ruleName}: the following cases do not typecheck under the rule fixture's compilerOptions.\n\n${details.join('\n\n')}`;
 }
+
+// region | Helpers
 
 // Labels each case by the list and position it occupies, which is how a failure points back at the source.
 function toTypecheckedCases<MessageIds extends string, Options extends readonly unknown[]>(
