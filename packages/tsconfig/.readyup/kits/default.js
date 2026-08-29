@@ -75,7 +75,7 @@ function toStringArray(value) {
 import { dirname, join, relative } from "node:path/posix";
 var CONFIG_DIR_TEMPLATE = "${configDir}";
 var FIELDS = ["exclude", "files", "include"];
-var ROOTED_PATH = /^(?:[/\\]|[A-Za-z]:)/;
+var ROOTED_PATH = /^(?:\/|[A-Za-z]:)/;
 function findEscapingPaths(entries) {
   const judged = entries[0];
   if (judged === void 0) return [];
@@ -101,8 +101,9 @@ function findEscapingPathsInField(entries, field, judgedDir) {
   });
 }
 function findOutwardPath(value, declaredDir, judgedDir) {
-  if (ROOTED_PATH.test(value)) return value;
-  const resolved = startsWithConfigDir(value) ? join(judgedDir, value.slice(CONFIG_DIR_TEMPLATE.length)) : join(declaredDir, value);
+  const normalized = value.split("\\").join("/");
+  if (ROOTED_PATH.test(normalized)) return normalized;
+  const resolved = startsWithConfigDir(normalized) ? join(judgedDir, normalized.slice(CONFIG_DIR_TEMPLATE.length)) : join(declaredDir, normalized);
   const fromJudged = relative(judgedDir, resolved);
   return fromJudged === ".." || fromJudged.startsWith("../") ? fromJudged : void 0;
 }

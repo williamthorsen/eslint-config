@@ -34,6 +34,22 @@ describe(findEscapingPaths, () => {
     ]);
   });
 
+  it('reports a Windows-rooted path with its separators normalized', () => {
+    const entries = [buildChainEntry({ config: { files: [String.raw`C:\shared\globals.d.ts`] }, path: API_CONFIG })];
+
+    expect(findEscapingPaths(entries)).toStrictEqual([
+      { declaredIn: API_CONFIG, field: 'files', path: 'C:/shared/globals.d.ts' },
+    ]);
+  });
+
+  it('reads a backslash as a separator, as TypeScript does on every platform', () => {
+    const entries = [buildChainEntry({ config: { include: [String.raw`..\shared\src`] }, path: API_CONFIG })];
+
+    expect(findEscapingPaths(entries)).toStrictEqual([
+      { declaredIn: API_CONFIG, field: 'include', path: '../shared/src' },
+    ]);
+  });
+
   it('resolves against a declaring config several hops up the chain', () => {
     const entries = [
       buildChainEntry({ path: API_CONFIG }),
@@ -126,6 +142,20 @@ describe(findEscapingPaths, () => {
     const entries = [
       buildChainEntry({ config: { files: [] }, path: API_CONFIG }),
       buildChainEntry({ config: { files: ['globals.d.ts'] }, path: ROOT_CONFIG, specifier: '../../tsconfig.json' }),
+    ];
+
+    expect(findEscapingPaths(entries)).toStrictEqual([]);
+  });
+
+  // A string is truthy, so it declares the field as an empty array does, and carries no paths to judge.
+  it('treats a malformed declaration as a declaration, so the field inherits nothing', () => {
+    const entries = [
+      buildChainEntry({ config: { include: 'src/' }, path: API_CONFIG }),
+      buildChainEntry({
+        config: { include: ['../shared/src'] },
+        path: ROOT_CONFIG,
+        specifier: '../../tsconfig.json',
+      }),
     ];
 
     expect(findEscapingPaths(entries)).toStrictEqual([]);

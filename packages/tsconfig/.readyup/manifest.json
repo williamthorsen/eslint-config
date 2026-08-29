@@ -31,7 +31,7 @@
           "path": "../src/readiness/es-year.ts"
         },
         {
-          "hash": "66520cfe",
+          "hash": "bfbb0002",
           "kind": "module",
           "path": "../src/readiness/findEscapingPaths.ts"
         },
@@ -56,7 +56,7 @@
       "readyupVersion": "0.34.0",
       "source": "kits/default.ts",
       "sourceHash": "f4ec4ffd",
-      "targetHash": "48793fb4"
+      "targetHash": "538eec8b"
     }
   ]
 }

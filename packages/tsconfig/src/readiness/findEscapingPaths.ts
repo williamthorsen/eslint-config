@@ -5,8 +5,8 @@ import type { TsconfigChainEntry } from 'readyup/check-utils';
 const CONFIG_DIR_TEMPLATE = '${configDir}';
 const FIELDS = ['exclude', 'files', 'include'] as const;
 
-// A path anchored to a filesystem root: POSIX-absolute or Windows drive-lettered.
-const ROOTED_PATH = /^(?:[/\\]|[A-Za-z]:)/;
+// A path anchored to a filesystem root: POSIX-absolute, UNC, or Windows drive-lettered.
+const ROOTED_PATH = /^(?:\/|[A-Za-z]:)/;
 
 export interface EscapingPath {
   /** The config that declared the field, which is where the fix belongs. */
@@ -74,13 +74,16 @@ function findEscapingPathsInField(
  * literal segments leading it.
  */
 function findOutwardPath(value: string, declaredDir: string, judgedDir: string): string | undefined {
+  // TypeScript normalizes separators on every platform, so a backslash separates here too.
+  const normalized = value.split('\\').join('/');
+
   // TypeScript leaves a rooted path un-rebased, and one naming a machine-specific location cannot
   // be shown to stay inside a directory named relative to the project root.
-  if (ROOTED_PATH.test(value)) return value;
+  if (ROOTED_PATH.test(normalized)) return normalized;
 
-  const resolved = startsWithConfigDir(value)
-    ? join(judgedDir, value.slice(CONFIG_DIR_TEMPLATE.length))
-    : join(declaredDir, value);
+  const resolved = startsWithConfigDir(normalized)
+    ? join(judgedDir, normalized.slice(CONFIG_DIR_TEMPLATE.length))
+    : join(declaredDir, normalized);
   const fromJudged = relative(judgedDir, resolved);
   return fromJudged === '..' || fromJudged.startsWith('../') ? fromJudged : undefined;
 }
