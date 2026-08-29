@@ -135,7 +135,7 @@ export default defineConfig(config, {
 });
 ```
 
-The defaults cover two families. Node's timer globals, `setImmediate`, `setInterval`, and `setTimeout`, return a `Timeout` implementing `Symbol.dispose`, so a bare `setTimeout(fn, ms);` would otherwise report a resource whose discard is the point. `node:crypto`'s stream factories, `createCipheriv`, `createDecipheriv`, `createHash`, `createHmac`, `createSign`, and `createVerify`, return a `Transform` or `Writable`, inheriting `Symbol.asyncDispose` from the stream base while owning no descriptor, socket, process, or lock: nothing is released, so nothing needs binding.
+The defaults cover two families. Node's timer globals, `setImmediate`, `setInterval`, and `setTimeout`, return a `Timeout` implementing `Symbol.dispose`, so a bare `setTimeout(fn, ms);` would otherwise report a resource whose discard is the point. `node:crypto`'s stream factories, `createCipheriv`, `createDecipheriv`, `createHash`, `createHmac`, `createSign`, and `createVerify`, return a `Transform` or `Writable`, inheriting `Symbol.asyncDispose` from the stream base while owning no descriptor, socket, process, or lock: nothing is released, so nothing needs binding. Both families are matched by name alone, so a userland `createHash` is exempt alongside `node:crypto`'s, and no option narrows the defaults back.
 
 A declaration is left alone in five further cases, each one a place where `using` would be the wrong binding:
 
