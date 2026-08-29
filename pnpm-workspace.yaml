@@ -6,8 +6,8 @@ allowBuilds:
   lefthook: true
 
 catalog:
-  '@williamthorsen/toolbelt.vitest': '0.6.0'
-  eslint: '10.8.1'
+  '@williamthorsen/toolbelt.vitest': '0.7.0'
+  eslint: '10.9.0'
   eslint-plugin-n: '18.3.0'
   readyup: '0.34.0'
   typescript: '6.0.3'
