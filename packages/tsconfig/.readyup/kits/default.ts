@@ -24,6 +24,7 @@ import {
 import { isConsumerOwnedConfig } from '../../src/readiness/base-chain.ts';
 import { classifyChain } from '../../src/readiness/classifyChain.ts';
 import { isEsYearAtLeast, readDeclaredEsYear } from '../../src/readiness/es-year.ts';
+import { type EscapingPath, findEscapingPaths } from '../../src/readiness/findEscapingPaths.ts';
 import { findRedundantOptions } from '../../src/readiness/findRedundantOptions.ts';
 import { listSearchDirs } from '../../src/readiness/listSearchDirs.ts';
 import { classifyNodeEsYear, findLowestNodeMajor, type NodeEsYear } from '../../src/readiness/node-floor.ts';
@@ -49,7 +50,7 @@ const cache: { adoptions?: Adoption[]; chains: Map<string, TsconfigChain | undef
 };
 
 export default defineRdyKit({
-  description: `Adoption and alignment checks for a project consuming ${PACKAGE_NAME}`,
+  description: `Adoption, alignment, and hygiene checks for a project consuming ${PACKAGE_NAME}`,
   defaultSeverity: 'warn',
   checklists: [
     {
@@ -87,6 +88,17 @@ export default defineRdyKit({
         },
       ],
     },
+    {
+      name: 'hygiene',
+      checks: [
+        {
+          name: "No tsconfig's include, exclude, or files names a path outside its own directory",
+          skip: skipUnlessSomeTsconfigWasFound,
+          check: noEscapingPaths,
+          fix: "Declare the field named above in the config that owns the directory, listing every path it needs, since a local declaration replaces the inherited one rather than merging and discards the default exclude of node_modules, bower_components, jspm_packages, and outDir; or prefix each path in the config being extended with ${configDir}, which resolves to the consuming config's directory",
+        },
+      ],
+    },
   ],
 });
 
@@ -112,6 +124,15 @@ function classifyTsconfig(path: string): Adoption {
 /** Removes repeats while keeping first-seen order, so a shared config is named once. */
 function dedupe(values: readonly string[]): string[] {
   return [...new Set(values)];
+}
+
+/**
+ * Describes one escaping path, naming the config that declared it where that is not the config being
+ * reported, since an inherited path is fixed where it was written.
+ */
+function describeEscape(configPath: string, escaping: EscapingPath): string {
+  const source = escaping.declaredIn === configPath ? '' : `, from ${escaping.declaredIn}`;
+  return `${escaping.field}: ${escaping.path}${source}`;
 }
 
 /** Fails when a consumer's own tsconfig declares an ES year that departs from the base's. */
@@ -225,6 +246,26 @@ function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
   return verdict.kind === 'skip' ? true : { ok: verdict.kind === 'pass', detail: verdict.detail };
 }
 
+/** Fails when a workspace tsconfig is governed by an include, exclude, or files path outside its own directory. */
+function noEscapingPaths(): boolean | CheckOutcome {
+  const judged = findTsconfigs().flatMap((path) => {
+    const chain = readChain(path);
+    return chain === undefined ? [] : [{ escapes: findEscapingPaths(chain.entries), path }];
+  });
+  const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
+  const progress: Progress = {
+    type: 'fraction',
+    passedCount: judged.length - offenders.length,
+    count: judged.length,
+  };
+  if (offenders.length === 0) return { ok: true, progress };
+
+  const details = offenders.flatMap((offender) =>
+    offender.escapes.map((escaping) => `${offender.path} (${describeEscape(offender.path, escaping)})`),
+  );
+  return { ok: false, detail: details.join(', '), progress };
+}
+
 /** Fails when a tsconfig re-declares an option the base already supplies with the same value. */
 function noRedundantOptions(): boolean | CheckOutcome {
   const offenders = listAdoptedTsconfigs().flatMap((adoption) =>
@@ -285,6 +326,11 @@ function skipUnlessSomeTsconfigIsAccountable(): false | string {
   return classified.some((adoption) => adoption.kind !== 'external-base')
     ? false
     : 'every workspace tsconfig extends a base belonging to another package';
+}
+
+/** Skips the escaping-path check where the project has no tsconfig to judge. */
+function skipUnlessSomeTsconfigWasFound(): false | string {
+  return findTsconfigs().length === 0 ? 'no workspace tsconfig was found' : false;
 }
 
 // endregion | Helpers

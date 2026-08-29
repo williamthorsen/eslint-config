@@ -4,13 +4,14 @@
     {
       "checklists": [
         "adoption",
-        "alignment"
+        "alignment",
+        "hygiene"
       ],
-      "description": "Adoption and alignment checks for a project consuming @williamthorsen/tsconfig",
+      "description": "Adoption, alignment, and hygiene checks for a project consuming @williamthorsen/tsconfig",
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "defbbe48",
+          "hash": "f4ec4ffd",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -28,6 +29,11 @@
           "hash": "723d4694",
           "kind": "module",
           "path": "../src/readiness/es-year.ts"
+        },
+        {
+          "hash": "66520cfe",
+          "kind": "module",
+          "path": "../src/readiness/findEscapingPaths.ts"
         },
         {
           "hash": "acd6ba2b",
@@ -49,8 +55,8 @@
       "path": "kits/default.js",
       "readyupVersion": "0.34.0",
       "source": "kits/default.ts",
-      "sourceHash": "defbbe48",
-      "targetHash": "20355baf"
+      "sourceHash": "f4ec4ffd",
+      "targetHash": "48793fb4"
     }
   ]
 }
