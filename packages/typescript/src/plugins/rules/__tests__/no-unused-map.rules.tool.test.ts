@@ -1,8 +1,11 @@
 import rule from '../no-unused-map.ts';
-import { createTypedRuleTester, RuleTester } from './ruleTester.ts';
+import { createTypedRuleTester, RuleTester } from '../test-utils/ruleTester.ts';
 
 // This rule's receiver guard is type-aware, so it needs the tester backed by a TS program.
 const typedRuleTester = createTypedRuleTester();
+
+// The fixture program declares no ambient `console`, so a case reaching for one declares its own.
+const consoleDeclaration = 'declare const console: { log(value: unknown): void };';
 
 typedRuleTester.run('no-unused-map', rule, {
   valid: [
@@ -11,11 +14,11 @@ typedRuleTester.run('no-unused-map', rule, {
     // Non-firing: result returned
     'function double(xs: number[]) { return xs.map((n) => n * 2); }',
     // Non-firing: result passed as a call argument
-    'console.log([1, 2, 3].map((n) => n * 2));',
+    `${consoleDeclaration} console.log([1, 2, 3].map((n) => n * 2));`,
     // Non-firing: result passed as a constructor argument
     'new Set([1, 2, 3].map((n) => n * 2));',
     // Non-firing: result passed as a constructor argument inside a `for...of` head
-    'declare const hits: { path: string }[]; for (const path of new Set(hits.map((hit) => hit.path))) { console.log(path); }',
+    `${consoleDeclaration} declare const hits: { path: string }[]; for (const path of new Set(hits.map((hit) => hit.path))) { console.log(path); }`,
     // Non-firing: result spread into an array
     'const combined = [0, ...[1, 2, 3].map((n) => n * 2)];',
     // Non-firing: result interpolated into a template literal
@@ -25,7 +28,7 @@ typedRuleTester.run('no-unused-map', rule, {
     // Non-firing: `void` marks an explicit discard
     'void [1, 2, 3].map((n) => n * 2);',
     // Non-firing: a non-`map` method call is ignored
-    '[1, 2, 3].forEach((n) => console.log(n));',
+    `${consoleDeclaration} [1, 2, 3].forEach((n) => console.log(n));`,
     // Non-firing: a side-effecting `.map` on a non-array receiver
     'declare const builder: { map(callback: (n: number) => number): void }; builder.map((n) => n * 2);',
     // Non-firing: an `any`-typed receiver suppresses the report
@@ -36,22 +39,22 @@ typedRuleTester.run('no-unused-map', rule, {
   invalid: [
     {
       // Firing: the mapped result is discarded
-      code: '[1, 2, 3].map((n) => console.log(n));',
+      code: `${consoleDeclaration} [1, 2, 3].map((n) => console.log(n));`,
       errors: [{ messageId: 'unusedMap' }],
     },
     {
       // Firing: discarded inside a nested callback body
-      code: '[[1], [2]].forEach((xs) => { xs.map((n) => console.log(n)); });',
+      code: `${consoleDeclaration} [[1], [2]].forEach((xs) => { xs.map((n) => console.log(n)); });`,
       errors: [{ messageId: 'unusedMap' }],
     },
     {
       // Firing: discarded behind optional chaining
-      code: 'declare const items: number[] | undefined; items?.map((n) => console.log(n));',
+      code: `${consoleDeclaration} declare const items: number[] | undefined; items?.map((n) => console.log(n));`,
       errors: [{ messageId: 'unusedMap' }],
     },
     {
       // Firing: a readonly-array receiver is still an array
-      code: 'declare const items: readonly number[]; items.map((n) => console.log(n));',
+      code: `${consoleDeclaration} declare const items: readonly number[]; items.map((n) => console.log(n));`,
       errors: [{ messageId: 'unusedMap' }],
     },
   ],

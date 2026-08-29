@@ -1,5 +1,5 @@
 import rule from '../prefer-function-declaration.ts';
-import { RuleTester } from './ruleTester.ts';
+import { RuleTester } from '../test-utils/ruleTester.ts';
 
 const ruleTester = new RuleTester();
 

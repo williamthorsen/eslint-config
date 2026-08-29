@@ -1,5 +1,5 @@
 import rule from '../no-undefined-with-number.ts';
-import { createTypedRuleTester } from './ruleTester.ts';
+import { createTypedRuleTester } from '../test-utils/ruleTester.ts';
 
 // This rule is type-aware, so it needs the tester backed by a TS program.
 const ruleTester = createTypedRuleTester();

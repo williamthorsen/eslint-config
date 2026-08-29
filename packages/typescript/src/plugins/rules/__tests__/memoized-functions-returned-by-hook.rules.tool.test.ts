@@ -1,5 +1,5 @@
 import rule from '../memoized-functions-returned-by-hook.ts';
-import { RuleTester } from './ruleTester.ts';
+import { RuleTester } from '../test-utils/ruleTester.ts';
 
 const ruleTester = new RuleTester();
 
