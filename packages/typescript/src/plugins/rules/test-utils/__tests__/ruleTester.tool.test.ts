@@ -1,29 +1,59 @@
+import type { RunTests } from '@typescript-eslint/rule-tester';
 import { describe, expect, it } from 'vitest';
 
-import { formatCaseTypeErrors } from '../ruleTester.ts';
+import { assertCasesTypecheck } from '../ruleTester.ts';
 
-describe(formatCaseTypeErrors, () => {
-  it('names the rule, each offending case, and its diagnostics', () => {
-    const message = formatCaseTypeErrors('no-unused-map', [
-      {
-        code: '[1, 2, 3].map((n) => console.log(n));',
-        label: 'invalid[0]',
-        messages: ["TS2584: Cannot find name 'console'."],
-      },
-    ]);
+const acquire = 'declare function acquire(): Disposable;';
 
-    expect(message).toContain('no-unused-map');
-    expect(message).toContain('invalid[0]: [1, 2, 3].map((n) => console.log(n));');
-    expect(message).toContain("TS2584: Cannot find name 'console'.");
+describe(assertCasesTypecheck, () => {
+  it('accepts a suite whose code uses only the shapes the fixture declares', () => {
+    expect(() =>
+      assertCasesTypecheck('no-floating-disposable', {
+        invalid: [{ code: `${acquire} acquire();`, errors: [{ messageId: 'floatingDisposable' }] }],
+        valid: [`${acquire} void acquire();`],
+      }),
+    ).not.toThrow();
   });
 
-  it('reports every offending case rather than only the first', () => {
-    const message = formatCaseTypeErrors('no-unused-map', [
-      { code: 'console.log(1);', label: 'valid[0]', messages: ['TS2584'] },
-      { code: 'console.log(2);', label: 'valid[2]', messages: ['TS2584'] },
-    ]);
+  it('names the rule, each offending position, and its diagnostics', () => {
+    // Both list forms are exercised: `valid` accepts a bare string, `invalid` an object.
+    const tests: RunTests<'floatingDisposable', []> = {
+      invalid: [{ code: 'console.info(2);', errors: [{ messageId: 'floatingDisposable' }] }],
+      valid: [`${acquire} void acquire();`, 'console.info(1);'],
+    };
 
-    expect(message).toContain('valid[0]: console.log(1);');
-    expect(message).toContain('valid[2]: console.log(2);');
+    expect(() => assertCasesTypecheck('no-floating-disposable', tests)).toThrow(
+      /no-floating-disposable[\s\S]*valid\[1\]: console\.info\(1\);[\s\S]*TS2584[\s\S]*invalid\[0\]: console\.info\(2\);/,
+    );
+  });
+
+  it('holds a fixer output to the program', () => {
+    const tests: RunTests<'floatingDisposable', []> = {
+      invalid: [{ code: `${acquire} acquire();`, errors: [{ messageId: 'floatingDisposable' }], output: 'missing();' }],
+      valid: [],
+    };
+
+    expect(() => assertCasesTypecheck('no-floating-disposable', tests)).toThrow(/invalid\[0\]\.output: missing\(\);/);
+  });
+
+  it('holds a suggestion output to the program', () => {
+    const tests: RunTests<'floatingDisposable', []> = {
+      invalid: [
+        {
+          code: `${acquire} acquire();`,
+          errors: [
+            {
+              messageId: 'floatingDisposable',
+              suggestions: [{ messageId: 'floatingDisposable', output: 'missing();' }],
+            },
+          ],
+        },
+      ],
+      valid: [],
+    };
+
+    expect(() => assertCasesTypecheck('no-floating-disposable', tests)).toThrow(
+      /invalid\[0\]\.errors\[0\]\.suggestions\[0\]\.output: missing\(\);/,
+    );
   });
 });
