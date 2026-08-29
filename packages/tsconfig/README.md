@@ -92,10 +92,11 @@ export default defineRdyConfig({
 
 The `readyup >=0.33.0` optional peer names the version the kit is developed and tested against. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
 
-The kit walks each workspace tsconfig's `extends` chain and reports four things:
+The kit walks each workspace tsconfig's `extends` chain and reports five things:
 
 - **Adoption**: a tsconfig reaching neither this base nor a framework base. A tsconfig naming this base through a specifier that does not resolve is reported separately, as declared but not installed.
 - **Re-declaration**: an option restated with the base's own value. A key that a framework base in the same chain also declares is exempt, since restating it is how a config wins against that base.
+- **Escaping paths**: an `include`, `exclude`, or `files` path resolving outside the directory that holds the tsconfig. A config that is extended hands these fields down resolved against its own directory, so a package inheriting them is governed by paths pointing outside itself; the remedy is a complete local declaration, or `${configDir}` in the config being extended.
 - **ES year**: a `target` or `lib` declaring a year other than the base's, read from the base you extend rather than from a constant compiled into the kit.
 - **Node floor**: an `engines.node` below the major that implements that ES year. This is the one failure `tsc` cannot surface on its own, which is why it alone is an error.
 

@@ -71,6 +71,46 @@ function toStringArray(value) {
   return value.filter((entry) => typeof entry === "string");
 }
 
+// src/readiness/findEscapingPaths.ts
+import { dirname, join, relative } from "node:path/posix";
+var CONFIG_DIR_TEMPLATE = "${configDir}";
+var FIELDS = ["exclude", "files", "include"];
+var ROOTED_PATH = /^(?:\/|[A-Za-z]:)/;
+function findEscapingPaths(entries) {
+  const judged = entries[0];
+  if (judged === void 0) return [];
+  const judgedDir = dirname(judged.path);
+  return FIELDS.flatMap((field) => findEscapingPathsInField(entries, field, judgedDir));
+}
+function findDeclaringEntry(entries, field) {
+  for (const entry of entries) {
+    const declared = entry.config[field];
+    if (declared) return entry;
+  }
+  return void 0;
+}
+function findEscapingPathsInField(entries, field, judgedDir) {
+  const declaring = findDeclaringEntry(entries, field);
+  if (declaring === void 0) return [];
+  const declared = declaring.config[field];
+  if (!Array.isArray(declared)) return [];
+  const declaredDir = dirname(declaring.path);
+  return declared.filter((value) => typeof value === "string").flatMap((value) => {
+    const outward = findOutwardPath(value, declaredDir, judgedDir);
+    return outward === void 0 ? [] : [{ declaredIn: declaring.path, field, path: outward }];
+  });
+}
+function findOutwardPath(value, declaredDir, judgedDir) {
+  const normalized = value.split("\\").join("/");
+  if (ROOTED_PATH.test(normalized)) return normalized;
+  const resolved = startsWithConfigDir(normalized) ? join(judgedDir, normalized.slice(CONFIG_DIR_TEMPLATE.length)) : join(declaredDir, normalized);
+  const fromJudged = relative(judgedDir, resolved);
+  return fromJudged === ".." || fromJudged.startsWith("../") ? fromJudged : void 0;
+}
+function startsWithConfigDir(value) {
+  return value.slice(0, CONFIG_DIR_TEMPLATE.length).toLowerCase() === CONFIG_DIR_TEMPLATE.toLowerCase();
+}
+
 // src/readiness/findRedundantOptions.ts
 import { isDeepStrictEqual } from "node:util";
 function findRedundantOptions(entries, baseIndex) {
@@ -140,7 +180,7 @@ var cache = {
   chains: /* @__PURE__ */ new Map()
 };
 var default_default = defineRdyKit({
-  description: `Adoption and alignment checks for a project consuming ${PACKAGE_NAME}`,
+  description: `Adoption, alignment, and hygiene checks for a project consuming ${PACKAGE_NAME}`,
   defaultSeverity: "warn",
   checklists: [
     {
@@ -177,6 +217,17 @@ var default_default = defineRdyKit({
           fix: "Raise engines.node to a major implementing the base's ES year: below it, code that typechecks fails at runtime"
         }
       ]
+    },
+    {
+      name: "hygiene",
+      checks: [
+        {
+          name: "No tsconfig's include, exclude, or files names a path outside its own directory",
+          skip: skipUnlessSomeTsconfigWasFound,
+          check: noEscapingPaths,
+          fix: "Declare the field named above in the config that owns the directory, listing every path it needs, since a local declaration replaces the inherited one rather than merging and discards the default exclude of node_modules, bower_components, jspm_packages, and outDir; or prefix each path in the config being extended with ${configDir}, which resolves to the consuming config's directory"
+        }
+      ]
     }
   ]
 });
@@ -192,6 +243,10 @@ function classifyTsconfig(path) {
 }
 function dedupe(values) {
   return [...new Set(values)];
+}
+function describeEscape(configPath, escaping) {
+  const source = escaping.declaredIn === configPath ? "" : `, from ${escaping.declaredIn}`;
+  return `${escaping.field}: ${escaping.path}${source}`;
 }
 function everyEsYearMatchesTheBase() {
   const baseEsYear = readBaseEsYear();
@@ -267,6 +322,23 @@ function nodeFloorSupportsBaseEsYear() {
   const verdict = judgeNodeFloor();
   return verdict.kind === "skip" ? true : { ok: verdict.kind === "pass", detail: verdict.detail };
 }
+function noEscapingPaths() {
+  const judged = findTsconfigs().flatMap((path) => {
+    const chain = readChain(path);
+    return chain === void 0 ? [] : [{ escapes: findEscapingPaths(chain.entries), path }];
+  });
+  const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
+  const progress = {
+    type: "fraction",
+    passedCount: judged.length - offenders.length,
+    count: judged.length
+  };
+  if (offenders.length === 0) return { ok: true, progress };
+  const details = offenders.flatMap(
+    (offender) => offender.escapes.map((escaping) => `${offender.path} (${describeEscape(offender.path, escaping)})`)
+  );
+  return { ok: false, detail: details.join(", "), progress };
+}
 function noRedundantOptions() {
   const offenders = listAdoptedTsconfigs().flatMap(
     (adoption) => findRedundantOptions(adoption.chain.entries, adoption.baseIndex).map(
@@ -306,6 +378,9 @@ function skipUnlessSomeTsconfigIsAccountable() {
   const classified = classifyAdoptions();
   if (classified.length === 0) return "no workspace tsconfig was found";
   return classified.some((adoption) => adoption.kind !== "external-base") ? false : "every workspace tsconfig extends a base belonging to another package";
+}
+function skipUnlessSomeTsconfigWasFound() {
+  return findTsconfigs().length === 0 ? "no workspace tsconfig was found" : false;
 }
 export {
   default_default as default
