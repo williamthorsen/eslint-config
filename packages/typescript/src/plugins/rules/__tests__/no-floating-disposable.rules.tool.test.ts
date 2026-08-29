@@ -1,5 +1,5 @@
 import rule from '../no-floating-disposable.ts';
-import { createTypedRuleTester, RuleTester } from './ruleTester.ts';
+import { createTypedRuleTester, RuleTester } from '../test-utils/ruleTester.ts';
 
 // Disposability is a type property, so every case here needs the tester backed by a TS program.
 const typedRuleTester = createTypedRuleTester();

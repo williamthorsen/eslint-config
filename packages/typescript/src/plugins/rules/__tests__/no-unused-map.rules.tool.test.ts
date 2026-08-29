@@ -1,5 +1,5 @@
 import rule from '../no-unused-map.ts';
-import { createTypedRuleTester, RuleTester } from './ruleTester.ts';
+import { createTypedRuleTester, RuleTester } from '../test-utils/ruleTester.ts';
 
 // This rule's receiver guard is type-aware, so it needs the tester backed by a TS program.
 const typedRuleTester = createTypedRuleTester();

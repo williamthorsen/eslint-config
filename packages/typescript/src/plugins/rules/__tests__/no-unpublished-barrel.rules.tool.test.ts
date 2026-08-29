@@ -3,7 +3,7 @@ import path from 'node:path';
 import type { TestCaseError } from '@typescript-eslint/rule-tester';
 
 import rule from '../no-unpublished-barrel.ts';
-import { RuleTester } from './ruleTester.ts';
+import { RuleTester } from '../test-utils/ruleTester.ts';
 
 const ruleTester = new RuleTester();
 
