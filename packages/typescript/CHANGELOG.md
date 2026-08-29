@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## 12.0.2 — 2026-08-29
+
+### 🐛 Bug fixes
+
+- Stop no-floating-disposable reporting a Node crypto stream (#195)
+
+  Fixes an issue where `sky-pilot/no-floating-disposable` was triggered by the streams `node:crypto` returns, such as the `Hash` from `createHash`. The rule's default `allow` list has been expanded to include the six `node:crypto` factories that return a stream.
+
+  The `allow` list matches a callee by name, so any userland function named `createHash` is also exempt from the rule.
+
+### 🧪 Tests
+
+- Fail typed rule-tester cases and outputs that do not typecheck (#196)
+
+  Adds a compile gate to `createTypedRuleTester()`. Every case a typed rule suite declares, along with every fixer and suggestion `output` it asserts, is compiled under the rule fixture's `tsconfig.json`, and a compile error fails the suite.
+
+  Corrects the seven `no-unused-map` cases the gate rejects; each reached for an ambient `console` the fixture program does not declare.
+
+  Separately, moves the rule-tester helper from `__tests__/` to a sibling `test-utils/`, where coverage measures it.
+
 ## 12.0.1 — 2026-08-28
 
 ### 🐛 Bug fixes
