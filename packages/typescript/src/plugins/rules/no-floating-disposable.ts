@@ -20,9 +20,21 @@ const blockNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
   AST_NODE_TYPES.SwitchCase,
 ]);
 
-// Callees whose disposable result is routinely discarded on purpose. Node's timer globals return a `Timeout`, which
-// implements `Symbol.dispose`, so every `setTimeout(fn, ms);` statement would otherwise report.
-const defaultAllow: readonly string[] = ['setImmediate', 'setInterval', 'setTimeout'];
+// Callees exempted for one of two reasons. Node's timer globals return a `Timeout` implementing `Symbol.dispose`, so
+// every `setTimeout(fn, ms);` statement would otherwise report a resource whose discard is the point. `node:crypto`'s
+// factories return a `Transform` or `Writable` wrapping an OpenSSL context, inheriting `Symbol.asyncDispose` from the
+// stream base while owning no descriptor, socket, process, or lock: nothing is released, so nothing needs binding.
+const defaultAllow: readonly string[] = [
+  'createCipheriv',
+  'createDecipheriv',
+  'createHash',
+  'createHmac',
+  'createSign',
+  'createVerify',
+  'setImmediate',
+  'setInterval',
+  'setTimeout',
+];
 
 const functionNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
   AST_NODE_TYPES.ArrowFunctionExpression,
