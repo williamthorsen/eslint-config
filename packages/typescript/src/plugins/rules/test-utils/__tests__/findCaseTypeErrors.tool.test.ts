@@ -30,7 +30,7 @@ describe(findCaseTypeErrors, () => {
     expect(errors[0]?.label).toBe('valid[0]');
   });
 
-  it('typechecks each case in isolation from the others', () => {
+  it('lets sibling cases declare the same name without colliding', () => {
     const errors = findCaseTypeErrors([
       {
         code: 'declare function acquire(): Disposable; function run() { using resource = acquire(); }',
@@ -40,6 +40,17 @@ describe(findCaseTypeErrors, () => {
     ]);
 
     expect(errors).toStrictEqual([]);
+  });
+
+  it('does not let a case resolve a name only a sibling declares', () => {
+    const errors = findCaseTypeErrors([
+      { code: 'declare const console: { log(value: unknown): void }; console.log(1);', label: 'valid[0]' },
+      { code: 'console.log(2);', label: 'valid[1]' },
+    ]);
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0]?.label).toBe('valid[1]');
+    expect(errors[0]?.messages.join('\n')).toContain("TS2584: Cannot find name 'console'.");
   });
 
   it('reports every offending case rather than stopping at the first', () => {
