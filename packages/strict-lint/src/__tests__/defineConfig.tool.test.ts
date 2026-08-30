@@ -6,8 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import type { MaxSeverityMap, StrictLintConfig } from '../defineConfig.ts';
-import { defineConfig } from '../defineConfig.ts';
+import { defineConfig, type MaxSeverityMap, type StrictLintConfig } from '../defineConfig.ts';
 
 const MANIFEST_PATH = fileURLToPath(new URL('../../package.json', import.meta.url));
 const MODULE_PATH = fileURLToPath(new URL('../defineConfig.ts', import.meta.url));
