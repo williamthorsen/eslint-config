@@ -13,8 +13,8 @@ const rules: Linter.RulesRecord = {
       tsx: 'always',
     },
   ],
-  // `prefer-inline` merges a module's split type/value pair into one statement carrying an inline `type` specifier.
-  'import-x/no-duplicates': ['warn', { 'prefer-inline': true }],
+  // `import-x/no-duplicates` is deliberately absent: its fixer corrupts a default, side-effect, or type-only
+  // statement in a same-module group. `sky-pilot/no-split-imports` merges the shapes it can and leaves the rest.
 };
 
 const config = defineConfig({

@@ -3,6 +3,7 @@ import type { Config } from 'eslint/config';
 
 import { ensurePluginRules } from '../utils/ensurePluginRules.ts';
 import noFloatingDisposableRule from './rules/no-floating-disposable.ts';
+import noSplitImportsRule from './rules/no-split-imports.ts';
 import noUndefinedWithNumberRule from './rules/no-undefined-with-number.ts';
 import noUnpublishedBarrelRule from './rules/no-unpublished-barrel.ts';
 import noUnusedMapRule from './rules/no-unused-map.ts';
@@ -15,6 +16,7 @@ const skyPilotPlugin: ESLint.Plugin = {
   },
   rules: ensurePluginRules({
     'no-floating-disposable': noFloatingDisposableRule,
+    'no-split-imports': noSplitImportsRule,
     'no-undefined-with-number': noUndefinedWithNumberRule,
     'no-unpublished-barrel': noUnpublishedBarrelRule,
     'no-unused-map': noUnusedMapRule,
@@ -31,6 +33,7 @@ const configs: { recommended: Config; strict: Config } = {
     },
     rules: {
       'sky-pilot/no-floating-disposable': 'warn',
+      'sky-pilot/no-split-imports': 'warn',
       'sky-pilot/no-undefined-with-number': 'error',
       'sky-pilot/no-unpublished-barrel': 'warn',
       'sky-pilot/no-unused-map': 'warn',
@@ -43,6 +46,7 @@ const configs: { recommended: Config; strict: Config } = {
     },
     rules: {
       'sky-pilot/no-floating-disposable': 'error',
+      'sky-pilot/no-split-imports': 'error',
       'sky-pilot/no-undefined-with-number': 'error',
       'sky-pilot/no-unpublished-barrel': 'error',
       'sky-pilot/no-unused-map': 'error',

@@ -6,33 +6,36 @@ Nothing else in the config changes namespace, and no rule this config sets is dr
 
 ## Why
 
-`import-x` supplies the same rules (45 of the 46 `eslint-plugin-import` ships, plus two of its own), real flat configs, and a bundled resolver. It also fixes `no-duplicates`, whose `prefer-inline` fixer in `eslint-plugin-import` 2.32.0 mishandles every same-module pair whose specifier list is not braced: it writes unparseable output for a default import and silently deletes a side-effect import.
+`eslint-plugin-import` 2.32.0 declares ESLint `^9` as its ceiling, and this config requires `eslint >=10`. `import-x` declares `^10`, supplies the same rules (45 of the 46 `eslint-plugin-import` ships, plus two of its own), real flat configs, and a bundled resolver.
 
 The one rule `import-x` lacks, `enforce-node-protocol-usage`, this config never set; `unicorn/prefer-node-protocol` covers it.
 
+One rule this config did set is gone in v7: `import/no-duplicates`. Its fixer, in both plugins, mishandles every same-module group that is not two braced statements, writing `import d, type { T }` for a default import and deleting a side-effect import outright. `sky-pilot/no-split-imports` takes its place and merges only what one statement can carry; see [Type imports](../packages/typescript/README.md#type-imports).
+
 ## Step 1: rename rule overrides
 
-Any `import/*` entry in your own `rules` block becomes `import-x/*`:
+Any `import/*` entry in your own `rules` block becomes `import-x/*`, except `import/no-duplicates`, which goes:
 
 ```diff
  rules: {
 -  'import/extensions': 'off',
 -  'import/no-duplicates': 'warn',
 +  'import-x/extensions': 'off',
-+  'import-x/no-duplicates': 'warn',
  }
 ```
 
 An `import/*` rule set to a severity other than `'off'` fails the ESLint run outright, naming the rule, because the `import` plugin is no longer registered. One set to `'off'` is accepted silently and does nothing, so grep for the namespace rather than relying on the run to find them all.
 
+Do not carry `no-duplicates` over as `import-x/no-duplicates`: its fixer merges `import type { T }` with `import { type U, v }` into `import type { T, type U, v }`, turning `v` into a type import, and this config's inline `type` specifiers put that shape in its path.
+
 ## Step 2: rename disable directives
 
 ```diff
--// eslint-disable-next-line import/no-duplicates
-+// eslint-disable-next-line import-x/no-duplicates
+-// eslint-disable-next-line import/extensions
++// eslint-disable-next-line import-x/extensions
 ```
 
-These report as `Definition for rule 'import/...' was not found`, so the run finds them for you.
+These report as `Definition for rule 'import/...' was not found`, so the run finds them for you. A directive naming `import/no-duplicates` is deleted rather than renamed.
 
 ## Step 3: rename settings
 
@@ -53,7 +56,7 @@ If you installed `eslint-plugin-import` yourself, remove it. This config no long
 
 ## What may newly fail
 
-`import-x/no-duplicates` now merges a module's split type and value imports into one statement. See [Type imports](../packages/typescript/README.md#type-imports) for the enforced form. Run `eslint --fix` once after upgrading.
+`sky-pilot/no-split-imports` reports a module imported in more than one statement, the split type and value pair among them, and merges what one statement can carry. See [Type imports](../packages/typescript/README.md#type-imports) for the enforced form and the shapes it leaves alone. Run `eslint --fix` once after upgrading; the rule sits in `advisoryRuleSeverities`, so under `strict-lint` with that map applied it warns rather than fails.
 
 ## Verify
 

@@ -80,33 +80,34 @@ A module's type and value imports go in one statement, with `type` on the specif
 import { Component, type ComponentProps } from './Component.ts';
 ```
 
-| Rule                                             | This config | Under `strict-lint` | Enforces                                                                         |
-| ------------------------------------------------ | ----------- | ------------------- | -------------------------------------------------------------------------------- |
-| `@typescript-eslint/consistent-type-imports`     | `warn`      | `error`             | A type-only specifier carries `type`; a mixed import fixes to the combined form. |
-| `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type lands on `import type`.              |
-| `import-x/no-duplicates`                         | `warn`      | `warn`              | Two statements importing one module merge into one.                              |
+| Rule                                             | This config | Under `strict-lint` | Enforces                                                                               |
+| ------------------------------------------------ | ----------- | ------------------- | -------------------------------------------------------------------------------------- |
+| `@typescript-eslint/consistent-type-imports`     | `warn`      | `error`             | A type-only specifier carries `type`; a mixed import fixes to the combined form.       |
+| `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type lands on `import type`.                    |
+| `sky-pilot/no-split-imports`                     | `warn`      | `warn`              | Two statements importing one module merge into one, `type` moving onto the specifiers. |
 
 `consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever you apply it; without it `strict-lint` promotes them too.
 
 An all-type statement stays `import type { Foo }` rather than `import { type Foo }`: Under `verbatimModuleSyntax` TypeScript strips the inline specifiers and leaves a runtime side-effect import behind.
 
-`import-x/no-duplicates` reports every duplicate import from a module, not only the type/value split.
+`sky-pilot/no-split-imports` merges every same-module group that one statement can carry: named specifiers, whether `type` is inline or top-level, and at most one default. It leaves alone a side-effect import (`import './m.ts'`), a namespace import, a type-only default (`import type d`), and a statement carrying import attributes, since none can join a named-specifier statement without changing what loads at runtime or which bindings are types; where a comment sits in the group's span, it reports without fixing, so the comment survives. `import-x/no-duplicates` is not set: its fixer mishandles exactly those shapes.
 
 ## Custom rules (`sky-pilot`)
 
-Five rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
+Six rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
 
-| Rule                                    | `recommended` | `strict` | Enforces                                                                               |
-| --------------------------------------- | ------------- | -------- | -------------------------------------------------------------------------------------- |
-| `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`. |
-| `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.           |
-| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                                  |
-| `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.                    |
-| `sky-pilot/prefer-function-declaration` | `warn`        | `error`  | An untyped function-valued variable is written as a function declaration.              |
+| Rule                                    | `recommended` | `strict` | Enforces                                                                                |
+| --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
+| `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
+| `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
+| `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
+| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                                   |
+| `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.                     |
+| `sky-pilot/prefer-function-declaration` | `warn`        | `error`  | An untyped function-valued variable is written as a function declaration.               |
 
-`advisoryRuleSeverities` exempts none of these, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each warning to an error: they report defects rather than style advice.
+`advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: they report defects rather than style advice.
 
-`createConfig.react()` adds a sixth rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
+`createConfig.react()` adds a seventh rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
 
 ### `sky-pilot/no-floating-disposable`
 
@@ -327,7 +328,7 @@ export default defineConfig({
 
 ## Advisory rule severities
 
-`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `import-x/no-duplicates`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
+`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `sky-pilot/no-split-imports`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
 
 Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
 
