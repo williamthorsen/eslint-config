@@ -40,6 +40,10 @@ The TypeScript rules are type-aware, and the preset enables typescript-eslint's 
 - Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from your build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
 - Set `tsconfigRootDir` (as in Quick start) to anchor resolution at your repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
 
+## Migrating to v13
+
+v13 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: every `import/` rule id, disable directive, and settings key becomes `import-x/`. See [Migrating to v13](../../docs/migrating-to-v13.md).
+
 ## Migrating from `parserOptions.project`
 
 This section covers the parser change alone. For the complete v5 → v6 upgrade (the Node and ESLint floors, the package bump, and post-upgrade cleanup), see [Migrating to v6](../../docs/migrating-to-v6.md).
@@ -54,35 +58,56 @@ Earlier versions left type-information wiring to the consumer: you set `parserOp
 
 The default export bundles configs for the following surfaces:
 
-| Surface        | File pattern                   | Notable plugins                                                   |
-| -------------- | ------------------------------ | ----------------------------------------------------------------- |
-| TypeScript     | `**/*.{ts,cts,mts,tsx}`        | `typescript-eslint` (type-aware), `sky-pilot`                     |
-| JavaScript     | `**/*.{js,cjs,mjs,jsx}`        | core rules, JS-specific conventions                               |
-| Cross-cutting  | all code files                 | `eslint-comments`, `import`, `n`, `simple-import-sort`, `unicorn` |
-| JSON / JSON5   | `**/*.{json,json5}`            | `jsonc`                                                           |
-| YAML           | `**/*.{yaml,yml}`              | `yml`                                                             |
-| `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)   |
-| Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed                                   |
+| Surface        | File pattern                   | Notable plugins                                                     |
+| -------------- | ------------------------------ | ------------------------------------------------------------------- |
+| TypeScript     | `**/*.{ts,cts,mts,tsx}`        | `typescript-eslint` (type-aware), `sky-pilot`                       |
+| JavaScript     | `**/*.{js,cjs,mjs,jsx}`        | core rules, JS-specific conventions                                 |
+| Cross-cutting  | all code files                 | `eslint-comments`, `import-x`, `n`, `simple-import-sort`, `unicorn` |
+| JSON / JSON5   | `**/*.{json,json5}`            | `jsonc`                                                             |
+| YAML           | `**/*.{yaml,yml}`              | `yml`                                                               |
+| `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)     |
+| Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed                                     |
 
 Every `package.json` must declare `author` and `engines`, and may not carry an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not take a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency a package declares must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
 
-Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so spec files don't fight the type checker. Declaration files (`*.d.ts`) have `import/no-duplicates` turned off.
+Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so spec files don't fight the type checker.
+
+## Type imports
+
+A module's type and value imports go in one statement, with `type` on the specifier:
+
+```ts
+import { Component, type ComponentProps } from './Component.ts';
+```
+
+| Rule                                             | This config | Under `strict-lint` | Enforces                                                                               |
+| ------------------------------------------------ | ----------- | ------------------- | -------------------------------------------------------------------------------------- |
+| `@typescript-eslint/consistent-type-imports`     | `warn`      | `error`             | A type-only specifier carries `type`; a mixed import fixes to the combined form.       |
+| `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type lands on `import type`.                    |
+| `sky-pilot/no-split-imports`                     | `warn`      | `warn`              | Two statements importing one module merge into one, `type` moving onto the specifiers. |
+
+`consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever you apply it; without it `strict-lint` promotes them too.
+
+An all-type statement stays `import type { Foo }` rather than `import { type Foo }`: Under `verbatimModuleSyntax` TypeScript strips the inline specifiers and leaves a runtime side-effect import behind.
+
+`sky-pilot/no-split-imports` merges every same-module group that one statement can carry: named specifiers, whether `type` is inline or top-level, and at most one default. It leaves alone a side-effect import (`import './m.ts'`), a namespace import, a type-only default (`import type d`), and a statement carrying import attributes, since none can join a named-specifier statement without changing what loads at runtime or which bindings are types; where a comment sits in the group's span, it reports without fixing, so the comment survives. `import-x/no-duplicates` is not set: its fixer mishandles exactly those shapes.
 
 ## Custom rules (`sky-pilot`)
 
-Five rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
+Six rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
 
-| Rule                                    | `recommended` | `strict` | Enforces                                                                               |
-| --------------------------------------- | ------------- | -------- | -------------------------------------------------------------------------------------- |
-| `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`. |
-| `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.           |
-| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                                  |
-| `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.                    |
-| `sky-pilot/prefer-function-declaration` | `warn`        | `error`  | An untyped function-valued variable is written as a function declaration.              |
+| Rule                                    | `recommended` | `strict` | Enforces                                                                                |
+| --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
+| `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
+| `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
+| `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
+| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                                   |
+| `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.                     |
+| `sky-pilot/prefer-function-declaration` | `warn`        | `error`  | An untyped function-valued variable is written as a function declaration.               |
 
-`advisoryRuleSeverities` exempts none of these, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each warning to an error: they report defects rather than style advice.
+`advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: they report defects rather than style advice.
 
-`createConfig.react()` adds a sixth rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
+`createConfig.react()` adds a seventh rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
 
 ### `sky-pilot/no-floating-disposable`
 
@@ -303,7 +328,7 @@ export default defineConfig({
 
 ## Advisory rule severities
 
-`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
+`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `sky-pilot/no-split-imports`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
 
 Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
 

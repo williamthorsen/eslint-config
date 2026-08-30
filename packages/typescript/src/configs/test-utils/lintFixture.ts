@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { ESLint, type Linter } from 'eslint';
-import { type Config } from 'eslint/config';
+import type { Config } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import { assert } from 'vitest';
 

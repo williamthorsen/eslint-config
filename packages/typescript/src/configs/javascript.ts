@@ -1,5 +1,5 @@
 import eslint from '@eslint/js';
-import { type Linter } from 'eslint';
+import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
 
 const rules: Linter.RulesRecord = {

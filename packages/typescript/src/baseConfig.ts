@@ -12,12 +12,6 @@ export const baseConfig: Config[] = [
       configs.typeScript,
     ],
   }),
-  {
-    files: ['**/*.d.ts'],
-    rules: {
-      'import/no-duplicates': 'off',
-    },
-  },
   ...defineConfig({
     files: javaScriptFiles,
     extends: [

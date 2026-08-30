@@ -53,11 +53,14 @@ const rules: Linter.RulesRecord = {
   '@typescript-eslint/consistent-type-imports': [
     'warn', // ⚫🟠
     {
-      prefer: 'type-imports',
       disallowTypeAnnotations: false,
+      fixStyle: 'inline-type-imports',
+      prefer: 'type-imports',
     },
   ],
   '@typescript-eslint/explicit-module-boundary-types': 'warn', // ⚫🟠
+  // An all-type statement written inline emits a runtime side-effect import under `verbatimModuleSyntax`.
+  '@typescript-eslint/no-import-type-side-effects': 'warn', // ⚫🟠
 
   // Stylistic: Enabled
   '@typescript-eslint/consistent-type-definitions': ['warn', 'interface'], // ⚫🟠

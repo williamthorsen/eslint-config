@@ -1,4 +1,4 @@
-import { type Config } from 'eslint/config';
+import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
 import { baseConfig } from '../../baseConfig.ts';

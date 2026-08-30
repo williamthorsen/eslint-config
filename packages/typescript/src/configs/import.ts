@@ -1,9 +1,9 @@
 import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
-import importPlugin from 'eslint-plugin-import';
+import importXPlugin from 'eslint-plugin-import-x';
 
 const rules: Linter.RulesRecord = {
-  'import/extensions': [
+  'import-x/extensions': [
     'error',
     'ignorePackages',
     {
@@ -17,7 +17,7 @@ const rules: Linter.RulesRecord = {
 
 const config = defineConfig({
   plugins: {
-    import: importPlugin,
+    'import-x': importXPlugin,
   },
   rules,
 });

@@ -4,6 +4,9 @@ packages:
 allowBuilds:
   esbuild: true
   lefthook: true
+  # Ships a prebuilt binding per platform as an optional dependency; the postinstall builds from
+  # source only where no binding exists, so it never needs to run here.
+  unrs-resolver: false
 
 catalog:
   '@williamthorsen/toolbelt.vitest': '0.7.0'
@@ -15,7 +18,6 @@ catalog:
 
 peerDependencyRules:
   allowedVersions:
-    'eslint-plugin-import>eslint': '>=10'
     'eslint-plugin-jest-dom>eslint': '>=10'
     'eslint-plugin-jsx-a11y>eslint': '>=10'
     'eslint-plugin-react>eslint': '>=10'
