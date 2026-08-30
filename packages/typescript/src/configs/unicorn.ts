@@ -32,6 +32,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-break-in-nested-loop': 'off', // 🔴⚫ Break/continue in nested loops is idiomatic; extracting a function is overkill
   'unicorn/no-for-each': 'off', // 🔴⚫
   'unicorn/no-lonely-if': 'warn', // 🔴🟠
+  'unicorn/no-named-default': 'off', // 🔴⚫ `{ default as x }` emits identically to `import x`; no defect content
   'unicorn/no-negated-condition': 'off', // 🔴⚫ Too prescriptive
   'unicorn/no-non-function-verb-prefix': 'off', // 🔴⚫ Flags verb-named holders like the `createConfig` factory map
   'unicorn/no-nested-ternary': 'warn', // 🔴🟠
