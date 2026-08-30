@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.7.0 — 2026-08-30
+
+### 🎉 Features
+
+- Report an include, exclude, or files path outside a tsconfig's directory (#197)
+
+  Adds a `hygiene` checklist to the `@williamthorsen/tsconfig` readiness kit, reporting at `warn` a workspace tsconfig whose effective `include`, `exclude`, or `files` names a path outside the directory holding it, whether that config declared the field itself or inherited it from a base.
+
 ## 0.6.1 — 2026-08-27
 
 ### 🐛 Bug fixes

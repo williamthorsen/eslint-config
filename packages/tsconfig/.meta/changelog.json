@@ -1,5 +1,22 @@
 [
   {
+    "version": "0.7.0",
+    "date": "2026-08-30",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Report an include, exclude, or files path outside a tsconfig's directory (#197)",
+            "body": "Adds a `hygiene` checklist to the `@williamthorsen/tsconfig` readiness kit, reporting at `warn` a workspace tsconfig whose effective `include`, `exclude`, or `files` names a path outside the directory holding it, whether that config declared the field itself or inherited it from a base.",
+            "hash": "502e7c79012d7817925cc5bacbe7bd11bb55702a"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.6.1",
     "date": "2026-08-27",
     "sections": [

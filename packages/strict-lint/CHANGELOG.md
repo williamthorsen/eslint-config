@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 12.0.0 — 2026-08-30
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Enforce the combined inline form for a module's type and value imports (#198)
+
+  A module's type and value imports now go in one statement, with `type` marking the type specifiers: `import { Component, type ComponentProps } from './Component.ts'`. A new rule, `sky-pilot/no-split-imports`, reports a module imported in more than one statement and merges the group wherever one statement can carry it. Nothing reported a split pair before, and the config's own autofix produced one, so lint pushed code away from the form the config recommends.
+
+  **Migration.** `eslint-plugin-import-x` replaces `eslint-plugin-import`, which does not support ESLint 10. In your own config:
+
+  1. Rename every `import/` rule id, `eslint-disable` directive, and `settings` key to `import-x/`. Grep for the namespace rather than leaving it to the run: a stale `settings` key is ignored without a word.
+  2. Delete `import/no-duplicates` rather than renaming it: its fixer writes invalid syntax for a default import and deletes side-effect imports. `sky-pilot/no-split-imports` replaces it.
+  3. Run `eslint --fix` once.
+
+  `docs/migrating-to-v13.md` walks through each step. Separately, `unicorn/no-named-default` is now off, so `import { default as x }` no longer reports.
+
 ## 11.1.0 — 2026-08-26
 
 ### 🎉 Features
