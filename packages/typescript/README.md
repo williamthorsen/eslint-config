@@ -66,7 +66,27 @@ The default export bundles configs for the following surfaces:
 
 Every `package.json` must declare `author` and `engines`, and may not carry an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not take a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency a package declares must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
 
-Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so spec files don't fight the type checker. Declaration files (`*.d.ts`) have `import/no-duplicates` turned off.
+Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so spec files don't fight the type checker.
+
+## Type imports
+
+A module's type and value imports go in one statement, with `type` on the specifier:
+
+```ts
+import { Component, type ComponentProps } from './Component.ts';
+```
+
+| Rule                                             | This config | Under `strict-lint` | Enforces                                                                         |
+| ------------------------------------------------ | ----------- | ------------------- | -------------------------------------------------------------------------------- |
+| `@typescript-eslint/consistent-type-imports`     | `warn`      | `error`             | A type-only specifier carries `type`; a mixed import fixes to the combined form. |
+| `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type lands on `import type`.              |
+| `import/no-duplicates`                           | `warn`      | `warn`              | Two statements importing one module merge into one.                              |
+
+`consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever you apply it; without it `strict-lint` promotes them too.
+
+An all-type statement stays `import type { Foo }` rather than `import { type Foo }`: Under `verbatimModuleSyntax` TypeScript strips the inline specifiers and leaves a runtime side-effect import behind.
+
+`import/no-duplicates` reports every duplicate import from a module, not only the type/value split.
 
 ## Custom rules (`sky-pilot`)
 
@@ -303,7 +323,7 @@ export default defineConfig({
 
 ## Advisory rule severities
 
-`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
+`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `import/no-duplicates`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
 
 Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
 
