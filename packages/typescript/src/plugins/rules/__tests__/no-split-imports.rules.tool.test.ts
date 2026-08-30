@@ -98,6 +98,18 @@ ruleTester.run('no-split-imports', rule, {
       output: "import { v, type T } from 'm';\nimport { x } from 'x';\n",
     },
     {
+      // Firing: a comment on an unrelated statement between the two is not at risk, so the fix applies
+      code: "import { v } from 'm';\n// about n\nimport { n } from 'n';\nimport type { T } from 'm';\n",
+      errors: [{ messageId: 'splitImports' }],
+      output: "import { v, type T } from 'm';\n// about n\nimport { n } from 'n';\n",
+    },
+    {
+      // Firing: a comment leading the surviving statement stays attached to it
+      code: "// group\nimport { v } from 'm';\nimport type { T } from 'm';\n",
+      errors: [{ messageId: 'splitImports' }],
+      output: "// group\nimport { v, type T } from 'm';\n",
+    },
+    {
       // Firing: a statement that shares its line with other code is removed without taking the line
       code: "import { v } from 'm'; import type { T } from 'm'; export {};",
       errors: [{ messageId: 'splitImports' }],
@@ -110,16 +122,22 @@ ruleTester.run('no-split-imports', rule, {
       output: "import 'm';\nimport { v, type T } from 'm';\n",
     },
     {
-      // Firing: a comment inside the group's span withholds the fix, which would drop it
+      // Firing: a comment leading a removed statement would be orphaned, so the fix is withheld
       code: "import { v } from 'm';\n// The type is used below.\nimport type { T } from 'm';\n",
       errors: [{ messageId: 'splitImports' }],
       output: null,
     },
     {
-      // Firing: a comment trailing a statement withholds the fix too
-      code: "import { v } from 'm'; // value\nimport type { T } from 'm';\n",
+      // Firing: a comment trailing a removed statement would be orphaned, so the fix is withheld
+      code: "import { v } from 'm';\nimport type { T } from 'm'; // the type\n",
       errors: [{ messageId: 'splitImports' }],
       output: null,
+    },
+    {
+      // Firing: a comment trailing the surviving statement stays attached to it
+      code: "import { v } from 'm'; // value\nimport type { T } from 'm';\n",
+      errors: [{ messageId: 'splitImports' }],
+      output: "import { v, type T } from 'm'; // value\n",
     },
   ],
 });

@@ -38,8 +38,8 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
           node: second,
           messageId: 'splitImports',
           data: { count: contributions.length, source },
-          // A comment anywhere in the span would be lost by the rewrite, so the report then carries no fix.
-          fix: spanHoldsComment(context.sourceCode, first, nodes.at(-1) ?? first)
+          // The fix is withheld where it would delete or orphan a comment.
+          fix: fixWouldLoseComment(context.sourceCode, first, nodes.slice(1))
             ? null
             : (fixer) => [
                 fixer.replaceText(first, renderMerged(context.sourceCode, contributions)),
@@ -82,6 +82,37 @@ function collectMergeableGroups(program: TSESTree.Program): Map<string, Contribu
 }
 
 /**
+ * Returns true if the fix would delete or orphan a comment: one inside the rewritten first statement, or one
+ * attached to a removed statement, whether leading it on its own line, sitting inside it, or trailing on its
+ * last line. A comment elsewhere in the group's span annotates code the fix leaves in place.
+ */
+function fixWouldLoseComment(
+  sourceCode: TSESLint.SourceCode,
+  first: TSESTree.Node,
+  removed: readonly TSESTree.Node[],
+): boolean {
+  const comments = sourceCode.getAllComments();
+  if (comments.some((comment) => rangesOverlap(comment.range, first.range))) {
+    return true;
+  }
+
+  return removed.some((node) => {
+    const previousToken = sourceCode.getTokenBefore(node);
+    const previousEnd = previousToken?.range[1] ?? 0;
+    const previousEndLine = previousToken?.loc.end.line ?? 0;
+
+    return comments.some(
+      (comment) =>
+        rangesOverlap(comment.range, node.range) ||
+        (comment.range[0] >= node.range[1] && comment.loc.start.line === node.loc.end.line) ||
+        (comment.range[0] >= previousEnd &&
+          comment.range[1] <= node.range[0] &&
+          comment.loc.start.line > previousEndLine),
+    );
+  });
+}
+
+/**
  * Widens a statement's range so its removal leaves no trace: the whole line where nothing else shares it, and
  * otherwise the spaces that separated it from what follows.
  */
@@ -96,6 +127,11 @@ function rangeWithLine(sourceCode: TSESLint.SourceCode, node: TSESTree.Node): TS
     return [start, end + trailingSpaces];
   }
   return [lineStart, end + lineBreakLength];
+}
+
+/** Returns true if the two ranges share any characters. */
+function rangesOverlap(a: TSESTree.Range, b: TSESTree.Range): boolean {
+  return a[0] < b[1] && a[1] > b[0];
 }
 
 /**
@@ -132,14 +168,6 @@ function renderMerged(sourceCode: TSESLint.SourceCode, contributions: readonly C
 
   const semicolon = sourceCode.getText(first.node).endsWith(';') ? ';' : '';
   return `import ${allTypes ? 'type ' : ''}${clauses.join(', ')} from ${sourceCode.getText(first.node.source)}${semicolon}`;
-}
-
-/** Returns true if any comment lies within the span the fix rewrites. */
-function spanHoldsComment(sourceCode: TSESLint.SourceCode, first: TSESTree.Node, last: TSESTree.Node): boolean {
-  const [start] = first.range;
-  const [, end] = rangeWithLine(sourceCode, last);
-
-  return sourceCode.getAllComments().some((comment) => comment.range[0] < end && comment.range[1] > start);
 }
 
 /** Reads the bindings a statement contributes, or undefined where the statement cannot take part in a merge. */
