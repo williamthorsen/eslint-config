@@ -40,6 +40,10 @@ The TypeScript rules are type-aware, and the preset enables typescript-eslint's 
 - Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from your build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
 - Set `tsconfigRootDir` (as in Quick start) to anchor resolution at your repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
 
+## Migrating to v7
+
+v7 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: every `import/` rule id, disable directive, and settings key becomes `import-x/`. See [Migrating to v7](../../docs/migrating-to-v7.md).
+
 ## Migrating from `parserOptions.project`
 
 This section covers the parser change alone. For the complete v5 → v6 upgrade (the Node and ESLint floors, the package bump, and post-upgrade cleanup), see [Migrating to v6](../../docs/migrating-to-v6.md).
@@ -54,15 +58,15 @@ Earlier versions left type-information wiring to the consumer: you set `parserOp
 
 The default export bundles configs for the following surfaces:
 
-| Surface        | File pattern                   | Notable plugins                                                   |
-| -------------- | ------------------------------ | ----------------------------------------------------------------- |
-| TypeScript     | `**/*.{ts,cts,mts,tsx}`        | `typescript-eslint` (type-aware), `sky-pilot`                     |
-| JavaScript     | `**/*.{js,cjs,mjs,jsx}`        | core rules, JS-specific conventions                               |
-| Cross-cutting  | all code files                 | `eslint-comments`, `import`, `n`, `simple-import-sort`, `unicorn` |
-| JSON / JSON5   | `**/*.{json,json5}`            | `jsonc`                                                           |
-| YAML           | `**/*.{yaml,yml}`              | `yml`                                                             |
-| `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)   |
-| Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed                                   |
+| Surface        | File pattern                   | Notable plugins                                                     |
+| -------------- | ------------------------------ | ------------------------------------------------------------------- |
+| TypeScript     | `**/*.{ts,cts,mts,tsx}`        | `typescript-eslint` (type-aware), `sky-pilot`                       |
+| JavaScript     | `**/*.{js,cjs,mjs,jsx}`        | core rules, JS-specific conventions                                 |
+| Cross-cutting  | all code files                 | `eslint-comments`, `import-x`, `n`, `simple-import-sort`, `unicorn` |
+| JSON / JSON5   | `**/*.{json,json5}`            | `jsonc`                                                             |
+| YAML           | `**/*.{yaml,yml}`              | `yml`                                                               |
+| `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)     |
+| Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed                                     |
 
 Every `package.json` must declare `author` and `engines`, and may not carry an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not take a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency a package declares must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
 
@@ -80,13 +84,13 @@ import { Component, type ComponentProps } from './Component.ts';
 | ------------------------------------------------ | ----------- | ------------------- | -------------------------------------------------------------------------------- |
 | `@typescript-eslint/consistent-type-imports`     | `warn`      | `error`             | A type-only specifier carries `type`; a mixed import fixes to the combined form. |
 | `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type lands on `import type`.              |
-| `import/no-duplicates`                           | `warn`      | `warn`              | Two statements importing one module merge into one.                              |
+| `import-x/no-duplicates`                         | `warn`      | `warn`              | Two statements importing one module merge into one.                              |
 
 `consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever you apply it; without it `strict-lint` promotes them too.
 
 An all-type statement stays `import type { Foo }` rather than `import { type Foo }`: Under `verbatimModuleSyntax` TypeScript strips the inline specifiers and leaves a runtime side-effect import behind.
 
-`import/no-duplicates` reports every duplicate import from a module, not only the type/value split.
+`import-x/no-duplicates` reports every duplicate import from a module, not only the type/value split.
 
 ## Custom rules (`sky-pilot`)
 
@@ -323,7 +327,7 @@ export default defineConfig({
 
 ## Advisory rule severities
 
-`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `import/no-duplicates`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
+`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `import-x/no-duplicates`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
 
 Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
 

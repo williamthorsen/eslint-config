@@ -7,7 +7,7 @@ export const advisoryRuleSeverities = {
   '@typescript-eslint/no-import-type-side-effects': 'warn',
   '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
 
-  'import/no-duplicates': 'warn',
+  'import-x/no-duplicates': 'warn',
 
   'unicorn/consistent-function-scoping': 'warn',
   'unicorn/no-array-reduce': 'warn',
