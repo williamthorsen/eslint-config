@@ -13,6 +13,8 @@ const rules: Linter.RulesRecord = {
       tsx: 'always',
     },
   ],
+  // `prefer-inline` merges a module's split type/value pair into one statement carrying an inline `type` specifier.
+  'import/no-duplicates': ['warn', { 'prefer-inline': true }],
 };
 
 const config = defineConfig({
