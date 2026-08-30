@@ -13,8 +13,9 @@ const rules: Linter.RulesRecord = {
       tsx: 'always',
     },
   ],
-  // `import-x/no-duplicates` is deliberately absent: its fixer corrupts a default, side-effect, or type-only
-  // statement in a same-module group. `sky-pilot/no-split-imports` merges the shapes it can and leaves the rest.
+  // `import-x/no-duplicates` is deliberately absent: with `prefer-inline` its fixer writes unparseable text for
+  // a default pair and folds a side-effect import into a type statement; without it a merge can flip a specifier
+  // between type and value. `sky-pilot/no-split-imports` merges the shapes it can and leaves the rest.
 };
 
 const config = defineConfig({

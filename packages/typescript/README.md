@@ -40,9 +40,9 @@ The TypeScript rules are type-aware, and the preset enables typescript-eslint's 
 - Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from your build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
 - Set `tsconfigRootDir` (as in Quick start) to anchor resolution at your repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
 
-## Migrating to v7
+## Migrating to v13
 
-v7 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: every `import/` rule id, disable directive, and settings key becomes `import-x/`. See [Migrating to v7](../../docs/migrating-to-v7.md).
+v13 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: every `import/` rule id, disable directive, and settings key becomes `import-x/`. See [Migrating to v13](../../docs/migrating-to-v13.md).
 
 ## Migrating from `parserOptions.project`
 
