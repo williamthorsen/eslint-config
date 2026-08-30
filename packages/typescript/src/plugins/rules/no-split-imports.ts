@@ -209,6 +209,8 @@ function toNamedSpecifier(specifier: TSESTree.ImportSpecifier, inTypeStatement: 
 
 // endregion | Helpers
 
+// `import-x/no-duplicates` merges the shapes `toContribution` excludes, losing a kind, a side-effect
+// import, or the parse.
 const ruleDefinition = {
   create,
   meta: {
