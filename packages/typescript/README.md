@@ -54,6 +54,10 @@ Earlier versions left type-information wiring to the consumer: you set `parserOp
 2. Fold any lint-only `tsconfig.eslint.json` `include` entries into the real `tsconfig.json`, then delete the `tsconfig.eslint.json`. Widening `include` is safe when the config is typecheck-only.
 3. Keep only `tsconfigRootDir: import.meta.dirname` in your `parserOptions`.
 
+## Migrating ESLint configs to TypeScript
+
+ESLint 10 loads `eslint.config.ts` natively, which brings the config into the compiler and the project service. Renaming it has two tsconfig prerequisites, both reported by the kit below. See [Migrating ESLint configs to TypeScript](../../docs/migrating-eslint-configs-to-typescript.md).
+
 ## What's included
 
 The default export bundles configs for the following surfaces:
