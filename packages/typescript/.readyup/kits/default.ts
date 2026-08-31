@@ -17,6 +17,8 @@ import {
   getJsonValue,
   readFile,
   readJsonFile,
+  readTsconfigChain,
+  type TsconfigChain,
 } from 'readyup/check-utils';
 
 import {
@@ -24,20 +26,25 @@ import {
   enablesNextPlugin,
   importsFromDir,
   listRelativeNextRootDirs,
+  listTsExtensionImports,
   setsNextRootDir,
   setsTsconfigRootDir,
 } from '../../src/readiness/eslint-config-contents.ts';
 import {
   ESLINT_CONFIG_BASENAMES,
+  listAncestorDirs,
   listEslintConfigCandidates,
   listShadowedEslintConfigDirs,
   resolveDirPath,
 } from '../../src/readiness/eslint-config-paths.ts';
 import { listSearchDirs } from '../../src/readiness/listSearchDirs.ts';
+import { permitsTsExtensionImports } from '../../src/readiness/permitsTsExtensionImports.ts';
 import { readVersionFloor } from '../../src/readiness/readVersionFloor.ts';
+import { type InputCoverage, judgeInputCoverage } from '../../src/readiness/tsconfig-inputs.ts';
 
 const PACKAGE_NAME = '@williamthorsen/eslint-config-typescript';
 const MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-from-parseroptionsproject`;
+const TS_ESLINT_CONFIG_MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-eslint-configs-to-typescript`;
 
 // Inlined at compile time, so the floors track the package's own peer ranges instead of a copy.
 const PEER_RANGES = pickJson('../../package.json', ['peerDependencies']);
@@ -48,7 +55,20 @@ const ESLINT_TYPESCRIPT_FLOOR = '10.0.0';
 type PeerComparison =
   { floor: string; installed: string; kind: 'comparable'; range: string } | { kind: 'unknown'; reason: string };
 
+interface InputJudgement {
+  configPath: string;
+  coverage: InputCoverage;
+}
+
+interface TsExtensionImporter {
+  configPath: string;
+  specifiers: string[];
+}
+
 const installedVersions = new Map<string, string | undefined>();
+
+// Held for the life of one `rdy` run, so several eslint configs owned by one tsconfig read it once.
+const tsconfigChains = new Map<string, TsconfigChain | undefined>();
 
 export default defineRdyKit({
   description: `Alignment checks for a project consuming ${PACKAGE_NAME}`,
@@ -116,6 +136,23 @@ export default defineRdyKit({
       ],
     },
     {
+      name: 'tsconfig',
+      checks: [
+        {
+          name: 'The tsconfig owning an eslint config permits its TypeScript-extension imports',
+          skip: skipUnlessTsExtensionImports,
+          check: tsExtensionImportsPermitted,
+          fix: `Set allowImportingTsExtensions in the tsconfig owning the eslint config, alongside one of noEmit, emitDeclarationOnly, or rewriteRelativeImportExtensions, one of which TypeScript requires with it. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
+        },
+        {
+          name: "A tsconfig enumerating an eslint config's siblings names the config itself",
+          skip: skipUnlessEnumerated,
+          check: eslintConfigEnumerated,
+          fix: `Replace the enumeration with a *.ts glob, which carries the next root-level config file to arrive as well; appending eslint.config.ts is the narrower fallback. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
+        },
+      ],
+    },
+    {
       name: 'projectservice',
       checks: [
         {
@@ -161,9 +198,33 @@ function comparePeer(name: string): PeerComparison {
   return { floor, installed, kind: 'comparable', range };
 }
 
+/** Fails when a tsconfig's enumerated inputs omit an eslint config sitting among the files they name. */
+function eslintConfigEnumerated(): boolean | CheckOutcome {
+  const offenders: string[] = [];
+  for (const { configPath, coverage } of listInputJudgements()) {
+    if (coverage.kind !== 'enumerated-without') continue;
+    const sites = coverage.sites.map((site) => `${site.field} in ${site.declaredIn}`).join(', ');
+    offenders.push(`${configPath} (${sites})`);
+  }
+  if (offenders.length === 0) return true;
+  return { ok: false, detail: `an enumeration omits the eslint config: ${offenders.join('; ')}` };
+}
+
 /** Lists every eslint config present across the repo's search directories. */
 function findEslintConfigs(): string[] {
   return listEslintConfigCandidates(listEslintConfigSearchDirs()).filter((configPath) => fileExists(configPath));
+}
+
+/**
+ * Finds the tsconfig owning a file, which is the nearest `tsconfig.json` at or above its directory.
+ * That is the config the project service resolves; a sibling under another basename owns nothing.
+ */
+function findOwningTsconfig(filePath: string): string | undefined {
+  const slash = filePath.lastIndexOf('/');
+  const dir = slash === -1 ? '.' : filePath.slice(0, slash);
+  return listAncestorDirs(dir)
+    .map((ancestor) => resolveDirPath(ancestor, 'tsconfig.json'))
+    .find((candidate) => fileExists(candidate));
 }
 
 /** Resolves the root eslint config as the loader does, taking the first basename in precedence order. */
@@ -184,11 +245,32 @@ function listEslintConfigsMatching(matches: (content: string) => boolean): strin
   });
 }
 
+/** Judges how each eslint config is treated by the inputs of the tsconfig owning it. */
+function listInputJudgements(): InputJudgement[] {
+  return findEslintConfigs().flatMap((configPath) => {
+    const tsconfigPath = findOwningTsconfig(configPath);
+    if (tsconfigPath === undefined) return [];
+    const chain = readChain(tsconfigPath);
+    if (chain === undefined) return [];
+    return [{ configPath, coverage: judgeInputCoverage(chain.entries, configPath) }];
+  });
+}
+
 /** Lists the workspace directories providing this package, which the repo developing it imports by path. */
 function listProviderWorkspaceDirs(): string[] {
   return discoverWorkspaces()
     .filter((workspace) => workspace.name === PACKAGE_NAME)
     .map((workspace) => workspace.dir);
+}
+
+/** Lists the eslint configs importing a file by TypeScript extension, with the specifiers they name. */
+function listTsExtensionImporters(): TsExtensionImporter[] {
+  return findEslintConfigs().flatMap((configPath) => {
+    const content = readFile(configPath);
+    if (content === undefined) return [];
+    const specifiers = listTsExtensionImports(content);
+    return specifiers.length === 0 ? [] : [{ configPath, specifiers }];
+  });
 }
 
 /** Fails when an eslint config sets a relative settings.next.rootDir, naming the offenders and their values. */
@@ -237,6 +319,12 @@ function noTsconfigEslintJson(): boolean | CheckOutcome {
   return { ok: false, detail: `tsconfig.eslint.json found: ${offenders.join(', ')}` };
 }
 
+/** Reads a tsconfig's resolved extends chain, once per path for the life of the run. */
+function readChain(tsconfigPath: string): TsconfigChain | undefined {
+  if (!tsconfigChains.has(tsconfigPath)) tsconfigChains.set(tsconfigPath, readTsconfigChain(tsconfigPath));
+  return tsconfigChains.get(tsconfigPath);
+}
+
 /**
  * Reads a dependency's installed version, taking the lowest found across the repo's search
  * directories so a workspace resolving an older copy decides the comparison. The result is cached
@@ -281,6 +369,18 @@ function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   return providerDir === undefined ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
 }
 
+/**
+ * Skips the enumeration check where no tsconfig owning an eslint config enumerates a sibling
+ * TypeScript file, whether it declares no inputs at all or its declared inputs name none. A root
+ * declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`,
+ * covers the config by a route its own inputs do not show.
+ */
+function skipUnlessEnumerated(): false | string {
+  const judged = listInputJudgements();
+  if (judged.some((judgement) => judgement.coverage.kind !== 'not-enumerated')) return false;
+  return 'No tsconfig owning an eslint config enumerates a sibling TypeScript file by name';
+}
+
 /** Skips the shadowing check below eslint 10, where a JavaScript config is the only loadable one. */
 function skipUnlessEslintLoadsTypeScript(): false | string {
   const installed = readInstalledVersion('eslint');
@@ -307,10 +407,29 @@ function skipUnlessPeerComparable(name: string): false | string {
   return comparison.kind === 'comparable' ? false : comparison.reason;
 }
 
+/** Skips the extension-import check where no eslint config imports a file by TypeScript extension. */
+function skipUnlessTsExtensionImports(): false | string {
+  return listTsExtensionImporters().length > 0 ? false : 'No eslint config imports a file by TypeScript extension';
+}
+
 /** Passes when any eslint config anchors the project service with tsconfigRootDir. */
 function tsconfigRootDirAnchored(): boolean | CheckOutcome {
   if (listEslintConfigsMatching(setsTsconfigRootDir).length > 0) return true;
   return { ok: false, detail: 'no eslint config sets parserOptions.tsconfigRootDir' };
+}
+
+/** Fails when a tsconfig owning an eslint config permits none of the TypeScript extensions it imports. */
+function tsExtensionImportsPermitted(): boolean | CheckOutcome {
+  const offenders: string[] = [];
+  for (const { configPath, specifiers } of listTsExtensionImporters()) {
+    const tsconfigPath = findOwningTsconfig(configPath);
+    if (tsconfigPath === undefined) continue;
+    const chain = readChain(tsconfigPath);
+    if (chain === undefined || permitsTsExtensionImports(chain.entries)) continue;
+    offenders.push(`${configPath} imports ${specifiers.join(', ')} under ${tsconfigPath}`);
+  }
+  if (offenders.length === 0) return true;
+  return { ok: false, detail: `no compiler option permits the import: ${offenders.join('; ')}` };
 }
 
 // endregion | Helpers

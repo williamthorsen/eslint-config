@@ -395,6 +395,12 @@ The check that your root config extends this package matches the package specifi
 
 The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. A config reaching the factory through a local re-export names neither, so one that also sets no `rootDir` goes unreported rather than reporting a wrong failure. One that does set it is still judged on the value it writes.
 
+The two `tsconfig` checks judge each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, is read by neither. Both resolve each setting through the config's `extends` chain, so a value a base supplies counts as the consumer's own.
+
+The extension-import check reports an eslint config importing a file by `.ts`, `.mts`, or `.cts` specifier where the effective compiler options permit no such import. It matches the specifier rather than what it names, since TypeScript raises TS5097 on the specifier alone, and it leaves a type-only import unreported, that form needing no option.
+
+The enumeration check reports a `files` or `include` that names the eslint config's siblings one by one without naming the config itself. Where nothing enumerates, it stays silent rather than reporting every project whose inputs miss the file: a root declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the config by a route its own inputs do not show.
+
 ## License
 
 ISC.

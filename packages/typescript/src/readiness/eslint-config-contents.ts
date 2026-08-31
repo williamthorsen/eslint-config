@@ -49,6 +49,27 @@ export function listRelativeNextRootDirs(content: string): string[] {
     .filter((value) => !isAbsolute(value));
 }
 
+/**
+ * Lists the TypeScript-extension specifiers an eslint config imports, without repetition. A
+ * type-only import is left out: TypeScript raises TS5097 on the value form alone, so
+ * counting one would report a compiler option the consumer does not need. An inline `{ type X }`
+ * specifier is a value import, its statement surviving erasure, and so counts.
+ */
+export function listTsExtensionImports(content: string): string[] {
+  const specifiers: string[] = [];
+  for (const match of content.matchAll(
+    /\b(?:import|export)\b(?<clause>[^'"]*?)\bfrom\s*['"](?<specifier>[^'"]+)['"]/g,
+  )) {
+    const { clause = '', specifier } = match.groups ?? {};
+    if (specifier !== undefined && !/^\s*type\b/.test(readClauseTail(clause))) specifiers.push(specifier);
+  }
+  for (const match of content.matchAll(/\b(?:import|require)\s*\(?\s*['"]([^'"]+)['"]/g)) {
+    const specifier = match[1];
+    if (specifier !== undefined) specifiers.push(specifier);
+  }
+  return [...new Set(specifiers.filter((specifier) => /\.[cm]?ts$/.test(specifier)))];
+}
+
 /** Reports whether an eslint config sets `settings.next.rootDir`. */
 export function setsNextRootDir(content: string): boolean {
   return listNextSettingsBlocks(content).some((block) => /\brootDir\s*:/.test(block));
@@ -115,6 +136,20 @@ function listRootDirValues(block: string): string[] {
 
   const bare = /\brootDir\s*:\s*([^,}]*)/.exec(block);
   return bare?.[1] === undefined ? [] : [bare[1]];
+}
+
+/**
+ * Reads the part of an import clause belonging to the statement that owns the specifier, which is
+ * everything after the last `import` or `export` keyword in it. A clause reaching back over an
+ * earlier statement is possible where no quote separates the two, and reading the whole of one would
+ * put that statement's `type` keyword in front of this statement's clause.
+ */
+function readClauseTail(clause: string): string {
+  const keyword = clause
+    .matchAll(/\b(?:import|export)\b/g)
+    .toArray()
+    .at(-1);
+  return keyword === undefined ? clause : clause.slice(keyword.index + keyword[0].length);
 }
 
 /**

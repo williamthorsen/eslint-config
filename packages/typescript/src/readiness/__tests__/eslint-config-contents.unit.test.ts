@@ -5,6 +5,7 @@ import {
   enablesNextPlugin,
   importsFromDir,
   listRelativeNextRootDirs,
+  listTsExtensionImports,
   setsNextRootDir,
   setsTsconfigRootDir,
 } from '../eslint-config-contents.ts';
@@ -219,6 +220,67 @@ describe(listRelativeNextRootDirs, () => {
       settings: { next: { rootDir: 'packages/admin' } }`;
 
     expect(listRelativeNextRootDirs(content)).toStrictEqual(['packages/web', 'packages/admin']);
+  });
+});
+
+describe(listTsExtensionImports, () => {
+  it('lists a default import by its specifier', () => {
+    const content = `import root from '../../eslint.config.ts';`;
+
+    expect(listTsExtensionImports(content)).toStrictEqual(['../../eslint.config.ts']);
+  });
+
+  it('lists every TypeScript extension', () => {
+    const content = `import a from './a.ts';
+      import b from './b.mts';
+      import c from './c.cts';`;
+
+    expect(listTsExtensionImports(content)).toStrictEqual(['./a.ts', './b.mts', './c.cts']);
+  });
+
+  it('ignores an extensionless or JavaScript specifier', () => {
+    const content = `import config from '@williamthorsen/eslint-config-typescript';
+      import root from '../../eslint.config.js';`;
+
+    expect(listTsExtensionImports(content)).toStrictEqual([]);
+  });
+
+  it('lists a side-effect import, a dynamic import, and a require', () => {
+    const content = `import './setup.ts';
+      const lazy = await import('./lazy.ts');
+      const legacy = require('./legacy.cts');`;
+
+    expect(listTsExtensionImports(content)).toStrictEqual(['./setup.ts', './lazy.ts', './legacy.cts']);
+  });
+
+  it('reports one specifier once however often it is imported', () => {
+    const content = `import a from './shared.ts';
+      import './shared.ts';`;
+
+    expect(listTsExtensionImports(content)).toStrictEqual(['./shared.ts']);
+  });
+
+  // TypeScript permits a type-only `.ts` specifier with no compiler option set.
+  it('ignores a type-only import or re-export', () => {
+    const content = `import type { Options } from './options.ts';
+      export type { Rules } from './rules.ts';`;
+
+    expect(listTsExtensionImports(content)).toStrictEqual([]);
+  });
+
+  it('lists an import whose specifiers are individually type-marked', () => {
+    const content = `import { type Options } from './options.ts';`;
+
+    expect(listTsExtensionImports(content)).toStrictEqual(['./options.ts']);
+  });
+
+  // Nothing but a quote stops a clause reaching back over the statement before it, whose `type`
+  // keyword would otherwise be read as this statement's.
+  it('lists a value import following a type-only one', () => {
+    const content = `export type { Rules }
+      import config from './config.ts'`;
+
+    expect(listTsExtensionImports(content)).toStrictEqual(['./config.ts']);
   });
 });
 

@@ -5,13 +5,14 @@
       "checklists": [
         "peers",
         "config",
+        "tsconfig",
         "projectservice"
       ],
       "description": "Alignment checks for a project consuming @williamthorsen/eslint-config-typescript",
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "371af333",
+          "hash": "8e250acb",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -24,12 +25,12 @@
           ]
         },
         {
-          "hash": "f484d6fb",
+          "hash": "941712c9",
           "kind": "module",
           "path": "../src/readiness/eslint-config-contents.ts"
         },
         {
-          "hash": "665ce59f",
+          "hash": "36c34370",
           "kind": "module",
           "path": "../src/readiness/eslint-config-paths.ts"
         },
@@ -39,17 +40,27 @@
           "path": "../src/readiness/listSearchDirs.ts"
         },
         {
+          "hash": "dac8db7d",
+          "kind": "module",
+          "path": "../src/readiness/permitsTsExtensionImports.ts"
+        },
+        {
           "hash": "d75d159a",
           "kind": "module",
           "path": "../src/readiness/readVersionFloor.ts"
+        },
+        {
+          "hash": "84fd294b",
+          "kind": "module",
+          "path": "../src/readiness/tsconfig-inputs.ts"
         }
       ],
       "name": "default",
       "path": "kits/default.js",
       "readyupVersion": "0.35.0",
       "source": "kits/default.ts",
-      "sourceHash": "371af333",
-      "targetHash": "410fe1b4"
+      "sourceHash": "8e250acb",
+      "targetHash": "7d0f76fb"
     }
   ]
 }
