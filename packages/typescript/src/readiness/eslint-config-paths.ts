@@ -16,6 +16,22 @@ export function isTypeScriptEslintConfig(configPath: string): boolean {
   return /\.[cm]?ts$/.test(configPath);
 }
 
+/**
+ * Lists a directory and each of its ancestors up to the repo root, nearest first. Walking outward is
+ * how the tsconfig owning a file is found, the project service resolving the nearest one above it.
+ */
+export function listAncestorDirs(dir: string): string[] {
+  const dirs: string[] = [];
+  let current = dir;
+  while (current !== '.') {
+    dirs.push(current);
+    const slash = current.lastIndexOf('/');
+    current = slash === -1 ? '.' : current.slice(0, slash);
+  }
+  dirs.push('.');
+  return dirs;
+}
+
 /** Lists every path an eslint config could occupy across the given directories. */
 export function listEslintConfigCandidates(dirs: readonly string[]): string[] {
   return dirs.flatMap((dir) => ESLINT_CONFIG_BASENAMES.map((basename) => resolveDirPath(dir, basename)));

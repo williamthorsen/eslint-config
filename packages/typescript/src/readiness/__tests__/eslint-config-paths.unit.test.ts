@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ESLINT_CONFIG_BASENAMES,
   isTypeScriptEslintConfig,
+  listAncestorDirs,
   listEslintConfigCandidates,
   listShadowedEslintConfigDirs,
   resolveDirPath,
@@ -34,6 +35,20 @@ describe(isTypeScriptEslintConfig, () => {
   it('classifies by the full path, so a directory name does not decide it', () => {
     expect(isTypeScriptEslintConfig('packages/ts/eslint.config.js')).toBe(false);
     expect(isTypeScriptEslintConfig('packages/js/eslint.config.ts')).toBe(true);
+  });
+});
+
+describe(listAncestorDirs, () => {
+  it('lists a nested directory and every ancestor, nearest first', () => {
+    expect(listAncestorDirs('packages/a/b')).toStrictEqual(['packages/a/b', 'packages/a', 'packages', '.']);
+  });
+
+  it('lists the repo root alone', () => {
+    expect(listAncestorDirs('.')).toStrictEqual(['.']);
+  });
+
+  it('lists a top-level directory and the root', () => {
+    expect(listAncestorDirs('packages')).toStrictEqual(['packages', '.']);
   });
 });
 

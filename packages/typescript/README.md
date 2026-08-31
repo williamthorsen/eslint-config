@@ -54,6 +54,10 @@ Earlier versions left type-information wiring to the consumer: you set `parserOp
 2. Fold any lint-only `tsconfig.eslint.json` `include` entries into the real `tsconfig.json`, then delete the `tsconfig.eslint.json`. Widening `include` is safe when the config is typecheck-only.
 3. Keep only `tsconfigRootDir: import.meta.dirname` in your `parserOptions`.
 
+## Migrating ESLint configs to TypeScript
+
+ESLint 10 loads `eslint.config.ts` natively, which brings the config into the compiler and the project service. Renaming it has two tsconfig prerequisites, both reported by the kit below. See [Migrating ESLint configs to TypeScript](../../docs/migrating-eslint-configs-to-typescript.md).
+
 ## What's included
 
 The default export bundles configs for the following surfaces:
@@ -390,6 +394,12 @@ The kit runs at the version resolved from your `node_modules`, so it reports whe
 The check that your root config extends this package matches the package specifier as text, or a path into a workspace that provides the package, so a config reaching it through a local re-export or a path alias is reported as not extending it.
 
 The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. A config reaching the factory through a local re-export names neither, so one that also sets no `rootDir` goes unreported rather than reporting a wrong failure. One that does set it is still judged on the value it writes.
+
+The two `tsconfig` checks judge each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, is read by neither. Both resolve each setting through the config's `extends` chain, so a value a base supplies counts as the consumer's own.
+
+The extension-import check reports an eslint config importing a file by `.ts`, `.mts`, or `.cts` specifier where the effective compiler options permit no such import. It matches the specifier rather than what it names, since TypeScript raises TS5097 on the specifier alone, and it leaves a type-only import unreported, that form needing no option.
+
+The enumeration check reports a `files` or `include` that names the eslint config's siblings one by one without naming the config itself. Where nothing enumerates, it stays silent rather than reporting every project whose inputs miss the file: a root declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the config by a route its own inputs do not show.
 
 ## License
 
