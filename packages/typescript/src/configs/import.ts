@@ -23,7 +23,7 @@ const rules: Linter.RulesRecord = {
   ],
 
   // `ignoreExternal` keeps the traversal out of `node_modules`, which costs twenty times the rest of the
-  // walk. It skips a bare or scoped specifier only, so every relative edge stays covered; a cycle running
+  // walk. It skips a bare or scoped specifier only, so it drops no relative edge of its own; a cycle running
   // through a workspace sibling imported by its package name goes unreported.
   'import-x/no-cycle': ['error', { ignoreExternal: true }],
 };
