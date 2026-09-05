@@ -135,14 +135,26 @@ function getServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<Messa
   }
 }
 
+/** Returns true if an import clause carries a top-level `type` modifier. */
+function hasTypeModifier(clause: ts.ImportClause): boolean {
+  // The modifier's other spelling is `defer`, which defers a value import rather than erasing it.
+  if (clause.phaseModifier !== undefined) {
+    return clause.phaseModifier === ts.SyntaxKind.TypeKeyword;
+  }
+
+  // TypeScript below 5.9, which the peer range admits, carries no `phaseModifier` and leaves `isTypeOnly` as the
+  // only signal. From 5.9 the two agree, so the compilers this package also supports reach the same answer here.
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- the only type-only signal below TypeScript 5.9
+  return clause.isTypeOnly;
+}
+
 /** Returns true if every binding an import clause names is a type. */
 function importsTypesOnly(clause: ts.ImportClause | undefined): boolean {
   // A side-effect import (`import './m.ts'`) carries no clause and runs at load time.
   if (clause === undefined) {
     return false;
   }
-  // The modifier also spells `defer`, which defers a value import rather than erasing it.
-  if (clause.phaseModifier === ts.SyntaxKind.TypeKeyword) {
+  if (hasTypeModifier(clause)) {
     return true;
   }
   // A default binding and a namespace binding are both values.

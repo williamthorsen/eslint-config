@@ -64,6 +64,10 @@ describe('sky-pilot/no-type-cycle', () => {
   it.each([
     ['an acyclic type graph', 'acyclic-type-a.ts'],
     ['a cycle whose every edge is a value edge, which import-x/no-cycle reports', 'cycle-value-a.ts'],
+    ['a cycle whose every edge is a star re-export', 'cycle-star-a.ts'],
+    // The search would not terminate on this graph without its visited set, so a regression hangs the lint run
+    // rather than reporting the wrong thing.
+    ['a cycle downstream of the linted file, which the file does not close', 'downstream-cycle-a.ts'],
   ])('reports nothing for %s', async (_subject, fixture) => {
     const results = await lintFixture([fixtureWiring, ruleConfig], fixture);
 
