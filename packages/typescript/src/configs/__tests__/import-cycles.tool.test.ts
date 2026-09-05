@@ -17,8 +17,8 @@ describe('the cycle rule the import config sets', () => {
 
   // `import-x/no-cycle` skips a statement whose specifiers are all types, through one code path for the
   // top-level spelling and another for the inline one, so a cycle reachable only through them goes
-  // unreported. These cases pin the gap the README documents and #201 closes with a type-aware rule: if
-  // upstream ever starts reporting a type edge, they fail, and the documentation is what needs revisiting.
+  // unreported. These cases pin the gap `sky-pilot/no-type-cycle` covers: if upstream ever starts reporting
+  // a type edge, they fail, and the division of ground between the two rules is what needs revisiting.
   // The inline spelling survives here although `consistent-type-imports` rewrites it to the top-level one,
   // because the rule keeps a separate path for it and a consumer may have that rule off.
   it.each([
