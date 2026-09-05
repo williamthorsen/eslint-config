@@ -102,10 +102,11 @@ An all-type statement stays `import type { Foo }` rather than `import { type Foo
 
 The config supplies `settings['import-x/extensions']` itself, so the rule needs no wiring on your side. That setting, which is unrelated to the rule of the same name, lists the extensions the plugin's module graph will open. It defaults to `['.js', '.mjs', '.cjs']`, which is why a graph-walking rule reports nothing on a TypeScript source until it is set, and any other `import-x` rule you enable reads it too.
 
-Every relative import within your own source is covered. Three kinds of edge are not, and each is passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
+Four kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
 
 - **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either, and nothing currently guards it; [#201](https://github.com/williamthorsen/eslint-config/issues/201) tracks a rule that would.
 - **A bare or scoped specifier**, such as `react` or `@scope/pkg`. The config sets `ignoreExternal`, which keeps the traversal out of `node_modules` and cuts the rule's cost by roughly twentyfold. It also drops a cycle running through a workspace sibling imported by its package name.
+- **A relative specifier ending in `.js` that names a `.ts` file**, which is the spelling NodeNext prescribes unless you set `allowImportingTsExtensions` or `rewriteRelativeImportExtensions`. The bundled resolver carries no `extensionAlias`, so such a specifier resolves to nothing and the whole graph goes unwalked. `import-x/extensions` accepts the spelling, so a codebase written this way gets no signal from either rule; the snippet below does not close it. [#203](https://github.com/williamthorsen/eslint-config/issues/203) weighs what the config should do about it.
 - **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. Point the bundled resolver at your tsconfig to close this one, which needs no additional package:
 
 ```ts
