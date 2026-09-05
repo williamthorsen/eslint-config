@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## 14.0.0 — 2026-09-05
+
+### 🎉 Features
+
+- Check the tsconfig prerequisites a TypeScript eslint config depends on (#199)
+
+  Adds two checks to the readiness kit in `@williamthorsen/eslint-config-typescript`, covering the tsconfig prerequisites for renaming an `eslint.config.js` to `eslint.config.ts`. One reports an eslint config that imports a file by `.ts`, `.mts`, or `.cts` specifier where no compiler option permits the import. The other reports a `tsconfig.json` whose `files` or `include` names the eslint config's siblings one by one without naming the config itself.
+
+  Adds the ESLint-config-to-TypeScript migration guide to the repo's `docs/`, linked from the package README. Both checks point a consumer at it.
+
+- 🚨 **Breaking:** Add import-x/no-cycle to report a circular import (#204)
+
+  - Adds `import-x/no-cycle` at `error`, so a circular import fails the lint run instead of reaching runtime as a briefly-`undefined` binding.
+  - Supplies `settings['import-x/extensions']`, so the rule needs no wiring on the consumer's side and any other graph-walking `import-x` rule enabled alongside it reads the same setting.
+
+  Migration: Break an existing cycle, or set `import-x/no-cycle` to `off` or `warn` in a config block placed after the base config. A repository carrying a cycle otherwise fails `eslint` on upgrade.
+
 ## 13.0.0 — 2026-08-30
 
 ### 🎉 Features

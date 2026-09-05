@@ -1,5 +1,28 @@
 [
   {
+    "version": "14.0.0",
+    "date": "2026-09-05",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Check the tsconfig prerequisites a TypeScript eslint config depends on (#199)",
+            "body": "Adds two checks to the readiness kit in `@williamthorsen/eslint-config-typescript`, covering the tsconfig prerequisites for renaming an `eslint.config.js` to `eslint.config.ts`. One reports an eslint config that imports a file by `.ts`, `.mts`, or `.cts` specifier where no compiler option permits the import. The other reports a `tsconfig.json` whose `files` or `include` names the eslint config's siblings one by one without naming the config itself.\n\nAdds the ESLint-config-to-TypeScript migration guide to the repo's `docs/`, linked from the package README. Both checks point a consumer at it.",
+            "hash": "e5842f9540c2c2bf7059a99f983e3a19d927a931"
+          },
+          {
+            "description": "Add import-x/no-cycle to report a circular import (#204)",
+            "body": "- Adds `import-x/no-cycle` at `error`, so a circular import fails the lint run instead of reaching runtime as a briefly-`undefined` binding.\n- Supplies `settings['import-x/extensions']`, so the rule needs no wiring on the consumer's side and any other graph-walking `import-x` rule enabled alongside it reads the same setting.\n\nMigration: Break an existing cycle, or set `import-x/no-cycle` to `off` or `warn` in a config block placed after the base config. A repository carrying a cycle otherwise fails `eslint` on upgrade.",
+            "breaking": true,
+            "hash": "2bf773d63c90ad836747690ea9b9e03e288f1c3c"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "13.0.0",
     "date": "2026-08-30",
     "sections": [
