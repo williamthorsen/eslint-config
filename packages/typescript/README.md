@@ -104,10 +104,10 @@ The config supplies `settings['import-x/extensions']` itself, so the rule needs 
 
 Four kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
 
-- **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either, and nothing currently guards it; [#201](https://github.com/williamthorsen/eslint-config/issues/201) tracks a rule that would.
+- **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them.
 - **A bare or scoped specifier**, such as `react` or `@scope/pkg`. The config sets `ignoreExternal`, which keeps the traversal out of `node_modules` and cuts the rule's cost by roughly twentyfold. It also drops a cycle running through a workspace sibling imported by its package name.
-- **A relative specifier ending in `.js` that names a `.ts` file**, which is the spelling NodeNext prescribes unless you set `allowImportingTsExtensions` or `rewriteRelativeImportExtensions`. The bundled resolver carries no `extensionAlias`, so such a specifier resolves to nothing and contributes no edge. `import-x/extensions` accepts the spelling, so a codebase written this way gets no signal from either rule; the snippet below does not close it. [#203](https://github.com/williamthorsen/eslint-config/issues/203) weighs what the config should do about it.
-- **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. Point the bundled resolver at your tsconfig to close this one, which needs no additional package:
+- **A relative specifier ending in `.js` that names a `.ts` file**, which is the spelling NodeNext prescribes unless you set `allowImportingTsExtensions` or `rewriteRelativeImportExtensions`. The bundled resolver carries no `extensionAlias`, so such a specifier resolves to nothing and contributes no edge. `import-x/extensions` accepts the spelling, so a codebase written this way gets no signal from either rule; the snippet below does not close it. [#203](https://github.com/williamthorsen/eslint-config/issues/203) weighs what the config should do about it. `sky-pilot/no-type-cycle` resolves the spelling as `tsc` does, so it closes this for a cycle carrying a type-only edge; one whose every edge is a value edge stays unreported.
+- **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at your tsconfig, which needs no additional package:
 
 ```ts
 export default [
@@ -122,12 +122,13 @@ export default [
 
 ## Custom rules (`sky-pilot`)
 
-Six rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
+Seven rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
 
 | Rule                                    | `recommended` | `strict` | Enforces                                                                                |
 | --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
 | `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
 | `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
+| `sky-pilot/no-type-cycle`               | `error`       | `error`  | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
 | `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
 | `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                                   |
 | `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.                     |
@@ -135,7 +136,7 @@ Six rules ship in this config's own plugin. The TypeScript config enables them, 
 
 `advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: they report defects rather than style advice.
 
-`createConfig.react()` adds a seventh rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
+`createConfig.react()` adds an eighth rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
 
 ### `sky-pilot/no-floating-disposable`
 
@@ -208,6 +209,33 @@ acquireHandle();
 ```
 
 typescript-eslint's `no-misused-disposable` covers this ground and more, but it is [still in draft](https://github.com/typescript-eslint/typescript-eslint/pull/12659).
+
+### `sky-pilot/no-type-cycle`
+
+Reports a cycle in the module graph that passes through at least one type-only import. TypeScript erases such an import, so `tsc` compiles the cycle clean, and `import-x/no-cycle` [excludes type-only edges](#import-cycles) by design. The two rules divide the ground on TypeScript sources: `import-x/no-cycle` reports a cycle whose every edge is a value edge, and this rule reports every other cycle.
+
+The graph comes from the TypeScript program the project service builds, so a specifier resolves as `tsc` resolves it. A tsconfig `paths` alias, a relative specifier ending in `.js` that names a `.ts` file, and a `.d.ts` all contribute edges, none of which the bundled `import-x` resolver reaches. The rule reads the program, so it reports nothing where the parser supplies none.
+
+Five spellings make a type-only edge, matching what TypeScript erases:
+
+```ts
+import type { T } from './m.ts';
+import { type T } from './m.ts';
+export type { T } from './m.ts';
+export { type T } from './m.ts';
+type Q = import('./m.ts').T;
+```
+
+The report sits on the statement that begins the cycle and names the chain of modules, so a cycle spanning a directory of layered modules reads as a path rather than as one file.
+
+Four things are passed over:
+
+- **A cycle whose every edge is a value edge**, which `import-x/no-cycle` reports. Reporting it here too would put two messages on one statement.
+- **A dynamic `import('./m.ts')` expression**, which loads asynchronously and so leaves no binding briefly `undefined`.
+- **A file from `node_modules` or from TypeScript's own `lib`**, excluded by where it comes from rather than by what kind of file it is: a hand-written `.d.ts` in your own source is part of the graph.
+- **A JavaScript file**, which no type-aware rule reaches. `import-x/no-cycle` is the only cycle guard there.
+
+The rule takes no options.
 
 ### `sky-pilot/no-unpublished-barrel`
 
