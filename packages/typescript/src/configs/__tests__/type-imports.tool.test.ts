@@ -3,9 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { baseConfig } from '../../baseConfig.ts';
 import { fixText } from '../test-utils/fixText.ts';
 
-// Building the TS program on a cold module cache runs well past Vitest's 5s default.
-const COLD_START_TIMEOUT_MS = 30_000;
-
 const MODULE = "'./type-imports-module.ts'";
 
 /**
@@ -106,21 +103,17 @@ const cases = rows.flatMap((row) =>
 );
 
 describe('type-import shapes under --fix', () => {
-  it.each(cases)(
-    '$id converges on the expected statements with nothing left to report',
-    async ({ row, source }) => {
-      const fixed = await fixText(baseConfig, 'type-imports-row.ts', source);
+  it.each(cases)('$id converges on the expected statements with nothing left to report', async ({ row, source }) => {
+    const fixed = await fixText(baseConfig, 'type-imports-row.ts', source);
 
-      expect(fixed.messages.map((message) => `${message.ruleId ?? 'fatal'}: ${message.message}`)).toStrictEqual([]);
-      expect(importLines(fixed.output).toSorted()).toStrictEqual(row.expected.toSorted());
+    expect(fixed.messages.map((message) => `${message.ruleId ?? 'fatal'}: ${message.message}`)).toStrictEqual([]);
+    expect(importLines(fixed.output).toSorted()).toStrictEqual(row.expected.toSorted());
 
-      const again = await fixText(baseConfig, 'type-imports-row.ts', fixed.output);
+    const again = await fixText(baseConfig, 'type-imports-row.ts', fixed.output);
 
-      expect(again.output).toBe(fixed.output);
-      expect(again.messages).toStrictEqual([]);
-    },
-    COLD_START_TIMEOUT_MS,
-  );
+    expect(again.output).toBe(fixed.output);
+    expect(again.messages).toStrictEqual([]);
+  });
 
   it.each(rows.filter((row) => row.imports.length === 2))(
     '$id fixes to the same text in both source orders',
@@ -132,7 +125,6 @@ describe('type-import shapes under --fix', () => {
 
       expect(reversed.output).toBe(asWritten.output);
     },
-    COLD_START_TIMEOUT_MS,
   );
 });
 
