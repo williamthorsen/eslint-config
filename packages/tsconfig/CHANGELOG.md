@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.8.0 — 2026-09-06
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Require a relative specifier to name its TypeScript source (#209)
+
+  - Adds an `import-x/resolver` default to `@williamthorsen/eslint-config-typescript`. The default sets `extensionAlias` and is scoped to TypeScript files, so `import-x/no-cycle` reports a cycle among specifiers ending in `.js` and a JavaScript source still resolves `./b.js` to `b.js`.
+  - Raises the `typescript` peer range to `>=5.7`, the first version in which a project emitting with `tsc` can write the required spelling.
+  - Sets `rewriteRelativeImportExtensions` in `@williamthorsen/tsconfig`'s base, so that a build that clears `noEmit` compiles a TypeScript-extension import.
+
+  Migration: Upgrade `typescript` to 5.7 or later, rewrite each relative specifier naming a TypeScript file to end in that file's own extension (`./b.ts`, not `./b.js`), and in the tsconfig owning those sources set `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`, or set `rewriteRelativeImportExtensions`. Do the rewrite by hand or with a codemod, and do not apply the editor suggestion that `import-x/extensions` offers: it appends the resolved extension rather than replacing the written one, turning `./b.js` into `./b.js.ts`. `docs/migrating-to-v15.md` walks through each step.
+
 ## 0.7.0 — 2026-08-30
 
 ### 🎉 Features

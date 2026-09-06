@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## 15.0.0 — 2026-09-06
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Add sky-pilot/no-type-cycle to report a cycle in the type graph (#206)
+
+  Adds `sky-pilot/no-type-cycle` at `error` in `recommended` and `strict`, which reports a module cycle passing through at least one type-only import, a cycle that `tsc` compiles clean and `import-x/no-cycle` excludes by design.
+
+  Resolves each specifier through the TypeScript program that the project service already builds, so that a `paths` alias, a `.js` specifier naming a `.ts` file, and a `.d.ts` each contribute an edge that the bundled `import-x` resolver does not reach.
+
+  Migration: Break a cycle that passes through a type-only import, or set `sky-pilot/no-type-cycle` to `off` in a config block placed after the base config. A codebase carrying such a cycle otherwise fails `eslint` on upgrade.
+
+- 🚨 **Breaking:** Require a relative specifier to name its TypeScript source (#209)
+
+  - Adds an `import-x/resolver` default to `@williamthorsen/eslint-config-typescript`. The default sets `extensionAlias` and is scoped to TypeScript files, so `import-x/no-cycle` reports a cycle among specifiers ending in `.js` and a JavaScript source still resolves `./b.js` to `b.js`.
+  - Raises the `typescript` peer range to `>=5.7`, the first version in which a project emitting with `tsc` can write the required spelling.
+  - Sets `rewriteRelativeImportExtensions` in `@williamthorsen/tsconfig`'s base, so that a build that clears `noEmit` compiles a TypeScript-extension import.
+
+  Migration: Upgrade `typescript` to 5.7 or later, rewrite each relative specifier naming a TypeScript file to end in that file's own extension (`./b.ts`, not `./b.js`), and in the tsconfig owning those sources set `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`, or set `rewriteRelativeImportExtensions`. Do the rewrite by hand or with a codemod, and do not apply the editor suggestion that `import-x/extensions` offers: it appends the resolved extension rather than replacing the written one, turning `./b.js` into `./b.js.ts`. `docs/migrating-to-v15.md` walks through each step.
+
+- 🚨 **Breaking:** Require a type-only specifier to name its TypeScript source (#212)
+
+  - Enables `checkTypeImports` on `import-x/extensions`, so that a `.js` specifier in a top-level `import type` or `export type ... from` statement is now reported when it names a `.ts` source; inline type specifiers were already being reported.
+
+  Migration: Rewrite every type-only specifier that names a `.js` path so that it names the `.ts` source instead, as step 2 of `docs/migrating-to-v15.md` shows.
+
+### 🐛 Bug fixes
+
+- Stop import-x/extensions reporting a package self-reference subpath (#211)
+
+  - Fixes the issue that `import-x/extensions` reported a missing extension on a subpath import written from inside the package that declared it, but adding the extension demanded by the rule would break the import at runtime.
+  - Drops `import-x/extensions` enforcement on every non-relative specifier holding a slash, such as the alias `src/foo/bar`, because the rule cannot tell one from a package subpath; a relative specifier stays enforced.
+
 ## 14.0.0 — 2026-09-05
 
 ### 🎉 Features
