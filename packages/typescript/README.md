@@ -10,7 +10,7 @@ Flat-config ESLint preset for TypeScript projects. Covers TypeScript, JavaScript
 pnpm add -D @williamthorsen/eslint-config-typescript eslint typescript
 ```
 
-Requires ESLint 9+ and TypeScript 5+.
+Requires ESLint 10+ and TypeScript 5.7+.
 
 ## Quick start
 
@@ -39,6 +39,18 @@ The TypeScript rules are type-aware, and the preset enables typescript-eslint's 
 
 - Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from your build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
 - Set `tsconfigRootDir` (as in Quick start) to anchor resolution at your repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
+
+## Import specifiers
+
+A relative specifier names the TypeScript source it reaches: `./m.ts`, never `./m.js`. `import-x/extensions` reports the `.js` spelling, and the config ships an `import-x` resolver default carrying `extensionAlias` so the rule reads the file the specifier resolves to. The alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source keeps naming the JavaScript file it loads.
+
+TypeScript rejects a `.ts` specifier unless the tsconfig owning the file sets `rewriteRelativeImportExtensions`, which rewrites the extension in output and declarations, or `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`. The first arrived in TypeScript 5.7, which is the peer floor this package declares. The kit below reports a tsconfig setting neither.
+
+Overriding `settings['import-x/resolver']` replaces the shipped default rather than merging with it, so compose with `importResolverOptions` as the [`paths` snippet](#import-cycles) does.
+
+## Migrating to v15
+
+v15 requires a relative specifier to name its TypeScript source, and raises the `typescript` peer floor to 5.7. See [Migrating to v15](../../docs/migrating-to-v15.md).
 
 ## Migrating to v13
 
@@ -102,19 +114,22 @@ An all-type statement stays `import type { Foo }` rather than `import { type Foo
 
 The config supplies `settings['import-x/extensions']` itself, so the rule needs no wiring on your side. That setting, which is unrelated to the rule of the same name, lists the extensions the plugin's module graph will open. It defaults to `['.js', '.mjs', '.cjs']`, which is why a graph-walking rule reports nothing on a TypeScript source until it is set, and any other `import-x` rule you enable reads it too.
 
-Four kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
+Three kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
 
 - **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them.
 - **A bare or scoped specifier**, such as `react` or `@scope/pkg`. The config sets `ignoreExternal`, which keeps the traversal out of `node_modules` and cuts the rule's cost by roughly twentyfold. It also drops a cycle running through a workspace sibling imported by its package name.
-- **A relative specifier ending in `.js` that names a `.ts` file**, which is the spelling NodeNext prescribes unless you set `allowImportingTsExtensions` or `rewriteRelativeImportExtensions`. The bundled resolver carries no `extensionAlias`, so such a specifier resolves to nothing and contributes no edge. `import-x/extensions` accepts the spelling, so a codebase written this way gets no signal from either rule; the snippet below does not close it. [#203](https://github.com/williamthorsen/eslint-config/issues/203) weighs what the config should do about it. `sky-pilot/no-type-cycle` resolves the spelling as `tsc` does, so it closes this for a cycle carrying a type-only edge; one whose every edge is a value edge stays unreported.
 - **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at your tsconfig, which needs no additional package:
 
 ```ts
+import { importResolverOptions } from '@williamthorsen/eslint-config-typescript';
+
 export default [
   ...baseConfig,
   {
     settings: {
-      'import-x/resolver': { node: { tsconfig: { configFile: './tsconfig.json' } } },
+      'import-x/resolver': {
+        node: { ...importResolverOptions, tsconfig: { configFile: './tsconfig.json' } },
+      },
     },
   },
 ];
@@ -214,7 +229,7 @@ typescript-eslint's `no-misused-disposable` covers this ground and more, but it 
 
 Reports a cycle in the module graph that passes through at least one type-only import. TypeScript erases such an import, so `tsc` compiles the cycle clean, and `import-x/no-cycle` [excludes type-only edges](#import-cycles) by design. The two rules divide the ground on TypeScript sources: `import-x/no-cycle` reports a cycle whose every edge is a value edge, and this rule reports every other cycle.
 
-The graph comes from the TypeScript program the project service builds, so a specifier resolves as `tsc` resolves it. A tsconfig `paths` alias, a relative specifier ending in `.js` that names a `.ts` file, and a `.d.ts` all contribute edges, none of which the bundled `import-x` resolver reaches. The rule reads the program, so it reports nothing where the parser supplies none.
+The graph comes from the TypeScript program the project service builds, so a specifier resolves as `tsc` resolves it. A tsconfig `paths` alias and a `.d.ts` both contribute edges, neither of which the bundled `import-x` resolver reaches. The rule reads the program, so it reports nothing where the parser supplies none.
 
 Five spellings make a type-only edge, matching what TypeScript erases:
 
@@ -415,7 +430,7 @@ An unscoped block applies `'warn'` everywhere, including in test files, where th
 | `@typescript-eslint/utils` | `^8.59.1`  |
 | `eslint`                   | `>=10`     |
 | `readyup`                  | `>=0.33.0` |
-| `typescript`               | `>=5`      |
+| `typescript`               | `>=5.7`    |
 
 `readyup` is optional, needed only to run the readiness kit described below.
 
@@ -447,9 +462,9 @@ The check that your root config extends this package matches the package specifi
 
 The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. A config reaching the factory through a local re-export names neither, so one that also sets no `rootDir` goes unreported rather than reporting a wrong failure. One that does set it is still judged on the value it writes.
 
-The two `tsconfig` checks judge each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, is read by neither. Both resolve each setting through the config's `extends` chain, so a value a base supplies counts as the consumer's own.
+The extension-import check reports a `tsconfig.json` whose effective compiler options permit no import path ending in a TypeScript extension, which the config requires of every relative specifier naming a TypeScript source. It reads the one at the repo root and one per workspace, resolving each setting through the `extends` chain, so a value a base supplies counts as the consumer's own. A repo declaring no `tsconfig.json` holds no TypeScript to measure, and the check skips.
 
-The extension-import check reports an eslint config importing a file by `.ts`, `.mts`, or `.cts` specifier where the effective compiler options permit no such import. It matches the specifier rather than what it names, since TypeScript raises TS5097 on the specifier alone, and it leaves a type-only import unreported, that form needing no option.
+The enumeration check judges each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, is read by neither.
 
 The enumeration check reports a `files` or `include` that names the eslint config's siblings one by one without naming the config itself. Where nothing enumerates, it stays silent rather than reporting every project whose inputs miss the file: a root declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the config by a route its own inputs do not show.
 

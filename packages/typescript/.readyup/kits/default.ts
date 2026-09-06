@@ -44,6 +44,7 @@ import { type InputCoverage, judgeInputCoverage } from '../../src/readiness/tsco
 const PACKAGE_NAME = '@williamthorsen/eslint-config-typescript';
 const MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-from-parseroptionsproject`;
 const TS_ESLINT_CONFIG_MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-eslint-configs-to-typescript`;
+const IMPORT_SPECIFIER_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#import-specifiers`;
 
 // Inlined at compile time, so the floors track the package's own peer ranges instead of a copy.
 const PEER_RANGES = pickJson('../../package.json', ['peerDependencies']);
@@ -136,7 +137,7 @@ export default defineRdyKit({
           name: "The repo's tsconfigs permit a TypeScript-extension import",
           skip: skipUnlessTsconfigPresent,
           check: tsExtensionImportsPermitted,
-          fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly where the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
+          fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly where the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`,
         },
         {
           name: "A tsconfig enumerating an eslint config's siblings names the config itself",
