@@ -7,7 +7,7 @@ Three published packages, of which `@williamthorsen/eslint-config-typescript` is
 ## Project structure
 
 - `packages/typescript/`: `@williamthorsen/eslint-config-typescript`. Sources under `src/`, compiled to `dist/esm/`, with subpath exports beside the root entry. Custom ESLint rules live in `src/plugins/rules/`.
-- `packages/strict-lint/`: `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin.
+- `packages/strict-lint/`: `@williamthorsen/strict-lint`. Compiled to `dist/esm/`; ships a `strict-lint` bin. `bin/strict-lint.js` is committed rather than built: pnpm links a bin before anything compiles, so a `bin` naming a path under `dist/` fails to link on a fresh clone and never retries. The wrapper loads `dist/esm/bin/strict-lint.js` at runtime, and `__tests__/bin-targets.tool.test.ts` holds every workspace to the pattern.
 - `packages/tsconfig/`: `@williamthorsen/tsconfig`. No build step; ships `tsconfig.base.json`, which inlines `@tsconfig/strictest`'s settings and adds the Node/build options it omits, alongside a readyup kit. The repo root consumes it via the workspace symlink. `src/` is never built and never published: it exists so the kit's predicates get tests and coverage.
 - `eslint.config.ts` (repo root): imports `packages/typescript/src/` directly; needs no build.
 - `.config/nmr.config.ts`: repo-level overrides for the `nmr` script runner.

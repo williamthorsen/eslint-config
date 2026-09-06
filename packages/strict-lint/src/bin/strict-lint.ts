@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { runInit } from '../init/initCommand.ts';
 
 // `init` is a command only in first position, so a path of that name still lints as `strict-lint ./init`.
