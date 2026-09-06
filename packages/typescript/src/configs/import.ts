@@ -16,7 +16,7 @@ const settings = {
 const rules: Linter.RulesRecord = {
   // The override exempts every bare specifier holding a slash, so a non-relative alias such as `src/foo/bar`
   // loses enforcement with it; a relative specifier keeps it, its leading dot unmatched by `*`.
-  // Option shapes and the two behaviors above: un-ts/eslint-plugin-import-x#508, #509.
+  // Option shapes and plugin behaviors: un-ts/eslint-plugin-import-x#508, #509.
   'import-x/extensions': [
     'error',
     'ignorePackages',
