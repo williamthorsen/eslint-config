@@ -1,0 +1,8 @@
+{
+  "name": "fixtures-self-reference",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./target": "./target.ts"
+  }
+}

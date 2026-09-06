@@ -44,6 +44,8 @@ The TypeScript rules are type-aware, and the preset enables typescript-eslint's 
 
 A relative specifier names the TypeScript source it reaches: `./m.ts`, never `./m.js`. `import-x/extensions` reports the `.js` spelling, and the config ships an `import-x` resolver default carrying `extensionAlias` so the rule reads the file the specifier resolves to. The alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source keeps naming the JavaScript file it loads.
 
+The rule enforces relative specifiers alone: every bare specifier holding a slash is exempt, which is what lets a package import its own subpath export. A non-relative alias such as `src/foo/bar` is indistinguishable from one and goes unchecked too.
+
 TypeScript rejects a `.ts` specifier unless the tsconfig owning the file sets `rewriteRelativeImportExtensions`, which rewrites the extension in output and declarations, or `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`. The first arrived in TypeScript 5.7, which is the peer floor this package declares. The kit below reports a tsconfig setting neither.
 
 ESLint merges `settings` deeply, so an override adding a resolver key of your own keeps the shipped alias; see the [`paths` snippet](#import-cycles).

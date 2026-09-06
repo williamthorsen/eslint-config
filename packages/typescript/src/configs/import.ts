@@ -14,14 +14,23 @@ const settings = {
 };
 
 const rules: Linter.RulesRecord = {
+  // `pathGroupOverrides` is dropped from an options object carrying the extension keys at the top level, so
+  // they sit under `pattern` (un-ts/eslint-plugin-import-x#509). The override exempts every bare specifier
+  // holding a slash: a subpath written from inside the package that declares it resolves through that
+  // package's own `exports` map, so it is classified `internal` and reported
+  // (un-ts/eslint-plugin-import-x#508). No narrower pattern reaches that shape, so a non-relative alias such
+  // as `src/foo/bar` loses enforcement too; a relative specifier keeps it, its leading dot unmatched by `*`.
   'import-x/extensions': [
     'error',
     'ignorePackages',
     {
-      js: 'always',
-      jsx: 'always',
-      ts: 'always',
-      tsx: 'always',
+      pattern: {
+        js: 'always',
+        jsx: 'always',
+        ts: 'always',
+        tsx: 'always',
+      },
+      pathGroupOverrides: [{ pattern: '*/**', action: 'ignore' }],
     },
   ],
 

@@ -1,4 +1,5 @@
 import type { ESLint } from 'eslint';
+import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
 import { baseConfig } from '../../baseConfig.ts';
@@ -33,6 +34,39 @@ describe('the extension rule the import config sets', () => {
 
     expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual(['Missing file extension "ts" for "./js-target"']);
+  });
+
+  it('reports nothing for a package subpath imported from inside that package', async () => {
+    const results = await lintFixture([...baseConfig, typedParserSettings], 'self-reference/importer.ts');
+
+    expect(results[0]?.fatalErrorCount).toBe(0);
+    expect(listExtensionMessages(results)).toStrictEqual(['Missing file extension "ts" for "./sibling"']);
+  });
+
+  // The override exempts an unresolvable specifier as readily as a resolved one, so the case above passes
+  // whether or not the fixture's `exports` map is reached. Composing the options the override replaces is
+  // what proves the fixture resolves, and that the override is what silences it.
+  it('reports that subpath where the path-group override is absent', async () => {
+    const withoutOverride = {
+      rules: {
+        'import-x/extensions': [
+          'error',
+          'ignorePackages',
+          { js: 'always', jsx: 'always', ts: 'always', tsx: 'always' },
+        ],
+      },
+    } satisfies Config;
+
+    const results = await lintFixture(
+      [...baseConfig, typedParserSettings, withoutOverride],
+      'self-reference/importer.ts',
+    );
+
+    expect(results[0]?.fatalErrorCount).toBe(0);
+    expect(listExtensionMessages(results)).toStrictEqual([
+      'Missing file extension "ts" for "fixtures-self-reference/target"',
+      'Missing file extension "ts" for "./sibling"',
+    ]);
   });
 
   // ESLint merges `settings` deeply, which is what lets a consumer add a resolver key without displacing
