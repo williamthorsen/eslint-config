@@ -24,6 +24,27 @@ describe('the extension rule the import config sets', () => {
     expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([]);
   });
+
+  // `js-target.ts` and `js-target.js` both sit beside the fixture, so the message names whichever the
+  // resolver's `extensions` list reaches first. The list is ordered by resolution priority, and the
+  // alphabetical ordering it departs from would name `js` here.
+  it('resolves an extensionless specifier to the TypeScript sibling', async () => {
+    const results = await lintFixture([...baseConfig, typedParserSettings], 'extensionless-importer.ts');
+
+    expect(results[0]?.fatalErrorCount).toBe(0);
+    expect(listExtensionMessages(results)).toStrictEqual(['Missing file extension "ts" for "./js-target"']);
+  });
+
+  // ESLint merges `settings` deeply, which is what lets a consumer add a resolver key without displacing
+  // the shipped `extensionAlias`. The README documents the override on that basis.
+  it('keeps the alias where a later config adds a resolver key of its own', async () => {
+    const override = { settings: { 'import-x/resolver': { node: { conditionNames: ['import'] } } } };
+
+    const results = await lintFixture([...baseConfig, typedParserSettings, override], 'cycle-jsvalue-a.ts');
+
+    expect(results[0]?.fatalErrorCount).toBe(0);
+    expect(listExtensionMessages(results)).toStrictEqual(['Missing file extension "ts" for "./cycle-jsvalue-b.js"']);
+  });
 });
 
 // region | Helpers
