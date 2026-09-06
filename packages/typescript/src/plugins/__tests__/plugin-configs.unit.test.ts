@@ -33,8 +33,9 @@ describe('custom plugin preset integrity', () => {
   });
 
   // Adding a rule means editing the plugin's `rules` map and each preset separately. One left out of a preset ships
-  // disabled under it, which no other check would report. The case below holds `optInRules` to its own claim, so a
-  // rule cannot be dropped from a preset by quietly listing it here.
+  // disabled under it, which no other check would report. `optInRules` names the deliberate omissions, and the case
+  // below holds each to being registered by the plugin and absent at any severity. Adding a name to that list is
+  // itself an unguarded edit: it is what a reviewer reads, not what the suite blocks.
   it.each(presetCases)(
     `$pluginName "$presetName" enables every rule the plugin registers but the opt-in ones`,
     ({ optInRules, pluginName, preset }) => {

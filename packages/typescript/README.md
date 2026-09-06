@@ -118,7 +118,7 @@ The config supplies `settings['import-x/extensions']` itself, so the rule needs 
 
 Three kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
 
-- **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them, and is off until you enable it.
+- **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them where you enable it.
 - **A bare or scoped specifier**, such as `react` or `@scope/pkg`. The config sets `ignoreExternal`, which keeps the traversal out of `node_modules` and cuts the rule's cost by roughly twentyfold. It also drops a cycle running through a workspace sibling imported by its package name.
 - **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so enabling it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at your tsconfig, which needs no additional package:
 
@@ -143,7 +143,7 @@ Seven rules ship in this config's own plugin. The TypeScript config enables six 
 | --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
 | `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
 | `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
-| `sky-pilot/no-type-cycle`               | `off`         | `off`    | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
+| `sky-pilot/no-type-cycle`               | opt-in        | opt-in   | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
 | `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
 | `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                                   |
 | `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.                     |
@@ -229,7 +229,7 @@ typescript-eslint's `no-misused-disposable` covers this ground and more, but it 
 
 Reports a cycle in the module graph that passes through at least one type-only import. The rule sits in neither preset, because TypeScript erases a type-only import: the cycle is cut at that edge, so it cannot exist in the emitted JavaScript.
 
-One configuration keeps it there, and it is the reason to enable the rule. Under `verbatimModuleSyntax` TypeScript strips an inline type specifier without dropping the statement, so `import { type A } from './a.ts'` emits `import {} from './a.ts'`, a live module load that carries the cycle into the output. `import-x/no-cycle` does not report that case: it treats a statement whose specifiers are all inline `type` as type-only and skips it, which leaves this rule as the only cover.
+One configuration keeps the cycle in the output, and is the reason to enable the rule. Under `verbatimModuleSyntax` TypeScript strips an inline type specifier without dropping the statement, so `import { type A } from './a.ts'` emits `import {} from './a.ts'`, a live module load that carries the cycle into the output. `import-x/no-cycle` does not report that case: it treats a statement whose specifiers are all inline `type` as type-only and skips it, which leaves this rule as the only cover.
 
 ```ts
 export default [
