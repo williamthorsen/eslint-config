@@ -24,13 +24,14 @@ const rules: Linter.RulesRecord = {
     'error',
     'ignorePackages',
     {
+      checkTypeImports: true,
+      pathGroupOverrides: [{ pattern: '*/**', action: 'ignore' }],
       pattern: {
         js: 'always',
         jsx: 'always',
         ts: 'always',
         tsx: 'always',
       },
-      pathGroupOverrides: [{ pattern: '*/**', action: 'ignore' }],
     },
   ],
 
