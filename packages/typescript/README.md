@@ -118,9 +118,9 @@ The config supplies `settings['import-x/extensions']` itself, so the rule needs 
 
 Three kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
 
-- **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them.
+- **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them, and is off until you enable it.
 - **A bare or scoped specifier**, such as `react` or `@scope/pkg`. The config sets `ignoreExternal`, which keeps the traversal out of `node_modules` and cuts the rule's cost by roughly twentyfold. It also drops a cycle running through a workspace sibling imported by its package name.
-- **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at your tsconfig, which needs no additional package:
+- **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so enabling it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at your tsconfig, which needs no additional package:
 
 ```ts
 export default [
@@ -137,13 +137,13 @@ ESLint merges `settings` deeply, so this adds `tsconfig` to the resolver without
 
 ## Custom rules (`sky-pilot`)
 
-Seven rules ship in this config's own plugin. The TypeScript config enables them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself.
+Seven rules ship in this config's own plugin. The TypeScript config enables six of them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself. The seventh, [`no-type-cycle`](#sky-pilotno-type-cycle), sits in neither preset and is enabled per project.
 
 | Rule                                    | `recommended` | `strict` | Enforces                                                                                |
 | --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
 | `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
 | `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
-| `sky-pilot/no-type-cycle`               | `error`       | `error`  | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
+| `sky-pilot/no-type-cycle`               | `off`         | `off`    | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
 | `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
 | `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                                   |
 | `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.                     |
@@ -151,7 +151,7 @@ Seven rules ship in this config's own plugin. The TypeScript config enables them
 
 `advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: they report defects rather than style advice.
 
-`createConfig.react()` adds an eighth rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
+`createConfig.react()` adds a rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
 
 ### `sky-pilot/no-floating-disposable`
 
@@ -227,7 +227,20 @@ typescript-eslint's `no-misused-disposable` covers this ground and more, but it 
 
 ### `sky-pilot/no-type-cycle`
 
-Reports a cycle in the module graph that passes through at least one type-only import. TypeScript erases such an import, so `tsc` compiles the cycle clean, and `import-x/no-cycle` [excludes type-only edges](#import-cycles) by design. The two rules divide the ground on TypeScript sources: `import-x/no-cycle` reports a cycle whose every edge is a value edge, and this rule reports every other cycle.
+Reports a cycle in the module graph that passes through at least one type-only import. The rule sits in neither preset, because TypeScript erases a type-only import: the cycle is cut at that edge, so it cannot exist in the emitted JavaScript.
+
+One configuration keeps it there, and it is the reason to enable the rule. Under `verbatimModuleSyntax` TypeScript strips an inline type specifier without dropping the statement, so `import { type A } from './a.ts'` emits `import {} from './a.ts'`, a live module load that carries the cycle into the output. `import-x/no-cycle` does not report that case: it treats a statement whose specifiers are all inline `type` as type-only and skips it, which leaves this rule as the only cover.
+
+```ts
+export default [
+  ...baseConfig,
+  {
+    rules: { 'sky-pilot/no-type-cycle': 'error' },
+  },
+];
+```
+
+Without `verbatimModuleSyntax` the rule still reports every cycle it finds, as a layering defect rather than a runtime one. Enabled either way, the two cycle rules cover the ground between them on TypeScript sources: `import-x/no-cycle` reports a cycle whose every edge is a value edge, and this rule reports every other cycle.
 
 The graph comes from the TypeScript program the project service builds, so a specifier resolves as `tsc` resolves it. A tsconfig `paths` alias and a `.d.ts` both contribute edges, neither of which the bundled `import-x` resolver reaches. The rule reads the program, so it reports nothing where the parser supplies none.
 

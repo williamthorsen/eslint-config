@@ -36,7 +36,6 @@ const configs: { recommended: Config; strict: Config } = {
     rules: {
       'sky-pilot/no-floating-disposable': 'warn',
       'sky-pilot/no-split-imports': 'warn',
-      'sky-pilot/no-type-cycle': 'error',
       'sky-pilot/no-undefined-with-number': 'error',
       'sky-pilot/no-unpublished-barrel': 'warn',
       'sky-pilot/no-unused-map': 'warn',
@@ -50,7 +49,6 @@ const configs: { recommended: Config; strict: Config } = {
     rules: {
       'sky-pilot/no-floating-disposable': 'error',
       'sky-pilot/no-split-imports': 'error',
-      'sky-pilot/no-type-cycle': 'error',
       'sky-pilot/no-undefined-with-number': 'error',
       'sky-pilot/no-unpublished-barrel': 'error',
       'sky-pilot/no-unused-map': 'error',
