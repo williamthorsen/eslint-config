@@ -13,6 +13,7 @@ describe('root entry point', () => {
       'configs',
       'createConfig',
       'default',
+      'importResolverOptions',
       'patterns',
     ]);
   });

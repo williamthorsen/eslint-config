@@ -4,12 +4,15 @@ import { describe, expect, it } from 'vitest';
 import { baseConfig } from '../../baseConfig.ts';
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
-// Every fixture pair imports its partner by a relative specifier carrying the `.ts` extension, which is
-// what `settings['import-x/extensions']` lets the rule's module graph open.
+// `settings['import-x/extensions']` is what lets the rule's module graph open a TypeScript file at all, and
+// the resolver alias is what lets a specifier written `./b.js` name one.
 
 describe('the cycle rule the import config sets', () => {
-  it('reports a cycle among value imports', async () => {
-    const results = await lintFixture([...baseConfig, typedParserSettings], 'cycle-value-a.ts');
+  it.each([
+    ['the TypeScript extension', 'cycle-value-a.ts'],
+    ['a `.js` extension naming a TypeScript file', 'cycle-jsvalue-a.ts'],
+  ])('reports a cycle among value imports spelled with %s', async (_spelling, fixture) => {
+    const results = await lintFixture([...baseConfig, typedParserSettings], fixture);
 
     expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listCycleMessages(results)).toStrictEqual(['Dependency cycle detected']);
