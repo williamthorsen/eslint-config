@@ -121,11 +121,12 @@ Three kinds of edge are passed over in silence, so a run with nothing reported i
 - **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at your tsconfig, which needs no additional package:
 
 ```ts
-import { importResolverOptions } from '@williamthorsen/eslint-config-typescript';
+import { importResolverOptions, patterns } from '@williamthorsen/eslint-config-typescript';
 
 export default [
   ...baseConfig,
   {
+    files: patterns.typeScriptFiles,
     settings: {
       'import-x/resolver': {
         node: { ...importResolverOptions, tsconfig: { configFile: './tsconfig.json' } },
@@ -134,6 +135,8 @@ export default [
   },
 ];
 ```
+
+The block carries `files` because `importResolverOptions` maps a `.js` specifier to its TypeScript source, which a JavaScript file must not do. Where a JavaScript source needs its `paths` aliases resolved too, add a second block that sets `node: { tsconfig: { configFile: './tsconfig.json' } }` without spreading the options.
 
 ## Custom rules (`sky-pilot`)
 
@@ -464,9 +467,7 @@ The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's 
 
 The extension-import check reports a `tsconfig.json` whose effective compiler options permit no import path ending in a TypeScript extension, which the config requires of every relative specifier naming a TypeScript source. It reads the one at the repo root and one per workspace, resolving each setting through the `extends` chain, so a value a base supplies counts as the consumer's own. A repo declaring no `tsconfig.json` holds no TypeScript to measure, and the check skips.
 
-The enumeration check judges each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, is read by neither.
-
-The enumeration check reports a `files` or `include` that names the eslint config's siblings one by one without naming the config itself. Where nothing enumerates, it stays silent rather than reporting every project whose inputs miss the file: a root declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the config by a route its own inputs do not show.
+The enumeration check judges each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, goes unread. It reports a `files` or `include` that names the eslint config's siblings one by one without naming the config itself. Where nothing enumerates, it stays silent rather than reporting every project whose inputs miss the file: a root declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the config by a route its own inputs do not show.
 
 ## License
 

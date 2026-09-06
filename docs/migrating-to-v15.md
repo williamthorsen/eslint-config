@@ -46,18 +46,19 @@ Each relative specifier naming a TypeScript file carries that file's own extensi
 
 A specifier naming a JavaScript file is unchanged. The resolver alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source still resolves `./m.js` to `m.js`.
 
-Run `eslint --fix`: `import-x/extensions` fixes each specifier it reports.
+`import-x/extensions` reports each specifier but cannot repair one. Its fixer is gated behind a rule option the config does not set, so `eslint --fix` changes nothing, and the repair it offers as an editor suggestion appends the resolved extension rather than replacing the written one, turning `./m.js` into `./m.js.ts`. Do not apply the suggestion or enable the rule's `fix` option: rewrite the specifiers by hand or with a codemod.
 
 ## Step 3: compose with the shipped resolver where you override it
 
 `settings['import-x/resolver']` is replaced by key rather than merged, so an override that names the key discards the alias. Spread the exported options into yours:
 
 ```diff
-+import { importResolverOptions } from '@williamthorsen/eslint-config-typescript';
++import { importResolverOptions, patterns } from '@williamthorsen/eslint-config-typescript';
 +
  export default [
    ...baseConfig,
    {
++    files: patterns.typeScriptFiles,
      settings: {
 -      'import-x/resolver': { node: { tsconfig: { configFile: './tsconfig.json' } } },
 +      'import-x/resolver': {
@@ -67,6 +68,8 @@ Run `eslint --fix`: `import-x/extensions` fixes each specifier it reports.
    },
  ];
 ```
+
+The `files` key is new alongside the spread: `importResolverOptions` maps a `.js` specifier to its TypeScript source, which a JavaScript file must not do. Where a JavaScript source needs its `paths` aliases resolved too, add a second block setting `node: { tsconfig: ... }` without the spread.
 
 ## What the kit reports
 
