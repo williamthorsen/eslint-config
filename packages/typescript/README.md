@@ -46,7 +46,7 @@ A relative specifier names the TypeScript source it reaches: `./m.ts`, never `./
 
 TypeScript rejects a `.ts` specifier unless the tsconfig owning the file sets `rewriteRelativeImportExtensions`, which rewrites the extension in output and declarations, or `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`. The first arrived in TypeScript 5.7, which is the peer floor this package declares. The kit below reports a tsconfig setting neither.
 
-Overriding `settings['import-x/resolver']` replaces the shipped default rather than merging with it, so compose with `importResolverOptions` as the [`paths` snippet](#import-cycles) does.
+ESLint merges `settings` deeply, so an override adding a resolver key of your own keeps the shipped alias; see the [`paths` snippet](#import-cycles).
 
 ## Migrating to v15
 
@@ -121,22 +121,17 @@ Three kinds of edge are passed over in silence, so a run with nothing reported i
 - **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at your tsconfig, which needs no additional package:
 
 ```ts
-import { importResolverOptions, patterns } from '@williamthorsen/eslint-config-typescript';
-
 export default [
   ...baseConfig,
   {
-    files: patterns.typeScriptFiles,
     settings: {
-      'import-x/resolver': {
-        node: { ...importResolverOptions, tsconfig: { configFile: './tsconfig.json' } },
-      },
+      'import-x/resolver': { node: { tsconfig: { configFile: './tsconfig.json' } } },
     },
   },
 ];
 ```
 
-The block carries `files` because `importResolverOptions` maps a `.js` specifier to its TypeScript source, which a JavaScript file must not do. Where a JavaScript source needs its `paths` aliases resolved too, add a second block that sets `node: { tsconfig: { configFile: './tsconfig.json' } }` without spreading the options.
+ESLint merges `settings` deeply, so this adds `tsconfig` to the resolver without displacing the `extensionAlias` the config supplies. A TypeScript file keeps both; a JavaScript file gets the `tsconfig` resolver alone, its specifiers naming the files they load.
 
 ## Custom rules (`sky-pilot`)
 

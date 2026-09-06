@@ -48,28 +48,22 @@ A specifier naming a JavaScript file is unchanged. The resolver alias is scoped 
 
 `import-x/extensions` reports each specifier but cannot repair one. Its fixer is gated behind a rule option the config does not set, so `eslint --fix` changes nothing, and the repair it offers as an editor suggestion appends the resolved extension rather than replacing the written one, turning `./m.js` into `./m.js.ts`. Do not apply the suggestion or enable the rule's `fix` option: rewrite the specifiers by hand or with a codemod.
 
-## Step 3: compose with the shipped resolver where you override it
+## Step 3: nothing to change where you override the resolver
 
-`settings['import-x/resolver']` is replaced by key rather than merged, so an override that names the key discards the alias. Spread the exported options into yours:
+ESLint merges `settings` deeply, so an override adding a resolver key of your own keeps the shipped `extensionAlias`. An existing override needs no change:
 
-```diff
-+import { importResolverOptions, patterns } from '@williamthorsen/eslint-config-typescript';
-+
- export default [
-   ...baseConfig,
-   {
-+    files: patterns.typeScriptFiles,
-     settings: {
--      'import-x/resolver': { node: { tsconfig: { configFile: './tsconfig.json' } } },
-+      'import-x/resolver': {
-+        node: { ...importResolverOptions, tsconfig: { configFile: './tsconfig.json' } },
-+      },
-     },
-   },
- ];
+```ts
+export default [
+  ...baseConfig,
+  {
+    settings: {
+      'import-x/resolver': { node: { tsconfig: { configFile: './tsconfig.json' } } },
+    },
+  },
+];
 ```
 
-The `files` key is new alongside the spread: `importResolverOptions` maps a `.js` specifier to its TypeScript source, which a JavaScript file must not do. Where a JavaScript source needs its `paths` aliases resolved too, add a second block setting `node: { tsconfig: ... }` without the spread.
+A TypeScript file resolves with both the shipped alias and your `tsconfig`; a JavaScript file resolves with your `tsconfig` alone.
 
 ## What the kit reports
 
