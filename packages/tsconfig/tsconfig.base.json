@@ -28,6 +28,9 @@
 
     // Permit `./foo.ts` specifiers; the build step rewrites them on emit.
     "allowImportingTsExtensions": true,
+    // The option TypeScript requires alongside the one above once a build clears `noEmit` and emits with
+    // `tsc`, which rewrites the specifier's extension in output and declarations.
+    "rewriteRelativeImportExtensions": true,
     // Without this, `lib` follows `target` into the `.full` variant, admitting DOM globals.
     // `ESNext.Disposable` carries the explicit-resource-management declarations; no numbered lib has them.
     "lib": ["ES2025", "ESNext.Disposable"],
