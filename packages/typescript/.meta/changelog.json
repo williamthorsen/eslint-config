@@ -1,5 +1,23 @@
 [
   {
+    "version": "16.0.0",
+    "date": "2026-09-06",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Drop no-type-cycle from the recommended and strict presets (#215)",
+            "body": "- No longer includes `sky-pilot/no-type-cycle` in `recommended` or `strict`, so a consumer does not get the rule by default. TypeScript erases a type-only import, so the cycle the rule reports cannot reach the emitted JavaScript.\n\nMigration: Add `'sky-pilot/no-type-cycle': 'error'` to the consuming config's `rules` block to keep receiving the rule's reports.",
+            "breaking": true,
+            "hash": "6c79f8e1f6e99a15e3bc5d0fc3d3b86425cd7294"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "15.0.0",
     "date": "2026-09-06",
     "sections": [

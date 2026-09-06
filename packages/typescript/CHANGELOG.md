@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 16.0.0 — 2026-09-06
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Drop no-type-cycle from the recommended and strict presets (#215)
+
+  - No longer includes `sky-pilot/no-type-cycle` in `recommended` or `strict`, so a consumer does not get the rule by default. TypeScript erases a type-only import, so the cycle the rule reports cannot reach the emitted JavaScript.
+
+  Migration: Add `'sky-pilot/no-type-cycle': 'error'` to the consuming config's `rules` block to keep receiving the rule's reports.
+
 ## 15.0.0 — 2026-09-06
 
 ### 🎉 Features
