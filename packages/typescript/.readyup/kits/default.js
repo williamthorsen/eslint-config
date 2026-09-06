@@ -37,20 +37,6 @@ function importsFromDir(content, dir) {
 function listRelativeNextRootDirs(content) {
   return listNextSettingsBlocks(content).flatMap((block) => listRootDirLiterals(block)).filter((value) => !isAbsolute(value));
 }
-function listTsExtensionImports(content) {
-  const specifiers = [];
-  for (const match of content.matchAll(
-    /\b(?:import|export)\b(?<clause>[^'"]*?)\bfrom\s*['"](?<specifier>[^'"]+)['"]/g
-  )) {
-    const { clause = "", specifier } = match.groups ?? {};
-    if (specifier !== void 0 && !/^\s*type\b/.test(readClauseTail(clause))) specifiers.push(specifier);
-  }
-  for (const match of content.matchAll(/\b(?:import|require)\s*\(?\s*['"]([^'"]+)['"]/g)) {
-    const specifier = match[1];
-    if (specifier !== void 0) specifiers.push(specifier);
-  }
-  return [...new Set(specifiers.filter((specifier) => /\.[cm]?ts$/.test(specifier)))];
-}
 function setsNextRootDir(content) {
   return listNextSettingsBlocks(content).some((block) => /\brootDir\s*:/.test(block));
 }
@@ -91,10 +77,6 @@ function listRootDirValues(block) {
   if (array !== null) return (array[1] ?? "").split(",");
   const bare = /\brootDir\s*:\s*([^,}]*)/.exec(block);
   return bare?.[1] === void 0 ? [] : [bare[1]];
-}
-function readClauseTail(clause) {
-  const keyword = clause.matchAll(/\b(?:import|export)\b/g).toArray().at(-1);
-  return keyword === void 0 ? clause : clause.slice(keyword.index + keyword[0].length);
 }
 function readStringLiteral(value) {
   const [, quote, literal] = /^\s*(['"`])([^'"`]*)\1\s*$/.exec(value) ?? [];
@@ -237,7 +219,8 @@ function toPatternRegExp(pattern) {
 var PACKAGE_NAME = "@williamthorsen/eslint-config-typescript";
 var MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-from-parseroptionsproject`;
 var TS_ESLINT_CONFIG_MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-eslint-configs-to-typescript`;
-var PEER_RANGES = { "peerDependencies": { "@typescript-eslint/utils": "^8.59.1", "eslint": ">=10", "readyup": ">=0.33.0", "typescript": ">=5" } };
+var IMPORT_SPECIFIER_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#import-specifiers`;
+var PEER_RANGES = { "peerDependencies": { "@typescript-eslint/utils": "^8.59.1", "eslint": ">=10", "readyup": ">=0.33.0", "typescript": ">=5.7" } };
 var ESLINT_TYPESCRIPT_FLOOR = "10.0.0";
 var installedVersions = /* @__PURE__ */ new Map();
 var tsconfigChains = /* @__PURE__ */ new Map();
@@ -310,10 +293,10 @@ var default_default = defineRdyKit({
       name: "tsconfig",
       checks: [
         {
-          name: "The tsconfig owning an eslint config permits its TypeScript-extension imports",
-          skip: skipUnlessTsExtensionImports,
+          name: "The repo's tsconfigs permit a TypeScript-extension import",
+          skip: skipUnlessTsconfigPresent,
           check: tsExtensionImportsPermitted,
-          fix: `Set allowImportingTsExtensions in the tsconfig owning the eslint config, alongside one of noEmit, emitDeclarationOnly, or rewriteRelativeImportExtensions, one of which TypeScript requires with it. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`
+          fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly where the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`
         },
         {
           name: "A tsconfig enumerating an eslint config's siblings names the config itself",
@@ -368,7 +351,7 @@ function eslintConfigEnumerated() {
   return { ok: false, detail: `an enumeration omits the eslint config: ${offenders.join("; ")}` };
 }
 function findEslintConfigs() {
-  return listEslintConfigCandidates(listEslintConfigSearchDirs()).filter((configPath) => fileExists(configPath));
+  return listEslintConfigCandidates(listRepoSearchDirs()).filter((configPath) => fileExists(configPath));
 }
 function findOwningTsconfig(filePath) {
   const slash = filePath.lastIndexOf("/");
@@ -377,9 +360,6 @@ function findOwningTsconfig(filePath) {
 }
 function findRootEslintConfig() {
   return ESLINT_CONFIG_BASENAMES.find((basename) => fileExists(basename));
-}
-function listEslintConfigSearchDirs() {
-  return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 function listEslintConfigsMatching(matches) {
   return findEslintConfigs().filter((configPath) => {
@@ -399,13 +379,12 @@ function listInputJudgements() {
 function listProviderWorkspaceDirs() {
   return discoverWorkspaces().filter((workspace) => workspace.name === PACKAGE_NAME).map((workspace) => workspace.dir);
 }
-function listTsExtensionImporters() {
-  return findEslintConfigs().flatMap((configPath) => {
-    const content = readFile(configPath);
-    if (content === void 0) return [];
-    const specifiers = listTsExtensionImports(content);
-    return specifiers.length === 0 ? [] : [{ configPath, specifiers }];
-  });
+function listRepoSearchDirs() {
+  return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
+}
+function listRepoTsconfigs() {
+  const declared = listRepoSearchDirs().map((dir) => resolveDirPath(dir, "tsconfig.json")).filter((candidate) => fileExists(candidate));
+  return [...new Set(declared)];
 }
 function nextRootDirsAbsolute() {
   const offenders = findEslintConfigs().flatMap((configPath) => {
@@ -437,7 +416,7 @@ function noShadowedEslintConfig() {
   return { ok: false, detail: `a JavaScript config shadows a TypeScript one in: ${dirs.join(", ")}` };
 }
 function noTsconfigEslintJson() {
-  const offenders = listEslintConfigSearchDirs().map((dir) => resolveDirPath(dir, "tsconfig.eslint.json")).filter((configPath) => fileExists(configPath));
+  const offenders = listRepoSearchDirs().map((dir) => resolveDirPath(dir, "tsconfig.eslint.json")).filter((configPath) => fileExists(configPath));
   if (offenders.length === 0) return true;
   return { ok: false, detail: `tsconfig.eslint.json found: ${offenders.join(", ")}` };
 }
@@ -449,7 +428,7 @@ function readInstalledVersion(name) {
   const cached = installedVersions.get(name);
   if (cached !== void 0 || installedVersions.has(name)) return cached;
   let lowest;
-  for (const dir of listEslintConfigSearchDirs()) {
+  for (const dir of listRepoSearchDirs()) {
     const manifest = readJsonFile(resolveDirPath(dir, `node_modules/${name}/package.json`));
     if (manifest === void 0) continue;
     const version = getJsonValue(manifest, "version");
@@ -491,24 +470,20 @@ function skipUnlessPeerComparable(name) {
   const comparison = comparePeer(name);
   return comparison.kind === "comparable" ? false : comparison.reason;
 }
-function skipUnlessTsExtensionImports() {
-  return listTsExtensionImporters().length > 0 ? false : "No eslint config imports a file by TypeScript extension";
+function skipUnlessTsconfigPresent() {
+  return listRepoTsconfigs().length > 0 ? false : "The repo declares no tsconfig";
 }
 function tsconfigRootDirAnchored() {
   if (listEslintConfigsMatching(setsTsconfigRootDir).length > 0) return true;
   return { ok: false, detail: "no eslint config sets parserOptions.tsconfigRootDir" };
 }
 function tsExtensionImportsPermitted() {
-  const offenders = [];
-  for (const { configPath, specifiers } of listTsExtensionImporters()) {
-    const tsconfigPath = findOwningTsconfig(configPath);
-    if (tsconfigPath === void 0) continue;
+  const offenders = listRepoTsconfigs().filter((tsconfigPath) => {
     const chain = readChain(tsconfigPath);
-    if (chain === void 0 || permitsTsExtensionImports(chain.entries)) continue;
-    offenders.push(`${configPath} imports ${specifiers.join(", ")} under ${tsconfigPath}`);
-  }
+    return chain !== void 0 && !permitsTsExtensionImports(chain.entries);
+  });
   if (offenders.length === 0) return true;
-  return { ok: false, detail: `no compiler option permits the import: ${offenders.join("; ")}` };
+  return { ok: false, detail: `no compiler option permits the import under ${offenders.join(", ")}` };
 }
 export {
   default_default as default

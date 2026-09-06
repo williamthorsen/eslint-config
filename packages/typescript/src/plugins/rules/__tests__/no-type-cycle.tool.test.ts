@@ -45,7 +45,7 @@ describe('sky-pilot/no-type-cycle', () => {
       './cycle-jsext-b.ts → ./cycle-jsext-a.ts',
     ],
     ['a tsconfig `paths` alias', 'cycle-alias-a.ts', './cycle-alias-b.ts → ./cycle-alias-a.ts'],
-  ])('follows %s, which the bundled import-x resolver does not reach', async (_specifier, fixture, chain) => {
+  ])('follows %s, resolving it as `tsc` does', async (_specifier, fixture, chain) => {
     const results = await lintFixture([fixtureWiring, ruleConfig], fixture);
 
     expect(results[0]?.fatalErrorCount).toBe(0);

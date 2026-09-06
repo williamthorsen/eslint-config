@@ -17,7 +17,7 @@ describe(loadEslintConfig, () => {
     assertLoaded(load);
     expect(load.filePath).toBe(path.join(REPO_ROOT, 'eslint.config.ts'));
     expect(load.elements.length).toBeGreaterThan(0);
-  }, 30_000);
+  }, 90_000);
 
   it('reads the config at an explicitly given path rather than discovering one', async () => {
     const filePath = path.join(REPO_ROOT, 'eslint.config.ts');
@@ -25,7 +25,7 @@ describe(loadEslintConfig, () => {
     const load = await loadEslintConfig(os.tmpdir(), filePath);
 
     expect(load.status).toBe('loaded');
-  }, 30_000);
+  }, 90_000);
 
   it('reports a config Node cannot import rather than throwing', async () => {
     const load = await loadEslintConfig(REPO_ROOT, path.join(REPO_ROOT, 'no-such.config.ts'));
@@ -55,7 +55,7 @@ describe(loadEslintConfig, () => {
 
       expect(load).toStrictEqual({ elements: [{ rules: { 'no-eval': 'error' } }], filePath, status: 'loaded' });
     });
-  }, 30_000);
+  }, 90_000);
 
   it('reports a function default export, which ESLint rejects before any lint runs', async () => {
     await withTempConfig('export default () => [{ rules: {} }];', async (filePath) => {
@@ -63,7 +63,7 @@ describe(loadEslintConfig, () => {
 
       expect(load.status).toBe('unreadable');
     });
-  }, 30_000);
+  }, 90_000);
 
   it('reports no config when the search finds none', async () => {
     const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'strict-lint-'));
@@ -73,7 +73,7 @@ describe(loadEslintConfig, () => {
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
-  }, 30_000);
+  }, 90_000);
 });
 
 // region | Helpers

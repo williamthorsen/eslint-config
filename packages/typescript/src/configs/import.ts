@@ -2,6 +2,9 @@ import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
 import importXPlugin from 'eslint-plugin-import-x';
 
+import { patterns } from '../patterns.ts';
+import { importResolverOptions } from './importResolverOptions.ts';
+
 // The plugin's `ExportMap` opens only a file whose extension appears here, and the key defaults to
 // `['.js', '.mjs', '.cjs']`, so without it every rule that walks the module graph is inert on a TypeScript
 // source. This is the `import-x/extensions` setting, unrelated to the rule of the same name below. The
@@ -28,12 +31,22 @@ const rules: Linter.RulesRecord = {
   'import-x/no-cycle': ['error', { ignoreExternal: true }],
 };
 
-const config = defineConfig({
-  plugins: {
-    'import-x': importXPlugin,
+const config = defineConfig(
+  {
+    plugins: {
+      'import-x': importXPlugin,
+    },
+    settings,
+    rules,
   },
-  settings,
-  rules,
-});
+  // Settings merge per linted file, so the alias reaches a TypeScript source alone. A JavaScript source keeps
+  // resolving `./b.js` to `b.js`, which is the file it loads at runtime.
+  {
+    files: patterns.typeScriptFiles,
+    settings: {
+      'import-x/resolver': { node: importResolverOptions },
+    },
+  },
+);
 
 export default config;

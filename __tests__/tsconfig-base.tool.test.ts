@@ -24,6 +24,7 @@ const nodeLayerKeys = [
   'moduleDetection',
   'noEmit',
   'removeComments',
+  'rewriteRelativeImportExtensions',
   'target',
 ];
 
