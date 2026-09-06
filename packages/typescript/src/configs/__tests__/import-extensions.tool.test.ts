@@ -15,6 +15,9 @@ describe('the extension rule the import config sets', () => {
     expect(listExtensionMessages(results)).toStrictEqual(['Missing file extension "ts" for "./cycle-jsvalue-b.js"']);
   });
 
+  // `js-target.ts` sits beside `js-target.js`, so the specifier resolves to whichever the alias reaches
+  // first: the TypeScript sibling wherever the alias applies, the JavaScript one where it does not. Without
+  // that sibling the case passes whether or not the alias is scoped, guarding nothing.
   it('reports nothing for a `.js` specifier that names a JavaScript file', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'js-importer.js');
 
