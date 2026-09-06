@@ -12,12 +12,12 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "8e250acb",
+          "hash": "d08cb212",
           "kind": "module",
           "path": "kits/default.ts"
         },
         {
-          "hash": "50418778",
+          "hash": "59bb13c2",
           "kind": "inline",
           "path": "../package.json",
           "paths": [
@@ -25,7 +25,7 @@
           ]
         },
         {
-          "hash": "941712c9",
+          "hash": "f484d6fb",
           "kind": "module",
           "path": "../src/readiness/eslint-config-contents.ts"
         },
@@ -59,8 +59,8 @@
       "path": "kits/default.js",
       "readyupVersion": "0.35.0",
       "source": "kits/default.ts",
-      "sourceHash": "8e250acb",
-      "targetHash": "7d0f76fb"
+      "sourceHash": "d08cb212",
+      "targetHash": "24936878"
     }
   ]
 }
