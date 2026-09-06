@@ -46,6 +46,8 @@ describe('the extension rule the import config sets', () => {
   // The override exempts an unresolvable specifier as readily as a resolved one, so the case above passes
   // whether or not the fixture's `exports` map is reached. Composing the options the override replaces is
   // what proves the fixture resolves, and that the override is what silences it.
+  // The fixture package is unscoped: `ignorePackages` exempts a scoped subpath through the `isScoped` arm of
+  // `isPackage`, so a scoped name would silence the subpath here too and leave the case above guarding nothing.
   it('reports that subpath where the path-group override is absent', async () => {
     const withoutOverride = {
       rules: {
