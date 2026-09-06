@@ -38,6 +38,15 @@ describe('bin wrapper', () => {
     expect(status).toBe(0);
     expect(stdout).toContain('entry reached');
   });
+
+  it('reports an entry point that fails to load', () => {
+    const wrapper = installWrapper('throw new Error("boom");\n');
+
+    const { status, stderr } = runWrapper(wrapper);
+
+    expect(status).toBe(1);
+    expect(stderr).toContain('failed to load: boom');
+  });
 });
 
 // region | Helpers

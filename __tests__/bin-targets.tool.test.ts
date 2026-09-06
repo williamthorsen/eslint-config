@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,8 +10,9 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const packagesDir = path.join(repoRoot, 'packages');
 
 const manifestSchema = z.object({
-  bin: z.record(z.string(), z.string()).optional(),
+  bin: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
   files: z.array(z.string()).optional(),
+  name: z.string(),
 });
 
 // pnpm links a workspace package's bins during the install's link phase, which runs before anything is built. A
@@ -24,10 +26,8 @@ describe('bin targets', () => {
     expect(offenders.map(describeTarget)).toStrictEqual([]);
   });
 
-  it('every bin target is present before a build', () => {
-    const offenders = collectBinTargets().filter(
-      ({ packageDir, target }) => !existsSync(path.join(packageDir, target)),
-    );
+  it('no bin target is untracked', () => {
+    const offenders = collectBinTargets().filter(({ packageDir, target }) => !isTracked(packageDir, target));
 
     expect(offenders.map(describeTarget)).toStrictEqual([]);
   });
@@ -51,6 +51,8 @@ interface BinTarget {
   target: string;
 }
 
+type Manifest = z.infer<typeof manifestSchema>;
+
 /**
  * Reads every workspace package's `bin` entries as one flat list. `packages/*` is the workspace manifest's only
  * pattern, and reading the directory rather than globbing keeps the package manifests under `__fixtures__` out.
@@ -63,7 +65,7 @@ function collectBinTargets(): BinTarget[] {
 
     const manifest = manifestSchema.parse(JSON.parse(readFileSync(manifestPath, 'utf8')));
 
-    return Object.entries(manifest.bin ?? {}).map(([command, target]) => ({
+    return Object.entries(readBinEntries(manifest)).map(([command, target]) => ({
       command,
       files: manifest.files ?? [],
       packageDir,
@@ -76,6 +78,22 @@ function collectBinTargets(): BinTarget[] {
 /** Renders one entry as `{package}:{command} -> {target}`, the form an offender is reported in. */
 function describeTarget({ command, packageName, target }: BinTarget): string {
   return `${packageName}:${command} -> ${target}`;
+}
+
+/** Reports whether git tracks the target. Build output is untracked, so tracking is independent of build directory and state. */
+function isTracked(packageDir: string, target: string): boolean {
+  const result = spawnSync('git', ['ls-files', '--error-unmatch', '--', target], {
+    cwd: packageDir,
+    stdio: 'ignore',
+  });
+  return result.status === 0;
+}
+
+/** Reads a manifest's `bin` as command-to-target pairs, expanding npm's string form, which names the command after the package. */
+function readBinEntries(manifest: Manifest): Record<string, string> {
+  if (manifest.bin === undefined) return {};
+  if (typeof manifest.bin === 'string') return { [manifest.name.split('/').at(-1) ?? manifest.name]: manifest.bin };
+  return manifest.bin;
 }
 
 /** Reads the leading path segment of a `bin` target or a `files` entry, which is the granularity `files` publishes at. */
