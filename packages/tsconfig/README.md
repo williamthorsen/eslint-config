@@ -70,9 +70,9 @@ The base declares none of these:
 
 The base sets `noEmit: true`, on the assumption that a separate build step owns emit. A consumer that builds with this config directly must override `noEmit` and, if it keeps `allowImportingTsExtensions`, pair that with `rewriteRelativeImportExtensions` so `./foo.ts` specifiers survive the rewrite.
 
-## Checking your configuration
+## Checking the configuration
 
-This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether your tsconfigs are wired for the version you have installed. It is a migration aid rather than a CI gate: only a Node floor too old to run the base's ES year is reported as an error, and everything else caps at a warning.
+This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether the workspace tsconfigs are wired for the installed version. It is a migration aid rather than a CI gate: only a Node floor too old to run the base's ES year is reported as an error, and everything else caps at a warning.
 
 Run it once:
 
@@ -80,7 +80,7 @@ Run it once:
 pnpm exec rdy run --from npm:@williamthorsen/tsconfig
 ```
 
-Or list it in `.config/readyup.config.ts` to include it whenever you run `rdy run --packages`:
+Or list it in `.config/readyup.config.ts` to include it in every `rdy run --packages`:
 
 ```ts
 import { defineRdyConfig } from 'readyup';
@@ -97,10 +97,10 @@ The kit walks each workspace tsconfig's `extends` chain and reports five things:
 - **Adoption**: a tsconfig reaching neither this base nor a framework base. A tsconfig naming this base through a specifier that does not resolve is reported separately, as declared but not installed.
 - **Re-declaration**: an option restated with the base's own value. A key that a framework base in the same chain also declares is exempt, since restating it is how a config wins against that base.
 - **Escaping paths**: an `include`, `exclude`, or `files` path resolving outside the directory that holds the tsconfig. A config that is extended hands these fields down resolved against its own directory, so a package inheriting them is governed by paths pointing outside itself; the remedy is a complete local declaration, or `${configDir}` in the config being extended.
-- **ES year**: a `target` or `lib` declaring a year other than the base's, read from the base you extend rather than from a constant compiled into the kit.
+- **ES year**: a `target` or `lib` declaring a year other than the base's, read from the base that the tsconfig extends rather than from a constant compiled into the kit.
 - **Node floor**: an `engines.node` below the major that implements that ES year. This is the one failure `tsc` cannot surface on its own, which is why it alone is an error.
 
-The kit runs at the version resolved from your `node_modules`, so it reports whether your configuration matches that version. It never reports whether that version is current.
+The kit runs at the version resolved from the project's `node_modules`, so it reports whether the configuration matches that version. It never reports whether that version is current.
 
 ## License
 

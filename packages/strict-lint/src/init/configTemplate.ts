@@ -9,12 +9,12 @@ export default defineConfig({
     // Cap a rule below \`error\` to keep it a warning under strict-lint:
     // 'unicorn/no-array-reduce': 'warn',
     //
-    // If you lint with @williamthorsen/eslint-config-typescript, its \`advisoryRuleSeverities\`
+    // Where the ESLint config extends @williamthorsen/eslint-config-typescript, its \`advisoryRuleSeverities\`
     // export is a ready-made set of ceilings: maxSeverity: { ...advisoryRuleSeverities }
   },
 
-  // Import the configs your ESLint config extends and name them here, as values, to be told
-  // which of your own rules merely repeat what they already apply:
+  // Import the configs that the ESLint config extends and name them here, as values, to be told
+  // which of its own rules merely repeat what they already apply:
   // sharedConfigs: [baseConfig, await createConfig.vitest()],
 });
 `;
