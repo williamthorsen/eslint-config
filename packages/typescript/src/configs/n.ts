@@ -5,12 +5,6 @@ import nPlugin from 'eslint-plugin-n';
 const modifiedRules: Linter.RulesRecord = {
   'n/no-callback-literal': 'off', // Enforces Node.js-style callback pattern
   'n/no-process-exit': 'off', // 🔴⚫ Needed in CLI tools and scripts
-  'n/no-extraneous-import': [
-    'error',
-    {
-      allowModules: ['vitest'],
-    },
-  ],
   'n/no-missing-import': 'warn', // 🔴🟠
   'n/no-unpublished-import': 'warn',
   // TODO: Enable this rule only in Node.js environments. See TOOLCHAIN-5.
