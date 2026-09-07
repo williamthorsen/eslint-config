@@ -43,7 +43,7 @@ nmr test:all      # vitest, every tier
 nmr test:coverage # vitest with coverage, the unit and tool tiers
 ```
 
-`nmr` is context-aware: the same command runs different scripts depending on whether you're in the repo root or a workspace directory. See the [nmr README](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/nmr#readme) for the full command reference.
+`nmr` is context-aware: the same command runs different scripts depending on whether it runs in the repo root or a workspace directory. See the [nmr README](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/nmr#readme) for the full command reference.
 
 ## Releases
 

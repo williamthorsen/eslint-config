@@ -10,11 +10,11 @@ Under the bundled `import-x` resolver, `./m.js` in a TypeScript file resolved to
 
 The config now ships an `import-x` resolver default carrying `extensionAlias`, which resolves `./m.js` to `m.ts`. `import-x/extensions` reads the resolved file's extension, so the same setting that restores the edge also turns the `.js` spelling into a reported error. The two are one change, not two: no resolver setting closes the graph without also deciding the spelling.
 
-## Step 1: permit the TypeScript extension in your tsconfig
+## Step 1: permit the TypeScript extension in the tsconfig
 
 TypeScript raises TS5097 on a `.ts` specifier unless one of two options is set in the tsconfig owning the file.
 
-Where your build emits with `tsc`:
+Where the build emits with `tsc`:
 
 ```diff
  "compilerOptions": {
@@ -33,7 +33,7 @@ Where it emits nothing, or emits declarations alone:
 
 `rewriteRelativeImportExtensions` arrived in TypeScript 5.7, which is why the peer floor moves with this release. The base in [`@williamthorsen/tsconfig`](../packages/tsconfig) sets both options, so a consumer on its current release skips this step.
 
-## Step 2: rewrite your relative specifiers
+## Step 2: rewrite the relative specifiers
 
 Each relative specifier naming a TypeScript file carries that file's own extension:
 
@@ -48,9 +48,9 @@ A specifier naming a JavaScript file is unchanged. The resolver alias is scoped 
 
 `import-x/extensions` reports each specifier but cannot repair one. Its fixer is gated behind a rule option the config does not set, so `eslint --fix` changes nothing, and the repair it offers as an editor suggestion appends the resolved extension rather than replacing the written one, turning `./m.js` into `./m.js.ts`. Do not apply the suggestion or enable the rule's `fix` option: rewrite the specifiers by hand or with a codemod.
 
-## Step 3: nothing to change where you override the resolver
+## Step 3: nothing to change where an override sets the resolver
 
-ESLint merges `settings` deeply, so an override adding a resolver key of your own keeps the shipped `extensionAlias`. An existing override needs no change:
+ESLint merges `settings` deeply, so an override adding a resolver key of its own keeps the shipped `extensionAlias`. An existing override needs no change:
 
 ```ts
 export default [
@@ -63,7 +63,7 @@ export default [
 ];
 ```
 
-A TypeScript file resolves with both the shipped alias and your `tsconfig`; a JavaScript file resolves with your `tsconfig` alone.
+A TypeScript file resolves with both the shipped alias and the `tsconfig`; a JavaScript file resolves with the `tsconfig` alone.
 
 ## What the kit reports
 

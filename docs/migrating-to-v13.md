@@ -14,7 +14,7 @@ One rule this config did set is gone in v13: `import/no-duplicates`. Its fixer, 
 
 ## Step 1: rename rule overrides
 
-Any `import/*` entry in your own `rules` block becomes `import-x/*`, except `import/no-duplicates`, which goes:
+Any `import/*` entry in the config's own `rules` block becomes `import-x/*`, except `import/no-duplicates`, which goes:
 
 ```diff
  rules: {
@@ -35,7 +35,7 @@ Do not carry `no-duplicates` over as `import-x/no-duplicates`. With `prefer-inli
 +// eslint-disable-next-line import-x/extensions
 ```
 
-These report as `Definition for rule 'import/...' was not found`, so the run finds them for you. A directive naming `import/no-duplicates` is deleted rather than renamed.
+These report as `Definition for rule 'import/...' was not found`, so the run finds them. A directive naming `import/no-duplicates` is deleted rather than renamed.
 
 ## Step 3: rename settings
 
@@ -46,13 +46,13 @@ These report as `Definition for rule 'import/...' was not found`, so the run fin
  }
 ```
 
-This is the step nothing reports. ESLint does not validate `settings`, so an `import/`-namespaced key is silently ignored and the rules fall back to `import-x`'s bundled node resolver. Where you rely on a resolver for path aliases, check this one by hand.
+This is the step nothing reports. ESLint does not validate `settings`, so an `import/`-namespaced key is silently ignored and the rules fall back to `import-x`'s bundled node resolver. Where a resolver carries path aliases, check this one by hand.
 
 The full set of keys: `import-x/cache`, `import-x/core-modules`, `import-x/docstyle`, `import-x/extensions`, `import-x/external-module-folders`, `import-x/ignore`, `import-x/parsers`, `import-x/resolver`.
 
 ## Step 4: drop the direct dependency
 
-If you installed `eslint-plugin-import` yourself, remove it. This config no longer depends on it, and `import-x` needs no separate `eslint-import-resolver-node`.
+Remove `eslint-plugin-import` where the project installed it directly. This config no longer depends on it, and `import-x` needs no separate `eslint-import-resolver-node`.
 
 ## What may newly fail
 
