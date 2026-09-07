@@ -1,6 +1,6 @@
 # @williamthorsen/strict-lint
 
-Run ESLint with all warnings promoted to errors, except for the rules you cap below `error`. Ships a `strict-lint` binary that drops in for `eslint` in CI, plus a programmatic API.
+Run ESLint with all warnings promoted to errors, except for the rules that a ceiling caps below `error`. Ships a `strict-lint` binary that drops in for `eslint` in CI, plus a programmatic API.
 
 <!-- section:release-notes --><!-- /section:release-notes -->
 
@@ -10,7 +10,7 @@ Run ESLint with all warnings promoted to errors, except for the rules you cap be
 pnpm add -D @williamthorsen/strict-lint eslint
 ```
 
-Requires ESLint 10+ (flat config) and Node 24+. If your ESLint config is TypeScript, install [`jiti`](https://www.npmjs.com/package/jiti) alongside it: ESLint loads TypeScript configs through jiti, exactly as a plain `eslint` run does.
+Requires ESLint 10+ (flat config) and Node 24+. If the ESLint config is TypeScript, install [`jiti`](https://www.npmjs.com/package/jiti) alongside it: ESLint loads TypeScript configs through jiti, exactly as a plain `eslint` run does.
 
 ## Quick start
 
@@ -20,24 +20,24 @@ In CI, use `strict-lint` instead of `eslint`:
 strict-lint .
 ```
 
-Every warning emitted by your ESLint config becomes an error and fails the run, except for the rules you cap below `error`. Out of the box nothing is capped. The CLI accepts the same flags as `eslint` and forwards them through.
+Every warning emitted by the ESLint config becomes an error and fails the run, except for the rules that a ceiling caps below `error`. Out of the box nothing is capped. The CLI accepts the same flags as `eslint` and forwards them through.
 
 ## How it works
 
 1. Runs ESLint via the Node API, letting it resolve a config for each linted file just as a plain `eslint` run does, or pinning one config for the whole run via `--config <path>`.
 2. Rewrites every reported warning to an error, except those whose `maxSeverity` ceiling sits below `error`.
-3. Reports any rule your own config merely repeats from the shared configs you named, if you named any.
+3. Reports any rule that the ESLint config merely repeats from the shared configs that `sharedConfigs` names, if it names any.
 4. Exits non-zero on any errors.
 
 `maxSeverity` is the resolved set of ceilings, computed by merging, in increasing precedence, every `.config/strict-lint.config.ts` from the project root down to the directory of the file being linted, then any `maxSeverity` passed programmatically. No rule is exempt from promotion unless one of those sources says so.
 
-A ceiling bounds how high strict-lint promotes a rule. It never lowers a severity your ESLint config sets explicitly: a rule configured `'error'` stays an error under every ceiling. To force a severity outright, use `ruleOverrides` or the `--rule` flag.
+A ceiling bounds how high strict-lint promotes a rule. It never lowers a severity that the ESLint config sets explicitly: a rule configured `'error'` stays an error under every ceiling. To force a severity outright, use `ruleOverrides` or the `--rule` flag.
 
-Warnings that name no rule keep the severity ESLint gave them. ESLint reports two of these: the notice for a path you name explicitly that your config ignores, and the unused `eslint-disable` directive report. Since `maxSeverity` is keyed by rule name, promoting either would raise an error no ceiling could exempt, so `strict-lint some/ignored/file.js` reports the notice and still exits 0. To fail a build on stale disable directives, set `linterOptions.reportUnusedDisableDirectives` to `'error'` in your ESLint config.
+Warnings that name no rule keep the severity ESLint gave them. ESLint reports two of these: the notice for a path that the command line names explicitly and the ESLint config ignores, and the unused `eslint-disable` directive report. Since `maxSeverity` is keyed by rule name, promoting either would raise an error no ceiling could exempt, so `strict-lint some/ignored/file.js` reports the notice and still exits 0. To fail a build on stale disable directives, set `linterOptions.reportUnusedDisableDirectives` to `'error'` in the ESLint config.
 
 ## Configuration
 
-Scaffold a config with [`strict-lint init`](#scaffolding-a-config), or create `.config/strict-lint.config.ts` at or above the files you lint by hand:
+Scaffold a config with [`strict-lint init`](#scaffolding-a-config), or create `.config/strict-lint.config.ts` by hand, at or above the linted files:
 
 ```ts
 // .config/strict-lint.config.ts
@@ -52,17 +52,17 @@ export default defineConfig({
 });
 ```
 
-The strict-lint config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not. This restriction applies to `.config/strict-lint.config.ts` alone; your ESLint config is loaded by ESLint through jiti, which transpiles rather than strips, and accepts any TypeScript.
+The strict-lint config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not. This restriction applies to `.config/strict-lint.config.ts` alone; the ESLint config is loaded by ESLint through jiti, which transpiles rather than strips, and accepts any TypeScript.
 
 ### Scaffolding a config
 
-`strict-lint init` writes a starter config for you:
+`strict-lint init` writes a starter config:
 
 ```shell
 strict-lint init
 ```
 
-It writes into the directory you run it from rather than into the project root, so ceilings are scoped by where you run it: `cd packages/pkg && strict-lint init` gives that package a config of its own. The command reports both the path it wrote and the project root the cascade merges down from, so you can see which files the new ceilings will govern.
+It writes into the directory it runs in rather than into the project root, so ceilings are scoped by where it runs: `cd packages/pkg && strict-lint init` gives that package a config of its own. The command reports both the path it wrote and the project root the cascade merges down from, naming which files the new ceilings govern.
 
 An existing config is left untouched unless `--force` is passed, and one whose contents already match is reported as up to date rather than rewritten.
 
@@ -78,14 +78,14 @@ The scaffolded config imports `@williamthorsen/strict-lint/config`, so the comma
 
 Every severity ESLint accepts is a valid ceiling, as is `undefined`:
 
-| Ceiling                | Effect                                              |
-| ---------------------- | --------------------------------------------------- |
-| absent, or `undefined` | promote a warning to `'error'`                      |
-| `'error'` or `2`       | promote a warning to `'error'`                      |
-| `'warn'` or `1`        | leave the rule at the severity your config gives it |
-| `'off'` or `0`         | leave the rule at the severity your config gives it |
+| Ceiling                | Effect                                                         |
+| ---------------------- | -------------------------------------------------------------- |
+| absent, or `undefined` | promote a warning to `'error'`                                 |
+| `'error'` or `2`       | promote a warning to `'error'`                                 |
+| `'warn'` or `1`        | leave the rule at the severity that the ESLint config gives it |
+| `'off'` or `0`         | leave the rule at the severity that the ESLint config gives it |
 
-`'off'` and `'warn'` have the same effect, because strict-lint only ever raises a severity: any ceiling below `'error'` blocks the raise, and none of them disables a rule. What `'off'` buys you is interchangeability. Because the value type is ESLint's own `Linter.RuleSeverity`, one map of rule severities can be spread into a flat-config `rules` block, where `'off'` disables the rule, and into `maxSeverity`, where it exempts the rule from promotion:
+`'off'` and `'warn'` have the same effect, because strict-lint only ever raises a severity: any ceiling below `'error'` blocks the raise, and none of them disables a rule. `'off'` buys interchangeability. Because the value type is ESLint's own `Linter.RuleSeverity`, one map of rule severities can be spread into a flat-config `rules` block, where `'off'` disables the rule, and into `maxSeverity`, where it exempts the rule from promotion:
 
 ```ts
 import type { Linter } from 'eslint';
@@ -98,7 +98,7 @@ export const severities = {
 
 The `satisfies` clause keeps the values at their literal types. Without it they widen to `string`, which is assignable to neither target.
 
-If you lint with [`@williamthorsen/eslint-config-typescript`](https://www.npmjs.com/package/@williamthorsen/eslint-config-typescript), its `advisoryRuleSeverities` export is a ready-made set of ceilings for style and modernization rules: `maxSeverity: { ...advisoryRuleSeverities }`.
+Where the ESLint config extends [`@williamthorsen/eslint-config-typescript`](https://www.npmjs.com/package/@williamthorsen/eslint-config-typescript), its `advisoryRuleSeverities` export is a ready-made set of ceilings for style and modernization rules: `maxSeverity: { ...advisoryRuleSeverities }`.
 
 ### Discovery
 
@@ -112,7 +112,7 @@ The project root is the nearest ancestor directory holding one of these markers:
 
 Failing that, it is the nearest directory holding a `package.json`; failing that, the directory the run starts in.
 
-Selection follows the files you lint, not the working directory. Running from the repo root applies each package's own ceilings to that package's files, so one run over a monorepo resolves exactly what a run inside each package would. The same holds for ESLint's own config, which ESLint resolves per file: a single `strict-lint .` at the repo root honours every package's `eslint.config.*`, and there is no need to run once per workspace.
+Selection follows the linted files, not the working directory. Running from the repo root applies each package's own ceilings to that package's files, so one run over a monorepo resolves exactly what a run inside each package would. The same holds for ESLint's own config, which ESLint resolves per file: a single `strict-lint .` at the repo root honours every package's `eslint.config.*`, and there is no need to run once per workspace.
 
 #### Merging across levels
 
@@ -132,7 +132,7 @@ export default defineConfig({
 });
 ```
 
-Setting it to `undefined` drops it the same way. Reach for this when the map you spread is shared and you want the inherited entry gone rather than restated:
+Setting it to `undefined` drops it the same way. Reach for this where the spread map is shared and the inherited entry must go rather than be restated:
 
 ```ts
 export default defineConfig({
@@ -164,7 +164,7 @@ Configs above it contribute nothing and are never imported, so their module-leve
 
 A config often repeats a rule setting that the shared config it extends already applies. The repetition is invisible: it looks like configuration, it survives upgrades, and it pins the rule at a setting the shared config may since have changed.
 
-Name the configs your ESLint config extends, and `strict-lint` reports the rules your own config merely repeats:
+Name the configs that the ESLint config extends, and `strict-lint` reports the rules that it merely repeats:
 
 ```ts
 // .config/strict-lint.config.ts
@@ -185,9 +185,9 @@ strict-lint:   n/no-extraneous-import (11 files)
 
 Without `sharedConfigs`, the check does no work.
 
-After linting, strict-lint resolves the rules governing each linted file twice: once over the elements it attributes to the configs you named, and once over your own. A rule both resolve to the same value is a repeat. `'error'`, `2`, and `['error']` count as one value, while differing options count as an override and pass unreported, as does a rule the shared config never sets for that file. ESLint performs the glob expansion and the `files` scoping, because the question is asked per real file rather than reconstructed from patterns.
+After linting, strict-lint resolves the rules governing each linted file twice: once over the elements it attributes to the named shared configs, and once over the ESLint config's own. A rule both resolve to the same value is a repeat. `'error'`, `2`, and `['error']` count as one value, while differing options count as an override and pass unreported, as does a rule the shared config never sets for that file. ESLint performs the glob expansion and the `files` scoping, because the question is asked per real file rather than reconstructed from patterns.
 
-Pass values rather than a package name. A name resolves through the package's `exports` field and can load a second instance of a module your ESLint config already imported; nothing in it would match, and the check would report nothing at all. Import the specifier your ESLint config imports.
+Pass values rather than a package name. A name resolves through the package's `exports` field and can load a second instance of a module that the ESLint config already imported; nothing in it would match, and the check would report nothing at all. Import the specifier that the ESLint config imports.
 
 Declare every shared source, factory calls included. An element strict-lint cannot attribute to either side stops the check, which names what it could not sort rather than guessing:
 
@@ -197,12 +197,12 @@ strict-lint:   UserConfig[0] > UserConfig[0] > vitest/all
 strict-lint: name the config each extends in sharedConfigs
 ```
 
-That is what an undeclared source looks like. `defineConfig` rebuilds the elements it reaches through `extends`, so an expansion of a config you did not name matches nothing strict-lint holds. Add it to `sharedConfigs` and the check runs.
+That is what an undeclared source looks like. `defineConfig` rebuilds the elements it reaches through `extends`, so an expansion of an unnamed config matches nothing strict-lint holds. Add it to `sharedConfigs` and the check runs.
 
 What the check does not do:
 
-- **No repeat of a whole shared element.** An element of your config matching one of the shared configs in both scope and rules is taken for that shared element and never compared, so copying one wholesale goes unreported.
-- **No partial repeat, and no whole-config guarantee.** A rule reports only where it repeats on every file _this run linted_ that your own config sets it for, and never where your own config gives that rule more than one value. A rule you set at two scopes, one restoring what the other turned off, is load-bearing at both and passes unreported. The denominator is the run's files rather than every file your config governs, so a run over part of your project measures against less than a full one does.
+- **No repeat of a whole shared element.** An element of the ESLint config matching one of the shared configs in both scope and rules is taken for that shared element and never compared, so copying one wholesale goes unreported.
+- **No partial repeat, and no whole-config guarantee.** A rule reports only where it repeats on every file _this run linted_ that the ESLint config sets it for, and never where the ESLint config gives that rule more than one value. A rule that the config sets at two scopes, one restoring what the other turned off, is load-bearing at both and passes unreported. The denominator is the run's files rather than every file that the ESLint config governs, so a run over part of a project measures against less than a full one does.
 - **No source location.** It reads resolved configuration rather than source text, so it names the rule and the config file, never the line.
 - **No editor feedback.** It is a command-line check, not a lint rule, so there is no on-save squiggle and no removal suggestion.
 - **One ESLint config per run.** The config is resolved once at the working directory, so a monorepo giving each package its own `eslint.config.*` is not covered.
@@ -218,7 +218,7 @@ strict-lint init [options]
 
 | Option                         | Description                                                                  |
 | ------------------------------ | ---------------------------------------------------------------------------- |
-| `-c, --config <path>`          | Path to your ESLint config file                                              |
+| `-c, --config <path>`          | Path to the ESLint config file                                               |
 | `--debug`                      | Report strict-lint's own config resolution on stderr                         |
 | `-h, --help`                   | Show usage for both modes                                                    |
 | `--rule <name:severity>`       | Override a single rule (repeatable). Severity: `off` \| `warn` \| `error`.   |
@@ -295,16 +295,16 @@ Define both a normal lint script and a strict one, and run the strict one in CI:
 ```
 
 - Local dev uses `lint:check`, where warnings stay warnings.
-- CI uses `lint:strict`, where warnings break the build, except for the rules you've capped below `error`.
+- CI uses `lint:strict`, where warnings break the build, except for the rules that a ceiling caps below `error`.
 
-This pattern lets you enable a stricter rule as a warning, watch it appear in local output for a while, and then promote it to an error in CI by simply removing it from `maxSeverity`.
+This pattern introduces a stricter rule as a warning, leaves it visible in local output for a while, and then promotes it to an error in CI by removing it from `maxSeverity`.
 
 ## Peer dependencies
 
-| Dependency | Version | Required when                    | Declared by                   |
-| ---------- | ------- | -------------------------------- | ----------------------------- |
-| `eslint`   | `>=10`  | always                           | `strict-lint`                 |
-| `jiti`     | `*`     | your ESLint config is TypeScript | `eslint`, as an optional peer |
+| Dependency | Version | Required when                   | Declared by                   |
+| ---------- | ------- | ------------------------------- | ----------------------------- |
+| `eslint`   | `>=10`  | always                          | `strict-lint`                 |
+| `jiti`     | `*`     | the ESLint config is TypeScript | `eslint`, as an optional peer |
 
 ## License
 
