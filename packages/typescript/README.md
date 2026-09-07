@@ -114,7 +114,7 @@ An all-type statement stays `import type { Foo }` rather than `import { type Foo
 
 `import-x/no-cycle` reports a circular import as an error. Nothing else in the toolchain catches one: a cycle compiles clean, and it surfaces at runtime as a binding that is briefly `undefined` rather than as a build failure.
 
-The config supplies `settings['import-x/extensions']` itself, so the rule needs no wiring on the consumer's side. That setting, which is unrelated to the rule of the same name, lists the extensions the plugin's module graph will open. It defaults to `['.js', '.mjs', '.cjs']`, which is why a graph-walking rule reports nothing on a TypeScript source until it is set, and any other `import-x` rule the config enables reads it too.
+The config supplies `settings['import-x/extensions']` itself, so the rule needs no wiring on the consumer's side. That setting, which is unrelated to the rule of the same name, lists the extensions the plugin's module graph will open. It defaults to `['.js', '.mjs', '.cjs']`, which is why a graph-walking rule reports nothing on a TypeScript source until it is set, and any other `import-x` rule that the config enables reads it too.
 
 Three kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
 

@@ -62,7 +62,7 @@ The strict-lint config file is loaded through Node's native TypeScript support (
 strict-lint init
 ```
 
-It writes into the directory it runs in rather than into the project root, so ceilings are scoped by where it runs: `cd packages/pkg && strict-lint init` gives that package a config of its own. The command reports both the path it wrote and the project root the cascade merges down from, naming which files the new ceilings govern.
+It writes into its own working directory rather than into the project root, so ceilings are scoped by where it runs: `cd packages/pkg && strict-lint init` gives that package a config of its own. The command reports both the path it wrote and the project root the cascade merges down from, naming which files the new ceilings govern.
 
 An existing config is left untouched unless `--force` is passed, and one whose contents already match is reported as up to date rather than rewritten.
 
