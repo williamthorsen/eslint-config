@@ -67,7 +67,7 @@ Every linted `.ts`/`.tsx` file must now belong to a discoverable `tsconfig.json`
 
 ## Step 3: clean up
 
-- Remove `@eslint/js` from your `devDependencies` if you only added it to satisfy this package; since v6.0.1 the config declares it as a direct dependency.
+- Remove `@eslint/js` from the project's `devDependencies` where it was added only to satisfy this package; since v6.0.1 the config declares it as a direct dependency.
 
 ## What may newly fail
 
