@@ -35,7 +35,7 @@ Everything this package exports is typed with ESLint core's own `Config`, so the
 
 ## Type-aware linting
 
-The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), so each file's owning `tsconfig.json` is discovered automatically; the config does **not** set `parserOptions.project`. Two requirements follow:
+The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), so each file's owning `tsconfig.json` is discovered automatically; a consuming config does **not** set `parserOptions.project`. Two requirements follow:
 
 - Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from the build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
 - Set `tsconfigRootDir` (as in Quick start) to anchor resolution at the repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
@@ -104,7 +104,7 @@ import { Component, type ComponentProps } from './Component.ts';
 | `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type lands on `import type`.                    |
 | `sky-pilot/no-split-imports`                     | `warn`      | `warn`              | Two statements importing one module merge into one, `type` moving onto the specifiers. |
 
-`consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever it is applied; without it `strict-lint` promotes them too.
+`consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever a config applies it; without it `strict-lint` promotes them too.
 
 An all-type statement stays `import type { Foo }` rather than `import { type Foo }`: Under `verbatimModuleSyntax` TypeScript strips the inline specifiers and leaves a runtime side-effect import behind.
 

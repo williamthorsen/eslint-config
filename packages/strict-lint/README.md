@@ -1,6 +1,6 @@
 # @williamthorsen/strict-lint
 
-Run ESLint with all warnings promoted to errors, except for the rules that a ceiling caps below `error`. Ships a `strict-lint` binary that drops in for `eslint` in CI, plus a programmatic API.
+Run ESLint with all warnings promoted to errors, except for the rules that a strict-lint config caps below `error`. Ships a `strict-lint` binary that drops in for `eslint` in CI, plus a programmatic API.
 
 <!-- section:release-notes --><!-- /section:release-notes -->
 
@@ -20,7 +20,7 @@ In CI, use `strict-lint` instead of `eslint`:
 strict-lint .
 ```
 
-Every warning emitted by the ESLint config becomes an error and fails the run, except for the rules that a ceiling caps below `error`. Out of the box nothing is capped. The CLI accepts the same flags as `eslint` and forwards them through.
+Every warning emitted by the ESLint config becomes an error and fails the run, except for the rules that a strict-lint config caps below `error`. Out of the box nothing is capped. The CLI accepts the same flags as `eslint` and forwards them through.
 
 ## How it works
 
@@ -295,9 +295,9 @@ Define both a normal lint script and a strict one, and run the strict one in CI:
 ```
 
 - Local dev uses `lint:check`, where warnings stay warnings.
-- CI uses `lint:strict`, where warnings break the build, except for the rules that a ceiling caps below `error`.
+- CI uses `lint:strict`, where warnings break the build, except for the rules that a strict-lint config caps below `error`.
 
-This pattern introduces a stricter rule as a warning, leaves it visible in local output for a while, and then promotes it to an error in CI by removing it from `maxSeverity`.
+Under this pattern a stricter rule enters as a warning, stays visible in local output for a while, and becomes a CI error once the project drops it from `maxSeverity`.
 
 ## Peer dependencies
 
