@@ -10,10 +10,12 @@ describe('root entry point', () => {
   it('exports the documented surface', () => {
     expect(Object.keys(rootEntry).toSorted()).toStrictEqual([
       'advisoryRuleSeverities',
+      'commonIgnores',
       'configs',
       'createConfig',
       'default',
       'patterns',
+      'toolIgnores',
     ]);
   });
 

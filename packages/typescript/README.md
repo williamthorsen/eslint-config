@@ -410,6 +410,40 @@ export default defineConfig({
 | `patterns.typeScriptExtensions` | `['{ts,cts,mts,tsx}']`                                                       |
 | `patterns.codeExtensions`       | both                                                                         |
 
+## Ignore lists
+
+Two lists of globs, neither applied by the preset. A consumer opts in by spreading them into `globalIgnores`:
+
+```js
+import { defineConfig, globalIgnores } from 'eslint/config';
+
+import config, { commonIgnores, toolIgnores } from '@williamthorsen/eslint-config-typescript';
+
+export default defineConfig(config, globalIgnores([...commonIgnores, ...toolIgnores, 'fixtures/**']));
+```
+
+Both are also reachable from the `./ignores` subpath, for a consumer who wants the lists without the config.
+
+What separates them decides where a new glob belongs. `commonIgnores` collects three kinds of path:
+
+- Build output: `dist/`, `dist-ssr/`, `coverage/`, and minified files.
+- Directories holding nothing a developer authored: `local/` and `tmp/`.
+- Files no rule can usefully report on: shell scripts and lockfiles, which no config parses; `CHANGELOG*` and `LICENSE*`; and `**/*.md/*.ts`, which parses but belongs to no tsconfig, so the project service cannot type it.
+
+None of it turns on which tools a repo runs, which is what separates this list from `toolIgnores`.
+
+`toolIgnores` collects content that a named developer tool owns and generates, so its entries are facts about which tools a repo happens to run:
+
+| Entry                       | Owner                            |
+| --------------------------- | -------------------------------- |
+| `**/.claude/**`             | Claude Code                      |
+| `**/.readyup/**/*.js`       | readyup, compiled kit bundles    |
+| `**/.readyup/manifest.json` | readyup, the recorded kit hashes |
+| `**/.rovo/**`               | Rovo Dev                         |
+| `**/.rovodev/**`            | Rovo Dev                         |
+
+Only the readyup entries are scoped, because `.readyup/` also holds authored TypeScript: the kit declaration and the predicates it composes, which stay linted. The two entries that are ignored are ones rdy records a hash of, so an autofix rewriting either makes the kit report as stale.
+
 ## Advisory rule severities
 
 `advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `sky-pilot/no-split-imports`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.

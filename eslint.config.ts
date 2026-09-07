@@ -1,8 +1,7 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 
-import { commonIgnores } from './packages/typescript/src/ignores/index.ts';
-import baseConfig, { createConfig, patterns } from './packages/typescript/src/index.ts';
+import baseConfig, { commonIgnores, createConfig, patterns, toolIgnores } from './packages/typescript/src/index.ts';
 
 const javaScriptFiles = ['**/*.{cjs,js,jsx,mjs}'];
 const typeScriptFiles = ['**/*.{cts,mts,ts,tsx}'];
@@ -14,10 +13,9 @@ const config = defineConfig([
   globalIgnores([
     // Completely ignore these files.
     ...commonIgnores,
+    ...toolIgnores,
     // Lint fixtures deliberately violate the rules they exercise.
     '**/__fixtures__/**',
-    // Compiled kit bundles are generated; an autofix here would break the hash rdy records for them.
-    '**/.readyup/**/*.js',
   ]),
   // Anchor the project service at the repo root for type-aware rules.
   // `projectService` itself is enabled by the base config; the consumer supplies only the root directory.
