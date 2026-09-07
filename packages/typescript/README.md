@@ -23,11 +23,11 @@ import tsConfig from '@williamthorsen/eslint-config-typescript';
 export default defineConfig(tsConfig, {
   languageOptions: {
     parserOptions: {
-      // Anchor type-aware linting at your repo root.
+      // Anchor type-aware linting at the repo root.
       tsconfigRootDir: import.meta.dirname,
     },
   },
-  // your overrides
+  // project overrides
 });
 ```
 
@@ -35,10 +35,10 @@ Everything this package exports is typed with ESLint core's own `Config`, so the
 
 ## Type-aware linting
 
-The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), so each file's owning `tsconfig.json` is discovered automatically; you do **not** set `parserOptions.project`. Two requirements follow:
+The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), so each file's owning `tsconfig.json` is discovered automatically; the config does **not** set `parserOptions.project`. Two requirements follow:
 
-- Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from your build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
-- Set `tsconfigRootDir` (as in Quick start) to anchor resolution at your repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
+- Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from the build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
+- Set `tsconfigRootDir` (as in Quick start) to anchor resolution at the repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
 
 ## Import specifiers
 
@@ -48,7 +48,7 @@ The rule enforces relative specifiers alone: every bare specifier holding a slas
 
 TypeScript rejects a `.ts` specifier unless the tsconfig owning the file sets `rewriteRelativeImportExtensions`, which rewrites the extension in output and declarations, or `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`. The first arrived in TypeScript 5.7, which is the peer floor this package declares. The kit below reports a tsconfig setting neither.
 
-ESLint merges `settings` deeply, so an override adding a resolver key of your own keeps the shipped alias; see the [`paths` snippet](#import-cycles).
+ESLint merges `settings` deeply, so an override adding a resolver key of its own keeps the shipped alias; see the [`paths` snippet](#import-cycles).
 
 ## Migrating to v15
 
@@ -62,11 +62,11 @@ v13 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: every `import
 
 This section covers the parser change alone. For the complete v5 → v6 upgrade (the Node and ESLint floors, the package bump, and post-upgrade cleanup), see [Migrating to v6](../../docs/migrating-to-v6.md).
 
-Earlier versions left type-information wiring to the consumer: you set `parserOptions.project` and usually kept a dedicated `tsconfig.eslint.json`. This version supplies `projectService` itself, so:
+Earlier versions left type-information wiring to the consumer, which set `parserOptions.project` and usually kept a dedicated `tsconfig.eslint.json`. This version supplies `projectService` itself, so:
 
-1. Remove `parserOptions.project` from your ESLint config. Leaving it set now throws `Enabling "project" does nothing when "projectService" is enabled`.
+1. Remove `parserOptions.project` from the ESLint config. Leaving it set now throws `Enabling "project" does nothing when "projectService" is enabled`.
 2. Fold any lint-only `tsconfig.eslint.json` `include` entries into the real `tsconfig.json`, then delete the `tsconfig.eslint.json`. Widening `include` is safe when the config is typecheck-only.
-3. Keep only `tsconfigRootDir: import.meta.dirname` in your `parserOptions`.
+3. Keep only `tsconfigRootDir: import.meta.dirname` in `parserOptions`.
 
 ## Migrating ESLint configs to TypeScript
 
@@ -104,7 +104,7 @@ import { Component, type ComponentProps } from './Component.ts';
 | `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type lands on `import type`.                    |
 | `sky-pilot/no-split-imports`                     | `warn`      | `warn`              | Two statements importing one module merge into one, `type` moving onto the specifiers. |
 
-`consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever you apply it; without it `strict-lint` promotes them too.
+`consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever it is applied; without it `strict-lint` promotes them too.
 
 An all-type statement stays `import type { Foo }` rather than `import { type Foo }`: Under `verbatimModuleSyntax` TypeScript strips the inline specifiers and leaves a runtime side-effect import behind.
 
@@ -114,13 +114,13 @@ An all-type statement stays `import type { Foo }` rather than `import { type Foo
 
 `import-x/no-cycle` reports a circular import as an error. Nothing else in the toolchain catches one: a cycle compiles clean, and it surfaces at runtime as a binding that is briefly `undefined` rather than as a build failure.
 
-The config supplies `settings['import-x/extensions']` itself, so the rule needs no wiring on your side. That setting, which is unrelated to the rule of the same name, lists the extensions the plugin's module graph will open. It defaults to `['.js', '.mjs', '.cjs']`, which is why a graph-walking rule reports nothing on a TypeScript source until it is set, and any other `import-x` rule you enable reads it too.
+The config supplies `settings['import-x/extensions']` itself, so the rule needs no wiring on the consumer's side. That setting, which is unrelated to the rule of the same name, lists the extensions the plugin's module graph will open. It defaults to `['.js', '.mjs', '.cjs']`, which is why a graph-walking rule reports nothing on a TypeScript source until it is set, and any other `import-x` rule the config enables reads it too.
 
 Three kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
 
 - **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them where a project enables it.
 - **A bare or scoped specifier**, such as `react` or `@scope/pkg`. The config sets `ignoreExternal`, which keeps the traversal out of `node_modules` and cuts the rule's cost by roughly twentyfold. It also drops a cycle running through a workspace sibling imported by its package name.
-- **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so enabling it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at your tsconfig, which needs no additional package:
+- **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so enabling it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at the project's tsconfig, which needs no additional package:
 
 ```ts
 export default [
@@ -137,7 +137,7 @@ ESLint merges `settings` deeply, so this adds `tsconfig` to the resolver without
 
 ## Custom rules (`sky-pilot`)
 
-Seven rules ship in this config's own plugin. The TypeScript config enables six of them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless you enable them yourself. The seventh, [`no-type-cycle`](#sky-pilotno-type-cycle), sits in neither preset and is enabled per project.
+Seven rules ship in this config's own plugin. The TypeScript config enables six of them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. The seventh, [`no-type-cycle`](#sky-pilotno-type-cycle), sits in neither preset and is enabled per project.
 
 | Rule                                    | `recommended` | `strict` | Enforces                                                                                |
 | --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
@@ -260,7 +260,7 @@ Four things are passed over:
 
 - **A cycle whose every edge is a value edge**, which `import-x/no-cycle` reports. Reporting it here too would put two messages on one statement.
 - **A dynamic `import('./m.ts')` expression**, which loads asynchronously and so leaves no binding briefly `undefined`.
-- **A file from `node_modules` or from TypeScript's own `lib`**, excluded by where it comes from rather than by what kind of file it is: a hand-written `.d.ts` in your own source is part of the graph.
+- **A file from `node_modules` or from TypeScript's own `lib`**, excluded by where it comes from rather than by what kind of file it is: a hand-written `.d.ts` in the project's own source is part of the graph.
 - **A JavaScript file**, which no type-aware rule reaches. `import-x/no-cycle` is the only cycle guard there.
 
 The rule takes no options.
@@ -342,7 +342,7 @@ export default defineConfig(
 );
 ```
 
-Scope the test-oriented factories to your test files rather than spreading them across the whole project. Applied to ordinary source, `vitest/require-hook` reports on every top-level statement:
+Scope the test-oriented factories to the test files rather than spreading them across the whole project. Applied to ordinary source, `vitest/require-hook` reports on every top-level statement:
 
 ```js
 import { defineConfig } from 'eslint/config';
@@ -355,7 +355,7 @@ export default defineConfig(config, {
 });
 ```
 
-`patterns.testFiles` covers JavaScript as well as TypeScript test files. Three of the Vitest rules read type information (`unbound-method`, `valid-title`, and `prefer-describe-function-title`), and each aborts the ESLint run rather than degrading when a file has no parser services, so `createConfig.vitest()` disables all three on JavaScript globs. That makes the scoping above safe whether or not your JavaScript test files get a type-aware parser.
+`patterns.testFiles` covers JavaScript as well as TypeScript test files. Three of the Vitest rules read type information (`unbound-method`, `valid-title`, and `prefer-describe-function-title`), and each aborts the ESLint run rather than degrading when a file has no parser services, so `createConfig.vitest()` disables all three on JavaScript globs. That makes the scoping above safe whether or not the JavaScript test files get a type-aware parser.
 
 | Method                               | Loads                                              |
 | ------------------------------------ | -------------------------------------------------- |
@@ -365,9 +365,9 @@ export default defineConfig(config, {
 | `createConfig.reactTestingLibrary()` | `eslint-plugin-testing-library`                    |
 | `createConfig.vitest()`              | `@vitest/eslint-plugin`                            |
 
-These plugins are declared as `devDependencies` of this package. Install them yourself in projects that use them.
+These plugins are declared as `devDependencies` of this package. A project that uses them installs them itself.
 
-`createConfig.react()` pins `settings.react.version` to a recent default, because `eslint-plugin-react`'s `'detect'` mode is incompatible with ESLint 10 (it calls a removed API). Override it to match your React version by appending a settings block:
+`createConfig.react()` pins `settings.react.version` to a recent default, because `eslint-plugin-react`'s `'detect'` mode is incompatible with ESLint 10 (it calls a removed API). Override it to match the project's React version by appending a settings block:
 
 ```js
 export default defineConfig(config, ...(await createConfig.react()), {
@@ -375,7 +375,7 @@ export default defineConfig(config, ...(await createConfig.react()), {
 });
 ```
 
-`createConfig.next()` leaves `settings.next.rootDir` to you, and `no-html-link-for-pages` needs it to be absolute. The plugin globs the value against the working directory, and falls back to that directory where the setting is absent. Under either, a repo linted from anywhere but the app's own directory finds no pages directory, and the rule stops running without failing the lint run:
+`createConfig.next()` leaves `settings.next.rootDir` to the consumer, and `no-html-link-for-pages` needs it to be absolute. The plugin globs the value against the working directory, and falls back to that directory where the setting is absent. Under either, a repo linted from anywhere but the app's own directory finds no pages directory, and the rule stops running without failing the lint run:
 
 ```js
 export default defineConfig(config, ...(await createConfig.next()), {
@@ -385,7 +385,7 @@ export default defineConfig(config, ...(await createConfig.next()), {
 
 ## File patterns
 
-For composing your own scoped configs without re-deriving the globs:
+For composing scoped configs without re-deriving the globs:
 
 ```js
 import { defineConfig } from 'eslint/config';
@@ -447,9 +447,9 @@ An unscoped block applies `'warn'` everywhere, including in test files, where th
 
 `readyup` is optional, needed only to run the readiness kit described below.
 
-## Checking your configuration
+## Checking the configuration
 
-This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether your project is wired correctly for the version you have installed. It is a migration aid rather than a CI gate: only a failure that stops ESLint loading or running the config is reported as an error, and everything else caps at a warning.
+This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether the project is wired correctly for the installed version. It is a migration aid rather than a CI gate: only a failure that stops ESLint loading or running the config is reported as an error, and everything else caps at a warning.
 
 Run it once:
 
@@ -457,7 +457,7 @@ Run it once:
 pnpm exec rdy run --from npm:@williamthorsen/eslint-config-typescript
 ```
 
-Or list it in `.config/readyup.config.ts` to include it whenever you run `rdy run --packages`:
+Or list it in `.config/readyup.config.ts` to include it in every `rdy run --packages`:
 
 ```ts
 import { defineRdyConfig } from 'readyup';
@@ -469,9 +469,9 @@ export default defineRdyConfig({
 
 The `readyup >=0.33.0` peer names the version the kit is developed and tested against. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
 
-The kit runs at the version resolved from your `node_modules`, so it reports whether your configuration matches that version. It never reports whether that version is current.
+The kit runs at the version resolved from the project's `node_modules`, so it reports whether the configuration matches that version. It never reports whether that version is current.
 
-The check that your root config extends this package matches the package specifier as text, or a path into a workspace that provides the package, so a config reaching it through a local re-export or a path alias is reported as not extending it.
+The check that the root config extends this package matches the package specifier as text, or a path into a workspace that provides the package, so a config reaching it through a local re-export or a path alias is reported as not extending it.
 
 The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. A config reaching the factory through a local re-export names neither, so one that also sets no `rootDir` goes unreported rather than reporting a wrong failure. One that does set it is still judged on the value it writes.
 
