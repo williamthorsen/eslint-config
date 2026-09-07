@@ -1,6 +1,6 @@
 export const commonIgnores: string[] = [
   '**/*.md/*.ts', // Markdown-embedded TS has no owning tsconfig, so the project service cannot type it.
-  '**/*.sh', // No config parses shell, so a script passed explicitly reports as unmatched rather than clean.
+  '**/*.sh', // No config parses shell. Publishing the glob is what lets a consumer drop their own copy.
   '**/dist/**',
   '**/dist-ssr/**',
   '**/coverage/**',

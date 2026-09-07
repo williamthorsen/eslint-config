@@ -424,7 +424,13 @@ export default defineConfig(config, globalIgnores([...commonIgnores, ...toolIgno
 
 Both are also reachable from the `./ignores` subpath, for a consumer who wants the lists without the config.
 
-What separates them decides where a new glob belongs. `commonIgnores` collects build output (`dist/`, `dist-ssr/`, `coverage/`, `local/`, `tmp/`, minified files) and files no ESLint config parses (shell scripts, lockfiles, `CHANGELOG*`, `LICENSE*`, TypeScript embedded in Markdown). Every entry is a fact about the JavaScript toolchain, true of any repo using it.
+What separates them decides where a new glob belongs. `commonIgnores` collects three kinds of path:
+
+- Build output: `dist/`, `dist-ssr/`, `coverage/`, and minified files.
+- Directories holding nothing a developer authored: `local/` and `tmp/`.
+- Files no rule can usefully report on: shell scripts and lockfiles, which no config parses; `CHANGELOG*` and `LICENSE*`; and `**/*.md/*.ts`, which parses but belongs to no tsconfig, so the project service cannot type it.
+
+None of it turns on which tools a repo runs, which is what separates this list from `toolIgnores`.
 
 `toolIgnores` collects content that a named developer tool owns and generates, so its entries are facts about which tools a repo happens to run:
 
