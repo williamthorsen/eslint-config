@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.9.0 — 2026-09-08
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Stop exempting vitest from n/no-extraneous-import (#219)
+
+  - Removes the `allowModules: ['vitest']` option from `n/no-extraneous-import`, so the rule now reports `vitest` in any workspace whose own `package.json` does not declare it.
+
+  Migration: Declare `vitest` in the `devDependencies` of every workspace that imports it; in a pnpm workspace, a catalog entry (`"vitest": "catalog:"`) declares it without repeating the version. To keep the old behavior instead, set `'n/no-extraneous-import': ['error', { allowModules: ['vitest'] }]` in the consuming config's own `rules` block.
+
+### 📚 Documentation
+
+- Remove second person from package documentation (#216)
+
+  - Removes the second-person pronouns from READMEs, migration guides, and the config template.
+
 ## 0.8.0 — 2026-09-06
 
 ### 🎉 Features
