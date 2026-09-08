@@ -41,7 +41,7 @@
     "typescript-eslint": "catalog:",
     "v11y-check": "0.15.8",
     "vite": "8.2.2",
-    "vitest": "4.1.11",
+    "vitest": "catalog:",
     "zod": "4.5.4"
   },
   "packageManager": "pnpm@12.1.0",
