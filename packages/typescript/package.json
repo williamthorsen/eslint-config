@@ -49,12 +49,12 @@
     "prepublishOnly": "rdy compile && nmr build"
   },
   "dependencies": {
-    "@eslint-community/eslint-plugin-eslint-comments": "4.8.0",
+    "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
     "@eslint/js": "10.0.1",
     "eslint-plugin-import-x": "4.17.1",
     "eslint-plugin-jsonc": "3.4.2",
     "eslint-plugin-n": "catalog:",
-    "eslint-plugin-package-json": "1.8.0",
+    "eslint-plugin-package-json": "1.8.1",
     "eslint-plugin-promise": "7.3.0",
     "eslint-plugin-simple-import-sort": "14.0.0",
     "eslint-plugin-unicorn": "74.0.0",
@@ -66,7 +66,7 @@
   },
   "devDependencies": {
     "@eslint/config-helpers": "0.7.0",
-    "@next/eslint-plugin-next": "16.3.4",
+    "@next/eslint-plugin-next": "16.3.5",
     "@typescript-eslint/rule-tester": "8.70.0",
     "@typescript-eslint/utils": "8.70.0",
     "@vitest/eslint-plugin": "1.6.27",
