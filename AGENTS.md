@@ -13,7 +13,7 @@ Three published packages, of which `@williamthorsen/eslint-config-typescript` is
 - `.config/nmr.config.ts`: repo-level overrides for the `nmr` script runner.
 - `.config/readyup.config.ts`: names the packages whose readyup kits check this repo.
 - `.config/release-kit.config.ts`, `.config/v11y-check.config.json`: config for the corresponding tools invoked by GitHub Actions reusable workflows.
-- `.config/wt.toml`: worktrunk's post-create hooks, which run `direnv allow` and `pnpm install` in a new worktree.
+- `.config/wt.toml`: worktrunk's pre-start hooks, which run `direnv allow` and `pnpm install` in a new worktree before its creation completes.
 
 ## Commands
 
