@@ -36,7 +36,6 @@ describe(judgeInputCoverage, () => {
     expect(judgeInputCoverage(entries, ESLINT_CONFIG)).toStrictEqual({ kind: 'not-enumerated' });
   });
 
-  // An entry naming the config's own directory gathers everything under it.
   it('is covered by an entry naming the judged directory itself', () => {
     const entries = [buildChainEntry({ config: { include: ['.'] } })];
 

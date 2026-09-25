@@ -29,7 +29,7 @@ describe(readVersionFloor, () => {
     expect(readVersionFloor('workspace:*')).toBeUndefined();
   });
 
-  // `>` and `<` exclude the version they name, so neither reduces to a floor the check can compare.
+  // `>` and `<` exclude the version they name, so neither reduces to a floor that the check can compare.
   it('returns undefined for an exclusive bound', () => {
     expect(readVersionFloor('>10')).toBeUndefined();
     expect(readVersionFloor('<12')).toBeUndefined();

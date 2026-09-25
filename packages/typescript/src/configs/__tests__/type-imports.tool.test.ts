@@ -6,7 +6,7 @@ import { fixText } from '../test-utils/fixText.ts';
 const MODULE = "'./type-imports-module.ts'";
 
 /**
- * One row of the shape matrix in #172. `imports` holds the statements in one source order; a two-statement
+ * One row of the import-shape matrix. `imports` holds the statements in one source order; a two-statement
  * row also runs reversed. `usage` references every binding the way the row intends, as a type or a value,
  * so that nothing reports an unused binding and `consistent-type-imports` sees the intended kind.
  * `expected` is the import block `--fix` must converge on, one statement per line, in any order.
@@ -147,6 +147,7 @@ function importLines(text: string): string[] {
     );
 }
 
+/** Renders a source text from import statements followed by the usage. */
 function renderSource(imports: readonly string[], usage: string): string {
   return `${imports.join('\n')}\n\n${usage}\n`;
 }

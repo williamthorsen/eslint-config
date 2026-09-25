@@ -37,6 +37,7 @@ const typeAwareRules: Linter.RulesRecord = {
   'vitest/valid-title': 'off',
 };
 
+/** Builds the Vitest config: every plugin rule, minus the corrections above. */
 async function createConfig(): Promise<Config[]> {
   const { default: vitestPlugin } = await import('@vitest/eslint-plugin');
 

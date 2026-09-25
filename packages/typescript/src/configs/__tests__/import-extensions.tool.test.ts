@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { baseConfig } from '../../baseConfig.ts';
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
-// The resolver alias the config ships is what makes the extension rule read `q.ts` for a specifier written
+// The resolver alias that the config ships is what makes the extension rule read `q.ts` for a specifier written
 // `./q.js`. Without it the rule reads the written extension, finds `js` where it expects `js`, and passes.
 
 describe('the extension rule the import config sets', () => {
@@ -28,7 +28,7 @@ describe('the extension rule the import config sets', () => {
 
   // `js-target.ts` and `js-target.js` both sit beside the fixture, so the message names whichever the
   // resolver's `extensions` list reaches first. The list is ordered by resolution priority, and the
-  // alphabetical ordering it departs from would name `js` here.
+  // alphabetical ordering from which it departs would name `js` here.
   it('resolves an extensionless specifier to the TypeScript sibling', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'extensionless-importer.ts');
 
@@ -44,7 +44,7 @@ describe('the extension rule the import config sets', () => {
   });
 
   // The override exempts an unresolvable specifier as readily as a resolved one, so the case above passes
-  // whether or not the fixture's `exports` map is reached. Composing the options the override replaces is
+  // whether or not the fixture's `exports` map is reached. Composing the options that the override replaces is
   // what proves the fixture resolves, and that the override is what silences it.
   // The fixture package is unscoped: `ignorePackages` exempts a scoped subpath through the `isScoped` arm of
   // `isPackage`, so a scoped name would silence the subpath here too and leave the case above guarding nothing.

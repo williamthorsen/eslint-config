@@ -169,7 +169,7 @@ export default defineRdyKit({
 
 // region | Helpers
 
-/** Compares a peer dependency's installed version against the floor this package's peer range sets. */
+/** Compares a peer dependency's installed version against the floor that this package's peer range sets. */
 function checkPeerFloor(name: string): boolean | CheckOutcome {
   const comparison = comparePeer(name);
   if (comparison.kind === 'unknown') return { ok: false, detail: comparison.reason };
@@ -179,7 +179,7 @@ function checkPeerFloor(name: string): boolean | CheckOutcome {
     : { ok: false, detail: `${installed} is below the ${range} peer range` };
 }
 
-/** Resolves the two versions a peer floor check compares, or the reason they cannot be compared. */
+/** Resolves the two versions that a peer floor check compares, or the reason they cannot be compared. */
 function comparePeer(name: string): PeerComparison {
   const range = readPeerRange(name);
   if (range === undefined) return { kind: 'unknown', reason: `${PACKAGE_NAME} declares no ${name} peer` };
@@ -253,7 +253,7 @@ function listProviderWorkspaceDirs(): string[] {
     .map((workspace) => workspace.dir);
 }
 
-/** Lists the directories a repo's configs sit in: the repo root and every workspace. */
+/** Lists the directories in which a repo's configs sit: the repo root and every workspace. */
 function listRepoSearchDirs(): string[] {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
@@ -325,7 +325,7 @@ function readChain(tsconfigPath: string): TsconfigChain | undefined {
 
 /**
  * Reads a dependency's installed version, taking the lowest found across the repo's search
- * directories so a workspace resolving an older copy decides the comparison. The result is cached
+ * directories so that a workspace resolving an older copy decides the comparison. The result is cached
  * for the life of the process, which holds while one `rdy` run targets one project.
  */
 function readInstalledVersion(name: string): string | undefined {
@@ -344,7 +344,7 @@ function readInstalledVersion(name: string): string | undefined {
   return lowest;
 }
 
-/** Reads the peer range this package declares for a dependency. */
+/** Reads the peer range that this package declares for a dependency. */
 function readPeerRange(name: string): string | undefined {
   const range = getJsonValue(PEER_RANGES, 'peerDependencies', name);
   return typeof range === 'string' ? range : undefined;
@@ -371,7 +371,7 @@ function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
  * Skips the enumeration check where no tsconfig owning an eslint config enumerates a sibling
  * TypeScript file, whether it declares no inputs at all or its declared inputs name none. A root
  * declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`,
- * covers the config by a route its own inputs do not show.
+ * covers the config by a route that its own inputs do not show.
  */
 function skipUnlessEnumerated(): false | string {
   const judged = listInputJudgements();
@@ -391,7 +391,7 @@ function skipUnlessEslintLoadsTypeScript(): false | string {
 /**
  * Skips the next.rootDir checks where no eslint config reaches the Next plugin and none sets the
  * value. The trigger is the union of the two, so a config reaching the plugin through a local
- * re-export is still judged on the value it writes.
+ * re-export is still judged on the value that it writes.
  */
 function skipUnlessNextRootDirApplies(): false | string {
   if (listEslintConfigsMatching(enablesNextPlugin).length > 0) return false;

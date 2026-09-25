@@ -25,7 +25,7 @@ export function enablesNextPlugin(content: string): boolean {
  * Reports whether an eslint config imports from a path inside the given directory. A repo providing
  * the config package reaches it by source path rather than by package specifier, so the directory of
  * the workspace providing it stands in for the specifier. Specifiers resolve against the repo root,
- * where the only config this reads sits; one reaching above the root cannot name a workspace, so it
+ * which holds the only config that this reads; one reaching above the root cannot name a workspace, so it
  * never matches.
  */
 export function importsFromDir(content: string, dir: string): boolean {
@@ -38,7 +38,7 @@ export function importsFromDir(content: string, dir: string): boolean {
 }
 
 /**
- * Lists the relative `settings.next.rootDir` values an eslint config sets. The plugin globs the
+ * Lists the relative `settings.next.rootDir` values that an eslint config sets. The plugin globs the
  * value against the working directory, so a relative one anchors to wherever eslint was launched.
  * Only a value that is itself a string literal, or an array of them, can be read; an expression such
  * as `import.meta.dirname` yields nothing, which is what keeps the remedy from reporting itself.
@@ -94,7 +94,7 @@ function listNextSettingsBlocks(content: string): string[] {
   return blocks;
 }
 
-/** Lists the string literals a `rootDir` key is assigned, discarding every value that is not one. */
+/** Lists the string literals assigned to a `rootDir` key, discarding every value that is not one. */
 function listRootDirLiterals(block: string): string[] {
   const literals: string[] = [];
   for (const value of listRootDirValues(block)) {

@@ -38,7 +38,7 @@ interface DeclaredPaths<Field extends DeclaredField> {
  *
  * A chain enumerating nothing is reported as such rather than as a failure: a root declaring
  * `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the
- * file by a route the config alone does not show.
+ * file by a route that the config alone does not show.
  */
 export function judgeInputCoverage(entries: readonly TsconfigChainEntry[], filePath: string): InputCoverage {
   const judged = entries[0];
@@ -114,7 +114,7 @@ function listDeclaredPaths<Field extends DeclaredField>(
 
 /**
  * Reports whether one declared path covers the target. A path holding no wildcard covers the target
- * it names and, where it names a directory, everything beneath it; TypeScript reads an entry naming
+ * that it names and, where it names a directory, everything beneath it; TypeScript reads an entry naming
  * neither a file nor a wildcard as a directory.
  */
 function matchesPattern(pattern: string, target: string): boolean {
@@ -146,7 +146,7 @@ function startsWithConfigDir(value: string): boolean {
 
 /**
  * Compiles a wildcard path into a regular expression. `*` and `?` match within one segment, and `**`
- * spans any number of them, which is the whole of the syntax TypeScript resolves in `include`.
+ * spans any number of them, which is the whole of the syntax that TypeScript resolves in `include`.
  */
 function toPatternRegExp(pattern: string): RegExp {
   const source = pattern

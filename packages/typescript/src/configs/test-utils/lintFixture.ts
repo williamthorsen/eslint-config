@@ -6,12 +6,10 @@ import type { Config } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import { assert } from 'vitest';
 
-// Fixtures live outside `src` so the build neither compiles nor publishes them, and Vitest never collects
-// the two that are deliberately named `*.test.*`.
 export const fixturesDir = path.join(import.meta.dirname, '../../../__fixtures__/configs');
 
-// Opt the fixture extensions into linting and wire the typescript-eslint parser with a project, so a
-// composed config runs against the fixture instead of being skipped as unmatched by any `files` glob.
+// Opts the fixture extensions into linting and wires the typescript-eslint parser with a project, so that a
+// composed config runs against the fixture instead of skipping it as matched by no `files` glob.
 export const fixtureWiring: Config = {
   files: ['**/*.ts', '**/*.tsx'],
   languageOptions: {
@@ -23,7 +21,7 @@ export const fixtureWiring: Config = {
   },
 };
 
-// Lint one fixture with the composed config and return the per-file results.
+/** Lints one fixture with the composed config and returns the per-file results. */
 export async function lintFixture(composed: readonly Config[], fixture: string): Promise<ESLint.LintResult[]> {
   const eslint = new ESLint({
     cwd: fixturesDir,
@@ -53,9 +51,11 @@ export const typedParserSettings: Config = {
 
 // region | Helpers
 
-// `new ESLint({ overrideConfig })` accepts `Linter.Config[]`, which models `languageOptions` with a
-// nominally-incompatible index signature. Bridge only at that constructor; never on the factory
-// results, whose assignability to `Config[]` is what the composability suite proves.
+/**
+ * Retypes configs as the `Linter.Config[]` that `new ESLint({ overrideConfig })` accepts, which models
+ * `languageOptions` with a nominally-incompatible index signature. Only that constructor calls it, never
+ * the factory results, whose assignability to `Config[]` is what the composability suite proves.
+ */
 function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above
   return configs as Linter.Config[];

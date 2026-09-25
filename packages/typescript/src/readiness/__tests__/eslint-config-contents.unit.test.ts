@@ -82,7 +82,7 @@ describe(enablesNextPlugin, () => {
   });
 
   // A local re-export names neither the factory call nor the plugin, so the config reads as not
-  // reaching it; a config that sets settings.next.rootDir is still judged on the value it writes.
+  // reaching it; a config that sets settings.next.rootDir is still judged on the value that it writes.
   it('is false for a config reaching the factory through a local re-export', () => {
     const content = `import { next } from '../config/eslint-presets.ts';`;
 
@@ -229,7 +229,7 @@ describe(setsNextRootDir, () => {
     expect(setsNextRootDir(content)).toBe(true);
   });
 
-  // A value no literal reader can judge still counts as set, so a config anchoring it correctly
+  // A value that no literal reader can judge still counts as set, so a config anchoring it correctly
   // reports a pass rather than a missing setting.
   it('is true for an expression value', () => {
     const content = `settings: { next: { rootDir: import.meta.dirname } }`;

@@ -24,8 +24,7 @@ describe('commonIgnores', () => {
     await expect(commonLinter.isPathIgnored('scripts/deploy.sh')).resolves.toBe(true);
   });
 
-  // `**/lib/**`, `**/output/**`, and `*.d.ts` were dropped from the list because these are the paths
-  // they reached: authored source in the repos consuming this config, and no build output anywhere.
+  // Repos consuming this config keep authored source at these paths, and no tool writes build output there.
   it('leaves authored source under lib and output, and a hand-written declaration, alone', async () => {
     await expect(commonLinter.isPathIgnored('src/lib/helpers.ts')).resolves.toBe(false);
     await expect(commonLinter.isPathIgnored('src/output/terminal.ts')).resolves.toBe(false);

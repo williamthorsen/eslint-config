@@ -1,5 +1,6 @@
 import { type Config, defineConfig } from 'eslint/config';
 
+/** Builds the React Testing Library config, with the jest-dom rules. */
 export async function createReactTestingLibraryConfig(): Promise<Config[]> {
   const { default: jestDomPlugin } = await import('eslint-plugin-jest-dom');
   const { default: testingLibraryPlugin } = await import('eslint-plugin-testing-library');
@@ -13,7 +14,6 @@ export async function createReactTestingLibraryConfig(): Promise<Config[]> {
   });
 }
 
-// Add other configs as needed.
 const configs = {
   react: createReactTestingLibraryConfig,
 };

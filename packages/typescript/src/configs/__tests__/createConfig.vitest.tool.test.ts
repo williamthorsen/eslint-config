@@ -35,9 +35,9 @@ describe('createConfig.vitest rule corrections', () => {
   });
 });
 
-// The shipped configs previously set vitest severities in two places, which drifted. Iterate the config set rather
-// than naming the offender, so a preset that reintroduces the split is caught without a test edit. The default export
-// carries a test-scoped rule block, which makes it the nearest config to a report on a test file.
+// Iterate the config set rather than naming configs, so that any preset setting a vitest severity is caught without a
+// test edit. The default export carries a test-scoped rule block, which makes it the nearest config to a report on a
+// test file.
 describe('vitest rule ownership', () => {
   it('sets vitest rule severities in no shipped config but its own', async () => {
     const lazy = Object.entries(createConfig).filter(([name]) => name !== 'vitest');

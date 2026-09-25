@@ -27,7 +27,7 @@ describe('rule ids configured by the opt-in factories', () => {
 
 // region | Helpers
 
-/** Collects every rule id the blocks configure that no registered plugin and no core rule defines. */
+/** Collects every rule id that the blocks configure and that no registered plugin and no core rule defines. */
 function findUnresolvedRuleIds(blocks: readonly Config[]): string[] {
   const plugins = collectPlugins(blocks);
   const ruleIds = new Set(blocks.flatMap((block) => Object.keys(block.rules ?? {})));
@@ -52,7 +52,7 @@ function collectPlugins(blocks: readonly Config[]): Map<string, ConfigPlugin> {
 
 /**
  * Splits a rule id into the plugin expected to define it and the rule's own name, matching how ESLint
- * resolves one: a scoped id splits at its last `/`, any other at its first. Both boundaries carry weight --
+ * resolves one: a scoped id splits at its last `/`, any other at its first. Both boundaries matter:
  * `@next/next/no-img-element` names a scoped plugin, and `n/no-unsupported-features/es-syntax` a rule whose
  * own name contains a `/`. A core rule has no plugin.
  */
@@ -71,7 +71,7 @@ function resolvesToRule(ruleId: string, plugins: Map<string, ConfigPlugin>): boo
   const { pluginName, ruleName } = parseRuleId(ruleId);
 
   if (pluginName === undefined) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- the only runtime registry of core rules that lists the deprecated ones this config still sets
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- the only runtime registry of core rules that lists the deprecated ones that this config still sets
     return builtinRules.has(ruleName);
   }
 

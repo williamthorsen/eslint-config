@@ -1,5 +1,5 @@
 /**
- * Every basename an ESLint loader resolves, in the order it resolves them.
+ * Every basename that an ESLint loader resolves, in the order in which it resolves them.
  * A JavaScript basename precedes its TypeScript sibling, which is what makes a shadowed config silently inert.
  */
 export const ESLINT_CONFIG_BASENAMES = [

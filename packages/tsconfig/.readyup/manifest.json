@@ -41,7 +41,7 @@
           "path": "../src/readiness/findRedundantOptions.ts"
         },
         {
-          "hash": "30178e5c",
+          "hash": "d87749cb",
           "kind": "module",
           "path": "../src/readiness/listSearchDirs.ts"
         },

@@ -20,8 +20,8 @@ describe('the cycle rule the import config sets', () => {
 
   // `import-x/no-cycle` skips a statement whose specifiers are all types, through one code path for the
   // top-level spelling and another for the inline one, so a cycle reachable only through them goes
-  // unreported. These cases pin the gap `sky-pilot/no-type-cycle` covers where a consumer enables it: if
-  // upstream ever starts reporting a type edge, they fail, and that division of ground needs revisiting.
+  // unreported. These cases pin the gap that `sky-pilot/no-type-cycle` covers where a consumer enables it; they
+  // fail if upstream starts reporting a type edge, at which point the two rules overlap.
   // The inline spelling survives here although `consistent-type-imports` rewrites it to the top-level one,
   // because the rule keeps a separate path for it and a consumer may have that rule off.
   it.each([
