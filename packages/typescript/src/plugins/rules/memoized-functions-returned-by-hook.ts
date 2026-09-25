@@ -2,6 +2,7 @@
 
 import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
+/** Reports each unmemoized function that a custom hook returns in an object literal. */
 const create: TSESLint.RuleCreateFunction<'memoizedFunctionsReturnedByHook'> = (context) => {
   return {
     FunctionDeclaration(node: TSESTree.FunctionDeclaration) {
@@ -19,10 +20,8 @@ const create: TSESLint.RuleCreateFunction<'memoizedFunctionsReturnedByHook'> = (
   };
 };
 
-// region | Helper Functions
-/**
- * Gets the function node from a variable declarator if it's a function expression.
- */
+// region | Helper functions
+/** Returns the declarator's initializer when it is a function or arrow function expression. */
 function getFunctionFromVariableDeclarator(
   node: TSESTree.VariableDeclarator,
 ): TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression | undefined {
@@ -35,9 +34,7 @@ function getFunctionFromVariableDeclarator(
   return undefined;
 }
 
-/**
- * Checks all returned functions in a function node and reports unmemoized ones.
- */
+/** Reports each function in the returned object that is not wrapped in `useCallback` or `useMemo`. */
 function checkReturnedFunctions(
   node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression,
   context: TSESLint.RuleContext<'memoizedFunctionsReturnedByHook', unknown[]>,
@@ -45,7 +42,6 @@ function checkReturnedFunctions(
   const properties = getReturnedObjectProperties(node);
 
   for (const prop of properties) {
-    // Check explicit property values (prop.value)
     if (isFunction(prop.value)) {
       if (!isUseCallbackOrUseMemo(prop.value.parent)) {
         context.report({
@@ -55,7 +51,7 @@ function checkReturnedFunctions(
       }
     }
 
-    // Check shorthand properties (prop.key when it references a function)
+    // Resolve a shorthand property to the local function that it names.
     if (prop.shorthand && prop.key.type === AST_NODE_TYPES.Identifier) {
       const functionNode = findFunctionByName(node, prop.key.name);
       if (functionNode && !isUseCallbackOrUseMemo(functionNode.parent)) {
@@ -67,20 +63,16 @@ function checkReturnedFunctions(
     }
   }
 }
-/**
- * Checks if a node is a call to useCallback or useMemo.
- */
+/** Returns true if the node calls `useCallback` or `useMemo`, bare or as a member. */
 function isUseCallbackOrUseMemo(node: TSESTree.Node | undefined): boolean {
   if (!node || node.type !== AST_NODE_TYPES.CallExpression) return false;
 
-  // useCallback(fn, deps) or useMemo(fn, deps)
   if (
     node.callee.type === AST_NODE_TYPES.Identifier &&
     (node.callee.name === 'useCallback' || node.callee.name === 'useMemo')
   ) {
     return true;
   }
-  // React.useCallback / React.useMemo
   return (
     node.callee.type === AST_NODE_TYPES.MemberExpression &&
     node.callee.property.type === AST_NODE_TYPES.Identifier &&
@@ -88,9 +80,7 @@ function isUseCallbackOrUseMemo(node: TSESTree.Node | undefined): boolean {
   );
 }
 
-/**
- * Checks if a node is a function expression or arrow function.
- */
+/** Returns true if the node is a function expression or an arrow function. */
 function isFunction(
   node: TSESTree.Node | undefined,
 ): node is TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression {
@@ -99,9 +89,7 @@ function isFunction(
   );
 }
 
-/**
- * Determines if a function declaration or variable declarator is a custom hook.
- */
+/** Returns true if the declared name starts with `use`. */
 function isCustomHook(node: TSESTree.FunctionDeclaration | TSESTree.VariableDeclarator): boolean {
   if (
     node.type === AST_NODE_TYPES.FunctionDeclaration &&
@@ -117,9 +105,7 @@ function isCustomHook(node: TSESTree.FunctionDeclaration | TSESTree.VariableDecl
   );
 }
 
-/**
- * Finds a function declaration by name within a function node.
- */
+/** Returns the function declaration with the given name among the statements. */
 function findFunctionDeclaration(
   statements: TSESTree.Statement[],
   functionName: string,
@@ -132,9 +118,7 @@ function findFunctionDeclaration(
   return undefined;
 }
 
-/**
- * Finds a function expression by name within variable declarations.
- */
+/** Returns the function expression that the statements' variable declarations assign to the given name. */
 function findFunctionExpression(
   statements: TSESTree.Statement[],
   functionName: string,
@@ -157,9 +141,7 @@ function findFunctionExpression(
   return undefined;
 }
 
-/**
- * Finds a function declaration or expression by name within a function node.
- */
+/** Returns the function with the given name declared at the top level of the function's block body. */
 function findFunctionByName(
   node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression,
   functionName: string,
@@ -171,9 +153,7 @@ function findFunctionByName(
   return findFunctionDeclaration(node.body.body, functionName) || findFunctionExpression(node.body.body, functionName);
 }
 
-/**
- * Extracts properties from an object expression.
- */
+/** Returns the object's properties, omitting spread elements. */
 function extractPropertiesFromObject(obj: TSESTree.ObjectExpression): TSESTree.Property[] {
   const properties: TSESTree.Property[] = [];
   for (const prop of obj.properties) {
@@ -184,9 +164,7 @@ function extractPropertiesFromObject(obj: TSESTree.ObjectExpression): TSESTree.P
   return properties;
 }
 
-/**
- * Extracts properties from return statements in a block body.
- */
+/** Returns the properties of each object literal returned by a top-level `return` in the block. */
 function extractPropertiesFromBlockBody(body: TSESTree.BlockStatement): TSESTree.Property[] {
   const properties: TSESTree.Property[] = [];
 
@@ -199,9 +177,7 @@ function extractPropertiesFromBlockBody(body: TSESTree.BlockStatement): TSESTree
   return properties;
 }
 
-/**
- * Extracts properties from an arrow function's implicit return.
- */
+/** Returns the properties of an object literal that the arrow function returns implicitly. */
 function extractPropertiesFromArrowFunction(node: TSESTree.ArrowFunctionExpression): TSESTree.Property[] {
   if (node.body.type === AST_NODE_TYPES.ObjectExpression) {
     return extractPropertiesFromObject(node.body);
@@ -209,9 +185,7 @@ function extractPropertiesFromArrowFunction(node: TSESTree.ArrowFunctionExpressi
   return [];
 }
 
-/**
- * Finds all returned object properties from a function node.
- */
+/** Returns the properties of every object literal that the function returns. */
 function getReturnedObjectProperties(
   node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression,
 ): TSESTree.Property[] {
@@ -225,7 +199,7 @@ function getReturnedObjectProperties(
 
   return [];
 }
-// endregion | Helper Functions
+// endregion | Helper functions
 
 const ruleDefinition = {
   create,

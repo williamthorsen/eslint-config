@@ -1,6 +1,7 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import ts from 'typescript';
 
+/** Reports a discarded `map` call, limited to array-like receivers when type information is available. */
 const create: TSESLint.RuleCreateFunction<'unusedMap'> = (context) => {
   const services = getServicesOrNull(context);
 

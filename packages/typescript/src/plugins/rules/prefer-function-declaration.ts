@@ -1,19 +1,20 @@
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
+/* eslint-disable @typescript-eslint/consistent-type-assertions --
+ * The AST walk indexes nodes by `for...in` keys, typed as `string`, and narrows child values by shape alone. */
 import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
+/** Reports an untyped variable initialized with a function expression. */
 const create: TSESLint.RuleCreateFunction<'preferDeclaration'> = (context) => {
   return {
     VariableDeclarator(node: TSESTree.VariableDeclarator) {
       if (!(
         node.init &&
         [AST_NODE_TYPES.ArrowFunctionExpression, AST_NODE_TYPES.FunctionExpression].includes(node.init.type) &&
-        !node.id.typeAnnotation // Preserves exception for typed functions
+        !node.id.typeAnnotation // Exempt a typed variable: a declaration cannot take its annotation
       )) {
         return;
       }
 
-      // If the function is an arrow function and uses 'this', then a function declaration might not be possible,
-      // so do not report it as a rule violation.
+      // Skip an arrow function that uses `this`: a declaration would rebind it.
       if (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression && containsThisExpression(node.init.body)) {
         return;
       }
@@ -26,6 +27,7 @@ const create: TSESLint.RuleCreateFunction<'preferDeclaration'> = (context) => {
   };
 };
 
+/** Returns true if a `ThisExpression` occurs anywhere beneath the root, nested functions included. */
 function containsThisExpression(root: TSESTree.Node): boolean {
   const stack: TSESTree.Node[] = [root];
   const visited = new Set<TSESTree.Node>();

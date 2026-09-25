@@ -6,10 +6,8 @@ import { afterAll, describe, it } from 'vitest';
 
 import { type CaseTypeError, findCaseTypeErrors, type RuleTestCase } from './findCaseTypeErrors.ts';
 
-// `RuleTester` reads `describe`/`it`/`afterAll` off the global scope, which Vitest
-// populates only when `globals: true`. This repo's Vitest config does not enable
-// globals, so wire the hooks explicitly. `describeSkip`/`itOnly`/`itSkip` derive
-// from `describe.skip` / `it.only` / `it.skip`, which Vitest provides.
+// `RuleTester` reads `describe`/`it`/`afterAll` off the global scope, which Vitest populates only under
+// `globals: true`. Its `describeSkip`/`itOnly`/`itSkip` derive from these three through `.skip` and `.only`.
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
 RuleTester.it = it;
@@ -17,7 +15,7 @@ RuleTester.it = it;
 // eslint-disable-next-line unicorn/prefer-export-from -- re-export follows the static-hook wiring above
 export { RuleTester };
 
-// Throws when any code a suite declares does not typecheck, naming each offender and its diagnostics.
+/** Throws when any code that a suite declares does not typecheck, naming each offender and its diagnostics. */
 export function assertCasesTypecheck<MessageIds extends string, Options extends readonly unknown[]>(
   ruleName: string,
   tests: RunTests<MessageIds, Options>,
@@ -28,9 +26,11 @@ export function assertCasesTypecheck<MessageIds extends string, Options extends 
   }
 }
 
-// Builds a tester for type-aware rules, which need a TS program. `allowDefaultProject` routes the inline code to the
-// default project, and `defaultProject` names the fixture `tsconfig.json` as that project; an unnamed default project
-// is inferred, and carries TypeScript's own `compilerOptions` rather than the fixture's.
+/**
+ * Builds a tester for type-aware rules, which need a TS program. `allowDefaultProject` routes the inline code to the
+ * default project, and `defaultProject` names the fixture `tsconfig.json` as that project; an unnamed default project
+ * is inferred, and uses TypeScript's own `compilerOptions` rather than the fixture's.
+ */
 export function createTypedRuleTester(): RuleTester {
   return new TypecheckedRuleTester({
     languageOptions: {
@@ -47,7 +47,7 @@ export function createTypedRuleTester(): RuleTester {
 
 // region | Helpers
 
-// Renders the offending cases as the one message a failing suite reports.
+/** Renders the offending cases as the one message that a failing suite reports. */
 function formatCaseTypeErrors(ruleName: string, errors: readonly CaseTypeError[]): string {
   const details = errors.map((error) =>
     [`${error.label}: ${error.code}`, ...error.messages.map((message) => `  ${message}`)].join('\n'),
@@ -55,8 +55,11 @@ function formatCaseTypeErrors(ruleName: string, errors: readonly CaseTypeError[]
   return `${ruleName}: the following code does not typecheck under the rule fixture's compilerOptions.\n\n${details.join('\n\n')}`;
 }
 
-// Labels each piece of code by the position it occupies in the suite, which is how a failure points back at the source.
-// A fixer's and a suggestion's `output` are code the suite asserts, so they are held to the program alongside the cases.
+/**
+ * Labels each piece of code by the position that it occupies in the suite, which is how a failure points back at the
+ * source. A fixer's and a suggestion's `output` are code that the suite asserts, so they are held to the program
+ * alongside the cases.
+ */
 function toTypecheckedCases<MessageIds extends string, Options extends readonly unknown[]>(
   tests: RunTests<MessageIds, Options>,
 ): RuleTestCase[] {
@@ -90,10 +93,13 @@ function toTypecheckedCases<MessageIds extends string, Options extends readonly 
   return cases;
 }
 
-// A tester that also holds every case to the fixture program. A case referencing a shape the program does not declare
-// typechecks as `any`, on which a type-aware rule returns early, so the case can pass while exercising none of the
-// behavior it names.
+/**
+ * A tester that also holds every case to the fixture program. A case referencing a shape that the program does not
+ * declare typechecks as `any`, on which a type-aware rule returns early, so the case can pass while exercising none of
+ * the behavior that it names.
+ */
 class TypecheckedRuleTester extends RuleTester {
+  /** Registers a typecheck test for the suite ahead of the rule's own cases. */
   override run<MessageIds extends string, Options extends readonly unknown[]>(
     ruleName: string,
     rule: RuleModule<MessageIds, Options>,

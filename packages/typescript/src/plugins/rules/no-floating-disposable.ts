@@ -20,10 +20,10 @@ const blockNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
   AST_NODE_TYPES.SwitchCase,
 ]);
 
-// Callees exempted for one of two reasons. Node's timer globals return a `Timeout` implementing `Symbol.dispose`, so
-// every `setTimeout(fn, ms);` statement would otherwise report a resource whose discard is the point. `node:crypto`'s
-// factories return a `Transform` or `Writable` wrapping an OpenSSL context, inheriting `Symbol.asyncDispose` from the
-// stream base while owning no descriptor, socket, process, or lock: nothing is released, so nothing needs binding.
+// Callees whose disposable result is safe to discard. Node's timer globals return a `Timeout` implementing
+// `Symbol.dispose`, and discarding it is the point of `setTimeout(fn, ms);`. `node:crypto`'s factories return a
+// `Transform` or `Writable` wrapping an OpenSSL context, which inherits `Symbol.asyncDispose` from the stream base but
+// owns no descriptor, socket, process, or lock.
 const defaultAllow: readonly string[] = [
   'createCipheriv',
   'createDecipheriv',
@@ -42,6 +42,7 @@ const functionNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
   AST_NODE_TYPES.FunctionExpression,
 ]);
 
+/** Reports a disposable resource that is discarded, or declared without `using` in a scope that could release it. */
 const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (context) => {
   const services = getTypedServicesOrNull(context);
 
@@ -54,6 +55,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
   const allow = new Set([...defaultAllow, ...(context.options[0]?.allow ?? [])]);
   const checkDeclarations = context.options[0]?.checkDeclarations ?? true;
 
+  /** Reports a call or `new` expression whose disposable result a statement discards. */
   const checkResourceExpression: TSESLint.RuleFunction<ResourceExpression> = (node) => {
     const discarded = readDiscardedExpression(node);
     const calleeName = readCalleeName(node);
@@ -74,6 +76,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
     context.report({ node, messageId: 'floatingDisposable', data: { keyword } });
   };
 
+  /** Reports a declaration that acquires a scope-bound resource without `using`. */
   const checkDeclarator: TSESLint.RuleFunction<TSESTree.VariableDeclarator> = (node) => {
     const declaration = node.parent;
     const { init } = node;
@@ -97,7 +100,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
       return;
     }
 
-    // The initializer carries the resource, so an awaited promise reads as the resource rather than the promise.
+    // Read the whole initializer's type, so that an awaited promise yields the resource rather than the promise.
     const type = services.getTypeAtLocation(init);
     const keyword = readDisposalKeyword(type, checker);
     if (
@@ -126,7 +129,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
 
 // region | Helper functions
 
-/** Returns the nearest statement list enclosing the node, which is the scope a `using` binding would be released at. */
+/** Returns the nearest statement list enclosing the node: the scope at which a `using` binding would be released. */
 function findEnclosingBlock(node: TSESTree.Node): TSESTree.Node | undefined {
   for (const ancestor of listAncestors(node)) {
     if (blockNodeTypes.has(ancestor.type)) {
@@ -168,10 +171,10 @@ function isContainedUse(identifier: ReferenceIdentifier): boolean {
 
 /**
  * Returns true if the reference is the receiver of a call taking a function argument, reached directly or through a
- * property, as `child.on(event, listener)` and `child.stdout.on(...)` are. Such a call schedules work the declaring
- * block does not contain, so releasing the resource at the block's end would cut the callback off. No signature says
- * whether an argument is invoked during the call or retained for later, so a synchronous higher-order call such as
- * `lines.forEach(...)` qualifies too.
+ * property, as `child.on(event, listener)` and `child.stdout.on(...)` are. Such a call schedules work that the
+ * declaring block does not contain, so releasing the resource at the block's end would cut the callback off. No
+ * signature says whether an argument is invoked during the call or retained for later, so a synchronous higher-order
+ * call such as `lines.forEach(...)` qualifies too.
  */
 function isContinuationRegistration(identifier: ReferenceIdentifier, services: TypedServices): boolean {
   let node: TSESTree.Node = identifier;
@@ -190,7 +193,7 @@ function isContinuationRegistration(identifier: ReferenceIdentifier, services: T
 /**
  * Returns true if the identifier is the object of a `Symbol.dispose` or `Symbol.asyncDispose` access. Code that
  * releases the resource by hand is correct; preferring `using` over a hand-written `finally` belongs to
- * `unicorn/prefer-dispose`, which reads the disposal call this rule only has to recognize.
+ * `unicorn/prefer-dispose`, which reads the disposal call that this rule only has to recognize.
  */
 function isDisposalAccess(identifier: ReferenceIdentifier): boolean {
   const { parent } = identifier;
@@ -208,7 +211,7 @@ function isDisposalAccess(identifier: ReferenceIdentifier): boolean {
   );
 }
 
-/** Returns true if the node is a function whose body a resource's references would be captured in. */
+/** Returns true if the node is a function in whose body a resource's references would be captured. */
 function isEnclosingFunction(node: TSESTree.Node): node is EnclosingFunction {
   return functionNodeTypes.has(node.type);
 }
@@ -225,7 +228,7 @@ function isOwnershipPassthrough(node: ResourceExpression, type: ts.Type, service
 }
 
 /**
- * Returns true if the argument may be a function. A spread's elements carry no node to read a type from, and `any`
+ * Returns true if the argument may be a function. A spread's elements have no node to read a type from, and `any`
  * withholds the answer, so both count: a resource wrongly reported costs more than one wrongly exempted.
  */
 function isPossiblyFunction(argument: TSESTree.CallExpressionArgument, services: TypedServices): boolean {
@@ -238,9 +241,9 @@ function isPossiblyFunction(argument: TSESTree.CallExpressionArgument, services:
 }
 
 /**
- * Returns true if the call yields the receiver it was called on. Such a method chains onto a resource the caller
- * already holds, as `server.listen(port)` does, rather than acquiring one. Two tests answer it: the call's type is
- * the receiver's own, which covers a fluent method annotated with its own class type; or the signature declares
+ * Returns true if the call yields the receiver on which it was called. Such a method chains onto a resource that the
+ * caller already holds, as `server.listen(port)` does, rather than acquiring one. Two tests answer it: the call's type
+ * is the receiver's own, which covers a fluent method annotated with its own class type; or the signature declares
  * `this`, which holds wherever instantiating `this` yields a type object distinct from the receiver's.
  */
 function isReceiverType(
@@ -258,12 +261,12 @@ function isReceiverType(
 }
 
 /**
- * Returns true if the declared resource belongs to the scope that declares it, which is what makes `using` the
- * binding it calls for. Every reference must be a member access sitting in the declaring block and function: a
- * return, an argument, an assignment, or a literal element all hand the resource somewhere that outlives this scope,
- * where releasing it at the scope's end would be wrong. Requiring the declaring block covers a `var`, whose binding
- * a caller may read past the block a `using` would be released at. A reference registering a continuation disqualifies
- * the declaration too, the resource then being finished by the callback rather than by the block returning.
+ * Returns true if the declared resource belongs to the scope that declares it, which is what makes `using` the binding
+ * that it calls for. Every reference must be a member access sitting in the declaring block and function: a return, an
+ * argument, an assignment, or a literal element all hand the resource somewhere that outlives this scope, where
+ * releasing it at the scope's end would be wrong. Requiring the declaring block covers a `var`, whose binding a caller
+ * may read past the block at which a `using` would be released. A reference registering a continuation disqualifies the
+ * declaration too, the resource then being finished by the callback rather than by the block returning.
  */
 function isScopeBound(
   declarator: TSESTree.VariableDeclarator,
@@ -284,7 +287,7 @@ function isScopeBound(
 
   const declaringFunction = findEnclosingFunction(declarator);
   return variable.references.every((reference) => {
-    // The declarator's own binding is a write that every declaration carries.
+    // The declarator's own binding is a write that every declaration makes.
     if (reference.init === true) {
       return true;
     }
@@ -307,9 +310,8 @@ function isWithin(node: TSESTree.Node, container: TSESTree.Node): boolean {
 }
 
 /**
- * Yields the node's ancestors, nearest first, ending at the `Program` it is rooted in. The walk stops there rather
- * than on an absent parent: ESLint sets the `Program`'s parent to `null`, which `TSESTree.Node['parent']` declares
- * non-nullable, so a walk guarding on the parent reads as unnecessary to the type checker and throws at the root.
+ * Yields the node's ancestors, nearest first, ending at the `Program` in which it is rooted. The walk tests for
+ * `Program` because ESLint sets its parent to `null`, which `TSESTree.Node['parent']` declares non-nullable.
  */
 function* listAncestors(node: TSESTree.Node): Generator<TSESTree.Node> {
   let current: TSESTree.Node = node;
@@ -320,8 +322,8 @@ function* listAncestors(node: TSESTree.Node): Generator<TSESTree.Node> {
 }
 
 /**
- * Returns the call or `new` expression an initializer acquires its value from, or undefined where the initializer is
- * not an acquisition site. An alias or a property read carries a resource some other expression already acquired.
+ * Returns the call or `new` expression from which an initializer acquires its value, or undefined where the initializer
+ * is not an acquisition site. An alias or a property read yields a resource that another expression already acquired.
  */
 function readAcquisitionExpression(init: TSESTree.Expression): ResourceExpression | undefined {
   let expression: TSESTree.Expression = init;
@@ -334,7 +336,7 @@ function readAcquisitionExpression(init: TSESTree.Expression): ResourceExpressio
     : undefined;
 }
 
-/** Returns the name the `allow` list matches against: the callee itself, or the property of a member call. */
+/** Returns the name against which the `allow` list matches: the callee itself, or the property of a member call. */
 function readCalleeName(node: ResourceExpression): string | undefined {
   const { callee } = node;
   if (callee.type === AST_NODE_TYPES.Identifier) {
@@ -353,9 +355,9 @@ function readCalleeName(node: ResourceExpression): string | undefined {
 /**
  * Returns the expression whose value a statement discards, or undefined where the result is consumed. An optional
  * chain interposes a `ChainExpression` between the call and the statement, and `await` an `AwaitExpression`; the
- * outermost of them carries the value that goes unused, and an awaited promise carries the resource rather than the
- * promise wrapping it. A `void` operator interposes a `UnaryExpression` instead, which is what makes it the
- * deliberate-discard escape hatch.
+ * outermost of them holds the value that goes unused, and an awaited promise yields the resource rather than the
+ * promise wrapping it. A `void` operator interposes a `UnaryExpression`, which makes `void` the escape hatch for an
+ * intended discard.
  */
 function readDiscardedExpression(node: ResourceExpression): TSESTree.Expression | undefined {
   let expression: TSESTree.Expression = node;
@@ -369,7 +371,7 @@ function readDiscardedExpression(node: ResourceExpression): TSESTree.Expression 
 }
 
 /**
- * Returns the binding keyword the type calls for, or undefined when the type is not disposable. Nullability is
+ * Returns the binding keyword that the type calls for, or undefined when the type is not disposable. Nullability is
  * stripped first: `getProperties()` resolves a union to its common properties, so `Disposable | undefined` would
  * otherwise report as bare of any property at all. Every remaining constituent must be disposable, so a union mixing
  * a resource with a plain value is left alone.

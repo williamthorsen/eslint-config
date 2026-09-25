@@ -10,12 +10,12 @@ const ruleTester = new RuleTester();
 ruleTester.run('no-unpublished-barrel', rule, {
   valid: [
     {
-      // Non-firing: the root entry point a conditional `exports` names
+      // Non-firing: the root entry point that a conditional `exports` names
       code: "export * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/index.ts'),
     },
     {
-      // Non-firing: a subpath entry point the same map names
+      // Non-firing: a subpath entry point that the same map names
       code: "export * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/configs/index.ts'),
     },
@@ -25,7 +25,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       filename: fixtureFile('string-exports', 'src/index.ts'),
     },
     {
-      // Non-firing: a subpath pattern publishes every path its `*` spans, `/` included
+      // Non-firing: a subpath pattern publishes every path that its `*` spans, `/` included
       code: "export * from './a.ts';",
       filename: fixtureFile('pattern-exports', 'src/configs/nested/index.ts'),
     },
@@ -70,7 +70,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       filename: fixtureFile('legacy-main', 'src/index.ts'),
     },
     {
-      // Non-firing: `types` names the declaration entry the same manifest publishes
+      // Non-firing: `types` names the declaration entry that the same manifest publishes
       code: "export * from './a.ts';",
       filename: fixtureFile('legacy-main', 'src/index.d.ts'),
     },
@@ -91,7 +91,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       options: [{ outDir: 'build' }],
     },
     {
-      // Non-firing: the option also moves the source directory the mapping strips
+      // Non-firing: the option also moves the source directory that the mapping strips
       code: "export * from './a.ts';",
       filename: fixtureFile('string-exports', 'lib/index.ts'),
       options: [{ sourceDir: 'lib' }],
@@ -127,7 +127,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
     },
     {
-      // Non-firing: a source-less export naming a binding the file defines is not a re-export
+      // Non-firing: a source-less export naming a binding that the file defines is not a re-export
       code: "import { a } from './a.ts';\nconst b = 2;\nexport { a, b };",
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
     },
@@ -220,7 +220,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
-      // Firing: a mapping the package does not build to reports its own entry point, loudly
+      // Firing: a mapping to which the package does not build reports its own entry point, loudly
       code: "export * from './a.ts';",
       filename: fixtureFile('custom-out-dir', 'src/index.ts'),
       errors: [buildUnpublishedError('src/index.ts', 'dist/esm/index.js')],
@@ -243,8 +243,8 @@ ruleTester.run('no-unpublished-barrel', rule, {
 // region | Helper functions
 
 /**
- * Builds the error an `unpublishedBarrel` case expects. Both paths are stated literally rather than derived
- * from the rule's own mapping.
+ * Builds the error that an `unpublishedBarrel` case expects. Both paths are literal, so that a fault in the rule's
+ * own mapping cannot also shape the expectation.
  */
 function buildUnpublishedError(sourcePath: string, target: string): TestCaseError<'unpublishedBarrel'> {
   return { messageId: 'unpublishedBarrel', data: { sourcePath, target } };
