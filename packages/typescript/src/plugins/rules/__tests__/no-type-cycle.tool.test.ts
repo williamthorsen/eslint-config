@@ -79,7 +79,7 @@ describe('sky-pilot/no-type-cycle', () => {
 
 // region | Helpers
 
-/** Collects the messages the rule reported against the first linted file. */
+/** Collects the messages that the rule reported against the first linted file. */
 function listCycleMessages(results: readonly ESLint.LintResult[]): string[] {
   const messages = results[0]?.messages ?? [];
 

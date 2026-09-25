@@ -6,11 +6,11 @@ const fixtureDir = path.join(import.meta.dirname, '../../../../__fixtures__/rule
 const fixtureConfigPath = path.join(fixtureDir, 'tsconfig.json');
 
 // A case is a script, so a program holding several of them merges their top-level declarations and reports collisions
-// no case has on its own. The appended export makes each case a module with a scope of its own.
+// that no case has on its own. The appended export makes each case a module with a scope of its own.
 const MODULE_SUFFIX = '\nexport {};';
 
-// Parsing the fixture's libs costs an order of magnitude more than checking the cases, and every program a worker
-// builds reads the same ones under the same options.
+// Parsing the fixture's libs costs an order of magnitude more than checking the cases, and every program that a
+// worker builds reads the same ones under the same options.
 const parsedLibraryFiles = new Map<string, ts.SourceFile | undefined>();
 
 export interface RuleTestCase {
@@ -24,7 +24,7 @@ export interface CaseTypeError {
   messages: string[];
 }
 
-// Compiles each case under the rule fixture's `compilerOptions` and reports the ones that do not typecheck.
+/** Compiles each case under the rule fixture's `compilerOptions` and reports the ones that do not typecheck. */
 export function findCaseTypeErrors(cases: readonly RuleTestCase[]): CaseTypeError[] {
   if (cases.length === 0) {
     return [];
@@ -52,7 +52,7 @@ export function findCaseTypeErrors(cases: readonly RuleTestCase[]): CaseTypeErro
       throw new Error(`Typechecking the rule-tester cases did not reach ${testCase.label}.`);
     }
 
-    // Asking per file rather than for the whole program keeps the fixture's libs out of the check, which dominates it.
+    // Ask per file: a whole-program check includes the fixture's libs, which dominate its cost.
     const diagnostics = [...program.getSyntacticDiagnostics(sourceFile), ...program.getSemanticDiagnostics(sourceFile)];
     if (diagnostics.length > 0) {
       errors.push({ code: testCase.code, label: testCase.label, messages: diagnostics.map(toMessage) });
@@ -64,7 +64,7 @@ export function findCaseTypeErrors(cases: readonly RuleTestCase[]): CaseTypeErro
 
 // region | Helpers
 
-// Builds a host serving the cases from memory and everything else, the fixture's libs included, from disk.
+/** Builds a host serving the cases from memory and everything else, the fixture's libs included, from disk. */
 function createCompilerHost(options: ts.CompilerOptions, sources: ReadonlyMap<string, RuleTestCase>): ts.CompilerHost {
   const host = ts.createCompilerHost(options);
   const fileExists = host.fileExists.bind(host);
@@ -90,7 +90,7 @@ function createCompilerHost(options: ts.CompilerOptions, sources: ReadonlyMap<st
   return host;
 }
 
-// Reads the options the rule tester's default project runs under, so a change to the fixture reaches the cases.
+/** Reads the options under which the rule tester's default project runs, so that a fixture change reaches the cases. */
 function readFixtureCompilerOptions(): ts.CompilerOptions {
   const configFile = ts.readConfigFile(fixtureConfigPath, (fileName) => ts.sys.readFile(fileName));
   if (configFile.error) {
@@ -108,7 +108,7 @@ function readFixtureCompilerOptions(): ts.CompilerOptions {
   return parsed.options;
 }
 
-// Renders a diagnostic as a single line led by its TypeScript error code.
+/** Renders a diagnostic as a single line led by its TypeScript error code. */
 function toMessage(diagnostic: ts.Diagnostic): string {
   return `TS${diagnostic.code}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ')}`;
 }

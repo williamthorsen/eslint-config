@@ -10,7 +10,6 @@ import noUnpublishedBarrelRule from './rules/no-unpublished-barrel.ts';
 import noUnusedMapRule from './rules/no-unused-map.ts';
 import preferFunctionDeclarationRule from './rules/prefer-function-declaration.ts';
 
-// Define the plugin
 const skyPilotPlugin: ESLint.Plugin = {
   meta: {
     name: 'eslint-plugin-sky-pilot',
@@ -26,8 +25,7 @@ const skyPilotPlugin: ESLint.Plugin = {
   }),
 };
 
-// Define the configs that can be extended. The annotation is explicit rather than `satisfies`:
-// declaration emit cannot name `@eslint/core`'s `Plugin`, which the inferred type would reference.
+// Annotate explicitly: declaration emit cannot name `@eslint/core`'s `Plugin`, which an inferred type would reference.
 const configs: { recommended: Config; strict: Config } = {
   recommended: {
     plugins: {
@@ -57,5 +55,4 @@ const configs: { recommended: Config; strict: Config } = {
   },
 };
 
-// Export the plugin
 export default { configs };

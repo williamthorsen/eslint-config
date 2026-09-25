@@ -79,7 +79,7 @@ untypedRuleTester.run('no-unused-map (syntactic fallback)', rule, {
     },
     {
       // Firing: the receiver guard needs a program, so the fallback reports a receiver
-      // the typed suite accepts; this case fails if the suite ever gains type information
+      // that the typed suite accepts; this case fails if the suite ever gains type information
       code: 'declare const builder: { map(callback: (n: number) => number): void }; builder.map((n) => n * 2);',
       errors: [{ messageId: 'unusedMap' }],
     },

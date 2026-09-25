@@ -30,17 +30,17 @@ ruleTester.run('no-split-imports', rule, {
     ...bothOrders("import a from './x.json' with { type: 'json' };", "import { b } from './x.json';"),
   ],
   invalid: [
-    // Firing: a value statement and a type statement merge with `type` moved onto the specifier (row A)
+    // Firing: a value statement and a type statement merge with `type` moved onto the specifier
     ...merges("import { v } from 'm';", "import type { T } from 'm';", [
       "import { v, type T } from 'm';",
       "import { type T, v } from 'm';",
     ]),
-    // Firing: a default import takes the type specifier as named bindings (row B)
+    // Firing: a default import takes the type specifier as named bindings
     ...merges("import d from 'm';", "import type { T } from 'm';", [
       "import d, { type T } from 'm';",
       "import d, { type T } from 'm';",
     ]),
-    // Firing: a default with named bindings takes the type specifier too (row H)
+    // Firing: a default with named bindings takes the type specifier too
     ...merges("import d, { v } from 'm';", "import type { T } from 'm';", [
       "import d, { v, type T } from 'm';",
       "import d, { type T, v } from 'm';",
@@ -144,12 +144,12 @@ ruleTester.run('no-split-imports', rule, {
 
 // region | Helpers
 
-// Renders the pair in both source orders, since a merge that is right in one order can be wrong in the other.
+/** Renders the pair in both source orders, since a merge that is right in one order can be wrong in the other. */
 function bothOrders(first: string, second: string): string[] {
   return [`${first}\n${second}\n`, `${second}\n${first}\n`];
 }
 
-// Renders the pair in both source orders as fixable cases, each with the output that order produces.
+/** Renders the pair in both source orders as fixable cases, each with the output produced by that order. */
 function merges(
   first: string,
   second: string,

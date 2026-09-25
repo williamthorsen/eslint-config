@@ -1,5 +1,6 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 
+/** Reports a `Number()` call whose argument's type includes `undefined`. */
 const create: TSESLint.RuleCreateFunction<'undefinedWithNumber'> = (context) => {
   const parserServices = ESLintUtils.getParserServices(context);
   const checker = parserServices.program.getTypeChecker();

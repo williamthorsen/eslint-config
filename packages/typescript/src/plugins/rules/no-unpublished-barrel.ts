@@ -47,6 +47,7 @@ const typeExpressionTypes = new Set<TSESTree.Node['type']>([
 // an ESLint server restart to take effect in an editor session.
 const manifestCache = new Map<string, Manifest | undefined>();
 
+/** Reports a barrel file whose built module the nearest package.json does not publish. */
 const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (context) => {
   return {
     Program(node: TSESTree.Program) {
@@ -93,7 +94,7 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
 
 // region | Helper functions
 
-/** Collects the local names every import declaration binds. */
+/** Collects the local names that every import declaration binds. */
 function collectImportedNames(program: TSESTree.Program): Set<string> {
   const names = new Set<string>();
 
@@ -108,7 +109,7 @@ function collectImportedNames(program: TSESTree.Program): Set<string> {
 }
 
 /**
- * Collects the paths the manifest publishes. `exports` is authoritative wherever it is present; the legacy
+ * Collects the paths that the manifest publishes. `exports` is authoritative wherever it is present; the legacy
  * fields name the entry points of a package that predates it, `types` among them because a declaration file
  * reaches this rule with its extension intact.
  */
@@ -123,8 +124,7 @@ function collectPublishedTargets(manifest: Record<string, unknown>): Set<string>
 
 /**
  * Collects every string reachable in the value, at any depth of array or object nesting. Taking the strings
- * rather than the keys covers the bare-string and conditional-object `exports` forms with no list of
- * condition names.
+ * covers the bare-string and conditional-object `exports` forms with no list of condition names.
  */
 function collectStrings(value: unknown): string[] {
   if (typeof value === 'string') {
@@ -153,6 +153,7 @@ function coversTarget(published: string, target: string): boolean {
   return new RegExp(`^${published.split('*').map(escapeRegExp).join('.*')}$`).test(target);
 }
 
+/** Escapes the characters that a regular expression treats as syntax. */
 function escapeRegExp(text: string): string {
   return text.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
 }
@@ -169,7 +170,7 @@ function findNearestManifest(dir: string): Manifest | undefined {
 }
 
 /**
- * Returns true if any directory between the package root and the file is one the rule exempts. The path is
+ * Returns true if any directory between the package root and the file is one that the rule exempts. The path is
  * package-relative, so a repository checked out below a directory of one of these names exempts nothing.
  */
 function hasScaffoldingSegment(relativePath: string): boolean {
@@ -222,12 +223,12 @@ function isImportedIdentifier(node: TSESTree.Node, importedNames: ReadonlySet<st
   return unwrapped.type === AST_NODE_TYPES.Identifier && importedNames.has(unwrapped.name);
 }
 
-/** Returns true if the specifier exports a binding the file imported. A string-named local never is one. */
+/** Returns true if the specifier exports a binding that the file imported. A string-named local never is one. */
 function isImportedLocal(specifier: TSESTree.ExportSpecifier, importedNames: ReadonlySet<string>): boolean {
   return specifier.local.type === AST_NODE_TYPES.Identifier && importedNames.has(specifier.local.name);
 }
 
-/** Returns true if any target the manifest publishes covers the path. */
+/** Returns true if any target that the manifest publishes covers the path. */
 function isPublished(target: string, publishedTargets: ReadonlySet<string>): boolean {
   for (const published of publishedTargets) {
     if (coversTarget(published, target)) {
@@ -237,24 +238,27 @@ function isPublished(target: string, publishedTargets: ReadonlySet<string>): boo
   return false;
 }
 
+/** Returns true if the value is a non-array object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+/** Returns true if the node is a type-only expression that wraps another expression. */
 function isTypeExpression(node: TSESTree.Node): node is TypeExpression {
   return typeExpressionTypes.has(node.type);
 }
 
+/** Narrows an array to `unknown[]`, which `Array.isArray` types as `any[]`. */
 function isUnknownArray(value: unknown): value is unknown[] {
   return Array.isArray(value);
 }
 
-/** Returns true if the source-less export names a binding the file defines rather than one it imported. */
+/** Returns true if the source-less export names a binding that the file defines rather than one that it imported. */
 function namesLocalBinding(node: TSESTree.ExportNamedDeclaration, importedNames: ReadonlySet<string>): boolean {
   return node.source === null && node.specifiers.some((specifier) => !isImportedLocal(specifier, importedNames));
 }
 
-/** Reduces a manifest path to the form a computed target takes: posix separators and no leading `./`. */
+/** Reduces a manifest path to the form that a computed target takes: posix separators and no leading `./`. */
 function normalizeTarget(target: string): string {
   return toPosix(target).replace(/^\.\//, '');
 }
@@ -288,8 +292,8 @@ function splitDir(dir: string): string[] {
 }
 
 /**
- * Rewrites a built path's extension to the one the compiler emits for it. A declaration file is already an
- * emitted form, so it keeps the extension it has.
+ * Rewrites a built path's extension to the one that the compiler emits for it. A declaration file is already an
+ * emitted form, so it keeps its extension.
  */
 function toEmittedPath(builtPath: string): string {
   if (/\.d\.[cm]?ts$/.test(builtPath)) {
@@ -301,12 +305,13 @@ function toEmittedPath(builtPath: string): string {
   return emitted === undefined ? builtPath : builtPath.slice(0, -extension.length) + emitted;
 }
 
+/** Replaces the platform's path separators with `/`. */
 function toPosix(filePath: string): string {
   return filePath.split(path.sep).join('/');
 }
 
 /**
- * Maps a package-relative source path to the path the build emits for it, or undefined where the file lies
+ * Maps a package-relative source path to the path that the build emits for it, or undefined where the file lies
  * outside the source directory and so is never built.
  */
 function toPublishedTarget(relativePath: string, options: Options): string | undefined {

@@ -3,15 +3,12 @@ import { describe, expect, it } from 'vitest';
 import skyPilot from '../eslint-plugin-sky-pilot.ts';
 import skyPilotReact from '../eslint-plugin-sky-pilot-react.ts';
 
-// Each rule id in a preset is `<pluginPrefix>/<ruleName>`. The prefix must match a key
-// registered in that preset's `plugins`, or ESLint cannot resolve the rule at load time.
-// This guards the class of bug where a preset references a plugin under the wrong key.
 interface Preset {
   plugins?: Record<string, { rules?: Record<string, unknown> | undefined }>;
   rules?: Record<string, unknown>;
 }
 
-// `optInRules` names the rules a plugin registers and no preset enables, which a project turns on for itself.
+// `optInRules` names the rules that a plugin registers but no preset enables; a project turns them on for itself.
 const pluginModules: { name: string; configs: Record<string, Preset>; optInRules: string[] }[] = [
   { name: 'sky-pilot', configs: skyPilot.configs, optInRules: ['no-type-cycle'] },
   { name: 'sky-pilot-react', configs: skyPilotReact.configs, optInRules: [] },
@@ -22,6 +19,8 @@ const presetCases = pluginModules.flatMap(({ name, configs, optInRules }) =>
 );
 
 describe('custom plugin preset integrity', () => {
+  // A rule id is `<pluginPrefix>/<ruleName>`, and ESLint cannot resolve it unless the prefix is a key of the preset's
+  // `plugins`.
   it.each(presetCases)(`$pluginName "$presetName" registers every rule's plugin prefix`, ({ preset }) => {
     const registeredPrefixes = Object.keys(preset.plugins ?? {});
     const rulePrefixes = Object.keys(preset.rules ?? {}).map((ruleId) => ruleId.slice(0, ruleId.indexOf('/')));
@@ -32,10 +31,8 @@ describe('custom plugin preset integrity', () => {
     }
   });
 
-  // Adding a rule means editing the plugin's `rules` map and each preset separately. One left out of a preset ships
-  // disabled under it, which no other check would report. `optInRules` names the deliberate omissions, and the case
-  // below holds each to being registered by the plugin and absent at any severity. Adding a name to that list is
-  // itself an unguarded edit: it is what a reviewer reads, not what the suite blocks.
+  // A rule that the plugin registers but a preset leaves out ships disabled under that preset, and no other check
+  // reports it.
   it.each(presetCases)(
     `$pluginName "$presetName" enables every rule the plugin registers but the opt-in ones`,
     ({ optInRules, pluginName, preset }) => {
@@ -55,7 +52,7 @@ describe('custom plugin preset integrity', () => {
       const enabledRules = Object.keys(preset.rules ?? {}).map((ruleId) => ruleId.slice(ruleId.indexOf('/') + 1));
 
       for (const ruleName of optInRules) {
-        // The rule stays reachable for a project that enables it deliberately.
+        // A project that opts in needs the rule registered.
         expect(registeredRules).toContain(ruleName);
         // An `'off'` entry would override a project that enabled the rule in an earlier config object.
         expect(enabledRules).not.toContain(ruleName);

@@ -8,13 +8,14 @@ interface NamedSpecifier {
   text: string;
 }
 
-/** The bindings one statement contributes to the merge. */
+/** The bindings that one statement contributes to the merge. */
 interface Contribution {
   defaultName: string | undefined;
   named: NamedSpecifier[];
   node: TSESTree.ImportDeclaration;
 }
 
+/** Reports each module imported in several statements that one statement could replace. */
 const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
   return {
     Program(program: TSESTree.Program) {
@@ -38,7 +39,6 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
           node: second,
           messageId: 'splitImports',
           data: { count: contributions.length, source },
-          // The fix is withheld where it would delete or orphan a comment.
           fix: fixWouldLoseComment(context.sourceCode, first, nodes.slice(1))
             ? null
             : (fixer) => [
@@ -54,9 +54,8 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
 // region | Helpers
 
 /**
- * Groups the program's mergeable import statements by module, in source order. A statement that cannot share
- * a statement with named bindings (a side-effect import, a namespace import, a type-only default, or one that
- * carries import attributes) is left out, so it is neither merged into nor removed.
+ * Groups the program's mergeable import statements by module, in source order. A statement rejected by
+ * `toContribution` is left out, so the fix neither merges into it nor removes it.
  */
 function collectMergeableGroups(program: TSESTree.Program): Map<string, Contribution[]> {
   const groups = new Map<string, Contribution[]>();
@@ -84,7 +83,7 @@ function collectMergeableGroups(program: TSESTree.Program): Map<string, Contribu
 /**
  * Returns true if the fix would delete or orphan a comment: one inside the rewritten first statement, or one
  * attached to a removed statement, whether leading it on its own line, sitting inside it, or trailing on its
- * last line. A comment elsewhere in the group's span annotates code the fix leaves in place.
+ * last line. A comment elsewhere in the group's span annotates code that the fix leaves in place.
  */
 function fixWouldLoseComment(
   sourceCode: TSESLint.SourceCode,
@@ -113,7 +112,7 @@ function fixWouldLoseComment(
 }
 
 /**
- * Widens a statement's range so its removal leaves no trace: the whole line where nothing else shares it, and
+ * Widens a statement's range so that its removal leaves no trace: the whole line when nothing else shares it, and
  * otherwise the spaces that separated it from what follows.
  */
 function rangeWithLine(sourceCode: TSESLint.SourceCode, node: TSESTree.Node): TSESTree.Range {
@@ -170,7 +169,7 @@ function renderMerged(sourceCode: TSESLint.SourceCode, contributions: readonly C
   return `import ${allTypes ? 'type ' : ''}${clauses.join(', ')} from ${sourceCode.getText(first.node.source)}${semicolon}`;
 }
 
-/** Reads the bindings a statement contributes, or undefined where the statement cannot take part in a merge. */
+/** Reads the bindings that a statement contributes, or undefined where the statement cannot take part in a merge. */
 function toContribution(node: TSESTree.ImportDeclaration): Contribution | undefined {
   if (node.specifiers.length === 0 || node.attributes.length > 0) {
     return undefined;
@@ -209,7 +208,7 @@ function toNamedSpecifier(specifier: TSESTree.ImportSpecifier, inTypeStatement: 
 
 // endregion | Helpers
 
-// `import-x/no-duplicates` merges the shapes `toContribution` excludes, losing a kind, a side-effect
+// `import-x/no-duplicates` also merges the shapes that `toContribution` excludes, and loses a kind, a side-effect
 // import, or the parse.
 const ruleDefinition = {
   create,

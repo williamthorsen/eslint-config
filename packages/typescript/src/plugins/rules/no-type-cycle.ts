@@ -18,10 +18,11 @@ interface ModuleReference {
   specifier: ts.StringLiteralLike;
 }
 
-// Keying on the program rather than on a file path is what lets an editor session pick up an edit: the project
-// service builds a new program, which finds no entry here and walks the graph afresh.
+// Key by program: after an edit, the project service builds a new program, which finds no entry here and walks the
+// graph afresh.
 const graphs = new WeakMap<ts.Program, Map<ts.SourceFile, readonly Edge[]>>();
 
+/** Reports each edge leaving the file that starts a cycle back to it through a type-only edge. */
 const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
   const services = getServicesOrNull(context);
   const program = services?.program ?? null;
@@ -55,8 +56,7 @@ function collectEdges(program: ts.Program, file: ts.SourceFile): readonly Edge[]
   const checker = program.getTypeChecker();
   const edges: Edge[] = [];
 
-  // An `import()` in type position is not a statement, so the walk descends the whole file rather than its
-  // statement list.
+  /** Records the node's edge, if any, and descends into its children, below which an `import()` type can sit. */
   function visit(node: ts.Node): void {
     const reference = toModuleReference(node);
     if (reference !== undefined) {
@@ -73,14 +73,14 @@ function collectEdges(program: ts.Program, file: ts.SourceFile): readonly Edge[]
   return edges;
 }
 
-/** Returns true if every binding an export clause names is a type. */
+/** Returns true if every binding that an export clause names is a type. */
 function exportsTypesOnly(node: ts.ExportDeclaration): boolean {
   if (node.isTypeOnly) {
     return true;
   }
 
   const clause = node.exportClause;
-  // `export * from './m.ts'` carries no clause and re-exports values.
+  // `export * from './m.ts'` has no clause and re-exports values.
   if (clause === undefined || !ts.isNamedExports(clause)) {
     return false;
   }
@@ -98,6 +98,7 @@ function findCycle(program: ts.Program, origin: ts.SourceFile, edge: Edge): read
   const visited = new Set<string>();
   const chain: ts.SourceFile[] = [];
 
+  /** Returns true if a path from the file reaches the origin behind a type-only edge, leaving that path in `chain`. */
   function walk(file: ts.SourceFile, typeSeen: boolean): boolean {
     if (file === origin) {
       return typeSeen;
@@ -135,22 +136,21 @@ function getServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<Messa
   }
 }
 
-/** Returns true if an import clause carries a top-level `type` modifier. */
+/** Returns true if an import clause has a top-level `type` modifier. */
 function hasTypeModifier(clause: ts.ImportClause): boolean {
   // The modifier's other spelling is `defer`, which defers a value import rather than erasing it.
   if (clause.phaseModifier !== undefined) {
     return clause.phaseModifier === ts.SyntaxKind.TypeKeyword;
   }
 
-  // TypeScript below 5.9, which the peer range admits, carries no `phaseModifier` and leaves `isTypeOnly` as the
-  // only signal. From 5.9 the two agree, so the compilers this package also supports reach the same answer here.
+  // TypeScript below 5.9, which the peer range admits, has no `phaseModifier`; from 5.9, `isTypeOnly` agrees with it.
   // eslint-disable-next-line @typescript-eslint/no-deprecated -- the only type-only signal below TypeScript 5.9
   return clause.isTypeOnly;
 }
 
-/** Returns true if every binding an import clause names is a type. */
+/** Returns true if every binding that an import clause names is a type. */
 function importsTypesOnly(clause: ts.ImportClause | undefined): boolean {
-  // A side-effect import (`import './m.ts'`) carries no clause and runs at load time.
+  // A side-effect import (`import './m.ts'`) has no clause and runs at load time.
   if (clause === undefined) {
     return false;
   }
@@ -190,12 +190,12 @@ function listEdges(program: ts.Program, file: ts.SourceFile): readonly Edge[] {
   return edges;
 }
 
-/** Renders a chain of files as the cycle the message names. */
+/** Renders a chain of files as the cycle that the message names. */
 function renderChain(cwd: string, chain: readonly ts.SourceFile[]): string {
   return chain.map((file) => toDisplayPath(cwd, file.fileName)).join(' → ');
 }
 
-/** Resolves a specifier to the file it names, or undefined for one outside the graph. */
+/** Resolves a specifier to the file that it names, or undefined for one outside the graph. */
 function resolveModule(
   program: ts.Program,
   checker: ts.TypeChecker,
