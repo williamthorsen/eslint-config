@@ -13,7 +13,7 @@ export interface RedundantOption {
  * Lists the options that a config nearer the entry than the base declares with the base's own value.
  * Only a config owned by the consumer is reported, since only that one can be edited. Comparison is
  * structural, so an array such as `lib` restated verbatim is reported as redundant. A key that
- * a config shipped by a dependency also declares is exempt: restating it is how a consumer wins
+ * a config shipped by a dependency also declares is exempt: Restating it is how a consumer wins
  * against that dependency's base.
  */
 export function findRedundantOptions(entries: readonly TsconfigChainEntry[], baseIndex: number): RedundantOption[] {

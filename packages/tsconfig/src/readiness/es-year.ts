@@ -35,7 +35,7 @@ export function readDeclaredEsYear(compilerOptions: Record<string, unknown>): st
 
 // region | Helpers
 
-/** Narrows an arbitrary JSON value to the strings it holds, treating anything else as empty. */
+/** Narrows an arbitrary JSON value to the strings that it holds, treating anything else as empty. */
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((entry: unknown): entry is string => typeof entry === 'string');

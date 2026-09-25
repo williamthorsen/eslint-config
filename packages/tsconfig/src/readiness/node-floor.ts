@@ -25,7 +25,7 @@ export function classifyNodeEsYear(
 }
 
 /**
- * Reduces declared Node floors to the lowest major they name.
+ * Reduces declared Node floors to the lowest major that they name.
  * A repo runs on the oldest Node that any of its packages admits.
  */
 export function findLowestNodeMajor(floors: readonly string[]): number | undefined {
@@ -37,7 +37,7 @@ export function findLowestNodeMajor(floors: readonly string[]): number | undefin
 }
 
 /**
- * Reads the major version a Node floor names, such as `24`, `24.5`, or `v22.11.0`.
+ * Reads the major version named by a Node floor, such as `24`, `24.5`, or `v22.11.0`.
  * A comparator or an alias yields `undefined`.
  */
 export function readNodeMajor(floor: string): number | undefined {

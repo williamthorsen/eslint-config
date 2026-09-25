@@ -180,7 +180,7 @@ function findTsconfigs(): string[] {
 }
 
 /**
- * Judges the lowest declared Node floor against the ES year the base sets, or names why the two
+ * Judges the lowest declared Node floor against the ES year set by the base, or names why the two
  * cannot be compared.
  */
 function judgeNodeFloor(): FloorVerdict {
@@ -240,7 +240,7 @@ function listTsconfigSearchDirs(): string[] {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 
-/** Fails when the lowest declared Node floor predates the ES year the base sets. */
+/** Fails when the lowest declared Node floor predates the ES year set by the base. */
 function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
   const verdict = judgeNodeFloor();
   return verdict.kind === 'skip' ? true : { ok: verdict.kind === 'pass', detail: verdict.detail };
