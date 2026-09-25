@@ -185,7 +185,7 @@ function extractPropertiesFromArrowFunction(node: TSESTree.ArrowFunctionExpressi
   return [];
 }
 
-/** Returns the properties of every object literal that the function returns. */
+/** Returns the properties of each object literal that the function returns at the top level of its body. */
 function getReturnedObjectProperties(
   node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression,
 ): TSESTree.Property[] {

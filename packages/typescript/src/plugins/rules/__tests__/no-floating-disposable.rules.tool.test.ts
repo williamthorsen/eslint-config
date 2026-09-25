@@ -333,7 +333,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
       errors: [{ messageId: 'unboundDisposable', data: { keyword: 'await using', kind: 'const' }, suggestions: [] }],
     },
     {
-      // Firing with no suggestion: an owning stream bound to a declaration, where no `await using` can appear
+      // Firing with no suggestion: an owning stream bound to a declaration in a function that cannot contain `await using`
       code: `${fileStream} declare function createWriteStream(path: string): FileStream; function run() { const out = createWriteStream('out.txt'); out.bytesWritten; }`,
       errors: [{ messageId: 'unboundDisposable', data: { keyword: 'await using', kind: 'const' }, suggestions: [] }],
     },
