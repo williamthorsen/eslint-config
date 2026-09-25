@@ -17,8 +17,7 @@ describe('createConfig preset load smoke tests', () => {
   );
 });
 
-// `Config`'s `parserOptions` is typed as `{}`, so read `projectService` through an
-// `unknown`-typed guard rather than the type assertion the repo's rules forbid.
+/** Reports whether parser options enable `projectService`, reading them as `unknown` because `Config` types them as `{}`. */
 function enablesProjectService(parserOptions: unknown): boolean {
   return (
     typeof parserOptions === 'object' &&

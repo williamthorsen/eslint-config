@@ -16,8 +16,7 @@ const rules: Linter.RulesRecord = {
   'jsonc/quotes': 'off',
 };
 
-// Use this config after the `json` config, because it overwrites some rules
-
+// Composed after the `json` config, whose rules it overrides on JSON5 files.
 const config = defineConfig({
   files: ['**/*.json5'],
   languageOptions: {

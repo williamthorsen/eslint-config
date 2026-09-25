@@ -34,7 +34,6 @@ export const baseConfig: Config[] = [
       globals: globals.commonjs,
     },
   },
-  // Test files
   {
     files: testFiles,
     rules: {
@@ -51,7 +50,7 @@ export const baseConfig: Config[] = [
     },
   },
   ...configs.json,
-  ...configs.json5, // Apply this after the `json` config, because it replaces some general JSON rules with JSON5 rules!
+  ...configs.json5, // Must follow `json`, whose rules it overrides on JSON5 files.
   ...configs.packageJson,
   ...configs.yaml,
 ];

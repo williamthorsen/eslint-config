@@ -1,7 +1,7 @@
 const SINGLE_COMPARATOR = /^(?:>=|\^|~)?(\d+)(?:\.(\d+))?(?:\.(\d+))?$/;
 
 /**
- * Reduces a semver range to the `x.y.z` version it floors at, or `undefined` where no single floor
+ * Reduces a semver range to its `x.y.z` floor, or `undefined` where no single floor
  * follows. Only ranges with one lower-bound comparator reduce: a union, an exclusive bound, or a
  * wildcard yields `undefined` rather than an invented floor.
  */

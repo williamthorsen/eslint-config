@@ -4,10 +4,7 @@ type ESLintPluginWithRules = Omit<ESLint.Plugin, 'configs'> & {
   configs: Record<string, { rules: Record<string, Linter.RuleEntry> }>;
 };
 
-/**
- * Type guard to ensure that a plugin is a valid ESLint plugin.
- * This guards against type inconsistencies during the migration to the flat ESLint config.
- */
+/** Returns the plugin typed as one exposing rule-bearing `configs`, throwing where it has no `configs`. */
 export function getSafeLinterPlugin<T>(plugin: T): Omit<T, 'configs'> & ESLintPluginWithRules {
   if (!isLinterPlugin(plugin)) {
     throw new Error('Plugin is not a valid ESLint plugin');
@@ -16,6 +13,7 @@ export function getSafeLinterPlugin<T>(plugin: T): Omit<T, 'configs'> & ESLintPl
   return plugin;
 }
 
+/** Reports whether a value is an object with a `configs` key. */
 function isLinterPlugin(plugin: unknown): plugin is ESLintPluginWithRules {
   return !!plugin && typeof plugin === 'object' && 'configs' in plugin;
 }

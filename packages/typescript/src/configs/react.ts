@@ -3,6 +3,7 @@ import { type Config, defineConfig } from 'eslint/config';
 import skyPilotReactPlugin from '../plugins/eslint-plugin-sky-pilot-react.ts';
 import { ensureExtendsElement } from '../utils/ensureExtendsElement.ts';
 
+/** Builds the React config: the react and react-hooks recommended sets plus the sky-pilot React rules. */
 async function createConfig(): Promise<Config[]> {
   const { default: reactPlugin } = await import('eslint-plugin-react');
   const { default: reactHooksPlugin } = await import('eslint-plugin-react-hooks');

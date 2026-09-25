@@ -12,7 +12,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "3d6d79f1",
+          "hash": "5f33c565",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -25,32 +25,32 @@
           ]
         },
         {
-          "hash": "f484d6fb",
+          "hash": "70166530",
           "kind": "module",
           "path": "../src/readiness/eslint-config-contents.ts"
         },
         {
-          "hash": "36c34370",
+          "hash": "bc8687e7",
           "kind": "module",
           "path": "../src/readiness/eslint-config-paths.ts"
         },
         {
-          "hash": "30178e5c",
+          "hash": "d87749cb",
           "kind": "module",
           "path": "../src/readiness/listSearchDirs.ts"
         },
         {
-          "hash": "dac8db7d",
+          "hash": "91eac517",
           "kind": "module",
           "path": "../src/readiness/permitsTsExtensionImports.ts"
         },
         {
-          "hash": "d75d159a",
+          "hash": "71be74f3",
           "kind": "module",
           "path": "../src/readiness/readVersionFloor.ts"
         },
         {
-          "hash": "84fd294b",
+          "hash": "c0dcbe2b",
           "kind": "module",
           "path": "../src/readiness/tsconfig-inputs.ts"
         }
@@ -59,7 +59,7 @@
       "path": "kits/default.js",
       "readyupVersion": "0.38.0",
       "source": "kits/default.ts",
-      "sourceHash": "3d6d79f1",
+      "sourceHash": "5f33c565",
       "targetHash": "f0c9d47e"
     }
   ]

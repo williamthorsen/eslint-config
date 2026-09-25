@@ -6,7 +6,7 @@ const PERMITTING_OPTIONS = ['allowImportingTsExtensions', 'rewriteRelativeImport
 /**
  * Reports whether a tsconfig's effective compiler options let an import path end in a TypeScript
  * extension. Each option is resolved to its nearest declaration in the chain, so a config setting one
- * to `false` over a base setting it to `true` withdraws the permission the base granted.
+ * to `false` over a base setting it to `true` withdraws the permission that the base granted.
  */
 export function permitsTsExtensionImports(entries: readonly TsconfigChainEntry[]): boolean {
   return PERMITTING_OPTIONS.some((option) => readNearestOption(entries, option) === true);

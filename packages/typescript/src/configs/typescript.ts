@@ -27,7 +27,6 @@ const rules: Linter.RulesRecord = {
     // Allow `fn(this: void)`, the canonical way to express that a function doesn't use `this`.
     { allowAsThisParameter: true },
   ],
-  // '@typescript-eslint/no-namespace': 'off',
   '@typescript-eslint/no-misused-promises': ['warn', { checksVoidReturn: false }], // 🔴🟠
   '@typescript-eslint/no-unnecessary-type-arguments': 'warn', // 🔴🟠
   '@typescript-eslint/no-unused-vars': [

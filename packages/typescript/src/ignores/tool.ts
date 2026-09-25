@@ -1,6 +1,6 @@
 /**
  * Ignores for content that a named developer tool owns and generates. This list is separate from
- * `commonIgnores`, which collects build output and files no ESLint config parses: those are facts
+ * `commonIgnores`, which collects build output and files that no ESLint config parses: those are facts
  * about the JavaScript toolchain, while these are facts about which tools a repo happens to run.
  */
 export const toolIgnores: string[] = [

@@ -26,8 +26,10 @@ const virtualFileWiring: Config = {
   },
 };
 
-// Lints the text with the composed config as though it were `fileName` in the fixtures directory, applying fixes
-// until none remain. ESLint stops after ten passes, so a fixer that never converges reports its residue here.
+/**
+ * Lints the text with the composed config as though it were `fileName` in the fixtures directory, applying fixes
+ * until none remain. ESLint stops after ten passes, so a fixer that never converges reports its residue here.
+ */
 export async function fixText(composed: readonly Config[], fileName: string, text: string): Promise<FixResult> {
   const eslint = new ESLint({
     cwd: fixturesDir,
@@ -45,8 +47,10 @@ export async function fixText(composed: readonly Config[], fileName: string, tex
 
 // region | Helpers
 
-// `new ESLint({ overrideConfig })` accepts `Linter.Config[]`, which models `languageOptions` with a
-// nominally-incompatible index signature; bridge only at that constructor.
+/**
+ * Retypes configs as the `Linter.Config[]` that `new ESLint({ overrideConfig })` accepts, which models
+ * `languageOptions` with a nominally-incompatible index signature. Only that constructor calls it.
+ */
 function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above
   return configs as Linter.Config[];

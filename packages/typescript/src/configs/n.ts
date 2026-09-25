@@ -3,7 +3,7 @@ import { defineConfig } from 'eslint/config';
 import nPlugin from 'eslint-plugin-n';
 
 const modifiedRules: Linter.RulesRecord = {
-  'n/no-callback-literal': 'off', // Enforces Node.js-style callback pattern
+  'n/no-callback-literal': 'off',
   'n/no-process-exit': 'off', // 🔴⚫ Needed in CLI tools and scripts
   'n/no-missing-import': 'warn', // 🔴🟠
   'n/no-unpublished-import': 'warn',

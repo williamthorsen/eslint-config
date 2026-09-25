@@ -5,7 +5,7 @@ import { ESLint } from 'eslint';
 import packageJsonConfig from '../package-json.ts';
 
 // ESLint reports `File ignored because outside of base path` in place of any rule output for a path outside
-// its `cwd`, so the subject sits under the directory the linter runs from. The file need not exist on disk.
+// its `cwd`, so the subject sits under the directory from which the linter runs. The file need not exist on disk.
 const manifestPath = path.join(import.meta.dirname, 'package.json');
 
 /**
