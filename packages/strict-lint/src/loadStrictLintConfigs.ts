@@ -7,18 +7,18 @@ import { formatRuleSeverities, isRuleSeverity } from './common/severity.ts';
 import { wrapNativeTsError } from './common/wrapNativeTsError.ts';
 import type { StrictLintConfig } from './types.ts';
 
-/** The config file strict-lint looks for, relative to each directory level of the walk. */
+/** The config file that strict-lint looks for, relative to each directory level of the walk. */
 export const STRICT_LINT_CONFIG_NAME = '.config/strict-lint.config.ts';
 
-/** A cascade of strict-lint configs, carrying the project root that bounded its ascent. */
+/** A cascade of strict-lint configs, with the project root that bounded its ascent. */
 export interface StrictLintCascade extends ConfigCascade<StrictLintConfig> {
   projectRoot: ProjectRoot;
 }
 
 /**
  * Loads every strict-lint config between `startDir` and the project root, nearest first, stopping at the first one
- * that declares `shouldIgnoreAncestors`. The cascade's provenance rides along so callers can report which files
- * contributed and where the walk was bounded.
+ * that declares `shouldIgnoreAncestors`. The result includes the cascade's provenance, so that callers can report
+ * which files contributed and where the walk was bounded.
  */
 export async function loadStrictLintConfigs(startDir: string): Promise<StrictLintCascade> {
   const projectRoot = findProjectRoot(startDir);
@@ -35,9 +35,9 @@ export async function loadStrictLintConfigs(startDir: string): Promise<StrictLin
 }
 
 /**
- * The nearest declared shared configs, flattened into one element list. The nearest level wins outright rather than
- * merging with the levels above it: a declaration names the configs one ESLint config extends, and two levels' lists
- * concatenated would assert a composition neither level wrote.
+ * Returns the nearest declared shared configs, flattened into one element list. The nearest level wins outright rather
+ * than merging with the levels above it: a declaration names the configs that one ESLint config extends, and two
+ * levels' lists concatenated would assert a composition that neither level wrote.
  */
 export function resolveSharedConfigs(cascade: StrictLintCascade): Linter.Config[] {
   const entry = cascade.entries.find(({ config }) => config.sharedConfigs !== undefined);
@@ -46,7 +46,7 @@ export function resolveSharedConfigs(cascade: StrictLintCascade): Linter.Config[
 
 // region | Helpers
 
-/** Runs the cascade, mapping the native-TypeScript failure modes its plain `import()` surfaces. */
+/** Runs the cascade, mapping the native-TypeScript failure modes that its plain `import()` surfaces. */
 async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigCascade<unknown>> {
   try {
     return await loadConfigCascade({
@@ -61,13 +61,14 @@ async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigC
 }
 
 /**
- * Whether a config bounds the walk at its own level. The cascade consults this the moment a config is loaded, before
- * strict-lint validates any of them, so every value has to be tolerated; an ill-typed flag fails validation instead.
+ * Checks whether a config bounds the walk at its own level. The cascade calls this as it loads each config, before
+ * strict-lint validates any of them, so it must tolerate every value; validation later rejects an ill-typed flag.
  */
 function isIgnoringAncestors(config: unknown): boolean {
   return isRecord(config) && config['shouldIgnoreAncestors'] === true;
 }
 
+/** Asserts that the default export of a config file is a valid strict-lint config. */
 function assertIsStrictLintConfig(config: unknown, filePath: string): asserts config is StrictLintConfig {
   if (!isRecord(config)) {
     throw new TypeError(`Expected the default export of "${filePath}" to be an object`);
@@ -80,7 +81,7 @@ function assertIsStrictLintConfig(config: unknown, filePath: string): asserts co
       throw new TypeError(`Expected maxSeverity in "${filePath}" to be an object`);
     }
     for (const [rule, severity] of Object.entries(maxSeverity)) {
-      // An explicit `undefined` reads as "no ceiling", exactly as an absent key does, so it never reaches the guard.
+      // Skip an explicit `undefined`, which means "no ceiling", as an absent key does.
       if (severity !== undefined && !isRuleSeverity(severity)) {
         const expectation = `to be a rule severity (${formatRuleSeverities()})`;
         throw new TypeError(
@@ -99,7 +100,7 @@ function assertIsStrictLintConfig(config: unknown, filePath: string): asserts co
   }
 }
 
-/** Accepts a list whose entries are each a config object or an array of them, which is what `flat()` later expects. */
+/** Asserts that `value` is a list whose entries are each a config object or an array of them, as `flat()` expects. */
 function assertIsSharedConfigs(value: unknown, filePath: string): void {
   if (!Array.isArray(value)) {
     throw new TypeError(`Expected sharedConfigs in "${filePath}" to be an array`);
@@ -117,7 +118,7 @@ function assertIsSharedConfigs(value: unknown, filePath: string): void {
   }
 }
 
-/** Renders a rejected value for a diagnostic, so an object reports its shape rather than `[object Object]`. */
+/** Renders a rejected value for a diagnostic, so that an object reports its shape rather than `[object Object]`. */
 function describeValue(value: unknown): string {
   if (typeof value === 'object' && value !== null) {
     return JSON.stringify(value);

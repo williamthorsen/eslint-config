@@ -11,9 +11,9 @@ import { CONFIG_TEMPLATE } from './configTemplate.ts';
 import { parseInitArgs } from './parseInitArgs.ts';
 
 /**
- * Scaffolds a strict-lint config in the working directory, returning the exit code the caller should exit with.
- * The command never refuses: a target the package cannot be imported from still gets its config, plus the install
- * step that would make the config load.
+ * Scaffolds a strict-lint config in `targetDir` and returns the exit code for the caller. The command never refuses:
+ * a target from which the package cannot be imported still gets its config, plus the install step that makes the
+ * config load.
  */
 export function runInit(argv: string[], targetDir: string): number {
   const { isDryRun, shouldOverwrite, shouldShowHelp } = parseInitArgs(argv);
@@ -55,7 +55,7 @@ function reportProjectRoot(targetDir: string): void {
   );
 }
 
-/** Reports what the write did, in the outcome vocabulary `reconcileFile` returns. */
+/** Reports what the write did, in the outcome vocabulary that `reconcileFile` returns. */
 function reportReconciliation(reconciliation: FileReconciliation, isDryRun: boolean): void {
   const { filePath } = reconciliation;
   switch (reconciliation.outcome) {

@@ -7,7 +7,7 @@ import { isRuleSeverity, toSeverityNumber } from '../common/severity.ts';
 import { buildPluginScaffold } from './buildPluginScaffold.ts';
 import { sortConfigElements } from './sortConfigElements.ts';
 
-/** A rule the consumer's own config sets to the value the shared config already resolves. */
+/** A rule that the consumer's own config sets to the value that the shared config already resolves. */
 export interface RepeatedRule {
   fileCount: number;
   ruleId: string;
@@ -28,11 +28,11 @@ export interface RepeatComparison {
 
 /**
  * Compares what the consumer's own config elements and the shared ones resolve for each file, reporting every rule
- * both sides set to an equal value. ESLint performs all glob expansion, `files` scoping, and last-wins ordering,
- * because the question is asked per real file rather than reconstructed from patterns.
+ * that both sides set to an equal value. ESLint performs all glob expansion, `files` scoping, and last-wins ordering,
+ * because the comparison asks about each real file rather than reconstructing the answer from patterns.
  *
  * An element that sorts to neither side stops the comparison: attributing it wrongly would invite a finding against a
- * setting the consumer never wrote, so the elements are named instead and nothing is reported.
+ * setting that the consumer never wrote, so the report names the elements instead and lists no repeated rule.
  */
 export async function findRepeatedRules(comparison: RepeatComparison): Promise<RepeatReport> {
   const { consumerElements, cwd, filePaths, sharedElements } = comparison;
@@ -65,9 +65,9 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
     }
   }
 
-  // A rule repeating on only some of the files the consumer sets it for is load-bearing on the rest, so deleting the
-  // entry that repeats would change them. Only a rule redundant everywhere the consumer sets it is safe to report,
-  // and a contested rule never is: the file counts agree whenever the run happens to lint one scope alone.
+  // Report only a rule that repeats on every file for which the consumer sets it: on the rest, deleting the repeating
+  // entry would change the result. Never report a contested rule, whose file counts agree whenever the run lints one
+  // scope alone.
   const contested = findContestedRules(own);
   const repeatedRules = [...repeatFileCounts]
     .filter(([ruleId, fileCount]) => fileCount === ownFileCounts.get(ruleId) && !contested.has(ruleId))
@@ -80,27 +80,27 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
 // region | Helpers
 
 /**
- * Reduces a rule entry to `[severity, ...options]` with a numeric severity, which is the form two entries have to
- * share before a comparison can tell one setting from two. ESLint applies the same reduction to what it resolves.
+ * Reduces a rule entry to `[severity, ...options]` with a numeric severity, the form that two entries must share
+ * before a comparison can tell one setting from two. ESLint applies the same reduction to what it resolves.
  */
 function canonicalizeRuleEntry(entry: unknown): unknown[] {
   const [severity, ...options] = isUnknownArray(entry) ? entry : [entry];
   return [isRuleSeverity(severity) ? toSeverityNumber(severity) : severity, ...options];
 }
 
-/** Builds an instance resolving one side of the comparison, with the whole config's plugin registrations beneath it. */
+/** Builds an ESLint instance that resolves one side of the comparison over the whole config's plugin registrations. */
 function createInstance(cwd: string, scaffold: Linter.Config[], side: readonly Linter.Config[]): ESLint {
   return new ESLint({ baseConfig: [...scaffold, ...side], cwd, overrideConfigFile: true });
 }
 
-/** Names an element for a diagnostic, falling back to the keys it carries when it has no name. */
+/** Names an element for a diagnostic, falling back to its keys when it has no name. */
 function describeElement(element: Linter.Config): string {
   return element.name ?? `unnamed config carrying ${Object.keys(element).toSorted().join(', ')}`;
 }
 
 /**
- * The rules the consumer's own elements configure to more than one value. Whether such a rule is redundant turns on
- * which element wins for a given file, which the files one run happens to lint cannot settle.
+ * Finds the rules that the consumer's own elements set to more than one value. Whether such a rule is redundant
+ * depends on which element wins for a given file, which the files linted by one run cannot settle.
  */
 function findContestedRules(own: readonly Linter.Config[]): Set<string> {
   const valuesByRule = new Map<string, unknown[]>();
@@ -118,14 +118,14 @@ function findContestedRules(own: readonly Linter.Config[]): Set<string> {
   return new Set([...valuesByRule].filter(([, values]) => values.length > 1).map(([ruleId]) => ruleId));
 }
 
-/** Whether a value is an array, narrowing to `unknown[]` where `Array.isArray` narrows to `any[]`. */
+/** Checks whether a value is an array, narrowing to `unknown[]`, whereas `Array.isArray` narrows to `any[]`. */
 function isUnknownArray(value: unknown): value is unknown[] {
   return Array.isArray(value);
 }
 
 /**
- * The rules one side resolves for a file. ESLint returns them normalized to `[severity, ...options]` with schema
- * defaults filled in, which is what lets `'error'`, `2`, and `['error']` compare as one value without further work.
+ * Returns the rules that one side resolves for a file. ESLint normalizes them to `[severity, ...options]` with schema
+ * defaults filled in, so `'error'`, `2`, and `['error']` compare as one value without further work.
  */
 async function resolveRules(eslint: ESLint, filePath: string): Promise<Record<string, unknown>> {
   const config: unknown = await eslint.calculateConfigForFile(filePath);

@@ -53,8 +53,7 @@ describe('concurrency (subprocess)', () => {
   }, 30_000);
 
   it('runs without the clone error that a plugin-bearing config once caused', () => {
-    // The config declares a plugin, whose rule functions cannot cross a worker thread. Before ESLint resolved the
-    // config itself, this config rode along in `overrideConfig` and failed `structuredClone` outright.
+    // The config declares a plugin, whose rule functions cannot cross a worker thread.
     const dir = makeFixture({
       'eslint.config.ts':
         "export default [{ plugins: { demo: { rules: { noop: { create: () => ({}) } } } }, rules: { 'no-unused-vars': 'warn' } }];\n",
@@ -69,7 +68,7 @@ describe('concurrency (subprocess)', () => {
 
 // region | Helpers
 
-/** A flat project with enough files that a worker count above one actually engages. */
+/** Writes a flat project with enough files that a worker count above one engages. */
 function makeFixture(extraFiles: Record<string, string> = {}): string {
   const sources = Object.fromEntries(
     Array.from({ length: FILE_COUNT }, (_, index) => [`f${String(index)}.js`, `const unused${String(index)} = 1;\n`]),
@@ -81,7 +80,7 @@ function makeFixture(extraFiles: Record<string, string> = {}): string {
   });
 }
 
-/** The report a run produced, reduced to what a worker could plausibly get wrong and ordered for comparison. */
+/** Runs the CLI and returns its report, reduced to what a worker could get wrong and sorted for comparison. */
 function reportOf(cwd: string, concurrency: string): ComparableResult[] {
   const { stdout, stderr } = runCli(cwd, ['--concurrency', concurrency, '--format', 'json', '.']);
   const output = stdout || stderr;
@@ -99,13 +98,13 @@ function reportOf(cwd: string, concurrency: string): ComparableResult[] {
     .toSorted((a, b) => a.file.localeCompare(b.file));
 }
 
-/** Run the CLI source under a plain `node` subprocess against the fixture directory. */
+/** Runs the CLI source under a plain `node` subprocess against the fixture directory. */
 function runCli(cwd: string, args: string[]): { status: number | null; stdout: string; stderr: string } {
   const result = spawnSync(process.execPath, [CLI_PATH, ...args], { cwd, encoding: 'utf8' });
   return { status: result.status, stdout: result.stdout, stderr: result.stderr };
 }
 
-/** Write the given files into a fresh temp directory carrying a project-root marker, and return its path. */
+/** Writes the given files into a fresh temp directory with a project-root marker, and returns its path. */
 function writeFixture(files: Record<string, string>): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-conc-'));
   createdDirs.push(dir);
@@ -118,14 +117,14 @@ function writeFixture(files: Record<string, string>): string {
   return dir;
 }
 
-/** One result reduced to the fields a concurrency comparison turns on. */
+/** One result, reduced to the fields on which a concurrency comparison depends. */
 interface ComparableResult {
   file: string;
   ruleIds: Array<string | null>;
   severities: number[];
 }
 
-/** The shape the JSON formatter emits, narrowed to the fields these tests read. */
+/** The shape that the JSON formatter emits, narrowed to the fields that these tests read. */
 interface ReportedResult {
   filePath: string;
   messages: Array<{ ruleId: string | null; severity: number }>;

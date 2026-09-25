@@ -38,7 +38,7 @@ describe(runInit, () => {
     expect(reported.info()).toContain(`project root at ${dir} (marker: ${ROOT_MARKER})`);
   });
 
-  // A fallback root is the case a reader most needs qualified: the cascade may not be the one they expect.
+  // A fallback root is the case a reader most needs qualified: The cascade may not be the one they expect.
   it('qualifies a project root reached by fallback', () => {
     const dir = makeTree({ 'package.json': '{}' }, { hasRootMarker: false });
     const reported = captureConsole();
@@ -116,7 +116,7 @@ describe(runInit, () => {
     expect(reported.info()).toContain('could not be read');
   });
 
-  // `reconcileFile` compares before it consults the conflict policy, so `--force` reports no write it did not make.
+  // `reconcileFile` compares before it consults the conflict policy, so `--force` makes no write here.
   it.each([[[]], [['--force']]])('reports an unchanged config as up to date, given %j', (argv) => {
     const dir = makeTree();
     writeConfig(dir, CONFIG_TEMPLATE);
@@ -157,7 +157,7 @@ function captureConsole(): { error: () => string; info: () => string } {
   };
 }
 
-/** A throwaway tree, carrying a project-root marker unless one is withheld to exercise the fallback. */
+/** Creates a throwaway tree with a project-root marker, unless `hasRootMarker` is false, and returns its path. */
 function makeTree(files: Record<string, string> = {}, { hasRootMarker = true } = {}): string {
   const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-init-unit-')));
   createdDirs.push(dir);
@@ -168,14 +168,17 @@ function makeTree(files: Record<string, string> = {}, { hasRootMarker = true } =
   return dir;
 }
 
+/** Reads the config that `runInit` writes into `dir`. */
 function readConfig(dir: string): string {
   return fs.readFileSync(path.join(dir, STRICT_LINT_CONFIG_NAME), 'utf8');
 }
 
+/** Writes an existing config into `dir`. */
 function writeConfig(dir: string, content: string): void {
   writeFile(path.join(dir, STRICT_LINT_CONFIG_NAME), content);
 }
 
+/** Writes a file, creating its parent directories. */
 function writeFile(filePath: string, content: string): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content);

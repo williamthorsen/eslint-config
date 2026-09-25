@@ -17,7 +17,7 @@ export interface ParsedCliArgs {
   shouldShowHelp: boolean;
 }
 
-/** Parse process.argv-style arguments into ESLint constructor options and metadata. */
+/** Parses process.argv-style arguments into ESLint constructor options and metadata. */
 export function parseCliArgs(argv: string[]): ParsedCliArgs {
   const { values, positionals } = parseArgs({
     args: argv,
@@ -142,7 +142,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
   };
 }
 
-/** Parse and validate the `--max-warnings` string value as an integer. */
+/** Parses and validates the `--max-warnings` value as an integer. */
 function parseMaxWarnings(value: string): number {
   const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed) || String(parsed) !== value) {
@@ -158,7 +158,7 @@ const FIX_TYPES: Record<string, ESLint.FixType> = {
   layout: 'layout',
 };
 
-/** Validate a --fix-type value against ESLint's accepted fix types. */
+/** Validates a `--fix-type` value against the fix types that ESLint accepts. */
 function toFixType(value: string): ESLint.FixType {
   const fixType = FIX_TYPES[value];
   if (fixType === undefined) {
@@ -172,7 +172,7 @@ const CACHE_STRATEGIES: Record<string, ESLint.CacheStrategy> = {
   metadata: 'metadata',
 };
 
-/** Validate a --cache-strategy value against ESLint's accepted strategies. */
+/** Validates a `--cache-strategy` value against the strategies that ESLint accepts. */
 function toCacheStrategy(value: string): ESLint.CacheStrategy {
   const strategy = CACHE_STRATEGIES[value];
   if (strategy === undefined) {
@@ -181,7 +181,7 @@ function toCacheStrategy(value: string): ESLint.CacheStrategy {
   return strategy;
 }
 
-/** Convert a concurrency string to the appropriate typed value. */
+/** Parses a `--concurrency` value, accepting an integer, `auto`, or `off`. */
 function parseConcurrency(value: string): number | 'auto' | 'off' {
   if (value === 'auto' || value === 'off') {
     return value;

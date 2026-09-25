@@ -50,6 +50,7 @@ describe(wrapNativeTsError, () => {
 
 // region | Helpers
 
+/** Makes `process.features.typescript` report that native type stripping is unavailable. */
 function disableNativeTypeScript(): void {
   Object.defineProperty(process.features, 'typescript', { value: false, configurable: true, enumerable: true });
 }

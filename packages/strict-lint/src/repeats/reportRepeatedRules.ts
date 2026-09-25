@@ -30,7 +30,7 @@ export function reportRepeatedRules(report: RepeatReport, configName: string): v
 
 // region | Helpers
 
-/** Renders a count with its noun, pluralized by adding an `s`, which every noun this reporter names accepts. */
+/** Renders a count with its noun, pluralized by adding an `s`, which every noun that this reporter names accepts. */
 function countOf(count: number, noun: string): string {
   return `${String(count)} ${noun}${count === 1 ? '' : 's'}`;
 }

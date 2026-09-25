@@ -10,6 +10,6 @@ if (process.argv[2] === 'init') {
   }
 }
 
-// Reached only past the dispatch: the lint entry point imports `eslint` for value, and `init` runs without it.
+// Import the lint entry point only past the dispatch: it imports `eslint` for value, and `init` runs without it.
 const { strictLint } = await import('../index.ts');
 await strictLint();

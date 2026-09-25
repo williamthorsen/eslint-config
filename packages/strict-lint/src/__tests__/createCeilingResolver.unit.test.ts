@@ -83,7 +83,7 @@ describe(createCeilingResolver, () => {
   it('shares one walk between lookups that overlap in flight', async () => {
     const resolver = createCeilingResolver();
 
-    // Both lookups start before either resolves, which is the case a result-keyed memo would miss.
+    // Both lookups start before either resolves.
     await Promise.all([resolver.resolveFor('/project/src/a.ts'), resolver.resolveFor('/project/src/b.ts')]);
 
     expect(mockedLoadStrictLintConfigs).toHaveBeenCalledTimes(1);
@@ -113,12 +113,12 @@ describe(createCeilingResolver, () => {
 
 // region | Helpers
 
-/** Make the mocked loader resolve with one cascade entry per config, given nearest first. */
+/** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
 function withCascade(...configs: StrictLintConfig[]): void {
   mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs));
 }
 
-/** A cascade carrying one entry per config, nearest first, bounded by a marker-identified project root. */
+/** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
 function cascadeOf(configs: StrictLintConfig[]) {
   return {
     entries: configs.map((config, index) => ({

@@ -40,7 +40,7 @@ describe(canResolveStrictLint, () => {
     expect(canResolveStrictLint(dir)).toBe(false);
   });
 
-  // A pnpm install links the package rather than copying it, so a walk that did not follow the link would miss it.
+  // A pnpm install links the package, so a walk that did not follow the link would miss it.
   it('follows a symlinked install', () => {
     const dir = makeTree({});
     const store = path.join(dir, 'store/strict-lint');
@@ -55,7 +55,7 @@ describe(canResolveStrictLint, () => {
 
 // region | Helpers
 
-/** A throwaway tree holding `packages/pkg/src`, optionally with the package installed at the named directory. */
+/** Creates a throwaway tree containing `packages/pkg/src`, optionally with the package installed at `install`. */
 function makeTree({ install }: { install?: string }): string {
   const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-resolve-')));
   createdDirs.push(dir);
@@ -66,6 +66,7 @@ function makeTree({ install }: { install?: string }): string {
   return dir;
 }
 
+/** Writes a file, creating its parent directories. */
 function writeFile(filePath: string, content: string): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content);

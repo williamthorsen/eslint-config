@@ -1,6 +1,6 @@
 /**
- * The config `strict-lint init` scaffolds. Its syntax has to be erasable: the cascade loads a strict-lint config
- * through Node's native type stripping, which rejects any construct that would emit runtime code.
+ * The config that `strict-lint init` scaffolds. Its syntax must be erasable: the cascade loads a strict-lint config
+ * through Node's native type stripping, which rejects any construct that emits runtime code.
  */
 export const CONFIG_TEMPLATE = `import { defineConfig } from '@williamthorsen/strict-lint/config';
 

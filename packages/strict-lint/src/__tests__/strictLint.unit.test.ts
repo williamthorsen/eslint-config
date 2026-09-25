@@ -202,7 +202,7 @@ describe(strictLint, () => {
     });
 
     it('promotes results served from cache identically, since it spans the whole returned array', async () => {
-      // A cached run returns fully formed results; nothing distinguishes them at this seam, which is the point.
+      // A cached run returns fully formed results, which nothing at this seam distinguishes from fresh ones.
       mockLintFiles.mockResolvedValue([
         buildResult({ filePath: '/project/cached.ts', messages: [buildMessage('some-rule', 1)] }),
         buildResult({ filePath: '/project/fresh.ts', messages: [buildMessage('some-rule', 1)] }),
@@ -340,7 +340,7 @@ describe(strictLint, () => {
       expect(errorSpy).not.toHaveBeenCalled();
     });
 
-    /** The lines the run wrote to stderr. */
+    /** Returns the lines that the run wrote to stderr. */
     function reportedLines(): string[] {
       return listConsoleLines(errorSpy);
     }
@@ -541,12 +541,12 @@ describe(strictLint, () => {
 
 // region | Helpers
 
-/** A lint message carrying the fields promotion reads, with the rest filled in to satisfy ESLint's shape. */
+/** Builds a lint message with the fields that promotion reads, filling in the rest to satisfy ESLint's shape. */
 function buildMessage(ruleId: string | null, severity: Linter.LintMessage['severity']): Linter.LintMessage {
   return { column: 1, line: 1, message: 'a problem', ruleId, severity };
 }
 
-/** A lint result whose counts start at zero, since promotion restates them from the messages. */
+/** Builds a lint result whose counts start at zero, since promotion restates them from the messages. */
 function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintResult {
   return {
     errorCount: 0,
@@ -562,7 +562,7 @@ function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintRes
   };
 }
 
-/** A cascade carrying one entry per config, nearest first, bounded by a marker-identified project root. */
+/** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
 function cascadeOf(configs: StrictLintConfig[], stopReason: 'predicate' | 'stop-dir' = 'stop-dir') {
   return {
     entries: configs.map((config, index) => ({
@@ -575,27 +575,28 @@ function cascadeOf(configs: StrictLintConfig[], stopReason: 'predicate' | 'stop-
   };
 }
 
-/** The strict-lint config path within the given directory. */
+/** Returns the strict-lint config path within a directory. */
 function configPathIn(dir: string): string {
   return `${dir}/.config/strict-lint.config.ts`;
 }
 
-/** The options the run handed the ESLint constructor. */
+/** Returns the options that the run passed to the ESLint constructor. */
 function constructedWith(): Record<string, unknown> {
   const [options] = mockEslintConstructor.mock.calls[0] ?? [];
   return isRecord(options) ? options : {};
 }
 
-/** The text the run wrote, as the formatter produced it plus any threshold message. */
+/** Returns the text that the formatter produced during the run. */
 function formattedText(): string {
   return mockFormat.mock.results.map((result) => String(result.value)).join('');
 }
 
+/** Checks whether a value is a non-null object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
-/** The severities the run handed the formatter, which is what it reports. */
+/** Returns the severities that the run passed to the formatter, which are the ones that it reports. */
 function reportedSeverities(): number[] {
   const [results] = mockFormat.mock.calls[0] ?? [];
   if (!Array.isArray(results)) {
@@ -604,17 +605,17 @@ function reportedSeverities(): number[] {
   return results.flatMap((result: ESLint.LintResult) => result.messages.map((message) => message.severity));
 }
 
-/** The given number of warnings for one rule, so a threshold test states a count rather than a list. */
+/** Builds a number of warnings for one rule, so that a threshold test states a count rather than a list. */
 function warningsFor(ruleId: string, count: number): Linter.LintMessage[] {
   return Array.from({ length: count }, () => buildMessage(ruleId, 1));
 }
 
-/** Make the mocked loader resolve with one cascade entry per config, given nearest first. */
+/** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
 function withStrictLintConfigs(...configs: StrictLintConfig[]): void {
   mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs));
 }
 
-/** The same, for a walk that a `shouldIgnoreAncestors` config cut short. */
+/** Makes the mocked loader resolve as `withStrictLintConfigs` does, for a walk cut short by `shouldIgnoreAncestors`. */
 function withStoppedAscent(...configs: StrictLintConfig[]): void {
   mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs, 'predicate'));
 }
