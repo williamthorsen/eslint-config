@@ -52,15 +52,15 @@ ESLint merges `settings` deeply, so an override adding a resolver key of its own
 
 ## Migrating to v15
 
-v15 requires a relative specifier to name its TypeScript source, and raises the `typescript` peer floor to 5.7. See [Migrating to v15](../../docs/migrating-to-v15.md).
+v15 requires a relative specifier to name its TypeScript source, and raises the `typescript` peer floor to 5.7. See [Migrating to v15](https://github.com/williamthorsen/eslint-config/blob/main/docs/migrating-to-v15.md).
 
 ## Migrating to v13
 
-v13 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: every `import/` rule id, disable directive, and settings key becomes `import-x/`. See [Migrating to v13](../../docs/migrating-to-v13.md).
+v13 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: every `import/` rule id, disable directive, and settings key becomes `import-x/`. See [Migrating to v13](https://github.com/williamthorsen/eslint-config/blob/main/docs/migrating-to-v13.md).
 
 ## Migrating from `parserOptions.project`
 
-This section covers the parser change alone. For the complete v5 → v6 upgrade (the Node and ESLint floors, the package bump, and post-upgrade cleanup), see [Migrating to v6](../../docs/migrating-to-v6.md).
+This section covers the parser change alone. For the complete v5 → v6 upgrade (the Node and ESLint floors, the package bump, and post-upgrade cleanup), see [Migrating to v6](https://github.com/williamthorsen/eslint-config/blob/main/docs/migrating-to-v6.md).
 
 Earlier versions left type-information wiring to the consumer, which set `parserOptions.project` and usually kept a dedicated `tsconfig.eslint.json`. This version supplies `projectService` itself, so:
 
@@ -70,7 +70,7 @@ Earlier versions left type-information wiring to the consumer, which set `parser
 
 ## Migrating ESLint configs to TypeScript
 
-ESLint 10 loads `eslint.config.ts` natively, which brings the config into the compiler and the project service. Renaming it has two tsconfig prerequisites, both reported by the kit below. See [Migrating ESLint configs to TypeScript](../../docs/migrating-eslint-configs-to-typescript.md).
+ESLint 10 loads `eslint.config.ts` natively, which brings the config into the compiler and the project service. Renaming it has two tsconfig prerequisites, both reported by the kit below. See [Migrating ESLint configs to TypeScript](https://github.com/williamthorsen/eslint-config/blob/main/docs/migrating-eslint-configs-to-typescript.md).
 
 ## What's included
 
