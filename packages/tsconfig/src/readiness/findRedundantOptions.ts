@@ -11,9 +11,9 @@ export interface RedundantOption {
 
 /**
  * Lists the options that a config nearer the entry than the base declares with the base's own value.
- * Only a config the consumer owns is reported, since only that one can be edited. Comparison is
- * structural, so an array such as `lib` restated verbatim reads as the redundancy it is. A key that
- * a config shipped by a dependency also declares is exempt: restating it is how a consumer wins
+ * Only a config owned by the consumer is reported, since only that one can be edited. Comparison is
+ * structural, so an array such as `lib` restated verbatim is reported as redundant. A key that
+ * a config shipped by a dependency also declares is exempt: Restating it is how a consumer wins
  * against that dependency's base.
  */
 export function findRedundantOptions(entries: readonly TsconfigChainEntry[], baseIndex: number): RedundantOption[] {
@@ -34,7 +34,7 @@ export function findRedundantOptions(entries: readonly TsconfigChainEntry[], bas
 
 // region | Helpers
 
-/** Collects every option key a config shipped by a dependency declares, this package's base aside. */
+/** Collects every option key that a config shipped by a dependency declares, this package's base aside. */
 function collectDependencyDeclaredKeys(entries: readonly TsconfigChainEntry[], baseIndex: number): Set<string> {
   const keys = new Set<string>();
   for (const [index, entry] of entries.entries()) {

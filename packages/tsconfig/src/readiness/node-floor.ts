@@ -1,14 +1,14 @@
 const NODE_MAJOR = /^v?(\d+)(?:[.\s]|$)/;
 
-// The widest range a Node major can occupy, bounding the search for the lowest major a table covers.
+// Bounds the search for the lowest major covered by a table.
 const NODE_MAJOR_CEILING = 99;
 
 export type NodeEsYear = { esYear: string; kind: 'exact' } | { esYear: string; kind: 'under' } | { kind: 'unknown' };
 
 /**
- * Classifies the ES year a Node major implements, against a table covering only some majors.
- * A major the table skips or postdates is unknown; one below every major it holds is not, since it predates
- * the table's lowest entry and so implements strictly less than that entry's year.
+ * Classifies the ES year that a Node major implements, against a table covering only some majors.
+ * A major that the table skips or postdates is unknown. A major below the table's lowest entry is
+ * under that entry's year, since it implements strictly less.
  */
 export function classifyNodeEsYear(
   major: number,
@@ -25,8 +25,8 @@ export function classifyNodeEsYear(
 }
 
 /**
- * Reduces declared Node floors to the lowest major they name.
- * The weakest link decides: A repo runs on the oldest Node any of its packages admits.
+ * Reduces declared Node floors to the lowest major that they name.
+ * A repo runs on the oldest Node that any of its packages admits.
  */
 export function findLowestNodeMajor(floors: readonly string[]): number | undefined {
   const majors = floors.flatMap((floor) => {
@@ -37,7 +37,7 @@ export function findLowestNodeMajor(floors: readonly string[]): number | undefin
 }
 
 /**
- * Reads the major version a Node floor names, such as `24`, `24.5`, or `v22.11.0`.
+ * Reads the major version named by a Node floor, such as `24`, `24.5`, or `v22.11.0`.
  * A comparator or an alias yields `undefined`.
  */
 export function readNodeMajor(floor: string): number | undefined {
@@ -47,7 +47,7 @@ export function readNodeMajor(floor: string): number | undefined {
 
 // region | Helpers
 
-/** Finds the lowest Node major a table covers. */
+/** Finds the lowest Node major covered by a table. */
 function findLowestKnownMajor(esYearForMajor: (candidate: number) => string | undefined): number | undefined {
   for (let candidate = 1; candidate <= NODE_MAJOR_CEILING; candidate += 1) {
     if (esYearForMajor(candidate) !== undefined) return candidate;

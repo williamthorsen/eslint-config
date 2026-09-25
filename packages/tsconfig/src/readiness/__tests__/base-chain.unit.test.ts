@@ -17,7 +17,7 @@ describe(findBaseIndex, () => {
     expect(findBaseIndex(entries)).toBe(2);
   });
 
-  // Under a workspace link the base realpaths inside the repo, so its path carries no package identity.
+  // Under a workspace link the base realpaths inside the repo, so its path does not name the package.
   it('locates the base whose path is a workspace directory', () => {
     const entries = [
       buildChainEntry({ path: 'tsconfig.json' }),
@@ -75,7 +75,6 @@ describe(isConsumerOwnedConfig, () => {
     expect(isConsumerOwnedConfig('packages/api/tsconfig.json')).toBe(true);
   });
 
-  // A framework base pulls in the configs it extends by relative path, which land beside it.
   it('is false for a config a dependency ships', () => {
     expect(isConsumerOwnedConfig('node_modules/astro/tsconfigs/base.json')).toBe(false);
     expect(

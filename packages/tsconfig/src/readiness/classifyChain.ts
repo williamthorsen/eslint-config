@@ -8,7 +8,7 @@ export type ChainClassification =
 /**
  * Classifies how a tsconfig's `extends` chain reaches, or fails to reach, this package's base.
  *
- * An unresolvable specifier decides before the opt-out carve-out: a config naming the base has
+ * An unresolvable specifier decides before the opt-out carve-out: A config naming the base has
  * adopted it and failed to install it, and a base belonging to another package in the same chain
  * must not excuse that.
  */

@@ -17,8 +17,8 @@ export interface EscapingPath {
 }
 
 /**
- * Lists the paths a tsconfig's effective `exclude`, `files`, and `include` name outside the
- * directory holding it. The chain's entry config is the one judged; a field it inherits resolves
+ * Lists the paths that a tsconfig's effective `exclude`, `files`, and `include` name outside the
+ * directory holding it. The chain's entry config is the one judged; a field that it inherits resolves
  * against the directory of the config that declared it, which is how an inherited path escapes.
  * Resolution is lexical, so a workspace reached through a symlink does not read as an escape.
  */
@@ -69,7 +69,7 @@ function findEscapingPathsInField(
 }
 
 /**
- * Resolves one declared path and returns it relative to the judged config, or `undefined` where it
+ * Resolves one declared path and returns it relative to the judged config, or `undefined` when it
  * stays inside that config's directory. A glob needs no expansion, since an escape lives in the
  * literal segments leading it.
  */

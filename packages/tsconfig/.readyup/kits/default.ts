@@ -1,11 +1,11 @@
 /**
  * Readiness checks for a project consuming @williamthorsen/tsconfig.
  *
- * The kit ships inside the package, so it always runs at the version the consumer has installed.
+ * The kit ships inside the package, so it always runs at the version that the consumer has installed.
  * That is what it asserts: whether the surrounding tsconfigs are wired for this version, never
  * whether the version itself is current.
  *
- * `error` is reserved for a failure that breaks or impairs use of the base. Only the Node floor
+ * The kit reserves `error` for a failure that breaks or impairs use of the base. Only the Node floor
  * qualifies, because `tsc` cannot see what runtime a project ships on; everything a typecheck would
  * surface on its own caps at `warn`.
  */
@@ -127,7 +127,7 @@ function dedupe(values: readonly string[]): string[] {
 }
 
 /**
- * Describes one escaping path, naming the config that declared it where that is not the config being
+ * Describes one escaping path, naming the config that declared it when that is not the config being
  * reported, since an inherited path is fixed where it was written.
  */
 function describeEscape(configPath: string, escaping: EscapingPath): string {
@@ -180,7 +180,7 @@ function findTsconfigs(): string[] {
 }
 
 /**
- * Judges the lowest declared Node floor against the ES year the base sets, or names why the two
+ * Judges the lowest declared Node floor against the ES year set by the base, or names why the two
  * cannot be compared.
  */
 function judgeNodeFloor(): FloorVerdict {
@@ -190,8 +190,8 @@ function judgeNodeFloor(): FloorVerdict {
   const nodeEsYear = readNodeEsYear();
   if (nodeEsYear === undefined) return { kind: 'skip', reason: 'no declared Node floor names a major' };
 
-  // A major the table skips or postdates means unknown, not unsupported: a consumer running ahead of
-  // the table is not in breach.
+  // A major that the table skips or postdates is unknown, not unsupported: A consumer running ahead
+  // of the table is not in breach.
   if (nodeEsYear.kind === 'unknown') return { kind: 'skip', reason: NO_NODE_ES_YEAR };
 
   if (nodeEsYear.kind === 'under') {
@@ -216,7 +216,7 @@ function listAdoptedTsconfigs(): AdoptedTsconfig[] {
   return classifyAdoptions().filter((adoption) => adoption.kind === 'adopted');
 }
 
-/** Lists the Node floors the repo declares, preferring the contract a manifest publishes. */
+/** Lists the Node floors declared by the repo, preferring the contract that a manifest publishes. */
 function listDeclaredNodeFloors(): string[] {
   const engineFloors = listTsconfigSearchDirs().flatMap((dir) => {
     const manifest = readJsonFile(resolveDirPath(dir, 'package.json'));
@@ -240,7 +240,7 @@ function listTsconfigSearchDirs(): string[] {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 
-/** Fails when the lowest declared Node floor predates the ES year the base sets. */
+/** Fails when the lowest declared Node floor predates the ES year set by the base. */
 function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
   const verdict = judgeNodeFloor();
   return verdict.kind === 'skip' ? true : { ok: verdict.kind === 'pass', detail: verdict.detail };
@@ -266,7 +266,7 @@ function noEscapingPaths(): boolean | CheckOutcome {
   return { ok: false, detail: details.join(', '), progress };
 }
 
-/** Fails when a tsconfig re-declares an option the base already supplies with the same value. */
+/** Fails when a tsconfig re-declares an option that the base already supplies with the same value. */
 function noRedundantOptions(): boolean | CheckOutcome {
   const offenders = listAdoptedTsconfigs().flatMap((adoption) =>
     findRedundantOptions(adoption.chain.entries, adoption.baseIndex).map(
@@ -277,7 +277,10 @@ function noRedundantOptions(): boolean | CheckOutcome {
   return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(', ')}` };
 }
 
-/** Reads the ES year from the base's own chain entry, so the comparison tracks the version the consumer extends. */
+/**
+ * Reads the ES year from the base's own chain entry, so the comparison tracks the version that the
+ * consumer extends.
+ */
 function readBaseEsYear(): string | undefined {
   for (const adoption of listAdoptedTsconfigs()) {
     const baseOptions = adoption.chain.entries[adoption.baseIndex]?.compilerOptions;
@@ -287,16 +290,16 @@ function readBaseEsYear(): string | undefined {
   return undefined;
 }
 
-/** Reads a tsconfig's extends chain, which several checks walk. */
+/** Reads a tsconfig's extends chain, caching it for the several checks that walk it. */
 function readChain(path: string): TsconfigChain | undefined {
   if (!cache.chains.has(path)) cache.chains.set(path, readTsconfigChain(path));
   return cache.chains.get(path);
 }
 
 /**
- * Reads the ES year the repo's declared Node floor implements.
- * `engines.node` is the floor a package publishes as a contract;
- * `.tool-versions` describes one dev machine, so it decides only where no manifest declares one.
+ * Reads the ES year that the repo's declared Node floor implements.
+ * `engines.node` is the floor that a package publishes as a contract;
+ * `.tool-versions` describes one dev machine, so it decides only when no manifest declares one.
  */
 function readNodeEsYear(): NodeEsYear | undefined {
   const major = findLowestNodeMajor(listDeclaredNodeFloors());
@@ -313,7 +316,7 @@ function skipUnlessBaseEsYearKnown(): false | string {
   return readBaseEsYear() === undefined ? NO_BASE_ES_YEAR : false;
 }
 
-/** Skips the Node floor check where either side of the comparison is unavailable. */
+/** Skips the Node floor check when either side of the comparison is unavailable. */
 function skipUnlessNodeFloorComparable(): false | string {
   const verdict = judgeNodeFloor();
   return verdict.kind === 'skip' ? verdict.reason : false;
@@ -328,7 +331,7 @@ function skipUnlessSomeTsconfigIsAccountable(): false | string {
     : 'every workspace tsconfig extends a base belonging to another package';
 }
 
-/** Skips the escaping-path check where the project has no tsconfig to judge. */
+/** Skips the escaping-path check when the project has no tsconfig to judge. */
 function skipUnlessSomeTsconfigWasFound(): false | string {
   return findTsconfigs().length === 0 ? 'no workspace tsconfig was found' : false;
 }

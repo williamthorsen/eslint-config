@@ -42,7 +42,6 @@ describe(classifyChain, () => {
     expect(classifyChain(chain)).toStrictEqual({ kind: 'uninstalled' });
   });
 
-  // Reversing this precedence would excuse a missing install as a deliberate opt-out.
   it('reports uninstalled ahead of the opt-out carve-out', () => {
     const chain = buildChain(
       [buildChainEntry({ path: 'packages/web/tsconfig.json' }), EXTERNAL_BASE_ENTRY],
