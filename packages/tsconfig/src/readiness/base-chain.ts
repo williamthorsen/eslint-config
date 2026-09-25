@@ -12,7 +12,7 @@ export function findBaseIndex(entries: readonly TsconfigChainEntry[]): number | 
 }
 
 /**
- * Reports whether a chain reaches a base belonging to another package. A config whose chain carries
+ * Reports whether a chain reaches a base belonging to another package. A config whose chain contains
  * one has opted out of this base rather than failed to adopt it.
  */
 export function hasExternalBase(entries: readonly TsconfigChainEntry[]): boolean {
@@ -29,9 +29,9 @@ export function isBaseSpecifier(specifier: string): boolean {
 }
 
 /**
- * Reports whether a config is the consumer's own rather than one a dependency ships. A base reached
- * by package specifier pulls in the configs it extends by relative path, and those are as
- * unreachable to the consumer as the base itself.
+ * Reports whether a config is the consumer's own rather than one shipped by a dependency. A base
+ * reached by package specifier pulls in the configs that it extends by relative path, and those are
+ * as unreachable to the consumer as the base itself.
  */
 export function isConsumerOwnedConfig(path: string): boolean {
   return !path.startsWith('../') && !path.split('/').includes('node_modules');

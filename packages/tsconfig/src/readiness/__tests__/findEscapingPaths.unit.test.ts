@@ -147,7 +147,7 @@ describe(findEscapingPaths, () => {
     expect(findEscapingPaths(entries)).toStrictEqual([]);
   });
 
-  // A string is truthy, so it declares the field as an empty array does, and carries no paths to judge.
+  // A string is truthy, so it declares the field as an empty array does, and contains no paths to judge.
   it('treats a malformed declaration as a declaration, so the field inherits nothing', () => {
     const entries = [
       buildChainEntry({ config: { include: 'src/' }, path: API_CONFIG }),

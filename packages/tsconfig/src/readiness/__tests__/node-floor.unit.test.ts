@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { classifyNodeEsYear, findLowestNodeMajor, readNodeMajor } from '../node-floor.ts';
 
-// Stands in for readyup's table, which covers even LTS majors from 18 upward.
+// Stands in for readyup's table, which covers the even-numbered LTS majors from 18 upward.
 const ES_YEAR_BY_MAJOR: Record<number, string | undefined> = { 18: 'es2022', 20: 'es2023', 22: 'es2024', 24: 'es2025' };
 
 function esYearForMajor(major: number): string | undefined {
@@ -14,7 +14,6 @@ describe(classifyNodeEsYear, () => {
     expect(classifyNodeEsYear(24, esYearForMajor)).toStrictEqual({ esYear: 'es2025', kind: 'exact' });
   });
 
-  // A major below every entry implements less than the lowest year the table names.
   it('reports a major predating the table as under its lowest year', () => {
     expect(classifyNodeEsYear(16, esYearForMajor)).toStrictEqual({ esYear: 'es2022', kind: 'under' });
   });

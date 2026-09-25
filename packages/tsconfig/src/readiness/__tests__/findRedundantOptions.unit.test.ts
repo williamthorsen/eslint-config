@@ -19,7 +19,7 @@ describe(findRedundantOptions, () => {
     expect(findRedundantOptions(entries, 1)).toStrictEqual([{ key: 'strict', path: 'packages/api/tsconfig.json' }]);
   });
 
-  // A conflicting override is a deliberate departure, which the check leaves alone.
+  // A conflicting override is a deliberate departure from the base.
   it('leaves a key declared with a different value alone', () => {
     const entries = [
       buildChainEntry({ compilerOptions: { strict: false, target: 'ES2022' }, path: 'packages/api/tsconfig.json' }),
