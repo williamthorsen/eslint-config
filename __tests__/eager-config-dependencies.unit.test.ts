@@ -9,13 +9,12 @@ import { collectStaticExternalImports, parseExternalImports } from './support/co
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// Published packages whose eager configs reach external consumers. `typescript` is the only one
-// today; `strict-lint` is a CLI with no eager plugin imports. Extend this list when a new
-// published config package appears.
+// Published packages whose eager configs reach external consumers. `strict-lint` is absent because it is a CLI
+// with no eager plugin imports.
 const packagesUnderGuard = ['typescript'];
 
-// Framework plugins the package loads only through a dynamic `import()` in `createConfig`. They are
-// consumer-installed devDependencies by design and must never surface in the static graph.
+// Framework plugins that the package loads only through a dynamic `import()` in `createConfig`. Consumers install
+// them as devDependencies, so they must never surface in the static graph.
 const optInPlugins = [
   '@next/eslint-plugin-next',
   '@vitest/eslint-plugin',
@@ -105,11 +104,13 @@ describe('dependency check', () => {
   });
 });
 
+/** Reads and validates a package's `package.json`. */
 function readManifest(packageDir: string): Manifest {
   const parsed: unknown = JSON.parse(readFileSync(path.join(packageDir, 'package.json'), 'utf8'));
   return manifestSchema.parse(parsed);
 }
 
+/** Lists each collected import that the manifest declares as neither a dependency nor a peer, sorted by name. */
 function findUndeclared(collected: Map<string, Set<string>>, manifest: Manifest): Violation[] {
   const declared = new Set([
     ...Object.keys(manifest.dependencies ?? {}),
@@ -132,6 +133,7 @@ function findUndeclared(collected: Map<string, Set<string>>, manifest: Manifest)
   return violations.toSorted((a, b) => a.packageName.localeCompare(b.packageName));
 }
 
+/** Formats the violations as an assertion message that names the remedy for each. */
 function formatViolations(pkg: string, violations: Violation[]): string {
   if (violations.length === 0) {
     return '';

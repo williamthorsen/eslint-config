@@ -2,8 +2,7 @@
 version: 2
 
 updates:
-  # Rotates the commit-SHA pins in .github/workflows, restoring the upgrade channel that pinning closes.
-  # Every bump is grouped into one pull request per run; the cadence is one review a month rather than one per action.
+  # Bump the `uses:` refs in .github/workflows, grouped into one pull request a month so that each run needs one review.
   - package-ecosystem: github-actions
     directory: /
     # Naming labels explicitly stops dependabot applying its defaults.

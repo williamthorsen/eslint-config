@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// The projects nmr's shared Vitest config declares. Each name is also the filename infix that selects it.
+// The projects declared by nmr's shared Vitest config. Each name is also the filename infix that selects it.
 const TIERS = new Set(['unit', 'tool', 'localhost', 'remote']);
 
 // `unit` is a residual project: it collects whatever the named tiers don't claim, and the shared config sets
@@ -20,7 +20,7 @@ describe('test-tier infixes', () => {
   });
 });
 
-/** Returns the repo-relative path of every test file Vitest collects, in sorted order. */
+/** Returns the repo-relative path of every test file that Vitest collects, in sorted order. */
 function collectTestFiles(): string[] {
   return globSync('**/__tests__/**/*.test.{ts,tsx}', {
     cwd: repoRoot,
@@ -28,7 +28,7 @@ function collectTestFiles(): string[] {
   }).toSorted();
 }
 
-/** Reads the dot-delimited segment immediately before `.test.`, which is the only one a project matches on. */
+/** Reads the dot-delimited segment immediately before `.test.`, which is the only one on which a project matches. */
 function readTierInfix(file: string): string {
   return path.basename(file).split('.').at(-3) ?? '';
 }

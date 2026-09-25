@@ -23,9 +23,8 @@ peerDependencyRules:
     'eslint-plugin-jsx-a11y>eslint': '>=10'
     'eslint-plugin-react>eslint': '>=10'
 
-# Keep pnpm 11's 24h minimumReleaseAge soak (supply-chain protection), set
-# explicitly to pin the policy, but exclude first-party packages so a freshly
-# published version can be consumed downstream without waiting out the soak.
+# Pin pnpm 11's default 24-hour release-age soak against supply-chain attacks, and exempt first-party
+# packages so that a fresh release is usable downstream at once.
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@williamthorsen/*'

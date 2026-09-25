@@ -11,14 +11,12 @@ const codeFiles = [...javaScriptFiles, ...typeScriptFiles];
 const config = defineConfig([
   ...baseConfig,
   globalIgnores([
-    // Completely ignore these files.
     ...commonIgnores,
     ...toolIgnores,
-    // Lint fixtures deliberately violate the rules they exercise.
+    // Lint fixtures violate the rules that they exercise.
     '**/__fixtures__/**',
   ]),
-  // Anchor the project service at the repo root for type-aware rules.
-  // `projectService` itself is enabled by the base config; the consumer supplies only the root directory.
+  // Anchor the base config's project service at the repo root.
   {
     files: typeScriptFiles,
     languageOptions: {
@@ -43,8 +41,8 @@ const config = defineConfig([
     files: patterns.testFiles,
     // A `*.rules.*test.ts` file declares its cases as a table handed to `RuleTester.run()`, which generates the
     // `describe`/`it` blocks internally. The plugin parses no test call there, so its rules have nothing to act on
-    // and `vitest/require-hook` reports the table itself as unhooked setup. The single `*` spans zero characters, so
-    // one pattern covers the bare `*.rules.test.ts` form alongside a tier infix such as `*.rules.tool.test.ts`.
+    // and `vitest/require-hook` reports the table itself as unhooked setup. The single `*` can span zero characters,
+    // which lets one pattern cover the bare `*.rules.test.ts` form alongside a tiered `*.rules.tool.test.ts`.
     ignores: ['**/*.rules.*test.ts'],
     extends: [await createConfig.vitest()],
   }),
@@ -55,9 +53,8 @@ const config = defineConfig([
     },
   },
   {
-    // Build and config files legitimately trip rules meant for published source:
-    // They use TypeScript `.js` import specifiers that resolve at runtime (tsc still reports missing imports) and
-    // compose config objects at module top level.
+    // Config files trip two rules meant for published source: Their `.js` import specifiers resolve only at runtime
+    // (tsc still reports a missing import), and they compose config objects at module top level.
     files: ['*.config.{cjs,js,mjs,ts}', 'config/**'],
     rules: {
       'n/no-missing-import': 'off',

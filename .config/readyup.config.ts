@@ -4,7 +4,7 @@ export default defineRdyConfig({
   internal: {
     infix: 'internal',
   },
-  // The checks in these packages will be run by `rdy run --packages`.
+  // Packages whose kits `rdy run --packages` runs against this repo.
   packages: [
     '@williamthorsen/eslint-config-typescript',
     '@williamthorsen/nmr',
