@@ -24,6 +24,7 @@ describe('package README links', () => {
   it('reports only the relative links that escape the package', () => {
     const markdown = [
       'See [the guide](../../docs/guide.md#usage) and [the source](./src/index.ts).',
+      "Read [the notes](../../docs/notes.md 'Notes') first.",
       'Also [the site](https://example.com/docs), [mail](mailto:a@example.com), [a section](#setup), and [a host](//example.com).',
       '[sibling]: ../other/README.md "Sibling package"',
       '[changelog]: CHANGELOG.md',
@@ -32,7 +33,7 @@ describe('package README links', () => {
 
     const targets = findEscapingTargets(markdown, path.join(repoRoot, 'packages', 'example'));
 
-    expect(targets).toStrictEqual(['../../docs/guide.md#usage', '../other/README.md']);
+    expect(targets).toStrictEqual(['../../docs/guide.md#usage', '../../docs/notes.md', '../other/README.md']);
   });
 });
 
@@ -40,7 +41,7 @@ describe('package README links', () => {
 
 /** Extracts the targets of inline links and reference definitions, in document order within each form. */
 function extractLinkTargets(markdown: string): string[] {
-  const inlineTargets = markdown.matchAll(/\]\(\s*<?([^\s)>]+)>?(?:\s+"[^"]*")?\s*\)/gu).toArray();
+  const inlineTargets = markdown.matchAll(/\]\(\s*<?([^\s)>]+)/gu).toArray();
   const referenceTargets = markdown.matchAll(/^ {0,3}\[[^\]]+\]:\s*<?([^\s>]+)>?/gmu).toArray();
   return [...inlineTargets, ...referenceTargets].map((match) => match[1] ?? '');
 }
