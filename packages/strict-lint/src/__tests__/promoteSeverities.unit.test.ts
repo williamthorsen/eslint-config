@@ -130,12 +130,12 @@ describe(promoteSeverities, () => {
 
 // region | Helpers
 
-/** A lint message carrying the fields promotion reads, with the rest filled in to satisfy ESLint's shape. */
+/** Builds a lint message with the fields that promotion reads, filling in the rest to satisfy ESLint's shape. */
 function buildMessage(overrides: Partial<Linter.LintMessage> = {}): Linter.LintMessage {
   return { column: 1, line: 1, message: 'a problem', ruleId: null, severity: 1, ...overrides };
 }
 
-/** A lint result whose counts default to zero, so a test states only the fields it asserts against. */
+/** Builds a lint result whose counts default to zero, so that a test states only the fields that it asserts against. */
 function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintResult {
   return {
     errorCount: 0,
@@ -151,7 +151,7 @@ function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintRes
   };
 }
 
-/** A resolver deriving each file's ceilings from its path. */
+/** Builds a resolver that derives each file's ceilings from its path. */
 function buildResolver(ceilingsFor: (filePath: string) => MaxSeverityMap): CeilingResolver {
   return {
     getCascades: () => new Map(),
@@ -159,7 +159,7 @@ function buildResolver(ceilingsFor: (filePath: string) => MaxSeverityMap): Ceili
   };
 }
 
-/** A resolver returning one set of ceilings for every file. */
+/** Builds a resolver that returns one set of ceilings for every file. */
 function resolverOf(ceilings: MaxSeverityMap): CeilingResolver {
   return buildResolver(() => ceilings);
 }

@@ -1,6 +1,6 @@
 import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 
-/** How the project root was chosen: by a marker file, or by one of the fallbacks. */
+/** Describes how the project root was chosen: by a marker file, or by one of the fallbacks. */
 export function describeRootSource({ marker, source }: ProjectRoot): string {
   if (marker !== null) {
     return `marker: ${marker}`;

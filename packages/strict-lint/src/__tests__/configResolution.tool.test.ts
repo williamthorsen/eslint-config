@@ -7,9 +7,9 @@ import { fileURLToPath } from 'node:url';
 import { ESLint } from 'eslint';
 import { afterAll, describe, expect, it } from 'vitest';
 
-// The defect covered here is a divergence between `strict-lint` and `eslint` over which config governs a file, so
-// each case runs both against one fixture and compares what they report. strict-lint runs as a subprocess, the way it
-// ships; ESLint runs in process, where its own resolution is the reference the CLI has to match.
+// Each case runs `strict-lint` and `eslint` against one fixture and compares what they report, since the two must agree
+// on which config governs a file. strict-lint runs as a subprocess, the way it ships; ESLint runs in process, where its
+// own resolution is the reference that the CLI must match.
 
 const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const ROOT_MARKER = 'pnpm-workspace.yaml';
@@ -59,7 +59,7 @@ describe('config resolution (subprocess)', () => {
 
 // region | Helpers
 
-/** A monorepo whose package config contradicts the root config, which is what makes the divergence observable. */
+/** Writes a monorepo whose package config contradicts the root config, so that a divergence is observable. */
 function makeMonorepoFixture(extraFiles: Record<string, string> = {}): string {
   return makeFixture({
     'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
@@ -69,7 +69,7 @@ function makeMonorepoFixture(extraFiles: Record<string, string> = {}): string {
   });
 }
 
-/** Write the given files into a fresh temp directory carrying a project-root marker, and return its path. */
+/** Writes the given files into a fresh temp directory with a project-root marker, and returns its path. */
 function makeFixture(files: Record<string, string>): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-cfg-'));
   createdDirs.push(dir);
@@ -82,7 +82,7 @@ function makeFixture(files: Record<string, string>): string {
   return dir;
 }
 
-/** The results strict-lint reports, read from its JSON formatter output. */
+/** Runs strict-lint on a target and returns the results from its JSON formatter output. */
 function reportFromStrictLint(cwd: string, target: string = TARGET): ReportedResult[] {
   const { stdout, stderr } = spawnSync(process.execPath, [CLI_PATH, '--format', 'json', target], {
     cwd,
@@ -99,19 +99,19 @@ function reportFromStrictLint(cwd: string, target: string = TARGET): ReportedRes
   }));
 }
 
-/** The shape the JSON formatter emits, narrowed to the fields these tests read. */
+/** The shape that the JSON formatter emits, narrowed to the fields that these tests read. */
 interface ReportedResult {
   filePath: string;
   messages: Array<{ ruleId: string | null; severity: number }>;
 }
 
-/** The rules ESLint itself reports, which is the reference strict-lint has to match. */
+/** Returns the rule ids that ESLint itself reports, the reference that strict-lint must match. */
 async function ruleIdsFromEslint(cwd: string): Promise<Array<string | null>> {
   const results = await new ESLint({ cwd }).lintFiles([TARGET]);
   return results.flatMap((result) => result.messages.map((message) => message.ruleId));
 }
 
-/** The rules strict-lint reports, in the same shape the ESLint reference produces. */
+/** Returns the rule ids that strict-lint reports, in the shape of the ESLint reference. */
 function ruleIdsFromStrictLint(cwd: string): Array<string | null> {
   return reportFromStrictLint(cwd).flatMap((result) => result.messages.map((message) => message.ruleId));
 }

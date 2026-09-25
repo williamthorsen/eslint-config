@@ -15,7 +15,7 @@ const ROOT_MARKER = 'pnpm-lock.yaml';
 const createdDirs: string[] = [];
 
 // The outcome matrix lives in `init/__tests__/initCommand.unit.test.ts`; these cases cover what only the shipped
-// binary can show: the dispatch, the argv it forwards, and the runtime the scaffolded config is loaded by.
+// binary can show: the dispatch, the argv that it forwards, and the runtime that loads the scaffolded config.
 describe('strict-lint init (subprocess)', () => {
   afterAll(() => {
     for (const dir of createdDirs) {
@@ -56,7 +56,7 @@ describe('strict-lint init (subprocess)', () => {
     expect(fs.existsSync(path.join(dir, STRICT_LINT_CONFIG_NAME))).toBe(false);
   }, 30_000);
 
-  // The cascade imports the config through Node's native type stripping, which admits erasable syntax alone.
+  // The cascade imports the config through Node's native type stripping, which accepts only erasable syntax.
   it('writes a config that loads under native type stripping', () => {
     const dir = makeTree();
     installStubPackage(dir);
@@ -104,7 +104,7 @@ describe('strict-lint init (subprocess)', () => {
 
 // region | Helpers
 
-/** Installs a stand-in for the published package, so the scaffolded config's import resolves without a build. */
+/** Installs a stand-in for the published package, so that the scaffolded config's import resolves without a build. */
 function installStubPackage(dir: string): void {
   const packageDir = path.join(dir, 'node_modules/@williamthorsen/strict-lint');
   const manifest = {
@@ -116,7 +116,7 @@ function installStubPackage(dir: string): void {
   writeFile(path.join(packageDir, 'defineConfig.js'), 'export function defineConfig(config) {\n  return config;\n}\n');
 }
 
-/** A fresh temp directory carrying a project-root marker, plus any given files. */
+/** Creates a fresh temp directory with a project-root marker and any given files, and returns its path. */
 function makeTree(files: Record<string, string> = {}): string {
   const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-init-')));
   createdDirs.push(dir);
@@ -133,6 +133,7 @@ function runCli(cwd: string, args: string[]): { status: number | null; stderr: s
   return { status: result.status, stderr: result.stderr, stdout: result.stdout };
 }
 
+/** Writes a file, creating its parent directories. */
 function writeFile(filePath: string, content: string): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content);

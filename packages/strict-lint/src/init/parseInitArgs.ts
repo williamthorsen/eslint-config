@@ -1,13 +1,13 @@
 import { parseArgs } from 'node:util';
 
-/** Result of parsing the arguments `strict-lint init` accepts. */
+/** Result of parsing the arguments of `strict-lint init`. */
 export interface ParsedInitArgs {
   isDryRun: boolean;
   shouldOverwrite: boolean;
   shouldShowHelp: boolean;
 }
 
-/** Parses the flags `strict-lint init` accepts, rejecting positional arguments it has no use for. */
+/** Parses the flags of `strict-lint init`, rejecting any positional argument. */
 export function parseInitArgs(argv: string[]): ParsedInitArgs {
   const { values, positionals } = parseArgs({
     args: argv,

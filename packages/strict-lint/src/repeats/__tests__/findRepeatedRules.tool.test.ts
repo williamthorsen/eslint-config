@@ -8,8 +8,8 @@ import { findRepeatedRules } from '../findRepeatedRules.ts';
 // config's globs rather than reading the file, so the comparison runs without a fixture config on disk.
 const FILE_PATHS = ['src/example.ts'];
 
-// A second rule keeps every shared element's `rules` object distinct from the one-rule element a consumer repeats it
-// with, which is what the sorter compares by value.
+// The second rule keeps each shared element's `rules` distinct from a consumer's one-rule repeat, since the sorter
+// compares `rules` by value.
 const SHARED_CORE: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-eval': 'error' } }];
 
 describe(findRepeatedRules, () => {
@@ -96,8 +96,8 @@ describe(findRepeatedRules, () => {
   });
 
   it('passes over a rule the consumer gives two values, even when the run lints one scope alone', async () => {
-    // Linting only `src/bin` makes the narrow entry the only one the run sees, so the file counts agree; the broad
-    // entry it restores still governs everything else, and both stay load-bearing.
+    // Linting only `src/bin` makes the narrow entry the only one that the run sees, so the file counts agree; the broad
+    // entry still governs everything else, and both stay load-bearing.
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
     const consumer: Linter.Config[] = [
       ...shared,
@@ -197,7 +197,7 @@ describe(findRepeatedRules, () => {
 
 // region | Helpers
 
-/** Runs one comparison over a single TypeScript path, which every case above scopes its config to. */
+/** Runs one comparison over a single TypeScript path, to which every case above scopes its config. */
 async function compare(sharedElements: Linter.Config[], consumerElements: Linter.Config[]) {
   return findRepeatedRules({ consumerElements, cwd: process.cwd(), filePaths: FILE_PATHS, sharedElements });
 }

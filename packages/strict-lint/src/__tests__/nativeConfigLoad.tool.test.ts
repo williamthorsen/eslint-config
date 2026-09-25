@@ -200,7 +200,7 @@ describe('native config loading (subprocess)', () => {
     const fresh = runCli(dir, cacheArgs);
     const cached = runCli(dir, cacheArgs);
 
-    // The second run is served from `.eslintcache`, whose entries hold the severities ESLint recorded before
+    // The second run is served from `.eslintcache`, whose entries hold the severities that ESLint recorded before
     // promotion. Promoting only freshly linted files would let this run report a warning and exit 0.
     expect(fs.existsSync(path.join(dir, '.eslintcache'))).toBe(true);
     expect(cached.stdout).toBe(fresh.stdout);
@@ -216,7 +216,7 @@ describe('native config loading (subprocess)', () => {
 
     const { status, stdout } = runCli(dir, ['a.js']);
 
-    // ESLint owns config loading and transpiles rather than stripping types, so an enum resolves where it once threw.
+    // ESLint loads its own config and transpiles it rather than stripping types, so an enum resolves.
     expect(status).toBe(1);
     expect(stdout).toContain('no-unused-vars');
   }, 30_000);
@@ -231,14 +231,14 @@ describe('native config loading (subprocess)', () => {
 
     const { status, stderr } = runCli(dir, ['a.js']);
 
-    // strict-lint still loads its own config through Node's native type stripping, which cannot erase an enum.
+    // strict-lint loads its own config through Node's native type stripping, which cannot erase an enum.
     expect(status).toBe(1);
     expect(stderr).toContain('native type stripping');
     expect(stderr).toContain('strict-lint.config.ts');
   }, 30_000);
 });
 
-/** A monorepo tree whose only ESLint config sits at the root and whose only ceiling sits inside the package. */
+/** Writes a monorepo tree whose only ESLint config is at the root and whose only ceiling is inside the package. */
 function makePackageCeilingFixture(): string {
   return makeFixture({
     'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
@@ -248,9 +248,9 @@ function makePackageCeilingFixture(): string {
 }
 
 /**
- * Write the given files into a fresh temp directory and return its path. The directory gets a project-root marker,
- * so config discovery is bounded by the fixture rather than by whatever happens to sit above the system temp
- * directory on the machine running the suite.
+ * Writes the given files into a fresh temp directory and returns its path. The directory gets a project-root marker,
+ * so that the fixture bounds config discovery, whatever sits above the system temp directory on the machine running
+ * the suite.
  */
 function makeFixture(files: Record<string, string>): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-int-'));
@@ -264,7 +264,7 @@ function makeFixture(files: Record<string, string>): string {
   return dir;
 }
 
-/** Run the CLI source under a plain `node` subprocess against the fixture directory. */
+/** Runs the CLI source under a plain `node` subprocess against the fixture directory. */
 function runCli(cwd: string, args: string[]): { status: number | null; stdout: string; stderr: string } {
   const result = spawnSync(process.execPath, [CLI_PATH, ...args], { cwd, encoding: 'utf8' });
   return { status: result.status, stdout: result.stdout, stderr: result.stderr };

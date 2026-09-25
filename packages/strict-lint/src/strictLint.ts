@@ -18,8 +18,8 @@ import { showUsage } from './usage.ts';
 export async function strictLint(options?: StrictLintOptions): Promise<string> {
   const { text, errorCount } = await runLint(options);
 
-  // An empty formatter result means a clean run, which `console.info` would emit as a blank line.The guard keys
-  // on the text, not the problem count, because a clean run is `[]` from `json` and a full document from `html`.
+  // Skip an empty formatter result, which `console.info` would print as a blank line. Test the text, not the problem
+  // count, because `json` reports a clean run as `[]` and `html` reports it as a full document.
   if (text) {
     console.info(text);
   }
@@ -30,7 +30,7 @@ export async function strictLint(options?: StrictLintOptions): Promise<string> {
 }
 
 /**
- * Runs the lint, reporting and exiting where it failed outright. The exit that ends a completed-but-failing run stays
+ * Runs the lint, reporting and exiting when it fails outright. The exit that ends a completed-but-failing run stays
  * with the caller, so it is not caught by the handler for the lint's own failures.
  */
 async function runLint(options: StrictLintOptions | undefined): Promise<{ text: string; errorCount: number }> {
@@ -44,8 +44,7 @@ async function runLint(options: StrictLintOptions | undefined): Promise<{ text: 
 
 /**
  * Runs ESLint with strict-lint promotion applied. ESLint resolves a config for each linted file, exactly as a plain
- * `eslint` run does; strict-lint raises severities afterwards rather than rewriting the config beforehand.
- * @link https://eslint.org/docs/latest/integrate/nodejs-api#eslint-class
+ * `eslint` run does; strict-lint raises severities in the results afterwards.
  */
 async function doLint(
   options: StrictLintOptions | undefined,
@@ -58,16 +57,13 @@ async function doLint(
     return { text: '', errorCount: 0 };
   }
 
-  // The walk is anchored at each linted file, matching how ESLint resolves its own config.
   const ceilings = createCeilingResolver(options?.maxSeverity);
 
   const eslint = new ESLint(buildEslintOptions(options, parsed));
 
   const results = await eslint.lintFiles(resolvePatterns(options, parsed.patterns));
 
-  // Promotion spans the whole array rather than each freshly linted file, so a result served from `--cache` is
-  // promoted like one linted just now. It also runs ahead of `--quiet`, whose filter keys on severity and would
-  // otherwise discard the very warnings strict-lint exists to raise.
+  // Promote ahead of `--quiet`, whose severity filter would otherwise discard the warnings that strict-lint raises.
   const promotedResults = await promoteSeverities(results, ceilings);
 
   if (parsed.debug) {
@@ -76,28 +72,23 @@ async function doLint(
 
   await checkForRepeatedRules(options, parsed, promotedResults);
 
-  // Write fixes to files unless --fix-dry-run was specified
   if (!parsed.fixDryRun) {
     await ESLint.outputFixes(promotedResults);
   }
 
-  // Filter warnings when --quiet is specified
   const filteredResults = parsed.quiet ? ESLint.getErrorResults(promotedResults) : promotedResults;
 
   const errorCount = filteredResults.reduce((sum, r) => sum + r.errorCount, 0);
-  // Compute warning count from unfiltered results so --max-warnings works with --quiet
+  // Count warnings in the unfiltered results, so that --max-warnings works with --quiet.
   const warningCount = promotedResults.reduce((sum, r) => sum + r.warningCount, 0);
 
-  // Format results
   const formatter = await eslint.loadFormatter(parsed.format);
   let text = await formatter.format(filteredResults);
 
-  // Write to output file if specified
   if (parsed.outputFile) {
     await fs.writeFile(parsed.outputFile, text, 'utf8');
   }
 
-  // Check max-warnings threshold
   if (parsed.maxWarnings >= 0 && warningCount > parsed.maxWarnings) {
     const message = `ESLint found too many warnings (maximum: ${String(parsed.maxWarnings)}).`;
     // Separate the message from the report only when there is one; otherwise it would lead with a blank line.
@@ -120,9 +111,8 @@ const SEVERITY_MAP: Record<string, Linter.RuleSeverity> = {
 };
 
 /**
- * Rejects the one combination no options shape can satisfy.
- * An in-memory config holds plugin objects, and ESLint clones its options to reach worker threads.
- * Left to ESLint the failure names `overrideConfig`, an option the programmatic caller never passed.
+ * Rejects concurrency alongside a programmatic `baseConfig`, whose plugin objects ESLint cannot clone to reach worker
+ * threads. Left to ESLint, the failure names `overrideConfig`, an option that the programmatic caller never passed.
  */
 function assertConcurrencyIsOff(concurrency: ESLint.Options['concurrency']): void {
   if (concurrency === undefined || concurrency === 'off') {
@@ -140,7 +130,7 @@ function buildEslintOptions(options: StrictLintOptions | undefined, parsed: Pars
 
   if (options?.baseConfig) {
     assertConcurrencyIsOff(parsed.eslintOptions.concurrency);
-    // An in-memory config has no file for ESLint to resolve, so it rides along and pins the run to itself.
+    // Pin the run to the in-memory config, which has no file for ESLint to resolve.
     return { ...eslintOptions, overrideConfigFile: true };
   }
 
@@ -148,11 +138,10 @@ function buildEslintOptions(options: StrictLintOptions | undefined, parsed: Pars
     return { ...eslintOptions, overrideConfigFile: parsed.configPath };
   }
 
-  // Nothing pinned: ESLint discovers a config for each linted file, as it does for a plain `eslint` run.
   return eslintOptions;
 }
 
-/** Builds the override layers, lowest precedence first, that ride on top of whatever config ESLint resolves. */
+/** Builds the override layers, lowest precedence first, that apply over whatever config ESLint resolves. */
 function buildOverrideConfig(
   baseConfig: Linter.Config[] | undefined,
   programmaticOverrides: Record<string, Linter.RuleSeverity> | undefined,
@@ -160,12 +149,10 @@ function buildOverrideConfig(
 ): Linter.Config[] {
   const configs: Linter.Config[] = baseConfig ? [...baseConfig] : [];
 
-  // Programmatic rule overrides (applied first, lower precedence)
   if (programmaticOverrides && Object.keys(programmaticOverrides).length > 0) {
     configs.push({ rules: { ...programmaticOverrides } });
   }
 
-  // CLI rule overrides (applied last, highest precedence)
   if (Object.keys(cliOverrides).length > 0) {
     configs.push({
       rules: Object.fromEntries(
@@ -178,9 +165,9 @@ function buildOverrideConfig(
 }
 
 /**
- * Compares the consumer's own config against the configs it extends, when a strict-lint config names them.
- * The walk is its own rather than the ceiling resolver's: Ceilings answer a per-file question and are memoized by
- * directory, while one run has one ESLint config to measure.
+ * Compares the consumer's own config against the configs that it extends, when a strict-lint config names them.
+ * It walks the cascade itself instead of reusing the ceiling resolver: Ceilings answer a per-file question and are
+ * memoized by directory, while one run has one ESLint config to measure.
  */
 async function checkForRepeatedRules(
   options: StrictLintOptions | undefined,
@@ -207,7 +194,7 @@ async function checkForRepeatedRules(
   reportRepeatedRules(report, consumer.name);
 }
 
-/** Names the directories a cascade governs, collapsing a long tail into a count so one group stays one line. */
+/** Names the directories that a cascade governs, collapsing a long tail into a count to keep one group on one line. */
 function describeDirs(dirs: readonly string[]): string {
   const shown = dirs.slice(0, MAX_REPORTED_DIRS).join(', ');
   const remaining = dirs.length - MAX_REPORTED_DIRS;
@@ -221,7 +208,7 @@ function describeDirs(dirs: readonly string[]): string {
 function groupByConfigFiles(cascades: ReadonlyMap<string, StrictLintCascade>): CascadeGroup[] {
   const groups = new Map<string, CascadeGroup>();
   for (const [dir, cascade] of cascades) {
-    // Lowest precedence first, matching the order the report prints them in.
+    // Reverse to lowest precedence first, the order in which the report prints them.
     const filePaths = cascade.entries.toReversed().map((entry) => entry.filePath);
     const key = `${cascade.stopReason}\n${filePaths.join('\n')}`;
     const group = groups.get(key);
@@ -234,7 +221,7 @@ function groupByConfigFiles(cascades: ReadonlyMap<string, StrictLintCascade>): C
   return groups.values().toArray();
 }
 
-/** The project roots the walks landed on, deduplicated: A run spanning one repository reports exactly one. */
+/** Lists the distinct project roots on which the walks landed: A run spanning one repository reports exactly one. */
 function listDistinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascade>): ProjectRoot[] {
   const roots = new Map<string, ProjectRoot>();
   for (const cascade of cascades.values()) {
@@ -243,7 +230,7 @@ function listDistinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascad
   return roots.values().toArray();
 }
 
-/** Reports where the ceilings came from, on stderr, so it stays clear of the formatter output. */
+/** Reports where the ceilings came from, on stderr, so that the report stays clear of the formatter output. */
 function reportConfigProvenance(cascades: ReadonlyMap<string, StrictLintCascade>): void {
   if (cascades.size === 0) {
     console.error('strict-lint: no files were linted, so no config was resolved');
@@ -269,7 +256,7 @@ function reportConfigProvenance(cascades: ReadonlyMap<string, StrictLintCascade>
   }
 }
 
-/** The config to measure against the shared one: the caller's own when it passed one, otherwise the config file. */
+/** Resolves the config to measure against the shared one: the caller's own if it passed one, else the config file. */
 async function resolveConsumerConfig(
   options: StrictLintOptions | undefined,
   parsed: ParsedCliArgs,

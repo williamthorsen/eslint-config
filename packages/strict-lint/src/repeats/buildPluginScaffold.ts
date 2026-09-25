@@ -1,9 +1,9 @@
 import type { Linter } from 'eslint';
 
 /**
- * Projects each element to a copy carrying no `rules`. Both sides of a comparison receive the projection of the whole
- * config, so a rule id resolves on whichever side names it; without it, a side naming a rule whose plugin the other
- * side registers cannot resolve the plugin at all. An element left with no keys is dropped.
+ * Projects each element to a copy without `rules`, dropping any element left with no keys. Both sides of a comparison
+ * receive the projection of the whole config, so that a rule id resolves on either side; without the scaffold, a side
+ * naming a rule whose plugin only the other side registers cannot resolve the plugin.
  */
 export function buildPluginScaffold(elements: readonly Linter.Config[]): Linter.Config[] {
   const scaffold: Linter.Config[] = [];

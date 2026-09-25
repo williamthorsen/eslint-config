@@ -37,7 +37,7 @@ describe(reportRepeatedRules, () => {
 
 // region | Helpers
 
-/** The stderr lines a report writes. */
+/** Returns the stderr lines that a report writes. */
 function capture(report: Parameters<typeof reportRepeatedRules>[0]): string[] {
   const silenced = disposeOnTestFinished(silenceConsole(['error']));
   reportRepeatedRules(report, 'eslint.config.ts');
