@@ -17,8 +17,8 @@ const manifestSchema = z.object({
 
 // pnpm links a workspace package's bins during the install's link phase, which runs before anything is built. A
 // target under `dist/` therefore does not exist when pnpm reaches for it, and pnpm never retries: the link stays
-// missing for the life of the `node_modules` tree, and deleting `node_modules` is the only repair. Each `bin`
-// entry points at a committed wrapper instead, which loads the build output at runtime.
+// missing for the life of the `node_modules` tree, and deleting `node_modules` is the only repair. These tests hold
+// each `bin` entry to a committed wrapper, which loads the build output at runtime.
 describe('bin targets', () => {
   it('no bin target names a path under dist/', () => {
     const offenders = collectBinTargets().filter(({ target }) => readFirstSegment(target) === 'dist');
@@ -55,7 +55,7 @@ type Manifest = z.infer<typeof manifestSchema>;
 
 /**
  * Reads every workspace package's `bin` entries as one flat list. `packages/*` is the workspace manifest's only
- * pattern, and reading the directory rather than globbing keeps the package manifests under `__fixtures__` out.
+ * pattern; reading that directory keeps the package manifests under `__fixtures__` out of the list.
  */
 function collectBinTargets(): BinTarget[] {
   return readdirSync(packagesDir).flatMap((packageName) => {
@@ -75,7 +75,7 @@ function collectBinTargets(): BinTarget[] {
   });
 }
 
-/** Renders one entry as `{package}:{command} -> {target}`, the form an offender is reported in. */
+/** Renders one entry as `{package}:{command} -> {target}`, the form in which the tests report an offender. */
 function describeTarget({ command, packageName, target }: BinTarget): string {
   return `${packageName}:${command} -> ${target}`;
 }
@@ -96,7 +96,7 @@ function readBinEntries(manifest: Manifest): Record<string, string> {
   return manifest.bin;
 }
 
-/** Reads the leading path segment of a `bin` target or a `files` entry, which is the granularity `files` publishes at. */
+/** Reads the leading path segment of a `bin` target or a `files` entry, the granularity at which `files` publishes. */
 function readFirstSegment(entry: string): string {
   return entry.replace(/^\.\//, '').split('/', 1).at(0) ?? '';
 }

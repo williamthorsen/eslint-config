@@ -8,13 +8,13 @@ import { z } from 'zod';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// The root config extends `@williamthorsen/tsconfig/tsconfig.base.json` by package name, so resolving it
-// exercises the same path a published consumer takes rather than a relative-path shortcut.
+// The root config extends `@williamthorsen/tsconfig/tsconfig.base.json` by package name, so parsing it resolves the
+// base the way a published consumer does.
 const options = parseRootConfig();
 
 const consumerOwnedKeys = new Set(['jsx', 'paths', 'types']);
 
-// What the base adds on top of the inlined `@tsconfig/strictest` settings. Every other key it declares
+// Keys that the base adds to the inlined `@tsconfig/strictest` settings. Every other key that it declares
 // must come from upstream; a leftover is drift. A key listed here that upstream also starts setting
 // fails both drift assertions, which is the intent: the collision is a decision, not a merge.
 const nodeLayerKeys = [
@@ -75,9 +75,8 @@ describe('@williamthorsen/tsconfig base config', () => {
   });
 
   it('extends no package', () => {
-    // An `extends` is what broke under pnpm: resolvers that don't realpath the symlink walk up to a
-    // top-level `node_modules/@tsconfig` that pnpm never creates. Its absence is the fix, so the base
-    // must stay reachable in one hop no matter what it would be convenient to inherit.
+    // A resolver that does not realpath pnpm's symlinks walks up to a top-level `node_modules/@tsconfig`
+    // that pnpm never creates, so the base must be reachable in one hop.
     expect(readBaseConfig().extends).toBeUndefined();
   });
 
@@ -92,7 +91,7 @@ describe('@williamthorsen/tsconfig base config', () => {
   });
 
   it('declares nothing beyond @tsconfig/strictest but the Node layer', () => {
-    // Catches the direction the mirror test can't: a setting upstream has dropped survives here as an
+    // Catches the direction that the mirror test can't: a setting that upstream has dropped survives here as an
     // unexplained key rather than as a missing one.
     const upstreamKeys = new Set(Object.keys(readUpstreamCompilerOptions()));
     const beyondUpstream = Object.keys(readBaseCompilerOptions()).filter((key) => !upstreamKeys.has(key));
@@ -101,6 +100,7 @@ describe('@williamthorsen/tsconfig base config', () => {
   });
 });
 
+/** Parses the repo-root tsconfig with its `extends` chain resolved, throwing on any error diagnostic. */
 function parseRootConfig(): ts.CompilerOptions {
   const configPath = path.join(repoRoot, 'tsconfig.json');
   const host: ts.ParseConfigFileHost = {
@@ -121,22 +121,27 @@ function parseRootConfig(): ts.CompilerOptions {
   return parsed.options;
 }
 
+/** Reads the `@williamthorsen/tsconfig` base as declared. */
 function readBaseConfig(): z.infer<typeof configSchema> {
   return readConfig(path.join(repoRoot, 'packages', 'tsconfig', 'tsconfig.base.json'));
 }
 
+/** Reads the compiler options that the base declares. */
 function readBaseCompilerOptions(): Record<string, unknown> {
   return readBaseConfig().compilerOptions ?? {};
 }
 
-// Resolve upstream from the tsconfig package rather than the repo root, which declares no
-// `@tsconfig/strictest` of its own, so the comparison is against the version that package pins.
+/**
+ * Reads the compiler options of the `@tsconfig/strictest` version pinned by the tsconfig package. The repo root
+ * declares no `@tsconfig/strictest` of its own.
+ */
 function readUpstreamCompilerOptions(): Record<string, unknown> {
   const requireFromPackage = createRequire(path.join(repoRoot, 'packages', 'tsconfig', 'package.json'));
 
   return readConfig(requireFromPackage.resolve('@tsconfig/strictest/tsconfig.json')).compilerOptions ?? {};
 }
 
+/** Reads a tsconfig file's own JSON, without resolving `extends`. */
 function readConfig(configPath: string): z.infer<typeof configSchema> {
   const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile.bind(ts.sys));
 
@@ -145,7 +150,7 @@ function readConfig(configPath: string): z.infer<typeof configSchema> {
   return configSchema.parse(config);
 }
 
-// TypeScript normalizes `lib` entries to their `lib.*.d.ts` filenames.
+/** Converts a `lib` name to the `lib.*.d.ts` filename to which TypeScript normalizes it. */
 function lib(name: string): string {
   return `lib.${name.toLowerCase()}.d.ts`;
 }
