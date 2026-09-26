@@ -62,8 +62,8 @@ interface InputJudgement {
 
 const installedVersions = new Map<string, string | undefined>();
 
-// Held for the life of one `rdy` run so that the kit reads a tsconfig's chain once for all the eslint configs
-// that it owns.
+// Held for the life of one `rdy` run so that the kit reads a tsconfig's chain once, however many
+// eslint configs the tsconfig owns.
 const tsconfigChains = new Map<string, TsconfigChain | undefined>();
 
 export default defineRdyKit({
