@@ -1,9 +1,9 @@
 /**
  * Readiness checks for a project consuming @williamthorsen/eslint-config-typescript.
  *
- * The kit ships inside the package, so it always runs at the version the consumer has installed.
- * That is what it asserts: whether the surrounding configuration is wired correctly for this
- * version, never whether the version itself is current. Prompting an upgrade needs a kit that
+ * The package includes the kit, so the kit always runs at the version that the consumer has
+ * installed. That is what it asserts: whether the surrounding configuration is wired correctly for
+ * this version, never whether the version itself is current. Prompting an upgrade needs a kit that
  * outlives the version being replaced, which a package-hosted kit cannot be.
  *
  * `error` is reserved for a failure that stops ESLint loading or running the config. Everything
@@ -62,7 +62,8 @@ interface InputJudgement {
 
 const installedVersions = new Map<string, string | undefined>();
 
-// Held for the life of one `rdy` run, so several eslint configs owned by one tsconfig read it once.
+// Held for the life of one `rdy` run so that the kit reads a tsconfig's chain once for all the eslint configs
+// that it owns.
 const tsconfigChains = new Map<string, TsconfigChain | undefined>();
 
 export default defineRdyKit({
@@ -73,18 +74,18 @@ export default defineRdyKit({
       name: 'peers',
       checks: [
         {
-          name: 'eslint satisfies the peer range this config declares',
+          name: 'eslint satisfies the peer range declared by this config',
           severity: 'error',
           skip: () => skipUnlessPeerComparable('eslint'),
           check: () => checkPeerFloor('eslint'),
-          fix: 'Upgrade eslint to the version this config requires as a peer',
+          fix: 'Upgrade eslint to the version that this config requires as a peer',
         },
         {
-          name: 'typescript satisfies the peer range this config declares',
+          name: 'typescript satisfies the peer range declared by this config',
           severity: 'error',
           skip: () => skipUnlessPeerComparable('typescript'),
           check: () => checkPeerFloor('typescript'),
-          fix: 'Upgrade typescript to the version this config requires as a peer',
+          fix: 'Upgrade typescript to the version that this config requires as a peer',
         },
       ],
     },
@@ -108,23 +109,23 @@ export default defineRdyKit({
           severity: 'error',
           skip: skipUnlessEslintLoadsTypeScript,
           check: noShadowedEslintConfig,
-          fix: 'Delete the JavaScript eslint config sharing a directory with a TypeScript one: the loader resolves the JavaScript basename first, so the TypeScript config never runs',
+          fix: 'Delete the JavaScript eslint config sharing a directory with a TypeScript one: The loader resolves the JavaScript basename first, so the TypeScript config never runs',
         },
         {
           name: 'An eslint config anchors the project service with tsconfigRootDir',
           check: tsconfigRootDirAnchored,
-          fix: 'Set parserOptions.tsconfigRootDir (import.meta.dirname) in the root eslint config, so type-aware linting resolves from the repo root rather than the working directory',
+          fix: 'Set parserOptions.tsconfigRootDir (import.meta.dirname) in the root eslint config so that type-aware linting resolves from the repo root rather than the working directory',
         },
         {
           name: 'An eslint config sets settings.next.rootDir',
           skip: skipUnlessNextRootDirApplies,
           check: nextRootDirSet,
-          fix: 'Set settings.next.rootDir (import.meta.dirname) in the eslint config reaching the Next plugin: unset, it falls back to the working directory, and no-html-link-for-pages stops running wherever that holds no pages directory',
+          fix: 'Set settings.next.rootDir (import.meta.dirname) in the eslint config enabling the Next plugin: Unset, it falls back to the working directory, and no-html-link-for-pages stops running wherever that holds no pages directory',
           checks: [
             {
               name: 'Every settings.next.rootDir is absolute',
               check: nextRootDirsAbsolute,
-              fix: 'Replace each relative settings.next.rootDir with an absolute path (import.meta.dirname): the plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched',
+              fix: 'Replace each relative settings.next.rootDir with an absolute path (import.meta.dirname): The plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched',
             },
           ],
         },
@@ -137,13 +138,13 @@ export default defineRdyKit({
           name: "The repo's tsconfigs permit a TypeScript-extension import",
           skip: skipUnlessTsconfigPresent,
           check: tsExtensionImportsPermitted,
-          fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly where the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`,
+          fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly when the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`,
         },
         {
           name: "A tsconfig enumerating an eslint config's siblings names the config itself",
           skip: skipUnlessEnumerated,
           check: eslintConfigEnumerated,
-          fix: `Replace the enumeration with a *.ts glob, which carries the next root-level config file to arrive as well; appending eslint.config.ts is the narrower fallback. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
+          fix: `Replace the enumeration with a *.ts glob, which also covers any root-level config file added later; appending eslint.config.ts is the narrower fallback. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
         },
       ],
     },
@@ -154,7 +155,7 @@ export default defineRdyKit({
           name: 'No eslint config sets parserOptions.project',
           severity: 'error',
           check: noLegacyParserProject,
-          fix: `Remove parserOptions.project: this config enables projectService, and typescript-eslint throws when both are set. Migration: ${MIGRATION_URL}`,
+          fix: `Remove parserOptions.project: This config enables projectService, and typescript-eslint throws when both are set. Migration: ${MIGRATION_URL}`,
         },
         {
           name: 'No tsconfig.eslint.json files remain',
@@ -193,7 +194,7 @@ function comparePeer(name: string): PeerComparison {
   return { floor, installed, kind: 'comparable', range };
 }
 
-/** Fails when a tsconfig's enumerated inputs omit an eslint config sitting among the files they name. */
+/** Fails when a tsconfig's enumerated inputs omit an eslint config located among the files that they name. */
 function eslintConfigEnumerated(): boolean | CheckOutcome {
   const offenders: string[] = [];
   for (const { configPath, coverage } of listInputJudgements()) {
@@ -212,7 +213,7 @@ function findEslintConfigs(): string[] {
 
 /**
  * Finds the tsconfig owning a file, which is the nearest `tsconfig.json` at or above its directory.
- * That is the config the project service resolves; a sibling under another basename owns nothing.
+ * That is the config that the project service resolves; a sibling under another basename owns nothing.
  */
 function findOwningTsconfig(filePath: string): string | undefined {
   const slash = filePath.lastIndexOf('/');
@@ -253,14 +254,14 @@ function listProviderWorkspaceDirs(): string[] {
     .map((workspace) => workspace.dir);
 }
 
-/** Lists the directories in which a repo's configs sit: the repo root and every workspace. */
+/** Lists the directories in which a repo's configs are: the repo root and every workspace. */
 function listRepoSearchDirs(): string[] {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 
 /**
  * Lists the tsconfigs owning the repo's sources: the one at the root and one per workspace declaring it.
- * A repo holding TypeScript declares at least one, so their absence is what stands in for a repo with no
+ * A repo containing TypeScript declares at least one, so their absence stands in for a repo with no
  * TypeScript source to measure.
  */
 function listRepoTsconfigs(): string[] {
@@ -283,14 +284,14 @@ function nextRootDirsAbsolute(): boolean | CheckOutcome {
   return { ok: false, detail: `settings.next.rootDir is relative in ${offenders.join(', ')}` };
 }
 
-/** Fails when an eslint config reaches the Next plugin and none sets settings.next.rootDir. */
+/** Fails when an eslint config enables the Next plugin and none sets settings.next.rootDir. */
 function nextRootDirSet(): boolean | CheckOutcome {
   const setting = listEslintConfigsMatching(setsNextRootDir);
   if (setting.length > 0) return { ok: true, detail: `settings.next.rootDir is set in ${setting.join(', ')}` };
   const reaching = listEslintConfigsMatching(enablesNextPlugin);
   return {
     ok: false,
-    detail: `The Next plugin is reached in ${reaching.join(', ')} and no eslint config sets settings.next.rootDir`,
+    detail: `The Next plugin is enabled in ${reaching.join(', ')} and no eslint config sets settings.next.rootDir`,
   };
 }
 
@@ -352,8 +353,8 @@ function readPeerRange(name: string): string | undefined {
 
 /**
  * Reports whether the root eslint config extends this package, by package specifier or by a path
- * into a workspace providing it. The second route is how the repo developing this package reaches
- * it, since importing the specifier there would resolve to a build artifact.
+ * into a workspace providing it. The repo developing this package imports it by the second route,
+ * since importing the specifier there would resolve to a build artifact.
  */
 function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   const basename = findRootEslintConfig();
@@ -364,11 +365,11 @@ function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   if (content.includes(PACKAGE_NAME)) return true;
 
   const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
-  return providerDir === undefined ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
+  return providerDir === undefined ? false : { ok: true, detail: `imported by source path from ${providerDir}` };
 }
 
 /**
- * Skips the enumeration check where no tsconfig owning an eslint config enumerates a sibling
+ * Skips the enumeration check when no tsconfig owning an eslint config enumerates a sibling
  * TypeScript file, whether it declares no inputs at all or its declared inputs name none. A root
  * declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`,
  * covers the config by a route that its own inputs do not show.
@@ -379,7 +380,7 @@ function skipUnlessEnumerated(): false | string {
   return 'No tsconfig owning an eslint config enumerates a sibling TypeScript file by name';
 }
 
-/** Skips the shadowing check below eslint 10, where a JavaScript config is the only loadable one. */
+/** Skips the shadowing check below eslint 10, which can load only a JavaScript config. */
 function skipUnlessEslintLoadsTypeScript(): false | string {
   const installed = readInstalledVersion('eslint');
   if (installed === undefined) return 'eslint is not installed';
@@ -389,14 +390,14 @@ function skipUnlessEslintLoadsTypeScript(): false | string {
 }
 
 /**
- * Skips the next.rootDir checks where no eslint config reaches the Next plugin and none sets the
- * value. The trigger is the union of the two, so a config reaching the plugin through a local
+ * Skips the next.rootDir checks when no eslint config enables the Next plugin and none sets the
+ * value. The trigger is the union of the two, so a config enabling the plugin through a local
  * re-export is still judged on the value that it writes.
  */
 function skipUnlessNextRootDirApplies(): false | string {
   if (listEslintConfigsMatching(enablesNextPlugin).length > 0) return false;
   if (listEslintConfigsMatching(setsNextRootDir).length > 0) return false;
-  return 'No eslint config reaches the Next plugin or sets settings.next.rootDir';
+  return 'No eslint config enables the Next plugin or sets settings.next.rootDir';
 }
 
 /** Skips a peer floor check when either side of the comparison is unavailable. */
@@ -405,7 +406,10 @@ function skipUnlessPeerComparable(name: string): false | string {
   return comparison.kind === 'comparable' ? false : comparison.reason;
 }
 
-/** Skips the extension-import check where the repo declares no tsconfig, so it holds no TypeScript source. */
+/**
+ * Skips the extension-import check when the repo declares no tsconfig, which the kit takes to mean
+ * no TypeScript source.
+ */
 function skipUnlessTsconfigPresent(): false | string {
   return listRepoTsconfigs().length > 0 ? false : 'The repo declares no tsconfig';
 }

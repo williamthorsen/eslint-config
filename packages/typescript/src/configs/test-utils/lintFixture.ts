@@ -39,8 +39,8 @@ export async function lintFixture(composed: readonly Config[], fixture: string):
 }
 
 // The base config enables `projectService` but leaves `tsconfigRootDir` to the consumer. Pointing it at the
-// fixtures dir is what lets a composition with the base resolve the fixture tsconfig, so every type-aware
-// rule runs for real.
+// fixtures dir lets a composition with the base resolve the fixture tsconfig, so every type-aware rule runs
+// for real.
 export const typedParserSettings: Config = {
   languageOptions: {
     parserOptions: {
@@ -54,7 +54,7 @@ export const typedParserSettings: Config = {
 /**
  * Retypes configs as the `Linter.Config[]` that `new ESLint({ overrideConfig })` accepts, which models
  * `languageOptions` with a nominally-incompatible index signature. Only that constructor calls it, never
- * the factory results, whose assignability to `Config[]` is what the composability suite proves.
+ * the factory results, whose assignability to `Config[]` the composability suite proves.
  */
 function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above

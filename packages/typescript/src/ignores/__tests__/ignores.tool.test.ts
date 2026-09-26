@@ -8,10 +8,10 @@ import { toolIgnores } from '../tool.ts';
 // Each list is probed through an ESLint built from that list alone, so an assertion pins the glob to
 // the list naming it. A shared instance built from both would pass with any glob in either list.
 //
-// `isPathIgnored` reports true for any path that no config block matches, so a positive assertion on
-// its own would still pass once its glob stopped matching. Every case below pairs one with a
+// Because `isPathIgnored` reports true for any path that no config block matches, a positive assertion
+// on its own would still pass once its glob stopped matching. Every case below pairs one with a
 // negative, and the `files` block claims each extension queried so that an unmatched path cannot be
-// mistaken for an ignored one. The paths need not exist: `isPathIgnored` answers on the path alone.
+// mistaken for an ignored one. The paths need not exist: `isPathIgnored` decides from the path alone.
 const commonLinter = buildLinter(commonIgnores);
 const toolLinter = buildLinter(toolIgnores);
 

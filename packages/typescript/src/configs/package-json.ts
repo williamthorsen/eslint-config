@@ -7,7 +7,7 @@ const config: Config[] = [
   {
     files: ['**/package.json'],
     rules: {
-      // Each rule below takes its default options, which is what sorts them into two tiers: `require-author` and
+      // Each rule below takes its default options, which sorts them into two tiers: `require-author` and
       // `require-engines` bind every package, while the rest exempt private ones through `ignorePrivate`.
       'package-json/no-local-dependencies': 'error',
       'package-json/require-author': 'error',

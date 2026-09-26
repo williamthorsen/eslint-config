@@ -50,7 +50,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-number-coercion': 'off', // 🔴⚫ Number() and parseInt() differ; the auto-fix can change behavior
   'unicorn/prefer-number-properties': 'warn', // 🔴🟠
   'unicorn/prefer-query-selector': 'warn', // 🔴🟠
-  'unicorn/prefer-simple-condition-first': 'off', // 🔴⚫ Reorders conditions away from reading order; its unsafe report ships no fix
+  'unicorn/prefer-simple-condition-first': 'off', // 🔴⚫ Reorders conditions away from reading order; its unsafe report includes no fix
   'unicorn/prefer-simplified-conditions': 'off', // 🔴⚫ Rewrites guard clauses in ways that can reduce readability
   'unicorn/prefer-spread': 'off', // 🔴⚫
   'unicorn/prefer-string-raw': 'warn', // 🔴🟠

@@ -31,7 +31,7 @@ const publishableTierFields = ['bugs', 'homepage', 'keywords'];
 const universalTierFields = ['author', 'engines'];
 
 describe('rules binding only publishable packages', () => {
-  it('report nothing against a private manifest omitting every field they require', async () => {
+  it('report nothing against a private manifest omitting every field that they require', async () => {
     const reported = await lintManifest({ ...omitFields(compliantManifest, publishableTierFields), private: true });
 
     expect(reported.filter((ruleId) => publishableTierRules.includes(ruleId))).toStrictEqual([]);
@@ -86,7 +86,7 @@ describe('the ban on local dependency paths', () => {
   });
 });
 
-describe('rules the preset supplies and this config no longer suppresses', () => {
+describe('rules that the preset supplies and this config no longer suppresses', () => {
   it('reject an empty field on a private manifest, which no-empty-fields binds as much as a publishable one', async () => {
     const reported = await lintManifest({ ...compliantManifest, keywords: [], private: true });
 

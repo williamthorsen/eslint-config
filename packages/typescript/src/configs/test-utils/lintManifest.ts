@@ -5,12 +5,12 @@ import { ESLint } from 'eslint';
 import packageJsonConfig from '../package-json.ts';
 
 // ESLint reports `File ignored because outside of base path` in place of any rule output for a path outside
-// its `cwd`, so the subject sits under the directory from which the linter runs. The file need not exist on disk.
+// its `cwd`, so the subject is in the directory from which the linter runs. The file need not exist on disk.
 const manifestPath = path.join(import.meta.dirname, 'package.json');
 
 /**
  * Lints a manifest given as an object and returns the ids of the rules that reported against it.
- * A message carrying no rule id means nothing was linted, which throws rather than reading as a clean run.
+ * A message with no rule id means nothing was linted, which throws rather than reading as a clean run.
  */
 export async function lintManifest(manifest: Record<string, unknown>): Promise<string[]> {
   const eslint = new ESLint({

@@ -12,7 +12,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "5f33c565",
+          "hash": "4e0a7de2",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -25,12 +25,12 @@
           ]
         },
         {
-          "hash": "70166530",
+          "hash": "80a22768",
           "kind": "module",
           "path": "../src/readiness/eslint-config-contents.ts"
         },
         {
-          "hash": "bc8687e7",
+          "hash": "3bfc688f",
           "kind": "module",
           "path": "../src/readiness/eslint-config-paths.ts"
         },
@@ -45,12 +45,12 @@
           "path": "../src/readiness/permitsTsExtensionImports.ts"
         },
         {
-          "hash": "71be74f3",
+          "hash": "05090df0",
           "kind": "module",
           "path": "../src/readiness/readVersionFloor.ts"
         },
         {
-          "hash": "c0dcbe2b",
+          "hash": "e70e61dd",
           "kind": "module",
           "path": "../src/readiness/tsconfig-inputs.ts"
         }
@@ -59,8 +59,8 @@
       "path": "kits/default.js",
       "readyupVersion": "0.38.0",
       "source": "kits/default.ts",
-      "sourceHash": "5f33c565",
-      "targetHash": "f0c9d47e"
+      "sourceHash": "4e0a7de2",
+      "targetHash": "79df66c2"
     }
   ]
 }
