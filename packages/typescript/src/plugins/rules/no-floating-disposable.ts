@@ -230,8 +230,8 @@ function isOwnershipPassthrough(node: ResourceExpression, type: ts.Type, service
 
 /**
  * Returns true if the argument may be a function. A spread and `any` both count, because a spread's elements have no
- * node to read a type from and `any` withholds the answer: Reporting a resource wrongly does more harm than exempting
- * one wrongly.
+ * node to read a type from and an `any` type does not show whether it is a function: Reporting a resource wrongly does
+ * more harm than exempting one wrongly.
  */
 function isPossiblyFunction(argument: TSESTree.CallExpressionArgument, services: TypedServices): boolean {
   if (argument.type === AST_NODE_TYPES.SpreadElement) {
