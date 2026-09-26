@@ -9,12 +9,12 @@ const create: TSESLint.RuleCreateFunction<'preferDeclaration'> = (context) => {
       if (!(
         node.init &&
         [AST_NODE_TYPES.ArrowFunctionExpression, AST_NODE_TYPES.FunctionExpression].includes(node.init.type) &&
-        !node.id.typeAnnotation // Exempt a typed variable: a declaration cannot take its annotation
+        !node.id.typeAnnotation // Exempt a typed variable: A declaration cannot take its annotation
       )) {
         return;
       }
 
-      // Skip an arrow function that uses `this`: a declaration would rebind it.
+      // Skip an arrow function that uses `this`: A declaration would rebind it.
       if (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression && containsThisExpression(node.init.body)) {
         return;
       }

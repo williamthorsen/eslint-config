@@ -4,7 +4,7 @@ import { createTypedRuleTester, RuleTester } from '../test-utils/ruleTester.ts';
 // This rule's receiver guard is type-aware, so it needs the tester backed by a TS program.
 const typedRuleTester = createTypedRuleTester();
 
-// The fixture program declares no ambient `console`, so a case reaching for one declares its own.
+// Because the fixture program declares no ambient `console`, a case reaching for one declares its own.
 const consoleDeclaration = 'declare const console: { log(value: unknown): void };';
 
 typedRuleTester.run('no-unused-map', rule, {

@@ -5,11 +5,11 @@ import ts from 'typescript';
 const fixtureDir = path.join(import.meta.dirname, '../../../../__fixtures__/rules');
 const fixtureConfigPath = path.join(fixtureDir, 'tsconfig.json');
 
-// A case is a script, so a program holding several of them merges their top-level declarations and reports collisions
-// that no case has on its own. The appended export makes each case a module with a scope of its own.
+// A case is a script, so a program containing several of them merges their top-level declarations and reports
+// collisions that arise only from the merge. The appended export makes each case a module with a scope of its own.
 const MODULE_SUFFIX = '\nexport {};';
 
-// Parsing the fixture's libs costs an order of magnitude more than checking the cases, and every program that a
+// Parsing the fixture's libs takes an order of magnitude longer than checking the cases, and every program that a
 // worker builds reads the same ones under the same options.
 const parsedLibraryFiles = new Map<string, ts.SourceFile | undefined>();
 
@@ -52,7 +52,7 @@ export function findCaseTypeErrors(cases: readonly RuleTestCase[]): CaseTypeErro
       throw new Error(`Typechecking the rule-tester cases did not reach ${testCase.label}.`);
     }
 
-    // Ask per file: a whole-program check includes the fixture's libs, which dominate its cost.
+    // Ask per file: A whole-program check includes the fixture's libs, which take most of its time.
     const diagnostics = [...program.getSyntacticDiagnostics(sourceFile), ...program.getSemanticDiagnostics(sourceFile)];
     if (diagnostics.length > 0) {
       errors.push({ code: testCase.code, label: testCase.label, messages: diagnostics.map(toMessage) });
@@ -90,7 +90,9 @@ function createCompilerHost(options: ts.CompilerOptions, sources: ReadonlyMap<st
   return host;
 }
 
-/** Reads the options under which the rule tester's default project runs, so that a fixture change reaches the cases. */
+/**
+ * Reads the options under which the rule tester's default project runs, so that a fixture change applies to the cases.
+ */
 function readFixtureCompilerOptions(): ts.CompilerOptions {
   const configFile = ts.readConfigFile(fixtureConfigPath, (fileName) => ts.sys.readFile(fileName));
   if (configFile.error) {

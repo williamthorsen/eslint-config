@@ -46,7 +46,8 @@ const functionNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
 const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (context) => {
   const services = getTypedServicesOrNull(context);
 
-  // Nothing about `foo();` identifies a disposable without types, so an untyped parse reports nothing at all.
+  // Nothing about `foo();` identifies a disposable without types, so the rule reports nothing at all on an untyped
+  // parse.
   if (services === null) {
     return {};
   }
@@ -139,7 +140,7 @@ function findEnclosingBlock(node: TSESTree.Node): TSESTree.Node | undefined {
   return undefined;
 }
 
-/** Returns the nearest function enclosing the node, or undefined where the node sits at module or class level. */
+/** Returns the nearest function enclosing the node, or undefined when the node is at module or class level. */
 function findEnclosingFunction(node: TSESTree.Node): EnclosingFunction | undefined {
   for (const ancestor of listAncestors(node)) {
     if (isEnclosingFunction(ancestor)) {
@@ -172,9 +173,9 @@ function isContainedUse(identifier: ReferenceIdentifier): boolean {
 /**
  * Returns true if the reference is the receiver of a call taking a function argument, reached directly or through a
  * property, as `child.on(event, listener)` and `child.stdout.on(...)` are. Such a call schedules work that the
- * declaring block does not contain, so releasing the resource at the block's end would cut the callback off. No
- * signature says whether an argument is invoked during the call or retained for later, so a synchronous higher-order
- * call such as `lines.forEach(...)` qualifies too.
+ * declaring block does not contain, so releasing the resource at the block's end would cut the callback off. A
+ * synchronous higher-order call such as `lines.forEach(...)` qualifies too, because a signature does not say whether an
+ * argument is invoked during the call or retained for later.
  */
 function isContinuationRegistration(identifier: ReferenceIdentifier, services: TypedServices): boolean {
   let node: TSESTree.Node = identifier;
@@ -228,8 +229,9 @@ function isOwnershipPassthrough(node: ResourceExpression, type: ts.Type, service
 }
 
 /**
- * Returns true if the argument may be a function. A spread's elements have no node to read a type from, and `any`
- * withholds the answer, so both count: a resource wrongly reported costs more than one wrongly exempted.
+ * Returns true if the argument may be a function. A spread and `any` both count, because a spread's elements have no
+ * node to read a type from and an `any` type does not show whether it is a function: Reporting a resource wrongly does
+ * more harm than exempting one wrongly.
  */
 function isPossiblyFunction(argument: TSESTree.CallExpressionArgument, services: TypedServices): boolean {
   if (argument.type === AST_NODE_TYPES.SpreadElement) {
@@ -242,9 +244,9 @@ function isPossiblyFunction(argument: TSESTree.CallExpressionArgument, services:
 
 /**
  * Returns true if the call yields the receiver on which it was called. Such a method chains onto a resource that the
- * caller already holds, as `server.listen(port)` does, rather than acquiring one. Two tests answer it: the call's type
+ * caller already owns, as `server.listen(port)` does, rather than acquiring one. Two tests decide it: The call's type
  * is the receiver's own, which covers a fluent method annotated with its own class type; or the signature declares
- * `this`, which holds wherever instantiating `this` yields a type object distinct from the receiver's.
+ * `this`, which holds whenever instantiating `this` yields a type object distinct from the receiver's.
  */
 function isReceiverType(
   node: ResourceExpression,
@@ -261,11 +263,11 @@ function isReceiverType(
 }
 
 /**
- * Returns true if the declared resource belongs to the scope that declares it, which is what makes `using` the binding
- * that it calls for. Every reference must be a member access sitting in the declaring block and function: a return, an
- * argument, an assignment, or a literal element all hand the resource somewhere that outlives this scope, where
- * releasing it at the scope's end would be wrong. Requiring the declaring block covers a `var`, whose binding a caller
- * may read past the block at which a `using` would be released. A reference registering a continuation disqualifies the
+ * Returns true if the declared resource belongs to the scope that declares it, which makes `using` the binding that it
+ * calls for. Every reference must be a member access inside the declaring block and function: A return, an argument,
+ * an assignment, or a literal element all pass the resource to something that outlives this scope, and releasing it at
+ * the scope's end would then be wrong. Requiring the declaring block covers a `var`, whose binding a caller may read
+ * past the block at which a `using` would be released. A reference registering a continuation disqualifies the
  * declaration too, the resource then being finished by the callback rather than by the block returning.
  */
 function isScopeBound(
@@ -322,7 +324,7 @@ function* listAncestors(node: TSESTree.Node): Generator<TSESTree.Node> {
 }
 
 /**
- * Returns the call or `new` expression from which an initializer acquires its value, or undefined where the initializer
+ * Returns the call or `new` expression from which an initializer acquires its value, or undefined when the initializer
  * is not an acquisition site. An alias or a property read yields a resource that another expression already acquired.
  */
 function readAcquisitionExpression(init: TSESTree.Expression): ResourceExpression | undefined {
@@ -353,10 +355,10 @@ function readCalleeName(node: ResourceExpression): string | undefined {
 }
 
 /**
- * Returns the expression whose value a statement discards, or undefined where the result is consumed. An optional
+ * Returns the expression whose value a statement discards, or undefined when the result is consumed. An optional
  * chain interposes a `ChainExpression` between the call and the statement, and `await` an `AwaitExpression`; the
- * outermost of them holds the value that goes unused, and an awaited promise yields the resource rather than the
- * promise wrapping it. A `void` operator interposes a `UnaryExpression`, which makes `void` the escape hatch for an
+ * outermost of them is the expression whose value goes unused, and an awaited promise yields the resource rather than
+ * the promise wrapping it. A `void` operator interposes a `UnaryExpression`, which makes `void` the escape hatch for an
  * intended discard.
  */
 function readDiscardedExpression(node: ResourceExpression): TSESTree.Expression | undefined {
@@ -373,11 +375,11 @@ function readDiscardedExpression(node: ResourceExpression): TSESTree.Expression 
 /**
  * Returns the binding keyword that the type calls for, or undefined when the type is not disposable. Nullability is
  * stripped first: `getProperties()` resolves a union to its common properties, so `Disposable | undefined` would
- * otherwise report as bare of any property at all. Every remaining constituent must be disposable, so a union mixing
- * a resource with a plain value is left alone.
+ * otherwise report as bare of any property at all. Every remaining constituent must be disposable; a union mixing a
+ * resource with a plain value is left alone.
  *
  * Resolving properties can crash inside TypeScript while it computes module specifiers for symbols declared
- * elsewhere, and disposability cannot then be confirmed, so a throw is treated as a non-disposable type.
+ * elsewhere. Because disposability cannot then be confirmed, a throw is treated as a non-disposable type.
  */
 function readDisposalKeyword(type: ts.Type, checker: ts.TypeChecker): 'await using' | 'using' | undefined {
   try {
@@ -402,7 +404,7 @@ function readDisposalKeyword(type: ts.Type, checker: ts.TypeChecker): 'await usi
 }
 
 /**
- * Returns the suggestion that rebinds the declaration keyword, or an empty array where no valid edit exists. A
+ * Returns the suggestion that rebinds the declaration keyword, or an empty array when no valid edit exists. A
  * declaration holding several declarators would bind its siblings too, and `await using` needs an enclosing `async`
  * function to appear in.
  */
@@ -478,7 +480,7 @@ const ruleDefinition = {
       floatingDisposable:
         'Discarded disposable resource. Bind the result with `{{keyword}}`, or mark the discard with `void`.',
       unboundDisposable:
-        'Resource is acquired and never disposed. Bind it with `{{keyword}}` instead of `{{kind}}`, so it is released when the scope ends.',
+        'Resource is acquired and never disposed. Bind it with `{{keyword}}` instead of `{{kind}}`, so that it is released when the scope ends.',
     },
   },
   create,

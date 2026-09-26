@@ -55,7 +55,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       filename: fixtureFile('source-exports', 'src/internal/index.ts'),
     },
     {
-      // Non-firing: a named source path is published wherever it sits, `sourceDir` notwithstanding
+      // Non-firing: a source path named by the manifest is published even outside `sourceDir`
       code: "export * from './a.ts';",
       filename: fixtureFile('root-source-exports', 'mod.ts'),
     },
@@ -75,7 +75,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       filename: fixtureFile('legacy-main', 'src/index.d.ts'),
     },
     {
-      // Non-firing: `module` names the entry point where a manifest declares neither `exports` nor `main`
+      // Non-firing: `module` names the entry point when a manifest declares neither `exports` nor `main`
       code: "export * from './a.ts';",
       filename: fixtureFile('legacy-module-and-bin', 'src/index.ts'),
     },
@@ -97,27 +97,27 @@ ruleTester.run('no-unpublished-barrel', rule, {
       options: [{ sourceDir: 'lib' }],
     },
     {
-      // Non-firing: fixture scaffolding ships nothing
+      // Non-firing: fixture scaffolding is never published
       code: "export * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/__fixtures__/index.ts'),
     },
     {
-      // Non-firing: mock scaffolding ships nothing
+      // Non-firing: mock scaffolding is never published
       code: "export * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/__mocks__/index.ts'),
     },
     {
-      // Non-firing: test scaffolding ships nothing
+      // Non-firing: test scaffolding is never published
       code: "export * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/__tests__/index.ts'),
     },
     {
-      // Non-firing: test-helper scaffolding ships nothing
+      // Non-firing: test-helper scaffolding is never published
       code: "export * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/test-utils/index.ts'),
     },
     {
-      // Non-firing: a file that defines something is not a barrel, wherever it sits
+      // Non-firing: a file that defines something is not a barrel, in any directory
       code: "export const a = 1;\nexport * from './b.ts';",
       filename: fixtureFile('conditional-exports', 'src/utils/index.ts'),
     },
@@ -160,7 +160,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
-      // Firing: detection is by content, so a re-export hub under any name reports
+      // Firing: a re-export hub under any name reports, because detection is by content
       code: "export type * from './a.ts';",
       filename: fixtureFile('conditional-exports', 'src/types.ts'),
       errors: [buildUnpublishedError('src/types.ts', 'dist/esm/types.js')],
@@ -196,7 +196,7 @@ ruleTester.run('no-unpublished-barrel', rule, {
       errors: [buildUnpublishedError('src/utils/index.ts', 'dist/esm/utils/index.js')],
     },
     {
-      // Firing: `main` is inert wherever `exports` is present, so its target is not published
+      // Firing: `main` is inert whenever `exports` is present, so its target is not published
       code: "export * from './a.ts';",
       filename: fixtureFile('exports-with-legacy-main', 'src/legacy/index.ts'),
       errors: [buildUnpublishedError('src/legacy/index.ts', 'dist/esm/legacy/index.js')],

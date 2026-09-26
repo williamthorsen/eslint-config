@@ -6,7 +6,7 @@ import { assertCasesTypecheck } from '../ruleTester.ts';
 const acquire = 'declare function acquire(): Disposable;';
 
 describe(assertCasesTypecheck, () => {
-  it('accepts a suite whose code uses only the shapes the fixture declares', () => {
+  it('accepts a suite whose code uses only the shapes that the fixture declares', () => {
     expect(() =>
       assertCasesTypecheck('no-floating-disposable', {
         invalid: [{ code: `${acquire} acquire();`, errors: [{ messageId: 'floatingDisposable' }] }],
@@ -27,7 +27,7 @@ describe(assertCasesTypecheck, () => {
     );
   });
 
-  it('holds a fixer output to the program', () => {
+  it('typechecks a fixer output against the program', () => {
     const tests: RunTests<'floatingDisposable', []> = {
       invalid: [{ code: `${acquire} acquire();`, errors: [{ messageId: 'floatingDisposable' }], output: 'missing();' }],
       valid: [],
@@ -36,7 +36,7 @@ describe(assertCasesTypecheck, () => {
     expect(() => assertCasesTypecheck('no-floating-disposable', tests)).toThrow(/invalid\[0\]\.output: missing\(\);/);
   });
 
-  it('holds each pass of a multi-pass fixer output to the program', () => {
+  it('typechecks each pass of a multi-pass fixer output against the program', () => {
     const tests: RunTests<'floatingDisposable', []> = {
       invalid: [
         {
@@ -53,7 +53,7 @@ describe(assertCasesTypecheck, () => {
     );
   });
 
-  it('holds a suggestion output to the program', () => {
+  it('typechecks a suggestion output against the program', () => {
     const tests: RunTests<'floatingDisposable', []> = {
       invalid: [
         {

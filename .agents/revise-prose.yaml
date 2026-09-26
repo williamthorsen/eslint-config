@@ -1,0 +1,143 @@
+rules:
+  capitalization-after-colon:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: false
+    roots:
+      - packages/typescript/src/plugins
+  doc-descriptions:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: false
+    roots:
+      - packages/typescript/src/plugins
+  em-dash:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: true
+    roots:
+      - packages/typescript/src/plugins
+  inline-comments:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: false
+    roots:
+      - packages/typescript/src/plugins
+  line-wrapping:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: false
+    roots:
+      - packages/typescript/src/plugins
+  plain-speech:
+    version: '7'
+    swept-at: 2026-09-25
+    detected: false
+    roots:
+      - packages/typescript/src/plugins
+  reduced-object-relative:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: true
+    roots:
+      - packages/typescript/src/plugins
+  second-person:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: true
+    roots:
+      - packages/typescript/src/plugins
+  sentence-case:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: false
+    roots:
+      - packages/typescript/src/plugins
+  so:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: true
+    roots:
+      - packages/typescript/src/plugins
+  where:
+    version: '1'
+    swept-at: 2026-09-25
+    detected: true
+    roots:
+      - packages/typescript/src/plugins
+rejections:
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/__tests__/no-floating-disposable.rules.tool.test.ts
+    phrase: handed a listener is
+    ground: "not the construction: 'handed' is a participle in an elliptical comparison"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/__tests__/no-split-imports.rules.tool.test.ts
+    phrase: statement stays attached
+    ground: "not the construction: 'stays' is the sentence's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/no-floating-disposable.ts
+    phrase: result a statement discards
+    ground: "not the construction: the relative clause opens with 'whose'"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/no-floating-disposable.ts
+    phrase: spread's elements have
+    ground: "not the construction: 'have' is the clause's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/no-type-cycle.ts
+    phrase: specifier the way `tsc` does
+    ground: "outside the rule: 'the way' heads an adjunct relative"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/no-unpublished-barrel.ts
+    phrase: module the nearest package.json does not publish
+    ground: "not the construction: the relative clause opens with 'whose'"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/no-unpublished-barrel.ts
+    phrase: name the entry points
+    ground: "not the construction: 'name' is the clause's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/test-utils/findCaseTypeErrors.ts
+    phrase: fixture's libs included
+    ground: "not the construction: 'included' is a participle in an absolute phrase"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/test-utils/findCaseTypeErrors.ts
+    phrase: rule-tester cases did not reach
+    ground: "not the construction: 'did not reach' is the sentence's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/test-utils/findCaseTypeErrors.ts
+    phrase: rule-tester cases reported
+    ground: "not the construction: 'reported' is the sentence's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/test-utils/ruleTester.ts
+    phrase: suite declares does not typecheck
+    ground: "not the construction: the relativizer 'that' is already present"
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/__tests__/no-floating-disposable.rules.tool.test.ts
+    phrase: inside an `async` function, where `await using` compiles
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/__tests__/no-split-imports.rules.tool.test.ts
+    phrase: an unrelated statement between the two stays where it is
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/__tests__/no-split-imports.rules.tool.test.ts
+    phrase: import attributes are left where they are
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/src/plugins/rules/no-unused-map.ts
+    phrase: in statement position, where its result is discarded
+    ground: "outside the rule: 'where' names a position"

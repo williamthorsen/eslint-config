@@ -8,7 +8,8 @@ import noTypeCycleRule from '../no-type-cycle.ts';
 
 const ruleId = 'sky-pilot/no-type-cycle';
 
-// Only the rule under test is enabled, so a message from a neighbouring rule cannot be mistaken for one of its own.
+// Only the rule under test is enabled, so that a message from a neighbouring rule cannot be mistaken for one of its
+// own.
 const ruleConfig: Config = {
   plugins: {
     'sky-pilot': { rules: ensurePluginRules({ 'no-type-cycle': noTypeCycleRule }) },

@@ -4,13 +4,13 @@ import { createTypedRuleTester, RuleTester } from '../test-utils/ruleTester.ts';
 // Disposability is a type property, so every case here needs the tester backed by a TS program.
 const typedRuleTester = createTypedRuleTester();
 
-// A declaration case needs an enclosing block: The `Program` body is exempt, and the tester's code is top-level,
-// so a case written bare passes as valid without exercising the rule.
+// A declaration case needs an enclosing block. Because the `Program` body is exempt and the tester's code is
+// top-level, a case written bare passes as valid without exercising the rule.
 const capture = 'interface Capture extends Disposable { lines: string[] } declare function acquire(): Capture;';
 const asyncCapture =
   'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function acquireAsync(): AsyncCapture;';
-// `on` returns `this` so that a chained registration typechecks; `stdout` and the optional `stderr` reach a second `on`
-// through a property.
+// `on` returns `this` so that a chained registration typechecks; `stdout` and the optional `stderr` are properties with
+// an `on` of their own.
 const child =
   'declare class Stream { on(event: string, listener: () => void): void } declare class Child { [Symbol.dispose](): void; on(event: string, listener: () => void): this; stdout: Stream; stderr?: Stream } declare function spawn(): Child;';
 // A `node:crypto` stream, async-disposable by inheritance from the stream base and owning nothing that needs releasing.
@@ -77,7 +77,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
 
     // -- Declarations --
 
-    // Non-firing: the declared resource is returned, so it becomes the caller's
+    // Non-firing: the declared resource is returned and becomes the caller's
     `${capture} function make() { const captured = acquire(); return captured; }`,
     // Non-firing: the declared resource is passed on as an argument
     `${capture} declare function register(resource: Capture): void; function run() { const captured = acquire(); register(captured); }`,
@@ -85,7 +85,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
     `${capture} declare let sink: Capture; function run() { const captured = acquire(); sink = captured; }`,
     // Non-firing: the declared resource leaves inside an object literal
     `${capture} declare function send(payload: unknown): void; function run() { const captured = acquire(); send({ captured }); }`,
-    // Non-firing: a reassigned binding, which `using` could not hold
+    // Non-firing: a reassigned binding, which `using` could not declare
     `${capture} function run() { let captured = acquire(); captured = acquire(); }`,
     // Non-firing: a closure may outlive the block in which it captures the resource
     `${capture} function run() { const captured = acquire(); return () => captured.lines; }`,
@@ -106,14 +106,14 @@ typedRuleTester.run('no-floating-disposable', rule, {
       code: `${capture} function run() { const captured = acquire(); captured.lines; }`,
       options: [{ checkDeclarations: false }],
     },
-    // Non-firing: the `allow` list reaches a declaration too
+    // Non-firing: the `allow` list applies to a declaration too
     {
       code: `${capture} function run() { const captured = acquire(); captured.lines; }`,
       options: [{ allow: ['acquire'] }],
     },
     // Non-firing: a default-allowed crypto factory bound to a plain declaration
     `${digest} declare function createHash(algorithm: string): Digest; function run() { const hash = createHash('sha256'); return hash.digest(); }`,
-    // Non-firing: ownership passthrough reaches a declaration too
+    // Non-firing: ownership passthrough applies to a declaration too
     `${capture} declare function keep<T extends Disposable>(resource: T): T; function run() { const captured = keep(acquire()); captured.lines; }`,
     // Non-firing: a fluent call yields the receiver's type rather than a new resource
     'declare class Server { [Symbol.asyncDispose](): Promise<void>; listen(port: number): this } declare const server: Server; function run() { const listening = server.listen(3000); listening.listen(3001); }',
@@ -127,7 +127,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
     `${child} function run() { const proc = spawn(); proc.stderr?.on('data', () => {}); }`,
     // Non-firing: a spread argument, whose elements have no node to read a type from
     `${child} declare const handlers: [string, () => void]; function run() { const proc = spawn(); proc.on(...handlers); }`,
-    // Non-firing: an `any` argument, which withholds whether it is a function
+    // Non-firing: an `any` argument, whose type does not show whether it is a function
     `${child} declare const handler: any; function run() { const proc = spawn(); proc.on('data', handler); }`,
     // Non-firing: chained registration, which matches at the inner call
     `${child} declare const settle: () => void; function run() { const proc = spawn(); proc.on('a', settle).on('b', settle); }`,
@@ -162,7 +162,8 @@ typedRuleTester.run('no-floating-disposable', rule, {
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'using' } }],
     },
     {
-      // Firing: a callee returning a resource other than the one that it was handed created it, so it is the caller's
+      // Firing: when a callee returns a resource other than the one that it was handed, the callee created it, so it is
+      // the caller's
       code: 'declare function acquire(): Disposable; declare function wrap(inner: Disposable): AsyncDisposable; wrap(acquire());',
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'await using' } }],
     },
@@ -172,7 +173,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'using' } }],
     },
     {
-      // Firing: a stream that owns a descriptor, whose factory the crypto entries do not reach
+      // Firing: a stream that owns a descriptor, whose factory matches none of the crypto entries
       code: `${fileStream} declare function createWriteStream(path: string): FileStream; createWriteStream('out.txt');`,
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'await using' } }],
     },
@@ -241,7 +242,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
       ],
     },
     {
-      // Firing: a `var` whose references all sit inside the block at which a `using` would be released
+      // Firing: a `var` whose references are all inside the block at which a `using` would be released
       code: `${capture} function run() { { var captured = acquire(); captured.lines; } }`,
       errors: [
         {
@@ -310,7 +311,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
       ],
     },
     {
-      // Firing: an awaited promise yields the resource that the declaration then holds
+      // Firing: an awaited promise yields the resource that the declaration then binds
       code: 'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function open(): Promise<AsyncCapture>; async function run() { const captured = await open(); captured.lines; }',
       errors: [
         {
@@ -428,7 +429,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
       ],
     },
     {
-      // Firing: the resource sits in argument position, so the call taking a function is not one that it receives
+      // Firing: the resource is in argument position, so the call taking a function is not one that it receives
       code: `${capture} declare function expectLines(lines: string[], assert: () => void): void; function run() { const captured = acquire(); expectLines(captured.lines, () => {}); }`,
       errors: [
         {
@@ -462,7 +463,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
       ],
     },
     {
-      // Firing: `checkDeclarations` scopes to the declaration half, leaving the discarded half reporting
+      // Firing: `checkDeclarations` applies only to the declaration half; the discarded half still reports
       code: 'declare function acquire(): Disposable; acquire();',
       options: [{ checkDeclarations: false }],
       errors: [{ messageId: 'floatingDisposable', data: { keyword: 'using' } }],

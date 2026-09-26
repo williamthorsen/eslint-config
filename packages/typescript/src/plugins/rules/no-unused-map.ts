@@ -51,7 +51,7 @@ function getServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<'unus
 }
 
 /**
- * Returns true if the call sits in statement position, where its result is discarded; every other position consumes
+ * Returns true if the call is in statement position, where its result is discarded; every other position consumes
  * the value. An optional chain (`items?.map(fn);`) interposes a `ChainExpression` before the `ExpressionStatement`.
  */
 function isResultDiscarded(node: TSESTree.CallExpression): boolean {
