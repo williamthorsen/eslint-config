@@ -88,7 +88,7 @@ The default export bundles configs for the following surfaces:
 
 Every `package.json` must declare `author` and `engines`, and may not contain an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not declare a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency declared by a package must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
 
-Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files don't fight the type checker.
+Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely.
 
 ## Type imports
 
@@ -104,7 +104,7 @@ import { Component, type ComponentProps } from './Component.ts';
 | `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type is written as `import type`.               |
 | `sky-pilot/no-split-imports`                     | `warn`      | `warn`              | Two statements importing one module merge into one, `type` moving onto the specifiers. |
 
-`consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and are listed in [`advisoryRuleSeverities`](#advisory-rule-severities), which caps them at `warn` in any config that applies it; without it `strict-lint` promotes them too.
+`consistent-type-imports` is promoted to an error because under `verbatimModuleSyntax` its report changes what the compiled output imports at runtime. The other two report arrangement alone and are listed in [`advisoryRuleSeverities`](#advisory-rule-severities), which caps them at `warn` in any config that applies it; without it `strict-lint` promotes them too.
 
 An all-type statement stays `import type { Foo }` rather than `import { type Foo }`: Under `verbatimModuleSyntax` TypeScript strips the inline specifiers and leaves a runtime side-effect import behind.
 
