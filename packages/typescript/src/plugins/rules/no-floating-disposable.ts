@@ -174,7 +174,7 @@ function isContainedUse(identifier: ReferenceIdentifier): boolean {
  * Returns true if the reference is the receiver of a call taking a function argument, reached directly or through a
  * property, as `child.on(event, listener)` and `child.stdout.on(...)` are. Such a call schedules work that the
  * declaring block does not contain, so releasing the resource at the block's end would cut the callback off. A
- * synchronous higher-order call such as `lines.forEach(...)` qualifies too, because no signature says whether an
+ * synchronous higher-order call such as `lines.forEach(...)` qualifies too, because a signature does not say whether an
  * argument is invoked during the call or retained for later.
  */
 function isContinuationRegistration(identifier: ReferenceIdentifier, services: TypedServices): boolean {
