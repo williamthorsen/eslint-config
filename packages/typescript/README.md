@@ -206,7 +206,7 @@ export default defineConfig(config, {
 
 The defaults cover two families. Node's timer globals, `setImmediate`, `setInterval`, and `setTimeout`, return a `Timeout` implementing `Symbol.dispose`, so the rule would otherwise report a bare `setTimeout(fn, ms);`, a resource that is meant to be discarded. `node:crypto`'s stream factories, `createCipheriv`, `createDecipheriv`, `createHash`, `createHmac`, `createSign`, and `createVerify`, return a `Transform` or `Writable`, inheriting `Symbol.asyncDispose` from the stream base while owning no descriptor, socket, process, or lock: Nothing needs binding, because nothing is released. The rule matches both families by name alone. A userland `createHash` is exempt alongside `node:crypto`'s, and no option narrows the defaults back.
 
-A declaration is left alone in five further cases, each one a case in which `using` would be the wrong binding:
+A declaration is left alone in five further cases, in each of which `using` would be the wrong binding:
 
 - **The resource escapes.** A variable that is returned, passed as an argument, assigned onward, placed in a literal, reassigned, or read from a nested function belongs to something outliving the declaring scope. Only a member access on the resource itself can keep the declaration reportable.
 - **It is handed a callback.** A call on the resource, or on one of its properties, that takes a function argument schedules work that the block does not contain, as `child.on('close', resolve)` and `child.stdout.on('data', collect)` do; `using` would release the resource before the callback runs. The argument is recognized by its type, so a named handler counts alongside an inline arrow. Because no signature distinguishes a retained listener from a synchronous higher-order call, `captured.lines.forEach(...)` leaves the declaration alone too, and one such reference is enough to do it. An argument whose type does not show whether it is a function, such as a spread or an `any`, is taken to be one.
@@ -240,7 +240,7 @@ export default [
 ];
 ```
 
-Without `verbatimModuleSyntax` the rule still reports every cycle that it finds, as a layering defect rather than a runtime one. Enabled either way, the two cycle rules together cover every cycle on TypeScript sources: `import-x/no-cycle` reports a cycle whose every edge is a value edge, and this rule reports every other cycle.
+Without `verbatimModuleSyntax` the rule still reports every cycle that it finds, as a layering defect rather than a runtime one. Enabled either way, the two cycle rules divide the cycles on TypeScript sources between them: `import-x/no-cycle` reports a cycle whose every edge is a value edge, and this rule reports every other cycle.
 
 The graph comes from the TypeScript program built by the project service, so a specifier resolves as `tsc` resolves it. A tsconfig `paths` alias and a `.d.ts` both contribute edges, neither of which the bundled `import-x` resolver resolves. Because the rule reads the program, it reports nothing when the parser supplies none.
 
