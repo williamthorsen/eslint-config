@@ -12,7 +12,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "4e0a7de2",
+          "hash": "54b49409",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -50,7 +50,7 @@
           "path": "../src/readiness/readVersionFloor.ts"
         },
         {
-          "hash": "e70e61dd",
+          "hash": "05ca3400",
           "kind": "module",
           "path": "../src/readiness/tsconfig-inputs.ts"
         }
@@ -59,7 +59,7 @@
       "path": "kits/default.js",
       "readyupVersion": "0.38.0",
       "source": "kits/default.ts",
-      "sourceHash": "4e0a7de2",
+      "sourceHash": "54b49409",
       "targetHash": "79df66c2"
     }
   ]

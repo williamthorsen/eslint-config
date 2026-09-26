@@ -35,10 +35,6 @@ interface DeclaredPaths<Field extends DeclaredField> {
  * two fields are additive, so their union decides the inputs, and `exclude` withdraws an `include`
  * match while having no power over a `files` one. Each field resolves to the nearest config in the
  * chain declaring it, TypeScript replacing rather than merging the three.
- *
- * A chain enumerating nothing is reported as such rather than as a failure: A root declaring
- * `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the
- * file by a route that the config alone does not show.
  */
 export function judgeInputCoverage(entries: readonly TsconfigChainEntry[], filePath: string): InputCoverage {
   const judged = entries[0];

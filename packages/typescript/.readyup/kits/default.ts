@@ -368,12 +368,7 @@ function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   return providerDir === undefined ? false : { ok: true, detail: `imported by source path from ${providerDir}` };
 }
 
-/**
- * Skips the enumeration check when no tsconfig owning an eslint config enumerates a sibling
- * TypeScript file, whether it declares no inputs at all or its declared inputs name none. A root
- * declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`,
- * covers the config by a route that its own inputs do not show.
- */
+/** Skips the enumeration check when no eslint config's nearest tsconfig covers it or names a TypeScript file beside it. */
 function skipUnlessEnumerated(): false | string {
   const judged = listInputJudgements();
   if (judged.some((judgement) => judgement.coverage.kind !== 'not-enumerated')) return false;
