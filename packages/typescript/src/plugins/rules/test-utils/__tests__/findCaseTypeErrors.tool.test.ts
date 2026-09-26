@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { findCaseTypeErrors } from '../findCaseTypeErrors.ts';
 
 describe(findCaseTypeErrors, () => {
-  it('reports nothing for a case using only the shapes the fixture declares', () => {
+  it('reports nothing for a case using only the shapes that the fixture declares', () => {
     const errors = findCaseTypeErrors([
       {
         code: 'declare function acquire(): Disposable; function run() { using resource = acquire(); }',
@@ -14,7 +14,7 @@ describe(findCaseTypeErrors, () => {
     expect(errors).toStrictEqual([]);
   });
 
-  it('reports a case referencing an ambient the fixture does not declare', () => {
+  it('reports a case referencing an ambient that the fixture does not declare', () => {
     const errors = findCaseTypeErrors([{ code: '[1, 2, 3].map((n) => console.log(n));', label: 'invalid[0]' }]);
 
     expect(errors).toHaveLength(1);
@@ -42,7 +42,7 @@ describe(findCaseTypeErrors, () => {
     expect(errors).toStrictEqual([]);
   });
 
-  it('does not let a case resolve a name only a sibling declares', () => {
+  it('does not let a case resolve a name that only a sibling declares', () => {
     const errors = findCaseTypeErrors([
       { code: 'declare const console: { log(value: unknown): void }; console.log(1);', label: 'valid[0]' },
       { code: 'console.log(2);', label: 'valid[1]' },

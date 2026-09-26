@@ -27,7 +27,7 @@ export function assertCasesTypecheck<MessageIds extends string, Options extends 
 }
 
 /**
- * Builds a tester for type-aware rules, which need a TS program. `allowDefaultProject` routes the inline code to the
+ * Builds a tester for type-aware rules, which need a TS program. `allowDefaultProject` assigns the inline code to the
  * default project, and `defaultProject` names the fixture `tsconfig.json` as that project; an unnamed default project
  * is inferred, and uses TypeScript's own `compilerOptions` rather than the fixture's.
  */
@@ -57,8 +57,8 @@ function formatCaseTypeErrors(ruleName: string, errors: readonly CaseTypeError[]
 
 /**
  * Labels each piece of code by the position that it occupies in the suite, which is how a failure points back at the
- * source. A fixer's and a suggestion's `output` are code that the suite asserts, so they are held to the program
- * alongside the cases.
+ * source. A fixer's and a suggestion's `output` are code that the suite asserts, so they are typechecked against the
+ * program alongside the cases.
  */
 function toTypecheckedCases<MessageIds extends string, Options extends readonly unknown[]>(
   tests: RunTests<MessageIds, Options>,
@@ -94,9 +94,9 @@ function toTypecheckedCases<MessageIds extends string, Options extends readonly 
 }
 
 /**
- * A tester that also holds every case to the fixture program. A case referencing a shape that the program does not
- * declare typechecks as `any`, on which a type-aware rule returns early, so the case can pass while exercising none of
- * the behavior that it names.
+ * A tester that also typechecks every case against the fixture program. A case referencing a shape that the program
+ * does not declare typechecks as `any`, on which a type-aware rule returns early. Such a case can pass while exercising
+ * none of the behavior that it names.
  */
 class TypecheckedRuleTester extends RuleTester {
   /** Registers a typecheck test for the suite ahead of the rule's own cases. */

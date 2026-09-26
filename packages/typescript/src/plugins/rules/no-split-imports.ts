@@ -54,8 +54,8 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
 // region | Helpers
 
 /**
- * Groups the program's mergeable import statements by module, in source order. A statement rejected by
- * `toContribution` is left out, so the fix neither merges into it nor removes it.
+ * Groups the program's mergeable import statements by module, in source order. Because a statement rejected by
+ * `toContribution` is left out, the fix neither merges into it nor removes it.
  */
 function collectMergeableGroups(program: TSESTree.Program): Map<string, Contribution[]> {
   const groups = new Map<string, Contribution[]>();
@@ -82,7 +82,7 @@ function collectMergeableGroups(program: TSESTree.Program): Map<string, Contribu
 
 /**
  * Returns true if the fix would delete or orphan a comment: one inside the rewritten first statement, or one
- * attached to a removed statement, whether leading it on its own line, sitting inside it, or trailing on its
+ * attached to a removed statement, whether leading it on its own line, inside it, or trailing on its
  * last line. A comment elsewhere in the group's span annotates code that the fix leaves in place.
  */
 function fixWouldLoseComment(
@@ -135,7 +135,7 @@ function rangesOverlap(a: TSESTree.Range, b: TSESTree.Range): boolean {
 
 /**
  * Renders the group as one statement. The specifiers keep their source order, and a binding imported twice is
- * kept once. Where every binding is a type, the statement is `import type { ... }`, which `verbatimModuleSyntax`
+ * kept once. When every binding is a type, the statement is `import type { ... }`, which `verbatimModuleSyntax`
  * erases entirely; an inline form would leave a side-effect import behind.
  */
 function renderMerged(sourceCode: TSESLint.SourceCode, contributions: readonly Contribution[]): string {
@@ -169,7 +169,7 @@ function renderMerged(sourceCode: TSESLint.SourceCode, contributions: readonly C
   return `import ${allTypes ? 'type ' : ''}${clauses.join(', ')} from ${sourceCode.getText(first.node.source)}${semicolon}`;
 }
 
-/** Reads the bindings that a statement contributes, or undefined where the statement cannot take part in a merge. */
+/** Reads the bindings that a statement contributes, or undefined when the statement cannot take part in a merge. */
 function toContribution(node: TSESTree.ImportDeclaration): Contribution | undefined {
   if (node.specifiers.length === 0 || node.attributes.length > 0) {
     return undefined;

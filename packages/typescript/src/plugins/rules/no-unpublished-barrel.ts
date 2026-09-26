@@ -24,7 +24,7 @@ type TypeExpression =
 
 const defaultOptions: Options = { outDir: 'dist/esm', sourceDir: 'src' };
 
-// Test scaffolding ships nothing, so a barrel under one of these has no entry point to sit at.
+// Test scaffolding is never published, so a barrel under one of these directories is never an entry point.
 const scaffoldingDirs = new Set(['__fixtures__', '__mocks__', '__tests__', 'test-utils']);
 
 const emittedExtensions = new Map([
@@ -43,7 +43,7 @@ const typeExpressionTypes = new Set<TSESTree.Node['type']>([
   AST_NODE_TYPES.TSTypeAssertion,
 ]);
 
-// Resolved manifests are memoized for the life of the process, so an edit to a package's entry points needs
+// Because resolved manifests are memoized for the life of the process, an edit to a package's entry points needs
 // an ESLint server restart to take effect in an editor session.
 const manifestCache = new Map<string, Manifest | undefined>();
 
@@ -110,8 +110,8 @@ function collectImportedNames(program: TSESTree.Program): Set<string> {
 
 /**
  * Collects the paths that the manifest publishes. `exports` is authoritative wherever it is present; the legacy
- * fields name the entry points of a package that predates it, `types` among them because a declaration file
- * reaches this rule with its extension intact.
+ * fields name the entry points of a package that predates it, `types` among them because this rule sees a
+ * declaration file's path with its extension intact.
  */
 function collectPublishedTargets(manifest: Record<string, unknown>): Set<string> {
   const declared =
@@ -158,7 +158,7 @@ function escapeRegExp(text: string): string {
   return text.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`);
 }
 
-/** Returns the manifest governing the directory, memoizing every directory the walk visits. */
+/** Returns the manifest governing the directory, memoizing every directory that the walk visits. */
 function findNearestManifest(dir: string): Manifest | undefined {
   if (manifestCache.has(dir)) {
     return manifestCache.get(dir);
@@ -180,7 +180,7 @@ function hasScaffoldingSegment(relativePath: string): boolean {
     .some((segment) => scaffoldingDirs.has(segment));
 }
 
-/** Returns true if the body holds only imports and re-exports, which is what makes the file a barrel. */
+/** Returns true if the body contains only imports and re-exports, which makes the file a barrel. */
 function isBarrel(program: TSESTree.Program): boolean {
   const importedNames = collectImportedNames(program);
   let hasReExport = false;
@@ -263,7 +263,7 @@ function normalizeTarget(target: string): string {
   return toPosix(target).replace(/^\.\//, '');
 }
 
-/** Reads the manifest at the path. A missing file and a malformed one are alike: neither states what a package publishes. */
+/** Reads the manifest at the path. A missing file and a malformed one are alike: Neither states what a package publishes. */
 function readManifest(manifestPath: string): Record<string, unknown> | undefined {
   try {
     const parsed: unknown = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
@@ -311,8 +311,8 @@ function toPosix(filePath: string): string {
 }
 
 /**
- * Maps a package-relative source path to the path that the build emits for it, or undefined where the file lies
- * outside the source directory and so is never built.
+ * Maps a package-relative source path to the path that the build emits for it, or undefined when the file lies
+ * outside the source directory; such a file is never built.
  */
 function toPublishedTarget(relativePath: string, options: Options): string | undefined {
   const sourceSegments = splitDir(options.sourceDir);

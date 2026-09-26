@@ -5,20 +5,20 @@ import ts from 'typescript';
 
 type MessageId = 'typeCycle';
 
-/** One edge of the module graph: the file it reaches, and whether TypeScript erases it. */
+/** One edge of the module graph: the file that it reaches, and whether TypeScript erases it. */
 interface Edge {
   isTypeOnly: boolean;
   source: ts.Node;
   target: ts.SourceFile;
 }
 
-/** A module specifier and the kind of edge its syntax makes. */
+/** A module specifier and the kind of edge that its syntax makes. */
 interface ModuleReference {
   isTypeOnly: boolean;
   specifier: ts.StringLiteralLike;
 }
 
-// Key by program: after an edit, the project service builds a new program, which finds no entry here and walks the
+// Key by program: After an edit, the project service builds a new program, which finds no entry here and walks the
 // graph afresh.
 const graphs = new WeakMap<ts.Program, Map<ts.SourceFile, readonly Edge[]>>();
 
@@ -56,7 +56,7 @@ function collectEdges(program: ts.Program, file: ts.SourceFile): readonly Edge[]
   const checker = program.getTypeChecker();
   const edges: Edge[] = [];
 
-  /** Records the node's edge, if any, and descends into its children, below which an `import()` type can sit. */
+  /** Records the node's edge, if any, and descends into its children, below which an `import()` type can appear. */
   function visit(node: ts.Node): void {
     const reference = toModuleReference(node);
     if (reference !== undefined) {
@@ -213,14 +213,14 @@ function resolveModule(
   return isOutsideGraph ? undefined : target;
 }
 
-/** Renders one file as a specifier-like path, relative to the lint run's directory where it sits under it. */
+/** Renders one file as a specifier-like path, relative to the lint run's directory when it is under that directory. */
 function toDisplayPath(cwd: string, fileName: string): string {
   const relative = path.relative(cwd, fileName);
 
   return relative.startsWith('..') || path.isAbsolute(relative) ? fileName : `./${relative}`;
 }
 
-/** Returns the module a node references, or undefined for a node that references none. */
+/** Returns the module that a node references, or undefined for a node that references none. */
 function toModuleReference(node: ts.Node): ModuleReference | undefined {
   if (ts.isImportDeclaration(node) && ts.isStringLiteralLike(node.moduleSpecifier)) {
     return { isTypeOnly: importsTypesOnly(node.importClause), specifier: node.moduleSpecifier };
@@ -247,7 +247,7 @@ function toModuleReference(node: ts.Node): ModuleReference | undefined {
     return { isTypeOnly: node.isTypeOnly, specifier: node.moduleReference.expression };
   }
 
-  // A dynamic `import()` expression loads asynchronously, so it makes no edge here.
+  // Because a dynamic `import()` expression loads asynchronously, it makes no edge here.
   return undefined;
 }
 
