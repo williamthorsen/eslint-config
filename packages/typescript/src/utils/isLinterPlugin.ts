@@ -4,7 +4,7 @@ type ESLintPluginWithRules = Omit<ESLint.Plugin, 'configs'> & {
   configs: Record<string, { rules: Record<string, Linter.RuleEntry> }>;
 };
 
-/** Returns the plugin typed as one exposing rule-bearing `configs`, throwing where it has no `configs`. */
+/** Returns the plugin typed as one whose `configs` contain rules, throwing when it has no `configs`. */
 export function getSafeLinterPlugin<T>(plugin: T): Omit<T, 'configs'> & ESLintPluginWithRules {
   if (!isLinterPlugin(plugin)) {
     throw new Error('Plugin is not a valid ESLint plugin');

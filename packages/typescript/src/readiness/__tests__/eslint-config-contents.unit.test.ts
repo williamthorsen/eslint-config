@@ -16,7 +16,7 @@ describe(declaresParserProject, () => {
     expect(declaresParserProject(content)).toBe(true);
   });
 
-  it('is true when project sits beside other parserOptions keys', () => {
+  it('is true when project appears beside other parserOptions keys', () => {
     const content = `parserOptions: {
       tsconfigRootDir: import.meta.dirname,
       project: ['./tsconfig.json'],
@@ -63,7 +63,7 @@ describe(declaresParserProject, () => {
 });
 
 describe(enablesNextPlugin, () => {
-  it('is true for the factory this package exposes', () => {
+  it('is true for the factory exposed by this package', () => {
     const content = `export default defineConfig(config, ...(await createConfig.next()));`;
 
     expect(enablesNextPlugin(content)).toBe(true);
@@ -116,13 +116,13 @@ describe(importsFromDir, () => {
   });
 
   // Without a separator, the shorter directory name is a prefix of the longer one.
-  it('is false for a directory the specifier merely starts with', () => {
+  it('is false for a directory that the specifier merely starts with', () => {
     const content = `import config from './packages/typescript-utils/src/index.ts';`;
 
     expect(importsFromDir(content, 'packages/typescript')).toBe(false);
   });
 
-  // Specifiers resolve against the repo root, above which no workspace can sit.
+  // Specifiers resolve against the repo root, above which no workspace can be.
   it('is false for a specifier reaching above the repo root', () => {
     const content = `import config from '../packages/typescript/src/index.ts';`;
 
@@ -161,7 +161,7 @@ describe(listRelativeNextRootDirs, () => {
     expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
   });
 
-  it('is empty for the expression the fix recommends', () => {
+  it('is empty for the expression that the fix recommends', () => {
     const content = `settings: { next: { rootDir: import.meta.dirname } }`;
 
     expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
@@ -175,7 +175,7 @@ describe(listRelativeNextRootDirs, () => {
     expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
   });
 
-  // The array form exists for the multi-app shape, where each entry is anchored by a call.
+  // The array form exists for the multi-app shape, in which each entry is anchored by a call.
   it('is empty for an array whose every entry is a call expression', () => {
     const content = `settings: { next: { rootDir: [path.join(import.meta.dirname, 'apps/web'), path.join(import.meta.dirname, 'apps/admin')] } }`;
 
@@ -194,8 +194,8 @@ describe(listRelativeNextRootDirs, () => {
     expect(listRelativeNextRootDirs(content)).toStrictEqual([]);
   });
 
-  // An interpolated template's text is not the path it resolves to, so reading it as one would
-  // report an absolute value as relative.
+  // An interpolated template's text is not the path to which it resolves, so reading it as one
+  // would report an absolute value as relative.
   it('is empty for an interpolated template', () => {
     const content = 'settings: { next: { rootDir: `${import.meta.dirname}/app` } }';
 
@@ -229,8 +229,8 @@ describe(setsNextRootDir, () => {
     expect(setsNextRootDir(content)).toBe(true);
   });
 
-  // A value that no literal reader can judge still counts as set, so a config anchoring it correctly
-  // reports a pass rather than a missing setting.
+  // A value that no literal reader can judge still counts as set, so the check reports a pass rather
+  // than a missing setting for a config anchoring it correctly.
   it('is true for an expression value', () => {
     const content = `settings: { next: { rootDir: import.meta.dirname } }`;
 

@@ -10,7 +10,7 @@ import {
 } from '../eslint-config-paths.ts';
 
 describe('ESLINT_CONFIG_BASENAMES', () => {
-  // The order is the loader's resolution order, which is what makes a shadowed config inert.
+  // The order is the loader's resolution order, which makes a shadowed config inert.
   it('lists every JavaScript basename ahead of every TypeScript one', () => {
     const firstTypeScript = ESLINT_CONFIG_BASENAMES.findIndex(isTypeScriptEslintConfig);
     const lastJavaScript = ESLINT_CONFIG_BASENAMES.findLastIndex((basename) => !isTypeScriptEslintConfig(basename));
@@ -20,7 +20,7 @@ describe('ESLINT_CONFIG_BASENAMES', () => {
 });
 
 describe(isTypeScriptEslintConfig, () => {
-  it('is true for every TypeScript basename the loader resolves', () => {
+  it('is true for every TypeScript basename that the loader resolves', () => {
     expect(isTypeScriptEslintConfig('eslint.config.ts')).toBe(true);
     expect(isTypeScriptEslintConfig('eslint.config.mts')).toBe(true);
     expect(isTypeScriptEslintConfig('eslint.config.cts')).toBe(true);
@@ -67,7 +67,7 @@ describe(listEslintConfigCandidates, () => {
 });
 
 describe(listShadowedEslintConfigDirs, () => {
-  it('names a directory holding both a JavaScript and a TypeScript config', () => {
+  it('names a directory containing both a JavaScript and a TypeScript config', () => {
     expect(listShadowedEslintConfigDirs(['eslint.config.js', 'eslint.config.ts'])).toStrictEqual(['.']);
   });
 
@@ -82,7 +82,7 @@ describe(listShadowedEslintConfigDirs, () => {
     expect(listShadowedEslintConfigDirs(['eslint.config.js', 'packages/react/eslint.config.ts'])).toStrictEqual([]);
   });
 
-  it('returns nothing when every directory holds one kind', () => {
+  it('returns nothing when every directory contains one kind', () => {
     expect(listShadowedEslintConfigDirs(['eslint.config.ts', 'packages/react/eslint.config.mts'])).toStrictEqual([]);
   });
 });

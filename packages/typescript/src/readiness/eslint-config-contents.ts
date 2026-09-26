@@ -22,11 +22,11 @@ export function enablesNextPlugin(content: string): boolean {
 }
 
 /**
- * Reports whether an eslint config imports from a path inside the given directory. A repo providing
- * the config package reaches it by source path rather than by package specifier, so the directory of
- * the workspace providing it stands in for the specifier. Specifiers resolve against the repo root,
- * which holds the only config that this reads; one reaching above the root cannot name a workspace, so it
- * never matches.
+ * Reports whether an eslint config imports from a path inside the given directory. Because a repo
+ * providing the config package reaches it by source path rather than by package specifier, the
+ * directory of the workspace providing it stands in for the specifier. Specifiers resolve against the
+ * repo root, which contains the only config that this reads; one reaching above the root cannot name a
+ * workspace and never matches.
  */
 export function importsFromDir(content: string, dir: string): boolean {
   for (const match of content.matchAll(/\b(?:from|import|require)\s*\(?\s*['"]([^'"]+)['"]/g)) {
@@ -41,7 +41,7 @@ export function importsFromDir(content: string, dir: string): boolean {
  * Lists the relative `settings.next.rootDir` values that an eslint config sets. The plugin globs the
  * value against the working directory, so a relative one anchors to wherever eslint was launched.
  * Only a value that is itself a string literal, or an array of them, can be read; an expression such
- * as `import.meta.dirname` yields nothing, which is what keeps the remedy from reporting itself.
+ * as `import.meta.dirname` yields nothing, which keeps the check from reporting the remedy itself.
  */
 export function listRelativeNextRootDirs(content: string): string[] {
   return listNextSettingsBlocks(content)
@@ -63,7 +63,7 @@ export function setsTsconfigRootDir(content: string): boolean {
 
 /**
  * Extracts the body of the brace-delimited block opening at `openIndex`, respecting nesting, or an
- * empty string where the block never closes. The counter reads braces inside strings, comments, and
+ * empty string when the block never closes. The counter reads braces inside strings, comments, and
  * template literals as structure, so an unbalanced count is reachable from a valid config; yielding
  * nothing keeps an unreadable block from matching against the remainder of the file.
  */
@@ -107,7 +107,7 @@ function listRootDirLiterals(block: string): string[] {
 /**
  * Lists the candidate `rootDir` values in a block: an array's bracket body split on commas, or a
  * bare value's text up to the next comma or brace. A comma inside an entry splits it, so the reader
- * below admits a candidate only where its whole extent is a string literal.
+ * below admits a candidate only when its whole extent is a string literal.
  */
 function listRootDirValues(block: string): string[] {
   const array = /\brootDir\s*:\s*\[([^\]]*)\]/.exec(block);
@@ -118,9 +118,9 @@ function listRootDirValues(block: string): string[] {
 }
 
 /**
- * Reads a value that is wholly a string literal, or nothing where it is an expression such as
+ * Reads a value that is wholly a string literal, or nothing when it is an expression such as
  * `path.join(import.meta.dirname, 'app')`, whose argument is not the value. An interpolated template
- * likewise reads as nothing, its text not being the path it resolves to.
+ * likewise reads as nothing, its text not being the path to which it resolves.
  */
 function readStringLiteral(value: string): string | undefined {
   const [, quote, literal] = /^\s*(['"`])([^'"`]*)\1\s*$/.exec(value) ?? [];

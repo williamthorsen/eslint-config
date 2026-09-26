@@ -1,6 +1,6 @@
 /**
  * Every basename that an ESLint loader resolves, in the order in which it resolves them.
- * A JavaScript basename precedes its TypeScript sibling, which is what makes a shadowed config silently inert.
+ * A JavaScript basename precedes its TypeScript sibling, which makes a shadowed config silently inert.
  */
 export const ESLINT_CONFIG_BASENAMES = [
   'eslint.config.js',
@@ -32,13 +32,13 @@ export function listAncestorDirs(dir: string): string[] {
   return dirs;
 }
 
-/** Lists every path an eslint config could occupy across the given directories. */
+/** Lists every path that an eslint config could occupy across the given directories. */
 export function listEslintConfigCandidates(dirs: readonly string[]): string[] {
   return dirs.flatMap((dir) => ESLINT_CONFIG_BASENAMES.map((basename) => resolveDirPath(dir, basename)));
 }
 
 /**
- * Lists the directories holding both a JavaScript and a TypeScript eslint config.
+ * Lists the directories containing both a JavaScript and a TypeScript eslint config.
  * The loader resolves the JavaScript basename first, so the TypeScript sibling that extends this package never runs.
  */
 export function listShadowedEslintConfigDirs(eslintConfigPaths: readonly string[]): string[] {
