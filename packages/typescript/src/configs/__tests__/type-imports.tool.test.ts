@@ -6,10 +6,10 @@ import { fixText } from '../test-utils/fixText.ts';
 const MODULE = "'./type-imports-module.ts'";
 
 /**
- * One row of the import-shape matrix. `imports` holds the statements in one source order; a two-statement
+ * One row of the import-shape matrix. `imports` lists the statements in one source order; a two-statement
  * row also runs reversed. `usage` references every binding the way the row intends, as a type or a value,
  * so that nothing reports an unused binding and `consistent-type-imports` sees the intended kind.
- * `expected` is the import block `--fix` must converge on, one statement per line, in any order.
+ * `expected` is the import block on which `--fix` must converge, one statement per line, in any order.
  */
 interface Row {
   expected: string[];

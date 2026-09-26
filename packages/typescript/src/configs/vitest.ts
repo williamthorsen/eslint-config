@@ -26,12 +26,13 @@ const correctedRules: Linter.RulesRecord = {
 };
 
 // Rules that read type information. Each aborts the whole ESLint run instead of reporting when a file has no parser
-// services, so none can reach a file the type-aware parser skips. The `settings.vitest.typecheck` this config sets is
-// what opens the lookups in `valid-title` and `prefer-describe-function-title`.
+// services, so none can run on a file that the type-aware parser skips. The `settings.vitest.typecheck` value that
+// this config sets enables the lookups in `valid-title` and `prefer-describe-function-title`.
 const typeAwareRules: Linter.RulesRecord = {
   // Looks up a type when a string title names an imported binding.
   'vitest/prefer-describe-function-title': 'off',
-  // Declares `requiresTypeChecking`, so it resolves parser services when the rule is created, before reading any code.
+  // Because it declares `requiresTypeChecking`, it resolves parser services when the rule is created, before reading
+  // any code.
   'vitest/unbound-method': 'off',
   // Looks up the title's type on every `describe`, `test`, and `it`, whatever shape the title takes.
   'vitest/valid-title': 'off',

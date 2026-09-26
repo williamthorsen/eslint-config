@@ -7,7 +7,7 @@ import { createConfig } from '../configs/createConfig.ts';
 
 // ESLint checks that a configured rule exists only when its severity is above `off`, and only for blocks
 // whose `files` glob matches the file being linted. An override that switches a rule off therefore goes
-// inert without a diagnostic once a plugin renames the rule it names.
+// inert without a diagnostic once a plugin renames the rule that it names.
 
 type ConfigPlugin = NonNullable<Config['plugins']>[string];
 

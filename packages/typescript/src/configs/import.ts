@@ -14,9 +14,9 @@ const settings = {
 };
 
 const rules: Linter.RulesRecord = {
-  // The override exempts every bare specifier holding a slash, so a non-relative alias such as `src/foo/bar`
+  // The override exempts every bare specifier containing a slash, so a non-relative alias such as `src/foo/bar`
   // loses enforcement with it; a relative specifier keeps it, its leading dot unmatched by `*`.
-  // The plugin reads this object as the extension map unless it carries `pattern`, `ignorePackages`, or
+  // The plugin reads this object as the extension map unless it contains `pattern`, `ignorePackages`, or
   // `checkTypeImports`; on that branch `pathGroupOverrides` is silently discarded.
   // Option shapes and plugin behaviors: un-ts/eslint-plugin-import-x#508, #509.
   'import-x/extensions': [
@@ -25,7 +25,7 @@ const rules: Linter.RulesRecord = {
     { checkTypeImports: true, pathGroupOverrides: [{ pattern: '*/**', action: 'ignore' }] },
   ],
 
-  // `ignoreExternal` keeps the traversal out of `node_modules`, which costs 20 times the rest of the walk.
+  // `ignoreExternal` keeps the traversal out of `node_modules`, which takes 20 times as long as the rest of the walk.
   // It skips a bare or scoped specifier only, so it drops no relative edge of its own;
   // a cycle running through a workspace sibling imported by its package name goes unreported.
   'import-x/no-cycle': ['error', { ignoreExternal: true }],
@@ -39,8 +39,8 @@ const config = defineConfig(
     settings,
     rules,
   },
-  // Settings merge per linted file, so the alias reaches a TypeScript source alone.
-  // A JavaScript source keeps resolving `./b.js` to `b.js`, which is the file it loads at runtime.
+  // Because settings merge per linted file, the alias applies to a TypeScript source alone.
+  // A JavaScript source keeps resolving `./b.js` to `b.js`, which is the file that it loads at runtime.
   {
     files: patterns.typeScriptFiles,
     settings: {

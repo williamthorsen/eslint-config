@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { baseConfig } from '../../baseConfig.ts';
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
-// `settings['import-x/extensions']` is what lets the rule's module graph open a TypeScript file at all, and
-// the resolver alias is what lets a specifier written `./b.js` name one.
+// `settings['import-x/extensions']` lets the rule's module graph open a TypeScript file at all, and the
+// resolver alias lets a specifier written `./b.js` name one.
 
-describe('the cycle rule the import config sets', () => {
+describe('the cycle rule that the import config sets', () => {
   it.each([
     ['the TypeScript extension', 'cycle-value-a.ts'],
     ['a `.js` extension naming a TypeScript file', 'cycle-jsvalue-a.ts'],
@@ -20,7 +20,7 @@ describe('the cycle rule the import config sets', () => {
 
   // `import-x/no-cycle` skips a statement whose specifiers are all types, through one code path for the
   // top-level spelling and another for the inline one, so a cycle reachable only through them goes
-  // unreported. These cases pin the gap that `sky-pilot/no-type-cycle` covers where a consumer enables it; they
+  // unreported. These cases pin the gap that `sky-pilot/no-type-cycle` covers when a consumer enables it; they
   // fail if upstream starts reporting a type edge, at which point the two rules overlap.
   // The inline spelling survives here although `consistent-type-imports` rewrites it to the top-level one,
   // because the rule keeps a separate path for it and a consumer may have that rule off.
@@ -38,7 +38,7 @@ describe('the cycle rule the import config sets', () => {
 
 // region | Helpers
 
-/** Collects the messages `import-x/no-cycle` reported against the first linted file. */
+/** Collects the messages that `import-x/no-cycle` reported against the first linted file. */
 function listCycleMessages(results: readonly ESLint.LintResult[]): string[] {
   const messages = results[0]?.messages ?? [];
 

@@ -30,7 +30,7 @@ describe(judgeInputCoverage, () => {
     expect(judgeInputCoverage(entries, ESLINT_CONFIG)).toStrictEqual({ kind: 'covered' });
   });
 
-  it('is not covered where a single-character wildcard is one character short', () => {
+  it('is not covered when a single-character wildcard is one character short', () => {
     const entries = [buildChainEntry({ config: { include: ['eslint.config.?'] } })];
 
     expect(judgeInputCoverage(entries, ESLINT_CONFIG)).toStrictEqual({ kind: 'not-enumerated' });
@@ -75,7 +75,7 @@ describe(judgeInputCoverage, () => {
     });
   });
 
-  it('names the base config where the base declared the enumeration', () => {
+  it('names the base config when the base declared the enumeration', () => {
     const entries = [
       buildChainEntry({ config: { compilerOptions: {} } }),
       buildChainEntry({ config: { include: ['vite.config.ts'] }, path: 'tsconfig.base.json' }),
@@ -155,7 +155,7 @@ describe(judgeInputCoverage, () => {
     expect(judgeInputCoverage(entries, ESLINT_CONFIG)).toStrictEqual({ kind: 'not-enumerated' });
   });
 
-  // A file enumerated in another directory says nothing about the one holding the eslint config.
+  // A file enumerated in another directory says nothing about the one containing the eslint config.
   it('is not enumerated when the named TypeScript files are not siblings', () => {
     const entries = [buildChainEntry({ config: { include: ['scripts/build.ts'] } })];
 

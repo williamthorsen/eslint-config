@@ -232,18 +232,18 @@ var default_default = defineRdyKit({
       name: "peers",
       checks: [
         {
-          name: "eslint satisfies the peer range this config declares",
+          name: "eslint satisfies the peer range declared by this config",
           severity: "error",
           skip: () => skipUnlessPeerComparable("eslint"),
           check: () => checkPeerFloor("eslint"),
-          fix: "Upgrade eslint to the version this config requires as a peer"
+          fix: "Upgrade eslint to the version that this config requires as a peer"
         },
         {
-          name: "typescript satisfies the peer range this config declares",
+          name: "typescript satisfies the peer range declared by this config",
           severity: "error",
           skip: () => skipUnlessPeerComparable("typescript"),
           check: () => checkPeerFloor("typescript"),
-          fix: "Upgrade typescript to the version this config requires as a peer"
+          fix: "Upgrade typescript to the version that this config requires as a peer"
         }
       ]
     },
@@ -267,23 +267,23 @@ var default_default = defineRdyKit({
           severity: "error",
           skip: skipUnlessEslintLoadsTypeScript,
           check: noShadowedEslintConfig,
-          fix: "Delete the JavaScript eslint config sharing a directory with a TypeScript one: the loader resolves the JavaScript basename first, so the TypeScript config never runs"
+          fix: "Delete the JavaScript eslint config sharing a directory with a TypeScript one: The loader resolves the JavaScript basename first, so the TypeScript config never runs"
         },
         {
           name: "An eslint config anchors the project service with tsconfigRootDir",
           check: tsconfigRootDirAnchored,
-          fix: "Set parserOptions.tsconfigRootDir (import.meta.dirname) in the root eslint config, so type-aware linting resolves from the repo root rather than the working directory"
+          fix: "Set parserOptions.tsconfigRootDir (import.meta.dirname) in the root eslint config so that type-aware linting resolves from the repo root rather than the working directory"
         },
         {
           name: "An eslint config sets settings.next.rootDir",
           skip: skipUnlessNextRootDirApplies,
           check: nextRootDirSet,
-          fix: "Set settings.next.rootDir (import.meta.dirname) in the eslint config reaching the Next plugin: unset, it falls back to the working directory, and no-html-link-for-pages stops running wherever that holds no pages directory",
+          fix: "Set settings.next.rootDir (import.meta.dirname) in the eslint config enabling the Next plugin: Unset, it falls back to the working directory, and no-html-link-for-pages stops running wherever that holds no pages directory",
           checks: [
             {
               name: "Every settings.next.rootDir is absolute",
               check: nextRootDirsAbsolute,
-              fix: "Replace each relative settings.next.rootDir with an absolute path (import.meta.dirname): the plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched"
+              fix: "Replace each relative settings.next.rootDir with an absolute path (import.meta.dirname): The plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched"
             }
           ]
         }
@@ -296,13 +296,13 @@ var default_default = defineRdyKit({
           name: "The repo's tsconfigs permit a TypeScript-extension import",
           skip: skipUnlessTsconfigPresent,
           check: tsExtensionImportsPermitted,
-          fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly where the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`
+          fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly when the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`
         },
         {
           name: "A tsconfig enumerating an eslint config's siblings names the config itself",
           skip: skipUnlessEnumerated,
           check: eslintConfigEnumerated,
-          fix: `Replace the enumeration with a *.ts glob, which carries the next root-level config file to arrive as well; appending eslint.config.ts is the narrower fallback. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`
+          fix: `Replace the enumeration with a *.ts glob, which also covers any root-level config file added later; appending eslint.config.ts is the narrower fallback. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`
         }
       ]
     },
@@ -313,7 +313,7 @@ var default_default = defineRdyKit({
           name: "No eslint config sets parserOptions.project",
           severity: "error",
           check: noLegacyParserProject,
-          fix: `Remove parserOptions.project: this config enables projectService, and typescript-eslint throws when both are set. Migration: ${MIGRATION_URL}`
+          fix: `Remove parserOptions.project: This config enables projectService, and typescript-eslint throws when both are set. Migration: ${MIGRATION_URL}`
         },
         {
           name: "No tsconfig.eslint.json files remain",
@@ -402,7 +402,7 @@ function nextRootDirSet() {
   const reaching = listEslintConfigsMatching(enablesNextPlugin);
   return {
     ok: false,
-    detail: `The Next plugin is reached in ${reaching.join(", ")} and no eslint config sets settings.next.rootDir`
+    detail: `The Next plugin is enabled in ${reaching.join(", ")} and no eslint config sets settings.next.rootDir`
   };
 }
 function noLegacyParserProject() {
@@ -449,7 +449,7 @@ function rootEslintConfigExtendsThisPackage() {
   if (content === void 0) return false;
   if (content.includes(PACKAGE_NAME)) return true;
   const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
-  return providerDir === void 0 ? false : { ok: true, detail: `reached by source path into ${providerDir}` };
+  return providerDir === void 0 ? false : { ok: true, detail: `imported by source path from ${providerDir}` };
 }
 function skipUnlessEnumerated() {
   const judged = listInputJudgements();
@@ -464,7 +464,7 @@ function skipUnlessEslintLoadsTypeScript() {
 function skipUnlessNextRootDirApplies() {
   if (listEslintConfigsMatching(enablesNextPlugin).length > 0) return false;
   if (listEslintConfigsMatching(setsNextRootDir).length > 0) return false;
-  return "No eslint config reaches the Next plugin or sets settings.next.rootDir";
+  return "No eslint config enables the Next plugin or sets settings.next.rootDir";
 }
 function skipUnlessPeerComparable(name) {
   const comparison = comparePeer(name);

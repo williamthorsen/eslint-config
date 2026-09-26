@@ -1,8 +1,8 @@
 const SINGLE_COMPARATOR = /^(?:>=|\^|~)?(\d+)(?:\.(\d+))?(?:\.(\d+))?$/;
 
 /**
- * Reduces a semver range to its `x.y.z` floor, or `undefined` where no single floor
- * follows. Only ranges with one lower-bound comparator reduce: a union, an exclusive bound, or a
+ * Reduces a semver range to its `x.y.z` floor, or `undefined` when no single floor
+ * follows. Only ranges with one lower-bound comparator reduce: A union, an exclusive bound, or a
  * wildcard yields `undefined` rather than an invented floor.
  */
 export function readVersionFloor(range: string): string | undefined {

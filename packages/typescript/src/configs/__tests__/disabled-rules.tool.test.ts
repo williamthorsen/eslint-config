@@ -10,7 +10,7 @@ const reEnabled: Config = {
   rules: Object.fromEntries(disabledRuleIds.map((ruleId) => [ruleId, 'error'])),
 };
 
-describe('rules the base config disables', () => {
+describe('rules that the base config disables', () => {
   it('report nothing against a fixture that would trip them', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'disabled-rules.ts');
 
@@ -21,7 +21,7 @@ describe('rules the base config disables', () => {
   });
 });
 
-describe('the fixture the disabled rules are measured against', () => {
+describe('the fixture against which the disabled rules are measured', () => {
   it('trips every one of them once they are re-enabled', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings, reEnabled], 'disabled-rules.ts');
 

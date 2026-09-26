@@ -35,10 +35,6 @@ interface DeclaredPaths<Field extends DeclaredField> {
  * two fields are additive, so their union decides the inputs, and `exclude` withdraws an `include`
  * match while having no power over a `files` one. Each field resolves to the nearest config in the
  * chain declaring it, TypeScript replacing rather than merging the three.
- *
- * A chain enumerating nothing is reported as such rather than as a failure: a root declaring
- * `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the
- * file by a route that the config alone does not show.
  */
 export function judgeInputCoverage(entries: readonly TsconfigChainEntry[], filePath: string): InputCoverage {
   const judged = entries[0];
@@ -87,7 +83,7 @@ function findDeclaringEntry(
   return entries.find((entry) => Array.isArray(entry.config[field]));
 }
 
-/** Reports whether a declared path names a TypeScript file sitting in the given directory. */
+/** Reports whether a declared path names a TypeScript file in the given directory. */
 function isSiblingTypeScriptFile(path: string, targetDir: string): boolean {
   if (/[*?]/.test(path) || !TYPESCRIPT_FILE.test(path)) return false;
   return dirname(path) === targetDir;
@@ -113,9 +109,9 @@ function listDeclaredPaths<Field extends DeclaredField>(
 }
 
 /**
- * Reports whether one declared path covers the target. A path holding no wildcard covers the target
- * that it names and, where it names a directory, everything beneath it; TypeScript reads an entry naming
- * neither a file nor a wildcard as a directory.
+ * Reports whether one declared path covers the target. A path containing no wildcard covers the
+ * target that it names and, when it names a directory, everything beneath it; TypeScript reads an
+ * entry naming neither a file nor a wildcard as a directory.
  */
 function matchesPattern(pattern: string, target: string): boolean {
   if (pattern === '' || pattern === '.') return true;

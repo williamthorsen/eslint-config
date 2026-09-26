@@ -4,79 +4,154 @@ rules:
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   doc-descriptions:
     version: '1'
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   em-dash:
     version: '1'
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   inline-comments:
     version: '1'
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   line-wrapping:
     version: '1'
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   plain-speech:
     version: '7'
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   reduced-object-relative:
     version: '1'
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   second-person:
     version: '1'
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   sentence-case:
     version: '1'
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   so:
     version: '1'
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
   where:
     version: '1'
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/.meta
+      - packages/typescript/.readyup
       - packages/typescript/README.md
-      - packages/typescript/src/plugins
+      - packages/typescript/package.json
+      - packages/typescript/src
+      - packages/typescript/tsconfig.json
+      - packages/typescript/types
 rejections:
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/.readyup/kits/default.ts
+    phrase: peer dependency's installed
+    ground: 'not the construction: `installed` modifies `version`, and the relative has its `that`'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/.readyup/kits/default.ts
+    phrase: relative one anchors
+    ground: "not the construction: `anchors` is the clause's main verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/.readyup/kits/default.ts
+    phrase: repo's tsconfigs permit
+    ground: "not the construction: `permit` is the sentence's main verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/.readyup/kits/default.ts
+    phrase: track the package's own peer ranges
+    ground: "not the construction: `track` is the clause's main verb"
   - rule: reduced-object-relative
     rule-version: '1'
     file: packages/typescript/README.md
@@ -107,6 +182,46 @@ rejections:
     file: packages/typescript/README.md
     phrase: Vitest rules read
     ground: "not the construction: 'read' is the sentence's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/__tests__/configured-rules.unit.test.ts
+    phrase: block's rules may name
+    ground: "not the construction: `name` is the clause's main verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/configs/__tests__/import-cycles.tool.test.ts
+    phrase: point the two rules
+    ground: 'not the construction: `at which point` is a pied-piped adjunct'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/configs/__tests__/import-extensions.tool.test.ts
+    phrase: wherever the alias applies
+    ground: 'not the construction: `wherever` is a conjunction'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/configs/__tests__/type-imports.tool.test.ts
+    phrase: row also runs reversed
+    ground: "not the construction: `runs` is the clause's main verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/configs/__tests__/type-imports.tool.test.ts
+    phrase: the way the row intends
+    ground: 'outside the rule: an adjunct relative'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/configs/import.ts
+    phrase: name goes unreported
+    ground: "not the construction: `goes` is the clause's main verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/configs/react.ts
+    phrase: plus the sky-pilot React rules
+    ground: 'not the construction: a coordinated noun phrase with no clause'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/configs/vitest.ts
+    phrase: shape the title takes
+    ground: 'outside the rule: `whatever shape` is a fused free relative'
   - rule: reduced-object-relative
     rule-version: '1'
     file: packages/typescript/src/plugins/rules/__tests__/no-floating-disposable.rules.tool.test.ts
@@ -162,6 +277,26 @@ rejections:
     file: packages/typescript/src/plugins/rules/test-utils/ruleTester.ts
     phrase: suite declares does not typecheck
     ground: "not the construction: the relativizer 'that' is already present"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/readiness/eslint-config-contents.ts
+    phrase: bare value's text
+    ground: 'not the construction: a possessive noun phrase with no relative clause'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/readiness/eslint-config-contents.ts
+    phrase: relative one anchors
+    ground: 'not the construction: `one` is the subject of the main verb'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/readiness/eslint-config-contents.ts
+    phrase: string literals assigned
+    ground: 'not the construction: `assigned` is a passive participle'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/src/readiness/tsconfig-inputs.ts
+    phrase: effective inputs treat
+    ground: 'not the construction: `inputs` is the subject of `treat`'
   - rule: so
     rule-version: '1'
     file: packages/typescript/README.md
@@ -197,6 +332,16 @@ rejections:
     file: packages/typescript/README.md
     phrase: Three kinds of edge are passed over in silence, so a run with nothing reported
     ground: direct result; no earlier so within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/src/configs/test-utils/fixText.ts
+    phrase: ESLint stops after ten passes, so a fixer that never converges reports its residue here.
+    ground: states a direct result, and no other clause-joining so is within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/src/readiness/eslint-config-contents.ts
+    phrase: The plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched.
+    ground: states a direct result, and no other clause-joining so is within three sentences
   - rule: where
     rule-version: '1'
     file: packages/typescript/README.md
@@ -212,6 +357,21 @@ rejections:
     file: packages/typescript/README.md
     phrase: This is the application repository, where no barrel has an entry point
     ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/src/configs/__tests__/import-extensions.tool.test.ts
+    phrase: finds `js` where it expects `js`
+    ground: 'outside the rule: `where` names a position in the specifier'
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/src/configs/__tests__/import-extensions.tool.test.ts
+    phrase: the JavaScript one where it does not
+    ground: "outside the rule: `where` names the files in the alias's glob scope, parallel to `wherever`"
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/src/ignores/tool.ts
+    phrase: the manifest is where those hashes live
+    ground: 'outside the rule: `where` names a place'
   - rule: where
     rule-version: '1'
     file: packages/typescript/src/plugins/rules/__tests__/no-floating-disposable.rules.tool.test.ts

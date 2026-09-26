@@ -30,7 +30,7 @@ describe('configs entry point', () => {
   });
 
   // A type export is erased at runtime, so naming it here is what keeps it reachable from the barrel.
-  it('exports the config-name union alongside the map it keys', () => {
+  it('exports the config-name union alongside the map that it keys', () => {
     const name: configsEntry.ConfigName = 'typeScript';
 
     expect(Object.keys(configsEntry.configs)).toContain(name);
@@ -46,8 +46,8 @@ describe('configs entry point', () => {
   });
 });
 
-// A factory dropped from the map takes its config off the published surface without failing anything else,
-// because each one is reached by key rather than by import.
+// A factory dropped from the map removes its config from the published surface without failing anything else,
+// because each one is accessed by key rather than imported.
 describe('createConfig factories', () => {
   it('exposes one factory per opt-in config', () => {
     expect(Object.keys(rootEntry.createConfig).toSorted()).toStrictEqual([
