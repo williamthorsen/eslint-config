@@ -31,10 +31,10 @@ describe('custom plugin preset integrity', () => {
     }
   });
 
-  // A rule that the plugin registers but a preset leaves out ships disabled under that preset, and no other check
+  // A rule that the plugin registers but a preset leaves out is disabled under that preset, and no other check
   // reports it.
   it.each(presetCases)(
-    `$pluginName "$presetName" enables every rule the plugin registers but the opt-in ones`,
+    `$pluginName "$presetName" enables every rule that the plugin registers but the opt-in ones`,
     ({ optInRules, pluginName, preset }) => {
       const registeredRules = Object.keys(preset.plugins?.[pluginName]?.rules ?? {});
       const expectedRules = registeredRules.filter((ruleName) => !optInRules.includes(ruleName));

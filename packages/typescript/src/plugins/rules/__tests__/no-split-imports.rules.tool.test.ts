@@ -128,7 +128,7 @@ ruleTester.run('no-split-imports', rule, {
       output: null,
     },
     {
-      // Firing: a comment trailing a removed statement would be orphaned, so the fix is withheld
+      // Firing: the fix is withheld because a comment trailing a removed statement would be orphaned
       code: "import { v } from 'm';\nimport type { T } from 'm'; // the type\n",
       errors: [{ messageId: 'splitImports' }],
       output: null,
