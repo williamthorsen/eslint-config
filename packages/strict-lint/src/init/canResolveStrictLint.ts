@@ -8,7 +8,7 @@ const INSTALLED_MANIFEST_PATH = 'node_modules/@williamthorsen/strict-lint/packag
 
 /**
  * Checks whether a config written to `dir` could import `@williamthorsen/strict-lint`, by walking up for an installed
- * copy. `require.resolve` cannot answer: the `./config` subpath declares `import` and `types` alone, so a CommonJS
+ * copy. `require.resolve` cannot answer: The `./config` subpath declares `import` and `types` alone, so a CommonJS
  * resolver reports an installed package as missing. `import.meta.resolve` resolves against the calling module, not
  * against `dir`.
  */

@@ -36,7 +36,7 @@ export async function loadStrictLintConfigs(startDir: string): Promise<StrictLin
 
 /**
  * Returns the nearest declared shared configs, flattened into one element list. The nearest level wins outright rather
- * than merging with the levels above it: a declaration names the configs that one ESLint config extends, and two
+ * than merging with the levels above it: A declaration names the configs that one ESLint config extends, and two
  * levels' lists concatenated would assert a composition that neither level wrote.
  */
 export function resolveSharedConfigs(cascade: StrictLintCascade): Linter.Config[] {
@@ -46,7 +46,7 @@ export function resolveSharedConfigs(cascade: StrictLintCascade): Linter.Config[
 
 // region | Helpers
 
-/** Runs the cascade, mapping the native-TypeScript failure modes that its plain `import()` surfaces. */
+/** Runs the cascade, mapping the native-TypeScript failure modes that its plain `import()` raises. */
 async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigCascade<unknown>> {
   try {
     return await loadConfigCascade({
@@ -118,7 +118,7 @@ function assertIsSharedConfigs(value: unknown, filePath: string): void {
   }
 }
 
-/** Renders a rejected value for a diagnostic, so that an object reports its shape rather than `[object Object]`. */
+/** Renders a rejected value for a diagnostic, so that it shows an object's shape rather than `[object Object]`. */
 function describeValue(value: unknown): string {
   if (typeof value === 'object' && value !== null) {
     return JSON.stringify(value);

@@ -15,7 +15,7 @@ Commands:
 Options:
   -h, --help    Show this help.
 
-Every other option strict-lint accepts is one eslint accepts, forwarded through. The full
+Every other option that strict-lint accepts is an eslint option, forwarded through. The full
 list is in the README: ${README_URL}`);
 }
 
@@ -24,7 +24,7 @@ export function showInitUsage(): void {
   console.info(`Usage: strict-lint init [options]
 
 Scaffolds .config/strict-lint.config.ts in the current directory. Run it from the directory
-whose files the ceilings should govern: configs merge from the project root down, so a config
+whose files the ceilings should govern: Configs merge from the project root down, so a config
 in a package applies to that package alone.
 
 Options:

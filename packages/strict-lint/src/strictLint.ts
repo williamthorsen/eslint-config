@@ -203,7 +203,7 @@ function describeDirs(dirs: readonly string[]): string {
 
 /**
  * Collapses the per-directory walks into one entry per distinct outcome. A monorepo resolves one cascade per
- * directory holding linted files, but only a handful of distinct config sets, and the report names those.
+ * directory containing linted files, but only a handful of distinct config sets, and the report names those.
  */
 function groupByConfigFiles(cascades: ReadonlyMap<string, StrictLintCascade>): CascadeGroup[] {
   const groups = new Map<string, CascadeGroup>();
@@ -221,7 +221,7 @@ function groupByConfigFiles(cascades: ReadonlyMap<string, StrictLintCascade>): C
   return groups.values().toArray();
 }
 
-/** Lists the distinct project roots on which the walks landed: A run spanning one repository reports exactly one. */
+/** Lists the distinct project roots at which the walks stopped: A run spanning one repository reports exactly one. */
 function listDistinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascade>): ProjectRoot[] {
   const roots = new Map<string, ProjectRoot>();
   for (const cascade of cascades.values()) {

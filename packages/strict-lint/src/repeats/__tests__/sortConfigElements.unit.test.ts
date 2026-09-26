@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { sortConfigElements } from '../sortConfigElements.ts';
 
 describe(sortConfigElements, () => {
-  it('drops an element the shared config contributed by reference', () => {
+  it('drops an element that the shared config contributed by reference', () => {
     const sharedElement: Linter.Config = { files: ['**/*.ts'], rules: { 'no-eval': 'error' } };
 
     const sorted = sortConfigElements([sharedElement], [sharedElement]);
@@ -76,7 +76,7 @@ describe(sortConfigElements, () => {
     expect(sorted).toStrictEqual({ own: [], unsortable: [expansion] });
   });
 
-  it('treats a consumer-chosen name carrying no expansion separator as the consumer own', () => {
+  it('treats a consumer-chosen name containing no expansion separator as the consumer own', () => {
     const named: Linter.Config = { name: 'my-overrides', rules: { 'no-eval': 'error' } };
 
     const sorted = sortConfigElements([named], []);

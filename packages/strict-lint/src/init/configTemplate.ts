@@ -9,7 +9,7 @@ export default defineConfig({
     // Cap a rule below \`error\` to keep it a warning under strict-lint:
     // 'unicorn/no-array-reduce': 'warn',
     //
-    // Where the ESLint config extends @williamthorsen/eslint-config-typescript, its \`advisoryRuleSeverities\`
+    // When the ESLint config extends @williamthorsen/eslint-config-typescript, its \`advisoryRuleSeverities\`
     // export is a ready-made set of ceilings: maxSeverity: { ...advisoryRuleSeverities }
   },
 

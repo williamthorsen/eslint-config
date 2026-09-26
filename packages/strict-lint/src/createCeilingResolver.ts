@@ -13,7 +13,7 @@ export interface CeilingResolver {
 
 /**
  * Builds a resolver that anchors the ceiling walk at each linted file, as ESLint anchors its own config lookup. One
- * walk runs per directory: files sharing a directory share a cascade, and the memo holds the in-flight promise, so
+ * walk runs per directory: Files sharing a directory share a cascade, and the memo stores the in-flight promise, so
  * concurrent lookups never start a second walk.
  */
 export function createCeilingResolver(overrides: MaxSeverityMap = {}): CeilingResolver {

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { reportRepeatedRules } from '../reportRepeatedRules.ts';
 
 describe(reportRepeatedRules, () => {
-  it('names the config, the rules it repeats, and how many files each covers', () => {
+  it('names the config, the rules that it repeats, and how many files each covers', () => {
     const lines = capture({
       repeatedRules: [
         { fileCount: 5, ruleId: 'n/no-extraneous-import' },

@@ -16,8 +16,8 @@ export interface SortedConfigElements {
 
 /**
  * Sorts a consumer's config elements into the consumer's own and the unsortable, dropping the shared ones and every
- * element that sets no rule. An element setting no rule resolves no rule value, so the side on which it lands cannot
- * change an answer.
+ * element that sets no rule. An element setting no rule resolves no rule value, so the side to which it is sorted
+ * cannot change an answer.
  */
 export function sortConfigElements(
   consumerElements: readonly Linter.Config[],

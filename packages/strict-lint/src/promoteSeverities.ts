@@ -4,16 +4,16 @@ import { allowsPromotion } from './common/severity.ts';
 import type { CeilingResolver } from './createCeilingResolver.ts';
 import type { MaxSeverityMap } from './types.ts';
 
-/** The severities of a reported problem. A rule that is off reports nothing, so `0` never reaches a message. */
+/** The severities of a reported problem. A rule that is off reports nothing, so no message has severity `0`. */
 type ReportedSeverity = Linter.LintMessage['severity'];
 
 const WARNING = 1;
 const ERROR = 2;
 
 /**
- * Rewrites every warning into an error where the linted file's ceilings allow it, recomputing the counts that ESLint
- * derived from the pre-promotion severities. It spans the whole array that `lintFiles` returns, so a result served
- * from `--cache` is promoted exactly like one linted just now.
+ * Rewrites every warning into an error when the linted file's ceilings allow it, recomputing the counts that ESLint
+ * derived from the pre-promotion severities. Because it spans the whole array that `lintFiles` returns, a result
+ * served from `--cache` is promoted exactly like one linted just now.
  */
 export async function promoteSeverities(
   results: ESLint.LintResult[],
@@ -35,7 +35,7 @@ function countFixableBySeverity(messages: ReadonlyArray<Linter.LintMessage>, sev
 }
 
 /**
- * Promotes one result's messages and restates its counts. It leaves `output` alone: a fix is independent of the
+ * Promotes one result's messages and restates its counts. It leaves `output` alone: A fix is independent of the
  * severity that reported it, and `ESLint.outputFixes` reads that field to write files.
  */
 function promoteResult(result: ESLint.LintResult, ceilings: MaxSeverityMap): ESLint.LintResult {

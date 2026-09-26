@@ -21,19 +21,19 @@ describe(canResolveStrictLint, () => {
     expect(canResolveStrictLint(dir)).toBe(true);
   });
 
-  it('reports an installed package held by an ancestor', () => {
+  it('reports an installed package in an ancestor directory', () => {
     const dir = makeTree({ install: '.' });
 
     expect(canResolveStrictLint(path.join(dir, 'packages/pkg/src'))).toBe(true);
   });
 
-  it('reports no package when the tree holds no node_modules', () => {
+  it('reports no package when the tree contains no node_modules', () => {
     const dir = makeTree({});
 
     expect(canResolveStrictLint(path.join(dir, 'packages/pkg'))).toBe(false);
   });
 
-  it('reports no package when node_modules holds a different package', () => {
+  it('reports no package when node_modules contains a different package', () => {
     const dir = makeTree({});
     writeFile(path.join(dir, 'node_modules/@williamthorsen/tsconfig/package.json'), '{}');
 
