@@ -215,13 +215,13 @@ const ruleDefinition = {
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Disallow importing one module in several statements where one statement could carry every binding',
+      description: 'Disallow importing one module in several statements when one statement could import every binding',
     },
     fixable: 'code',
     schema: [],
     messages: {
       splitImports:
-        "'{{source}}' is imported in {{count}} statements; one statement can carry every binding, with `type` on the specifiers that import types.",
+        "'{{source}}' is imported in {{count}} statements; one statement can import every binding, with `type` on the specifiers that import types.",
     },
   },
 } as const;

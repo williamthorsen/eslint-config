@@ -480,7 +480,7 @@ const ruleDefinition = {
       floatingDisposable:
         'Discarded disposable resource. Bind the result with `{{keyword}}`, or mark the discard with `void`.',
       unboundDisposable:
-        'Resource is acquired and never disposed. Bind it with `{{keyword}}` instead of `{{kind}}`, so it is released when the scope ends.',
+        'Resource is acquired and never disposed. Bind it with `{{keyword}}` instead of `{{kind}}`, so that it is released when the scope ends.',
     },
   },
   create,
