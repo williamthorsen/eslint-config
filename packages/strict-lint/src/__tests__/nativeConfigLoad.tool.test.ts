@@ -51,7 +51,7 @@ describe('native config loading (subprocess)', () => {
     expect(status).toBe(0);
   }, 30_000);
 
-  it('applies an ancestor strict-lint config when none sits beside the ESLint config', () => {
+  it('applies an ancestor strict-lint config when none is beside the ESLint config', () => {
     const dir = makeFixture({
       '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
       'packages/pkg/eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
@@ -75,17 +75,17 @@ describe('native config loading (subprocess)', () => {
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
-  it('applies a strict-lint config below the directory the run starts in', () => {
+  it('applies a strict-lint config below the directory in which the run starts', () => {
     const dir = makePackageCeilingFixture();
 
     const { status, stdout } = runCli(dir, ['packages/pkg/a.js']);
 
-    // Ceilings follow the linted file, so a package's own ceiling governs its files from any working directory.
+    // Because ceilings follow the linted file, a package's own ceiling governs its files from any working directory.
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
-  it('merges a package config over the root config, dropping only the entry it overrides', () => {
+  it('merges a package config over the root config, dropping only the entry that it overrides', () => {
     const dir = makeFixture({
       '.config/strict-lint.config.ts':
         "export default { maxSeverity: { 'no-console': 'warn', 'no-unused-vars': 'warn' } };\n",
@@ -141,14 +141,14 @@ describe('native config loading (subprocess)', () => {
 
     const { status, stdout, stderr } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
 
-    // A run that reached the ancestor would die on its throw instead of reporting the promoted rule.
+    // A run that imported the ancestor would fail on its throw instead of reporting the promoted rule.
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 0 warnings');
     expect(stderr).not.toContain('ancestor config was imported');
   }, 30_000);
 
   it('applies ceilings from a config authored with defineConfig', () => {
-    // The fixture tree carries no `node_modules`, so the config reaches the helper by URL instead of by package name.
+    // The fixture tree has no `node_modules`, so the config imports the helper by URL instead of by package name.
     const dir = makeFixture({
       '.config/strict-lint.config.ts':
         `import { defineConfig } from '${DEFINE_CONFIG_URL}';\n` +
@@ -185,7 +185,7 @@ describe('native config loading (subprocess)', () => {
 
     const { status, stdout } = runCli(dir, ['a.js']);
 
-    // Raising this one is ESLint's own call, through `linterOptions.reportUnusedDisableDirectives`.
+    // Only ESLint raises this one, through `linterOptions.reportUnusedDisableDirectives`.
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
@@ -200,14 +200,14 @@ describe('native config loading (subprocess)', () => {
     const fresh = runCli(dir, cacheArgs);
     const cached = runCli(dir, cacheArgs);
 
-    // The second run is served from `.eslintcache`, whose entries hold the severities that ESLint recorded before
+    // The second run is served from `.eslintcache`, whose entries contain the severities that ESLint recorded before
     // promotion. Promoting only freshly linted files would let this run report a warning and exit 0.
     expect(fs.existsSync(path.join(dir, '.eslintcache'))).toBe(true);
     expect(cached.stdout).toBe(fresh.stdout);
     expect(cached.status).toBe(1);
   }, 30_000);
 
-  it('loads an ESLint config carrying non-erasable syntax, which ESLint transpiles', () => {
+  it('loads an ESLint config containing non-erasable syntax, which ESLint transpiles', () => {
     const dir = makeFixture({
       'eslint.config.ts':
         "enum Severity { Warn = 'warn' }\nexport default [{ rules: { 'no-unused-vars': Severity.Warn } }];\n",
@@ -249,7 +249,7 @@ function makePackageCeilingFixture(): string {
 
 /**
  * Writes the given files into a fresh temp directory and returns its path. The directory gets a project-root marker,
- * so that the fixture bounds config discovery, whatever sits above the system temp directory on the machine running
+ * so that the fixture bounds config discovery, whatever is above the system temp directory on the machine running
  * the suite.
  */
 function makeFixture(files: Record<string, string>): string {

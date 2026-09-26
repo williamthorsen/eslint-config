@@ -39,7 +39,7 @@ describe(wrapNativeTsError, () => {
     expect(wrapNativeTsError(native, '/proj/eslint.config.coffee')).toBeUndefined();
   });
 
-  it('returns undefined for an unrelated error so the caller rethrows it as-is', () => {
+  it('returns undefined for an unrelated error so that the caller rethrows it as-is', () => {
     const uncoded = new Error('nope');
     const otherCode = Object.assign(new Error('not found'), { code: 'ERR_MODULE_NOT_FOUND' });
 

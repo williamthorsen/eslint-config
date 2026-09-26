@@ -6,7 +6,7 @@ import { promoteSeverities } from '../promoteSeverities.ts';
 import type { MaxSeverityMap } from '../types.ts';
 
 describe(promoteSeverities, () => {
-  it('promotes a warning no ceiling caps', async () => {
+  it('promotes a warning capped by no ceiling', async () => {
     const results = [buildResult({ messages: [buildMessage({ ruleId: 'some-rule', severity: 1 })] })];
 
     const [promoted] = await promoteSeverities(results, resolverOf({}));
@@ -14,7 +14,7 @@ describe(promoteSeverities, () => {
     expect(promoted?.messages[0]?.severity).toBe(2);
   });
 
-  it('leaves a warning whose ceiling sits below error', async () => {
+  it('leaves a warning whose ceiling is below error', async () => {
     const results = [buildResult({ messages: [buildMessage({ ruleId: 'some-rule', severity: 1 })] })];
 
     const [promoted] = await promoteSeverities(results, resolverOf({ 'some-rule': 'warn' }));
@@ -22,7 +22,7 @@ describe(promoteSeverities, () => {
     expect(promoted?.messages[0]?.severity).toBe(1);
   });
 
-  it('leaves a severity the config already set to error', async () => {
+  it('leaves a severity that the config already set to error', async () => {
     const results = [buildResult({ messages: [buildMessage({ ruleId: 'some-rule', severity: 2 })] })];
 
     const [promoted] = await promoteSeverities(results, resolverOf({ 'some-rule': 'warn' }));
@@ -89,7 +89,7 @@ describe(promoteSeverities, () => {
     expect(promoted?.fatalErrorCount).toBe(1);
   });
 
-  it('promotes suppressed messages, so a formatter reporting them agrees with the rest', async () => {
+  it('promotes suppressed messages, keeping a formatter that reports them consistent with the rest', async () => {
     const results = [
       buildResult({
         suppressedMessages: [

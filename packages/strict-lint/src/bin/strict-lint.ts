@@ -1,6 +1,6 @@
 import { runInit } from '../init/initCommand.ts';
 
-// `init` is a command only in first position, so a path of that name still lints as `strict-lint ./init`.
+// `init` is a command only in first position, so `strict-lint ./init` still lints a path of that name.
 if (process.argv[2] === 'init') {
   try {
     process.exit(runInit(process.argv.slice(3), process.cwd()));
@@ -10,6 +10,6 @@ if (process.argv[2] === 'init') {
   }
 }
 
-// Import the lint entry point only past the dispatch: it imports `eslint` for value, and `init` runs without it.
+// Import the lint entry point only after the dispatch: It imports `eslint` for value, and `init` runs without it.
 const { strictLint } = await import('../index.ts');
 await strictLint();

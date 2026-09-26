@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 
 // Concurrency runs the lint in worker threads, which receive the ESLint options through `structuredClone`. Only a
-// subprocess exercises that: the threads are real, and a plugin object anywhere in the options fails the clone.
+// subprocess exercises that: The threads are real, and a plugin object anywhere in the options fails the clone.
 
 const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const ROOT_MARKER = 'pnpm-workspace.yaml';
