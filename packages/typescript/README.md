@@ -35,18 +35,18 @@ Everything this package exports is typed with ESLint core's own `Config`, so the
 
 ## Type-aware linting
 
-The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), so each file's owning `tsconfig.json` is discovered automatically; a consuming config does **not** set `parserOptions.project`. Two requirements follow:
+The TypeScript rules are type-aware, and the preset enables typescript-eslint's project service (`parserOptions.projectService`), which discovers each file's owning `tsconfig.json` automatically; a consuming config does **not** set `parserOptions.project`. Two requirements follow:
 
 - Every linted `.ts`/`.tsx` file must belong to a discoverable `tsconfig.json` through its `include`. A file outside every project (for example, a test directory excluded from the build config) must be added to some `tsconfig.json`'s `include`, or ESLint reports it as not found in any project.
 - Set `tsconfigRootDir` (as in Quick start) to anchor resolution at the repo root. Without it, resolution falls back to the current working directory, which varies by how ESLint is launched.
 
 ## Import specifiers
 
-A relative specifier names the TypeScript source it reaches: `./m.ts`, never `./m.js`. `import-x/extensions` reports the `.js` spelling, and the config ships an `import-x` resolver default carrying `extensionAlias` so the rule reads the file the specifier resolves to. The alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source keeps naming the JavaScript file it loads.
+A relative specifier names the TypeScript source that it reaches: `./m.ts`, never `./m.js`. `import-x/extensions` reports the `.js` spelling, and the config supplies an `import-x` resolver default that sets `extensionAlias` so that the rule reads the file to which the specifier resolves. The alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source keeps naming the JavaScript file that it loads.
 
-The rule enforces relative specifiers alone: every bare specifier holding a slash is exempt, which is what lets a package import its own subpath export. A non-relative alias such as `src/foo/bar` is indistinguishable from one and goes unchecked too.
+The rule enforces relative specifiers alone: Every bare specifier holding a slash is exempt, which lets a package import its own subpath export. A non-relative alias such as `src/foo/bar` is indistinguishable from one and goes unchecked too.
 
-TypeScript rejects a `.ts` specifier unless the tsconfig owning the file sets `rewriteRelativeImportExtensions`, which rewrites the extension in output and declarations, or `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`. The first arrived in TypeScript 5.7, which is the peer floor this package declares. The kit below reports a tsconfig setting neither.
+TypeScript rejects a `.ts` specifier unless the tsconfig owning the file sets `rewriteRelativeImportExtensions`, which rewrites the extension in output and declarations, or `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`. The first arrived in TypeScript 5.7, which is the peer floor declared by this package. The kit below reports a tsconfig setting neither.
 
 ESLint merges `settings` deeply, so an override adding a resolver key of its own keeps the shipped alias; see the [`paths` snippet](#import-cycles).
 
@@ -56,7 +56,7 @@ v15 requires a relative specifier to name its TypeScript source, and raises the 
 
 ## Migrating to v13
 
-v13 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: every `import/` rule id, disable directive, and settings key becomes `import-x/`. See [Migrating to v13](https://github.com/williamthorsen/eslint-config/blob/main/docs/migrating-to-v13.md).
+v13 replaces `eslint-plugin-import` with `eslint-plugin-import-x`: Every `import/` rule id, disable directive, and settings key becomes `import-x/`. See [Migrating to v13](https://github.com/williamthorsen/eslint-config/blob/main/docs/migrating-to-v13.md).
 
 ## Migrating from `parserOptions.project`
 
@@ -86,9 +86,9 @@ The default export bundles configs for the following surfaces:
 | `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)     |
 | Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed                                     |
 
-Every `package.json` must declare `author` and `engines`, and may not carry an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not take a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency a package declares must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
+Every `package.json` must declare `author` and `engines`, and may not contain an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not declare a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency declared by a package must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
 
-Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so spec files don't fight the type checker.
+Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely.
 
 ## Type imports
 
@@ -100,27 +100,27 @@ import { Component, type ComponentProps } from './Component.ts';
 
 | Rule                                             | This config | Under `strict-lint` | Enforces                                                                               |
 | ------------------------------------------------ | ----------- | ------------------- | -------------------------------------------------------------------------------------- |
-| `@typescript-eslint/consistent-type-imports`     | `warn`      | `error`             | A type-only specifier carries `type`; a mixed import fixes to the combined form.       |
-| `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type lands on `import type`.                    |
+| `@typescript-eslint/consistent-type-imports`     | `warn`      | `error`             | A type-only specifier has `type`; a mixed import is fixed to the combined form.        |
+| `@typescript-eslint/no-import-type-side-effects` | `warn`      | `warn`              | A statement whose every specifier is a type is written as `import type`.               |
 | `sky-pilot/no-split-imports`                     | `warn`      | `warn`              | Two statements importing one module merge into one, `type` moving onto the specifiers. |
 
-`consistent-type-imports` is promoted to an error because its report is load-bearing under `verbatimModuleSyntax`. The other two report arrangement alone and sit in [`advisoryRuleSeverities`](#advisory-rule-severities), which holds them at `warn` wherever a config applies it; without it `strict-lint` promotes them too.
+`consistent-type-imports` is promoted to an error because under `verbatimModuleSyntax` its report changes what the compiled output imports at runtime. The other two report arrangement alone and are listed in [`advisoryRuleSeverities`](#advisory-rule-severities), which caps them at `warn` in any config that applies it; without it `strict-lint` promotes them too.
 
 An all-type statement stays `import type { Foo }` rather than `import { type Foo }`: Under `verbatimModuleSyntax` TypeScript strips the inline specifiers and leaves a runtime side-effect import behind.
 
-`sky-pilot/no-split-imports` merges every same-module group that one statement can carry: named specifiers, whether `type` is inline or top-level, and at most one default. It leaves alone a side-effect import (`import './m.ts'`), a namespace import, a type-only default (`import type d`), and a statement carrying import attributes, since none can join a named-specifier statement without changing what loads at runtime or which bindings are types; where a comment sits in the group's span, it reports without fixing, so the comment survives. `import-x/no-duplicates` is not set: its fixer mishandles exactly those shapes.
+`sky-pilot/no-split-imports` merges every same-module group that one statement can contain: named specifiers, whether `type` is inline or top-level, and at most one default. It leaves alone a side-effect import (`import './m.ts'`), a namespace import, a type-only default (`import type d`), and a statement with import attributes, since none can join a named-specifier statement without changing what loads at runtime or which bindings are types; when the group's span contains a comment, it reports without fixing, so the comment survives. `import-x/no-duplicates` is not set: Its fixer mishandles exactly those shapes.
 
 ## Import cycles
 
-`import-x/no-cycle` reports a circular import as an error. Nothing else in the toolchain catches one: a cycle compiles clean, and it surfaces at runtime as a binding that is briefly `undefined` rather than as a build failure.
+`import-x/no-cycle` reports a circular import as an error. Nothing else in the toolchain catches one: A cycle compiles clean, and it appears at runtime as a binding that is briefly `undefined` rather than as a build failure.
 
-The config supplies `settings['import-x/extensions']` itself, so the rule needs no wiring on the consumer's side. That setting, which is unrelated to the rule of the same name, lists the extensions the plugin's module graph will open. It defaults to `['.js', '.mjs', '.cjs']`, which is why a graph-walking rule reports nothing on a TypeScript source until it is set, and any other `import-x` rule that the config enables reads it too.
+The config supplies `settings['import-x/extensions']` itself, so the rule needs no wiring on the consumer's side. That setting, which is unrelated to the rule of the same name, lists the file extensions that the plugin opens when it builds its module graph. It defaults to `['.js', '.mjs', '.cjs']`, which is why a graph-walking rule reports nothing on a TypeScript source until it is set, and any other `import-x` rule that the config enables reads it too.
 
 Three kinds of edge are passed over in silence, so a run with nothing reported is not by itself evidence of an acyclic graph:
 
-- **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. TypeScript erases them, so `tsc` cannot catch such a cycle either. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them where a project enables it.
-- **A bare or scoped specifier**, such as `react` or `@scope/pkg`. The config sets `ignoreExternal`, which keeps the traversal out of `node_modules` and cuts the rule's cost by roughly twentyfold. It also drops a cycle running through a workspace sibling imported by its package name.
-- **A specifier the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so enabling it closes this for a cycle carrying a type-only edge; for one whose every edge is a value edge, point the bundled resolver at the project's tsconfig, which needs no additional package:
+- **A type-only import**, written either `import type { T } from './m.ts'` or `import { type T } from './m.ts'`. The rule excludes type-only edges by design. `tsc` cannot catch such a cycle either, because TypeScript erases them. [`sky-pilot/no-type-cycle`](#sky-pilotno-type-cycle) reports them when a project enables it.
+- **A bare or scoped specifier**, such as `react` or `@scope/pkg`. The config sets `ignoreExternal`, which keeps the traversal out of `node_modules` and cuts the rule's run time by roughly twentyfold. It also drops a cycle running through a workspace sibling imported by its package name.
+- **A specifier that the resolver cannot resolve**, such as a tsconfig `paths` alias. An unresolved specifier contributes no edge. `sky-pilot/no-type-cycle` resolves the alias, so enabling it covers this case for a cycle that includes a type-only edge; for one whose every edge is a value edge, point the bundled resolver at the project's tsconfig, which needs no additional package:
 
 ```ts
 export default [
@@ -133,11 +133,11 @@ export default [
 ];
 ```
 
-ESLint merges `settings` deeply, so this adds `tsconfig` to the resolver without displacing the `extensionAlias` the config supplies. A TypeScript file keeps both; a JavaScript file gets the `tsconfig` resolver alone, its specifiers naming the files they load.
+Because ESLint merges `settings` deeply, this adds `tsconfig` to the resolver without displacing the `extensionAlias` that the config supplies. A TypeScript file keeps both; a JavaScript file gets the `tsconfig` resolver alone, its specifiers naming the files that they load.
 
 ## Custom rules (`sky-pilot`)
 
-Seven rules ship in this config's own plugin. The TypeScript config enables six of them, so they reach `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. The seventh, [`no-type-cycle`](#sky-pilotno-type-cycle), sits in neither preset and is enabled per project.
+This config's own plugin contains seven rules. The TypeScript config enables six of them, so they apply to `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. The seventh, [`no-type-cycle`](#sky-pilotno-type-cycle), is in neither preset and is enabled per project.
 
 | Rule                                    | `recommended` | `strict` | Enforces                                                                                |
 | --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
@@ -145,19 +145,19 @@ Seven rules ship in this config's own plugin. The TypeScript config enables six 
 | `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
 | `sky-pilot/no-type-cycle`               | opt-in        | opt-in   | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
 | `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
-| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel sits only at a module the package publishes.                                   |
-| `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used; a discarded one wants `forEach`.                     |
+| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel exists only at a module published by the package.                              |
+| `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used, or the call is written as `forEach`.                 |
 | `sky-pilot/prefer-function-declaration` | `warn`        | `error`  | An untyped function-valued variable is written as a function declaration.               |
 
-`advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: they report defects rather than style advice.
+`advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: They report defects rather than style advice.
 
-`createConfig.react()` adds a rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function a hook returns be memoized.
+`createConfig.react()` adds a rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function returned by a hook be memoized.
 
 ### `sky-pilot/no-floating-disposable`
 
-Reports a resource that is acquired and never released, in either of the two shapes that leak. The message names `using` or `await using` to match the type, and the rule reads types, so it reports nothing where the parser supplies no TypeScript program.
+Reports a resource that is acquired and never released, in either of the two shapes that leak. The message names `using` or `await using` to match the type, and the rule reads types, so it reports nothing when the parser supplies no TypeScript program.
 
-**A discarded result.** A call or `new` expression whose result is dropped and whose type carries `Symbol.dispose` or `Symbol.asyncDispose`. Such a result does nothing unless it is bound: the resource is acquired and never released, and nothing else reports the mistake, since the call typechecks. An awaited call is read through the `await`, so a discarded `Promise<AsyncDisposable>` reports as well.
+**A discarded result.** A call or `new` expression whose result is dropped and whose type has `Symbol.dispose` or `Symbol.asyncDispose`. Such a result does nothing unless it is bound: The resource is acquired and never released, and nothing else reports the mistake, since the call typechecks. The rule reads an awaited call through the `await`, and reports a discarded `Promise<AsyncDisposable>` as well.
 
 ```ts
 captureOutput(); // reported: the capture is installed and never removed
@@ -167,7 +167,7 @@ await openHandle(); // reported: `openHandle` returns a Promise<AsyncDisposable>
 await using handle = await openHandle(); // fine
 ```
 
-**A resource bound to a plain declaration.** A `const`, `let`, or `var` whose initializer acquires a resource the declaring scope then keeps. This leaks exactly as a discarded call does, and less visibly: the variable is read, so `no-unused-vars` reports nothing either.
+**A resource bound to a plain declaration.** A `const`, `let`, or `var` whose initializer acquires a resource that the declaring scope then keeps. This leaks exactly as a discarded call does, and less visibly: Because the variable is read, `no-unused-vars` reports nothing either.
 
 ```ts
 function assertsOnOutput() {
@@ -176,7 +176,7 @@ function assertsOnOutput() {
 }
 ```
 
-A suggestion rewrites the declaration keyword, making the fix one editor action. It is withheld where no valid edit exists: an `await using` outside an `async` function, and a declaration holding more than one declarator. The report still fires in both.
+A suggestion rewrites the declaration keyword, making the fix one editor action. The rule withholds it when no valid edit exists: an `await using` outside an `async` function, and a declaration holding more than one declarator. The report still fires in both.
 
 `checkDeclarations: false` keeps the discarded half and drops this one:
 
@@ -192,9 +192,9 @@ export default defineConfig(config, {
 
 Three narrowings apply to both shapes:
 
-- A call that yields its own receiver chains onto a resource the caller already holds, so `server.listen(3000)` is left alone even though a `net.Server` is async-disposable. Either a signature declaring `this` as its return type or a call whose type is the receiver's own qualifies, so a fluent method is covered whether it annotates `this`, annotates its own class type, or leaves the return inferred. The declaration is taken at its word, so a method that builds a fresh resource while declaring one of those returns is skipped too.
-- A call whose type is identical to one of its argument types has passed ownership on rather than acquired anything. That is the shape of a registrar such as `<T extends Disposable>(resource: T): T`. The comparison is of types, not resources, so a callee that builds a fresh resource while declaring the type it received on both sides is skipped too.
-- An `allow` option names callees the rule leaves alone, whether the result is discarded on purpose or is not a resource at all. It matches the callee's final name, so `timers.setTimeout` matches alongside `setTimeout`, and it adds to the defaults rather than replacing them:
+- A call that yields its own receiver chains onto a resource that the caller already owns, so `server.listen(3000)` is left alone even though a `net.Server` is async-disposable. Either a signature declaring `this` as its return type or a call whose type is the receiver's own qualifies. A fluent method is covered whether it annotates `this`, annotates its own class type, or leaves the return inferred. The rule trusts the declared return type: A method that builds a fresh resource while declaring one of those returns is skipped too.
+- A call whose type is identical to one of its argument types has passed ownership on rather than acquired anything. That is the shape of a registrar such as `<T extends Disposable>(resource: T): T`. The comparison is of types, not resources, so a callee that builds a fresh resource while declaring the type that it received on both sides is skipped too.
+- An `allow` option names callees that the rule leaves alone, whether the result is discarded on purpose or is not a resource at all. It matches the callee's final name (`timers.setTimeout` matches alongside `setTimeout`) and adds to the defaults rather than replacing them:
 
 ```js
 export default defineConfig(config, {
@@ -204,17 +204,17 @@ export default defineConfig(config, {
 });
 ```
 
-The defaults cover two families. Node's timer globals, `setImmediate`, `setInterval`, and `setTimeout`, return a `Timeout` implementing `Symbol.dispose`, so a bare `setTimeout(fn, ms);` would otherwise report a resource whose discard is the point. `node:crypto`'s stream factories, `createCipheriv`, `createDecipheriv`, `createHash`, `createHmac`, `createSign`, and `createVerify`, return a `Transform` or `Writable`, inheriting `Symbol.asyncDispose` from the stream base while owning no descriptor, socket, process, or lock: nothing is released, so nothing needs binding. Both families are matched by name alone, so a userland `createHash` is exempt alongside `node:crypto`'s, and no option narrows the defaults back.
+The defaults cover two families. Node's timer globals, `setImmediate`, `setInterval`, and `setTimeout`, return a `Timeout` implementing `Symbol.dispose`, so the rule would otherwise report a bare `setTimeout(fn, ms);`, a resource that is meant to be discarded. `node:crypto`'s stream factories, `createCipheriv`, `createDecipheriv`, `createHash`, `createHmac`, `createSign`, and `createVerify`, return a `Transform` or `Writable`, inheriting `Symbol.asyncDispose` from the stream base while owning no descriptor, socket, process, or lock: Nothing needs binding, because nothing is released. The rule matches both families by name alone. A userland `createHash` is exempt alongside `node:crypto`'s, and no option narrows the defaults back.
 
-A declaration is left alone in five further cases, each one a place where `using` would be the wrong binding:
+A declaration is left alone in five further cases, in each of which `using` would be the wrong binding:
 
 - **The resource escapes.** A variable that is returned, passed as an argument, assigned onward, placed in a literal, reassigned, or read from a nested function belongs to something outliving the declaring scope. Only a member access on the resource itself can keep the declaration reportable.
-- **It is handed a callback.** A call on the resource, or on one of its properties, that takes a function argument schedules work the block does not contain, as `child.on('close', resolve)` and `child.stdout.on('data', collect)` do; `using` would release the resource before the callback runs. The argument is recognized by its type, so a named handler counts alongside an inline arrow. No signature distinguishes a retained listener from a synchronous higher-order call, so `captured.lines.forEach(...)` leaves the declaration alone too, and one such reference is enough to do it. An argument whose type withholds the answer, a spread or an `any`, is taken to be one.
-- **It sits at module or global scope.** `using` releases a module-level resource at the end of module evaluation, before any importer runs, so a singleton declared there must keep its `const`.
+- **It is handed a callback.** A call on the resource, or on one of its properties, that takes a function argument schedules work that the block does not contain, as `child.on('close', resolve)` and `child.stdout.on('data', collect)` do; `using` would release the resource before the callback runs. The argument is recognized by its type, so a named handler counts alongside an inline arrow. Because no signature distinguishes a retained listener from a synchronous higher-order call, `captured.lines.forEach(...)` leaves the declaration alone too, and one such reference is enough to do it. An argument whose type does not show whether it is a function, such as a spread or an `any`, is taken to be one.
+- **It is at module or global scope.** `using` releases a module-level resource at the end of module evaluation, before any importer runs, so a singleton declared there must keep its `const`.
 - **It is released by hand.** A `Symbol.dispose` or `Symbol.asyncDispose` call on the variable already frees the resource. Preferring `using` over a hand-written `finally` belongs to `unicorn/prefer-dispose`.
-- **A `var` is read past its block.** `using` is block-scoped, so rebinding one would leave the later read out of scope.
+- **A `var` is read past its block.** Because `using` is block-scoped, rebinding one would leave the later read out of scope.
 
-A deliberate discard is marked with `void`, or with an inline disable carrying its reason:
+A deliberate discard is marked with `void`, or with an inline disable that states its reason:
 
 ```ts
 void captureOutput();
@@ -223,13 +223,13 @@ void captureOutput();
 acquireHandle();
 ```
 
-typescript-eslint's `no-misused-disposable` covers this ground and more, but it is [still in draft](https://github.com/typescript-eslint/typescript-eslint/pull/12659).
+typescript-eslint's `no-misused-disposable` covers these cases and more, but it is [still in draft](https://github.com/typescript-eslint/typescript-eslint/pull/12659).
 
 ### `sky-pilot/no-type-cycle`
 
-Reports a cycle in the module graph that passes through at least one type-only import. The rule sits in neither preset, because TypeScript erases a type-only import: the cycle is cut at that edge, so it cannot exist in the emitted JavaScript.
+Reports a cycle in the module graph that passes through at least one type-only import. The rule is in neither preset, because TypeScript erases a type-only import: The cycle is cut at that edge, so it cannot exist in the emitted JavaScript.
 
-One configuration keeps the cycle in the output, and is the reason to enable the rule. Under `verbatimModuleSyntax` TypeScript strips an inline type specifier without dropping the statement, so `import { type A } from './a.ts'` emits `import {} from './a.ts'`, a live module load that carries the cycle into the output. `import-x/no-cycle` does not report that case: it treats a statement whose specifiers are all inline `type` as type-only and skips it, which leaves this rule as the only cover.
+One configuration keeps the cycle in the output, and is the reason to enable the rule. Under `verbatimModuleSyntax` TypeScript strips an inline type specifier without dropping the statement: `import { type A } from './a.ts'` emits `import {} from './a.ts'`, a live module load that keeps the cycle in the output. `import-x/no-cycle` does not report that case: It treats a statement whose specifiers are all inline `type` as type-only and skips it, which leaves this rule as the only one that reports it.
 
 ```ts
 export default [
@@ -240,9 +240,9 @@ export default [
 ];
 ```
 
-Without `verbatimModuleSyntax` the rule still reports every cycle it finds, as a layering defect rather than a runtime one. Enabled either way, the two cycle rules cover the ground between them on TypeScript sources: `import-x/no-cycle` reports a cycle whose every edge is a value edge, and this rule reports every other cycle.
+Without `verbatimModuleSyntax` the rule still reports every cycle that it finds, as a layering defect rather than a runtime one. Enabled either way, the two cycle rules divide the cycles on TypeScript sources between them: `import-x/no-cycle` reports a cycle whose every edge is a value edge, and this rule reports every other cycle.
 
-The graph comes from the TypeScript program the project service builds, so a specifier resolves as `tsc` resolves it. A tsconfig `paths` alias and a `.d.ts` both contribute edges, neither of which the bundled `import-x` resolver reaches. The rule reads the program, so it reports nothing where the parser supplies none.
+The graph comes from the TypeScript program built by the project service, so a specifier resolves as `tsc` resolves it. A tsconfig `paths` alias and a `.d.ts` both contribute edges, neither of which the bundled `import-x` resolver resolves. Because the rule reads the program, it reports nothing when the parser supplies none.
 
 Five spellings make a type-only edge, matching what TypeScript erases:
 
@@ -254,28 +254,28 @@ export { type T } from './m.ts';
 type Q = import('./m.ts').T;
 ```
 
-The report sits on the statement that begins the cycle and names the chain of modules, so a cycle spanning a directory of layered modules reads as a path rather than as one file.
+The rule reports at the statement that begins the cycle, and the message names the chain of modules: A cycle spanning a directory of layered modules appears as a path rather than as one file.
 
 Four things are passed over:
 
 - **A cycle whose every edge is a value edge**, which `import-x/no-cycle` reports. Reporting it here too would put two messages on one statement.
 - **A dynamic `import('./m.ts')` expression**, which loads asynchronously and so leaves no binding briefly `undefined`.
-- **A file from `node_modules` or from TypeScript's own `lib`**, excluded by where it comes from rather than by what kind of file it is: a hand-written `.d.ts` in the project's own source is part of the graph.
-- **A JavaScript file**, which no type-aware rule reaches. `import-x/no-cycle` is the only cycle guard there.
+- **A file from `node_modules` or from TypeScript's own `lib`**, excluded by where it comes from rather than by what kind of file it is: A hand-written `.d.ts` in the project's own source is part of the graph.
+- **A JavaScript file**, which no type-aware rule checks. `import-x/no-cycle` is the only cycle guard there.
 
 The rule takes no options.
 
 ### `sky-pilot/no-unpublished-barrel`
 
-Reports a file whose body holds only imports and re-exports (a barrel) unless the package publishes that module. Importing one symbol through a barrel loads every module the barrel re-exports, so a barrel earns its place at a package's entry point and nowhere else.
+Reports a file whose body contains only imports and re-exports (a barrel) unless the package publishes that module. Importing one symbol through a barrel loads every module re-exported by the barrel, so a barrel is justified at a package's entry point and nowhere else.
 
-The exemption is computed from the linted file's own manifest, so a consuming repo configures nothing. The rule finds the nearest ancestor `package.json`, collects every string appearing anywhere in its `exports` value, and leaves the file alone when either the path its build emits or the file's own package-relative path is among them. Matching the strings rather than the keys covers the bare-string form (`"exports": "./dist/esm/index.js"`) and the conditional-object form alike, and needs no list of condition names. A collected target containing `*` covers every path the `*` spans, `/` included, as Node's subpath patterns do, and one ending in `/` covers everything below it.
+The rule computes the exemption from the linted file's own manifest; a consuming repo configures nothing. The rule finds the nearest ancestor `package.json`, collects every string appearing anywhere in its `exports` value, and leaves the file alone when either the path emitted by its build or the file's own package-relative path is among them. Matching the strings rather than the keys covers the bare-string form (`"exports": "./dist/esm/index.js"`) and the conditional-object form alike, and needs no list of condition names. A collected target containing `*` covers every path that the `*` spans, `/` included, as Node's subpath patterns do, and one ending in `/` covers everything below it.
 
-That second match is what reaches a package publishing source instead of a build. A manifest naming `./src/mod.ts` states that `src/mod.ts` is an entry point, and no source-to-build mapping could say the same, since the mapping always rewrites the extension. The match disregards `sourceDir`, so a package with no source directory publishes `./mod.ts` the same way, and it matches by the rules above, so a `*` or trailing-slash target spans source paths as it spans built ones.
+That second match covers a package that publishes source instead of a build. A manifest naming `./src/mod.ts` states that `src/mod.ts` is an entry point, and no source-to-build mapping could say the same, since the mapping always rewrites the extension. The match disregards `sourceDir`, so a package with no source directory publishes `./mod.ts` the same way. It also follows the rules above: A `*` or trailing-slash target spans source paths as it spans built ones.
 
-Where the manifest declares no `exports`, the legacy `bin`, `main`, `module`, and `types` fields name the published paths in its place. A manifest declaring none of them publishes nothing, so every barrel under it is reported: this is the application repository, where no barrel has an entry point to sit at. A file with no ancestor `package.json` at all is reported by nothing, an absent manifest being an absence of information rather than a statement that the package publishes nothing.
+When the manifest declares no `exports`, the legacy `bin`, `main`, `module`, and `types` fields name the published paths in its place. Because a manifest declaring none of them publishes nothing, every barrel under it is reported: This is the application repository, where no barrel has an entry point. A file with no ancestor `package.json` at all is reported by nothing, an absent manifest being an absence of information rather than a statement that the package publishes nothing.
 
-Mapping a source path onto the path the build emits is the one input the manifest does not supply. It comes from an option, which defaults to the layout this package itself uses:
+Mapping a source path onto the path emitted by the build is the one input that the manifest does not supply. It comes from an option, which defaults to the layout that this package itself uses:
 
 ```js
 export default defineConfig(config, {
@@ -285,9 +285,9 @@ export default defineConfig(config, {
 });
 ```
 
-A mapping that does not match the build reports every published entry point rather than going quiet, and the message names both the path it computed and the file's own, so the setting to correct is visible in the report. A package that publishes source needs no such setting, its entry points matching by their own paths.
+When the mapping does not match the build, the rule reports every published entry point rather than going quiet, and the message names both the path that it computed and the file's own, so the setting to correct is visible in the report. A package that publishes source needs no such setting, its entry points matching by their own paths.
 
-A file under `__fixtures__`, `__mocks__`, `__tests__`, or `test-utils` is exempt, since test scaffolding ships nothing. A barrel at a vendor boundary, a directory holding the only permitted import site for an external dependency, takes an inline disable comment naming that boundary:
+A file under `__fixtures__`, `__mocks__`, `__tests__`, or `test-utils` is exempt, since test scaffolding is not published. A barrel at a vendor boundary, a directory containing the only permitted import site for an external dependency, takes an inline disable comment naming that boundary:
 
 ```ts
 /* eslint-disable sky-pilot/no-unpublished-barrel -- the sole permitted import site for the vendor SDK */
@@ -327,7 +327,7 @@ export default defineConfig(
 
 ## Framework configs (lazy-loaded)
 
-Framework-specific configs are exposed via `createConfig` so their plugin dependencies (`eslint-plugin-react`, `@next/eslint-plugin-next`, etc.) load only when used. Every factory resolves to a config array, so spread each one (or pass them through `extends`):
+Framework-specific configs are exposed via `createConfig` so that their plugin dependencies (`eslint-plugin-react`, `@next/eslint-plugin-next`, etc.) load only when used. Every factory resolves to a config array, so spread each one (or pass them through `extends`):
 
 ```js
 import { defineConfig } from 'eslint/config';
@@ -375,7 +375,7 @@ export default defineConfig(config, ...(await createConfig.react()), {
 });
 ```
 
-`createConfig.next()` leaves `settings.next.rootDir` to the consumer, and `no-html-link-for-pages` needs it to be absolute. The plugin globs the value against the working directory, and falls back to that directory where the setting is absent. Under either, a repo linted from anywhere but the app's own directory finds no pages directory, and the rule stops running without failing the lint run:
+`createConfig.next()` leaves `settings.next.rootDir` to the consumer, and `no-html-link-for-pages` needs it to be absolute. The plugin globs the value against the working directory, and falls back to that directory when the setting is absent. Under either, a repo linted from anywhere but the app's own directory finds no pages directory, and the rule stops running without failing the lint run:
 
 ```js
 export default defineConfig(config, ...(await createConfig.next()), {
@@ -428,11 +428,11 @@ What separates them decides where a new glob belongs. `commonIgnores` collects t
 
 - Build output: `dist/`, `dist-ssr/`, `coverage/`, and minified files.
 - Directories holding nothing a developer authored: `local/` and `tmp/`.
-- Files no rule can usefully report on: shell scripts and lockfiles, which no config parses; `CHANGELOG*` and `LICENSE*`; and `**/*.md/*.ts`, which parses but belongs to no tsconfig, so the project service cannot type it.
+- Files on which no rule can usefully report: shell scripts and lockfiles, which no config parses; `CHANGELOG*` and `LICENSE*`; and `**/*.md/*.ts`, which parses but belongs to no tsconfig, so the project service cannot type it.
 
-None of it turns on which tools a repo runs, which is what separates this list from `toolIgnores`.
+None of it depends on which tools a repo runs, which separates this list from `toolIgnores`.
 
-`toolIgnores` collects content that a named developer tool owns and generates, so its entries are facts about which tools a repo happens to run:
+`toolIgnores` collects content that a named developer tool owns and generates. Its entries are facts about which tools a repo happens to run:
 
 | Entry                       | Owner                            |
 | --------------------------- | -------------------------------- |
@@ -442,13 +442,13 @@ None of it turns on which tools a repo runs, which is what separates this list f
 | `**/.rovo/**`               | Rovo Dev                         |
 | `**/.rovodev/**`            | Rovo Dev                         |
 
-Only the readyup entries are scoped, because `.readyup/` also holds authored TypeScript: the kit declaration and the predicates it composes, which stay linted. The two entries that are ignored are ones rdy records a hash of, so an autofix rewriting either makes the kit report as stale.
+Only the readyup entries are scoped, because `.readyup/` also contains authored TypeScript: the kit declaration and the predicates that it composes, which stay linted. The two entries that are ignored are ones of which rdy records a hash, so an autofix rewriting either makes the kit report as stale.
 
 ## Advisory rule severities
 
-`advisoryRuleSeverities` maps the rules this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `sky-pilot/no-split-imports`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules this config disables outright are not included.
+`advisoryRuleSeverities` maps the rules that this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `sky-pilot/no-split-imports`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules that this config disables outright are not included.
 
-Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so a stricter CI run still fails on genuine defects only:
+Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so that a stricter CI run still fails on genuine defects only:
 
 ```ts
 // .config/strict-lint.config.ts
@@ -468,7 +468,7 @@ import { advisoryRuleSeverities } from '@williamthorsen/eslint-config-typescript
 export default [{ rules: { ...advisoryRuleSeverities } }];
 ```
 
-An unscoped block applies `'warn'` everywhere, including in test files, where this config turns `unicorn/consistent-function-scoping` and `unicorn/no-useless-undefined` off. Scope the block with `files` to keep those exceptions.
+An unscoped block applies `'warn'` everywhere, including in test files, in which this config turns `unicorn/consistent-function-scoping` and `unicorn/no-useless-undefined` off. Scope the block with `files` to keep those exceptions.
 
 ## Peer dependencies
 
@@ -483,7 +483,7 @@ An unscoped block applies `'warn'` everywhere, including in test files, where th
 
 ## Checking the configuration
 
-This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether the project is wired correctly for the installed version. It is a migration aid rather than a CI gate: only a failure that stops ESLint loading or running the config is reported as an error, and everything else caps at a warning.
+This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether the project is wired correctly for the installed version. It is a migration aid rather than a CI gate: Only a failure that stops ESLint loading or running the config is reported as an error, and everything else caps at a warning.
 
 Run it once:
 
@@ -501,17 +501,17 @@ export default defineRdyConfig({
 });
 ```
 
-The `readyup >=0.33.0` peer names the version the kit is developed and tested against. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
+The `readyup >=0.33.0` peer names the version against which the kit is developed and tested. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
 
-The kit runs at the version resolved from the project's `node_modules`, so it reports whether the configuration matches that version. It never reports whether that version is current.
+The kit runs at the version resolved from the project's `node_modules` and reports whether the configuration matches that version. It never reports whether that version is current.
 
-The check that the root config extends this package matches the package specifier as text, or a path into a workspace that provides the package, so a config reaching it through a local re-export or a path alias is reported as not extending it.
+The check that the root config extends this package matches the package specifier as text, or a path into a workspace that provides the package: A config reaching it through a local re-export or a path alias is reported as not extending it.
 
-The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. A config reaching the factory through a local re-export names neither, so one that also sets no `rootDir` goes unreported rather than reporting a wrong failure. One that does set it is still judged on the value it writes.
+The `settings.next.rootDir` check matches `createConfig.next()` or the plugin's own specifier the same way. Because a config reaching the factory through a local re-export names neither, one that also sets no `rootDir` goes unreported rather than reporting a wrong failure. One that does set it is still judged on the value that it writes.
 
-The extension-import check reports a `tsconfig.json` whose effective compiler options permit no import path ending in a TypeScript extension, which the config requires of every relative specifier naming a TypeScript source. It reads the one at the repo root and one per workspace, resolving each setting through the `extends` chain, so a value a base supplies counts as the consumer's own. A repo declaring no `tsconfig.json` holds no TypeScript to measure, and the check skips.
+The extension-import check reports a `tsconfig.json` whose effective compiler options permit no import path ending in a TypeScript extension, which the config requires of every relative specifier naming a TypeScript source. It reads the one at the repo root and one per workspace, resolving each setting through the `extends` chain, so a value supplied by a base counts as the consumer's own. A repo declaring no `tsconfig.json` contains no TypeScript to measure, and the check skips.
 
-The enumeration check judges each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, goes unread. It reports a `files` or `include` that names the eslint config's siblings one by one without naming the config itself. Where nothing enumerates, it stays silent rather than reporting every project whose inputs miss the file: a root declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the config by a route its own inputs do not show.
+The enumeration check judges each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config that the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, goes unread. It reports a `files` or `include` that names the eslint config's siblings one by one without naming the config itself. When nothing enumerates, it stays silent rather than reporting every project whose inputs omit the file: A root declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the config by a route that its own inputs do not show.
 
 ## License
 

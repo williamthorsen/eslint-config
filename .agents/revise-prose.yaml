@@ -1,71 +1,112 @@
 rules:
   capitalization-after-colon:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   doc-descriptions:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   em-dash:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   inline-comments:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   line-wrapping:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   plain-speech:
     version: '7'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   reduced-object-relative:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   second-person:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   sentence-case:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   so:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
   where:
     version: '1'
-    swept-at: 2026-09-25
+    swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/typescript/README.md
       - packages/typescript/src/plugins
 rejections:
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: argument types has passed
+    ground: "not the construction: 'has passed' is the main clause's verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: composition typechecks unchanged
+    ground: "not the construction: 'typechecks' is the clause's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: file it is
+    ground: 'outside the rule: an interrogative clause, not a relative with a lexical head'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: name the published paths
+    ground: "not the construction: 'name' is the sentence's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: not the JavaScript test files
+    ground: "not the construction: the clause's verb is 'get'"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: Vitest rules read
+    ground: "not the construction: 'read' is the sentence's own verb"
   - rule: reduced-object-relative
     rule-version: '1'
     file: packages/typescript/src/plugins/rules/__tests__/no-floating-disposable.rules.tool.test.ts
@@ -121,6 +162,56 @@ rejections:
     file: packages/typescript/src/plugins/rules/test-utils/ruleTester.ts
     phrase: suite declares does not typecheck
     ground: "not the construction: the relativizer 'that' is already present"
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: before any importer runs, so a singleton declared there must keep its `const`.
+    ground: direct result; no earlier so within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: Every factory resolves to a config array, so spread each one
+    ground: direct result; no earlier so within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: resolving each setting through the `extends` chain, so a value
+    ground: direct result; no earlier so within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: return a `Timeout` implementing `Symbol.dispose`, so
+    ground: direct result; no earlier so within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: The alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source keeps naming
+    ground: direct result; no earlier so within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: The comparison is of types, not resources, so a callee
+    ground: direct result; no earlier so within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: Three kinds of edge are passed over in silence, so a run with nothing reported
+    ground: direct result; no earlier so within three sentences
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: decides where a new glob belongs
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: excluded by where it comes from
+    ground: "outside the rule: 'where' names a place of origin"
+  - rule: where
+    rule-version: '1'
+    file: packages/typescript/README.md
+    phrase: This is the application repository, where no barrel has an entry point
+    ground: "outside the rule: 'where' names a place"
   - rule: where
     rule-version: '1'
     file: packages/typescript/src/plugins/rules/__tests__/no-floating-disposable.rules.tool.test.ts
