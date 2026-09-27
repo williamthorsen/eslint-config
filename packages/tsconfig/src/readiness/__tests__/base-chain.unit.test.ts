@@ -17,7 +17,7 @@ describe(findBaseIndex, () => {
     expect(findBaseIndex(entries)).toBe(2);
   });
 
-  // Under a workspace link the base's real path is inside the repo, so that path does not name the package.
+  // Under a workspace link the base's real path is inside the repo, so it does not name the package.
   it('locates the base whose path is a workspace directory', () => {
     const entries = [
       buildChainEntry({ path: 'tsconfig.json' }),
