@@ -3,6 +3,6 @@ import baseConfig, { createConfig } from '../packages/typescript/src/index.ts';
 
 export default defineConfig({
   // Import from source, as `eslint.config.ts` does. The package specifiers resolve through `exports` to `dist/esm`,
-  // whose elements are different objects and match nothing that the config array holds.
+  // whose elements are different objects and match nothing that the config array contains.
   sharedConfigs: [baseConfig, await createConfig.vitest()],
 });

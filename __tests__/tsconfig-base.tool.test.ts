@@ -16,7 +16,7 @@ const consumerOwnedKeys = new Set(['jsx', 'paths', 'types']);
 
 // Keys that the base adds to the inlined `@tsconfig/strictest` settings. Every other key that it declares
 // must come from upstream; a leftover is drift. A key listed here that upstream also starts setting
-// fails both drift assertions, which is the intent: the collision is a decision, not a merge.
+// fails both drift assertions, which is the intent: The collision is a decision, not a merge.
 const nodeLayerKeys = [
   'allowImportingTsExtensions',
   'lib',
@@ -42,7 +42,7 @@ describe('@williamthorsen/tsconfig base config', () => {
     expect(options.esModuleInterop).toBe(true);
   });
 
-  it('supplies the Node and build options strictest omits', () => {
+  it('supplies the Node and build options that strictest omits', () => {
     expect(options.allowImportingTsExtensions).toBe(true);
     // A `--lib` name is an alias: TypeScript resolves a superseded one to its numbered successor with no
     // diagnostic, so this array names the file actually loaded. A numbered successor appearing here is the
@@ -55,7 +55,7 @@ describe('@williamthorsen/tsconfig base config', () => {
     expect(options.target).toBe(ts.ScriptTarget.ES2025);
   });
 
-  it('resolves the consumer-owned keys the root declares', () => {
+  it('resolves the consumer-owned keys that the root declares', () => {
     expect(options.types).toStrictEqual(['node']);
     expect(options.paths).toStrictEqual({ '~/*': ['./*'] });
     expect(options.jsx).toBe(ts.JsxEmit.ReactJSX);
@@ -91,7 +91,7 @@ describe('@williamthorsen/tsconfig base config', () => {
   });
 
   it('declares nothing beyond @tsconfig/strictest but the Node layer', () => {
-    // Catches the direction that the mirror test can't: a setting that upstream has dropped survives here as an
+    // Catches the direction that the mirror test can't: A setting that upstream has dropped survives here as an
     // unexplained key rather than as a missing one.
     const upstreamKeys = new Set(Object.keys(readUpstreamCompilerOptions()));
     const beyondUpstream = Object.keys(readBaseCompilerOptions()).filter((key) => !upstreamKeys.has(key));

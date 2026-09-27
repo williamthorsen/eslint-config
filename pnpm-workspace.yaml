@@ -5,7 +5,7 @@ allowBuilds:
   esbuild: true
   lefthook: true
   # Ships a prebuilt binding per platform as an optional dependency; the postinstall builds from
-  # source only where no binding exists, so it never needs to run here.
+  # source only when no binding exists, so it never needs to run here.
   unrs-resolver: false
 
 catalog:

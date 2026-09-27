@@ -1,9 +1,22 @@
 rules:
   capitalization-after-colon:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: false
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -13,11 +26,29 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   doc-descriptions:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: false
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -27,11 +58,29 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   em-dash:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: true
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -41,11 +90,29 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   inline-comments:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: false
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -55,11 +122,29 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   line-wrapping:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: false
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -69,23 +154,77 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   negative-quantifier:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: true
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/tsconfig
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   plain-speech:
     version: '8'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: false
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/tsconfig
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   reduced-object-relative:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: true
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -95,11 +234,29 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   second-person:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: true
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -109,11 +266,29 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   sentence-case:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: false
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -123,11 +298,29 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   so:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: true
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -137,11 +330,29 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
   where:
     version: '1'
-    swept-at: 2026-09-26
+    swept-at: 2026-09-27
     detected: true
     roots:
+      - .agents/preferences.yaml
+      - .claude
+      - .config
+      - .github
+      - .meta
+      - .prettierrc.js
+      - AGENTS.md
+      - README.md
+      - __tests__
+      - docs
+      - eslint.config.ts
+      - lefthook.yml
+      - package.json
       - packages/strict-lint
       - packages/tsconfig
       - packages/typescript/.meta
@@ -151,7 +362,72 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+      - pnpm-workspace.yaml
+      - taze.config.ts
+      - tsconfig.json
+      - vitest.config.ts
+      - vitest.root.config.ts
 rejections:
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: __tests__/duplicated-readiness-modules.unit.test.ts
+    phrase: package's tests exercise
+    ground: 'not the construction: main-clause subject and verb'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: __tests__/tsconfig-base.tool.test.ts
+    phrase: base the way a published
+    ground: 'outside the rule: adjunct relative on `the way`'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: .config/strict-lint.config.ts
+    phrase: package specifiers resolve
+    ground: 'not the construction: main-clause subject and verb'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: AGENTS.md
+    phrase: anything a kit asserts
+    ground: 'outside the rule: fused-head indefinite pronoun'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: AGENTS.md
+    phrase: directory it targets
+    ground: 'not the construction: prepositional phrase followed by main clause'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: AGENTS.md
+    phrase: plugin's rules do apply
+    ground: 'not the construction: subject and verb of the where-clause'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: AGENTS.md
+    phrase: project-specific values to pass are
+    ground: "not the construction: infinitival modifier with the sentence's own verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: AGENTS.md
+    phrase: root a command fans
+    ground: 'not the construction: prepositional phrase followed by main clause'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: docs/migrating-to-v15.md
+    phrase: resolver alias is scoped
+    ground: 'not the construction: main-clause subject and verb'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: docs/migrating-to-v6.md
+    phrase: v6.0.1 the config declares
+    ground: 'not the construction: prepositional phrase followed by main clause'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: eslint.config.ts
+    phrase: import specifiers resolve
+    ground: 'not the construction: main-clause subject and verb'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: eslint.config.ts
+    phrase: rules meant
+    ground: 'not the construction: `meant` is a passive participle'
   - rule: reduced-object-relative
     rule-version: '1'
     file: packages/strict-lint/README.md
@@ -419,6 +695,21 @@ rejections:
     ground: 'not the construction: `inputs` is the subject of `treat`'
   - rule: so
     rule-version: '1'
+    file: AGENTS.md
+    phrase: both consumer packages declare `eslint` as a peer, so a test
+    ground: a lone `so` stating a direct result
+  - rule: so
+    rule-version: '1'
+    file: AGENTS.md
+    phrase: It is also the only command that clears `noEmit`, so
+    ground: a lone `so` stating a direct result
+  - rule: so
+    rule-version: '1'
+    file: docs/migrating-to-v15.md
+    phrase: ESLint merges `settings` deeply, so an override
+    ground: a lone `so` stating a direct result
+  - rule: so
+    rule-version: '1'
     file: packages/strict-lint/README.md
     phrase: so a run over part of a project measures against less than a full one does
     ground: a lone so stating a direct result
@@ -482,6 +773,21 @@ rejections:
     file: packages/typescript/src/readiness/eslint-config-contents.ts
     phrase: The plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched.
     ground: states a direct result, and no other clause-joining so is within three sentences
+  - rule: where
+    rule-version: '1'
+    file: AGENTS.md
+    phrase: '`src/readiness/`, where tests and coverage reach them'
+    ground: 'outside the rule: names a place (a directory)'
+  - rule: where
+    rule-version: '1'
+    file: AGENTS.md
+    phrase: in a sibling file without `.rules.`, where the plugin's rules do apply
+    ground: 'outside the rule: names a place (a file)'
+  - rule: where
+    rule-version: '1'
+    file: docs/migrating-eslint-configs-to-typescript.md
+    phrase: where those mistakes are reported as errors
+    ground: 'outside the rule: names the place in which the errors appear'
   - rule: where
     rule-version: '1'
     file: packages/strict-lint/README.md

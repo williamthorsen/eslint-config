@@ -53,7 +53,7 @@ const config = defineConfig([
     },
   },
   {
-    // Config files trip two rules meant for published source: Their `.js` import specifiers resolve only at runtime
+    // Config files violate two rules meant for published source: Their `.js` import specifiers resolve only at runtime
     // (tsc still reports a missing import), and they compose config objects at module top level.
     files: ['*.config.{cjs,js,mjs,ts}', 'config/**'],
     rules: {

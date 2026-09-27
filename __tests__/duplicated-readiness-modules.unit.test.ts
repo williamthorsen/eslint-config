@@ -7,9 +7,9 @@ import { describe, expect, it } from 'vitest';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 // Readiness modules copied into both kit-shipping packages. The packages share no internal module, so
-// each copy is maintained by hand, and each package's tests exercise only its own copy: a fix applied to one
-// alone passes both suites and leaves the other wrong. Dropping an entry is how a deliberate divergence is
-// recorded, since the copies are locked together only while this list names them.
+// each copy is maintained by hand, and each package's tests exercise only its own copy: A fix applied to one
+// alone passes both suites and leaves the other wrong. To record a deliberate divergence, drop its entry, since
+// the copies are locked together only while this list names them.
 const DUPLICATED_READINESS_MODULES = ['listSearchDirs.ts'];
 
 describe('duplicated readiness modules', () => {

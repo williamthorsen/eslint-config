@@ -8,11 +8,11 @@ All commits follow the structured format: `{workspace}|{work_type}: {description
 
 ### Workspace prefixes
 
-- `root` - Changes affecting the monorepo root
-- `strict-lint` - Strict-lint package (`@williamthorsen/strict-lint`)
-- `tsconfig` - TSConfig package (`@williamthorsen/tsconfig`)
-- `typescript` - TypeScript package (`@williamthorsen/eslint-config-typescript`); the `ts` alias `scopeAliases` resolves is retained for commits predating the switch and is not used for new ones
-- `*` - Changes affecting multiple workspaces
+- `root`: Changes affecting the monorepo root
+- `strict-lint`: Strict-lint package (`@williamthorsen/strict-lint`)
+- `tsconfig`: TSConfig package (`@williamthorsen/tsconfig`)
+- `typescript`: TypeScript package (`@williamthorsen/eslint-config-typescript`); the `ts` alias that `scopeAliases` resolves is retained for commits predating the switch and is not used for new ones
+- `*`: Changes affecting multiple workspaces
 
 ### Work types
 
@@ -35,12 +35,12 @@ All commits follow the structured format: `{workspace}|{work_type}: {description
 
 ### Breaking changes
 
-Add `!` after the work type to indicate breaking changes: `ts|feat!: Remove deprecated API`
+Add `!` after the work type to indicate breaking changes: `typescript|feat!: Remove deprecated API`
 
 ### Multi-type commits
 
-- Rare `|*` suffix indicates multiple work types in one workspace: `ts|*: Modernize tooling and add tests`
-- Keep commits focused - avoid mixing unrelated changes
+- Rare `|*` suffix indicates multiple work types in one workspace: `typescript|*: Modernize tooling and add tests`
+- Keep commits focused; avoid mixing unrelated changes
 
 ## Work type rules
 
@@ -48,7 +48,7 @@ Add `!` after the work type to indicate breaking changes: `ts|feat!: Remove depr
 
 ## Changelog categories
 
-Generated changelogs group commits under the Category column of the [work types](#work-types) table, plus a **Breaking changes** section for any commit carrying `!`.
+Generated changelogs group commits under the Category column of the [work types](#work-types) table, plus a **Breaking changes** section for any commit marked with `!`.
 
 ## Release process
 
@@ -58,7 +58,7 @@ Releases run through the **Release** workflow, which analyzes commits since each
 gh workflow run release.yaml
 ```
 
-It accepts three optional inputs: `only` (comma-separated workspaces), `bump` (override the derived level), and `force` (release when no bump-worthy commits exist). Pushing a `<workspace>-v<semver>` tag triggers the **Publish** and **Create GitHub Release** workflows, so tags must come from this workflow rather than by hand.
+It accepts three optional inputs: `only` (comma-separated workspaces), `bump` (override the derived level), and `force` (release when no bump-worthy commits exist). Pushing a `<workspace>-v<semver>` tag triggers the **Publish** and **Create GitHub Release** workflows, so tags must be pushed by this workflow rather than by hand.
 
 ### Dry run
 

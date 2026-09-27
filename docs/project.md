@@ -8,6 +8,6 @@ When colored circles appear next to a rule, they indicate the default setting an
 
 The left icon indicates the default severity; the right icon indicates the override setting.
 
-⚫ - off
-🟠 - warn
-🔴 - error
+⚫: off
+🟠: warn
+🔴: error

@@ -16,9 +16,9 @@ const manifestSchema = z.object({
 });
 
 // pnpm links a workspace package's bins during the install's link phase, which runs before anything is built. A
-// target under `dist/` therefore does not exist when pnpm reaches for it, and pnpm never retries: the link stays
-// missing for the life of the `node_modules` tree, and deleting `node_modules` is the only repair. These tests hold
-// each `bin` entry to a committed wrapper, which loads the build output at runtime.
+// target under `dist/` therefore does not exist when pnpm tries to link it, and pnpm never retries: The link
+// stays missing for the life of the `node_modules` tree, and deleting `node_modules` is the only repair. These
+// tests hold each `bin` entry to a committed wrapper, which loads the build output at runtime.
 describe('bin targets', () => {
   it('no bin target names a path under dist/', () => {
     const offenders = collectBinTargets().filter(({ target }) => readFirstSegment(target) === 'dist');

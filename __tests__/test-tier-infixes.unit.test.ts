@@ -9,7 +9,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 // The projects declared by nmr's shared Vitest config. Each name is also the filename infix that selects it.
 const TIERS = new Set(['unit', 'tool', 'localhost', 'remote']);
 
-// `unit` is a residual project: it collects whatever the named tiers don't claim, and the shared config sets
+// `unit` is a residual project: It collects whatever the named tiers don't claim, and the shared config sets
 // `passWithNoTests`. A file whose infix is missing or misspelt therefore runs under `unit` and reports success, so a
 // test run cannot distinguish it from a correctly named one.
 describe('test-tier infixes', () => {
