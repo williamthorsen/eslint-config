@@ -14,7 +14,7 @@ const ROOT_MARKER = 'pnpm-lock.yaml';
 
 const createdDirs: string[] = [];
 
-// The outcome matrix lives in `init/__tests__/initCommand.unit.test.ts`; these cases cover what only the shipped
+// The outcome matrix lives in `init/__tests__/initCommand.unit.test.ts`; these cases cover what only the published
 // binary can show: the dispatch, the argv that it forwards, and the runtime that loads the scaffolded config.
 describe('strict-lint init (subprocess)', () => {
   afterAll(() => {
@@ -127,7 +127,7 @@ function makeTree(files: Record<string, string> = {}): string {
   return dir;
 }
 
-/** Runs the CLI as it ships, from `cwd`. */
+/** Runs the CLI as consumers run it, from `cwd`. */
 function runCli(cwd: string, args: string[]): { status: number | null; stderr: string; stdout: string } {
   const result = spawnSync(process.execPath, [CLI_PATH, ...args], { cwd, encoding: 'utf8' });
   return { status: result.status, stderr: result.stderr, stdout: result.stdout };

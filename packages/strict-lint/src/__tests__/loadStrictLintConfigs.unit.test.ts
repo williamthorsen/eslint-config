@@ -18,7 +18,7 @@ vi.mock('@williamthorsen/toolbelt.filesystem', () => ({
   loadConfigCascade: mockedLoadConfigCascade,
 }));
 
-// The real `findProjectRoot` reaches for `findDirectoryChainMatch`, which the filesystem mock above withholds.
+// The real `findProjectRoot` calls `findDirectoryChainMatch`, which the filesystem mock above omits.
 vi.mock('@williamthorsen/toolbelt.packaging', () => ({
   findProjectRoot: mockedFindProjectRoot,
 }));
@@ -41,7 +41,7 @@ describe(loadStrictLintConfigs, () => {
     );
   });
 
-  it('returns the config of every level the cascade collected, nearest first', async () => {
+  it('returns the config of every level collected by the cascade, nearest first', async () => {
     withCascadeEntries([
       ['/project/packages/pkg', { maxSeverity: { 'nearer-rule': 'warn' } }],
       ['/project', { maxSeverity: { 'farther-rule': 'warn' } }],
@@ -154,7 +154,7 @@ describe(loadStrictLintConfigs, () => {
         message: `Expected sharedConfigs[0] in "${configPathIn('/project')}" to be a config object or an array of them, got "@some/shared-config"`,
       },
       {
-        name: 'a sharedConfigs entry holds a non-config among its elements',
+        name: 'a sharedConfigs entry contains a non-config among its elements',
         config: { sharedConfigs: [[{ rules: {} }, 'not-a-config']] },
         message: `Expected sharedConfigs[0] in "${configPathIn('/project')}" to be a config object or an array of them, got "not-a-config"`,
       },
@@ -255,7 +255,7 @@ describe(resolveSharedConfigs, () => {
     expect(resolveSharedConfigs(await loadStrictLintConfigs('/project/packages/pkg'))).toStrictEqual([nearer]);
   });
 
-  it('reaches past a level that declares none', async () => {
+  it('skips a level that declares none', async () => {
     withCascadeEntries([
       ['/project/packages/pkg', { maxSeverity: {} }],
       ['/project', { sharedConfigs: [farther] }],

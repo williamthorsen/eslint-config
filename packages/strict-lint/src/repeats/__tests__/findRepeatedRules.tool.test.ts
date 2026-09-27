@@ -13,7 +13,7 @@ const FILE_PATHS = ['src/example.ts'];
 const SHARED_CORE: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-eval': 'error' } }];
 
 describe(findRepeatedRules, () => {
-  it('reports a rule the consumer sets to the value the shared config already resolves', async () => {
+  it('reports a rule that the consumer sets to the value already resolved by the shared config', async () => {
     const report = await compare(SHARED_CORE, [...SHARED_CORE, { files: ['**/*.ts'], rules: { 'no-eval': 'error' } }]);
 
     expect(report.repeatedRules).toStrictEqual([{ fileCount: 1, ruleId: 'no-eval' }]);
@@ -45,7 +45,7 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([]);
   });
 
-  it('passes over a rule the shared config never sets', async () => {
+  it('passes over a rule that the shared config never sets', async () => {
     const report = await compare(SHARED_CORE, [
       ...SHARED_CORE,
       { files: ['**/*.ts'], rules: { 'no-debugger': 'error' } },
@@ -54,7 +54,7 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([]);
   });
 
-  it('passes over a rule the shared config sets for files this one is not among', async () => {
+  it('passes over a rule that the shared config sets only for other files', async () => {
     const shared: Linter.Config[] = [{ files: ['**/*.js'], rules: { 'no-alert': 'error', 'no-eval': 'error' } }];
     const consumer: Linter.Config[] = [...shared, { files: ['**/*.ts'], rules: { 'no-eval': 'error' } }];
 
@@ -75,9 +75,9 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([{ fileCount: 1, ruleId: 'some/no-widgets' }]);
   });
 
-  it('passes over a rule that repeats on only some of the files the consumer sets it for', async () => {
+  it('passes over a rule that repeats on only some of the files for which the consumer sets it', async () => {
     // The narrow entry restores what the broad one turned off, so it matches the shared value on `src/bin/cli.ts`
-    // alone. Neither entry is removable, and reporting the rule would name a load-bearing one.
+    // alone. Neither entry is removable, and reporting the rule would name a necessary one.
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
     const consumer: Linter.Config[] = [
       ...shared,
@@ -95,9 +95,9 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([]);
   });
 
-  it('passes over a rule the consumer gives two values, even when the run lints one scope alone', async () => {
-    // Linting only `src/bin` makes the narrow entry the only one that the run sees, so the file counts agree; the broad
-    // entry still governs everything else, and both stay load-bearing.
+  it('passes over a rule that the consumer gives two values, even when the run lints one scope alone', async () => {
+    // Because linting only `src/bin` makes the narrow entry the only one that the run sees, the file counts agree; the
+    // broad entry still governs everything else, and both stay necessary.
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
     const consumer: Linter.Config[] = [
       ...shared,
@@ -115,7 +115,7 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([]);
   });
 
-  it('reports a rule the consumer sets at two disjoint scopes to one value', async () => {
+  it('reports a rule set by the consumer at two disjoint scopes to one value', async () => {
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-eval': 'error' } }];
     const consumer: Linter.Config[] = [
       ...shared,
@@ -133,7 +133,7 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([{ fileCount: 2, ruleId: 'no-eval' }]);
   });
 
-  it('reports a rule the consumer sets at two disjoint scopes in two severity forms', async () => {
+  it('reports a rule set by the consumer at two disjoint scopes in two severity forms', async () => {
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-eval': 'error' } }];
     const consumer: Linter.Config[] = [
       ...shared,
@@ -151,7 +151,7 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([{ fileCount: 2, ruleId: 'no-eval' }]);
   });
 
-  it('reports a rule that repeats on every file the consumer sets it for', async () => {
+  it('reports a rule that repeats on every file for which the consumer sets it', async () => {
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-alert': 'error', 'no-console': 'error' } }];
     const consumer: Linter.Config[] = [...shared, { files: ['src/bin/**/*.ts'], rules: { 'no-console': 'error' } }];
 
@@ -165,7 +165,7 @@ describe(findRepeatedRules, () => {
     expect(report.repeatedRules).toStrictEqual([{ fileCount: 1, ruleId: 'no-console' }]);
   });
 
-  it('reports a repeat a consumer literal narrows to a subset of the shared scope', async () => {
+  it('reports a repeat that a consumer literal narrows to a subset of the shared scope', async () => {
     const shared: Linter.Config[] = [{ files: ['**/*.ts'], rules: { 'no-eval': 'error' } }];
     const consumer: Linter.Config[] = [...shared, { files: ['src/**/*.ts'], rules: { 'no-eval': 'error' } }];
 
@@ -176,7 +176,8 @@ describe(findRepeatedRules, () => {
 
   describe('an extends expansion', () => {
     // `defineConfig` rebuilds what it reaches through `extends`, so these cases run against a real expansion rather
-    // than a hand-written label: the format changing upstream fails this suite instead of degrading the sort silently.
+    // than a hand-written label: A change to the format upstream fails this suite instead of silently degrading the
+    // sort.
     const extended: Linter.Config[] = [{ rules: { 'no-alert': 'error', 'no-eval': 'error' } }];
     const consumer = defineConfig([{ files: ['**/*.ts'], extends: [extended] }, { rules: { 'no-eval': 'error' } }]);
 

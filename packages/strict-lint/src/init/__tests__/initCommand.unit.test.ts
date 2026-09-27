@@ -29,7 +29,7 @@ describe(runInit, () => {
     expect(reported.info()).toContain(`Created ${path.join(dir, STRICT_LINT_CONFIG_NAME)}`);
   });
 
-  it('reports the project root and the marker that chose it', () => {
+  it('reports the project root and the marker that identified it', () => {
     const dir = makeTree();
     const reported = captureConsole();
 
@@ -38,7 +38,7 @@ describe(runInit, () => {
     expect(reported.info()).toContain(`project root at ${dir} (marker: ${ROOT_MARKER})`);
   });
 
-  // A fallback root is the case a reader most needs qualified: The cascade may not be the one they expect.
+  // A fallback root is the case that a reader most needs qualified: The cascade may not be the one that they expect.
   it('qualifies a project root reached by fallback', () => {
     const dir = makeTree({ 'package.json': '{}' }, { hasRootMarker: false });
     const reported = captureConsole();
@@ -96,7 +96,7 @@ describe(runInit, () => {
     expect(reported.info()).toContain('Overwrote');
   });
 
-  it('reports the overwrite it would make under --dry-run --force', () => {
+  it('reports the overwrite that it would make under --dry-run --force', () => {
     const dir = makeTree();
     writeConfig(dir, 'export default {};\n');
     const reported = captureConsole();

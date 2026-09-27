@@ -102,7 +102,7 @@ describe(strictLint, () => {
       expect(constructedWith()).toMatchObject({ overrideConfig: [{ rules: {} }], overrideConfigFile: true });
     });
 
-    it('carries no plugin-bearing config when none was passed, so the options stay cloneable', async () => {
+    it('includes no plugin-bearing config when none was passed, keeping the options cloneable', async () => {
       await strictLint();
 
       expect(constructedWith()).toMatchObject({ overrideConfig: [] });
@@ -187,7 +187,8 @@ describe(strictLint, () => {
 
       await captureError(ProcessExitError, () => strictLint());
 
-      // The rule promoted, so no warning remains to breach the threshold; the error alone fails the run.
+      // Because strict-lint promoted the rule, no warning remains to exceed the threshold; the error alone fails the
+      // run.
       expect(formattedText()).not.toContain('too many warnings');
     });
 
@@ -324,7 +325,7 @@ describe(strictLint, () => {
       expect(reportedLines()).toContain('strict-lint: ascent stopped by shouldIgnoreAncestors');
     });
 
-    it('says so when no file was linted, rather than reporting a config nothing consulted', async () => {
+    it('says so when no file was linted, rather than reporting a config that nothing consulted', async () => {
       mockLintFiles.mockResolvedValue([]);
 
       await strictLint();
@@ -506,8 +507,8 @@ describe(strictLint, () => {
       expect(infoSpy).not.toHaveBeenCalled();
     });
 
-    it('writes whatever the formatter produced, even where another formatter would produce nothing', async () => {
-      // `json` reports a clean run as `[]`, which a count-based guard would wrongly swallow.
+    it('writes whatever the formatter produced, even when another formatter would produce nothing', async () => {
+      // `json` reports a clean run as `[]`, which a count-based guard would wrongly discard.
       mockFormat.mockResolvedValue('[]');
 
       await strictLint();
@@ -526,7 +527,7 @@ describe(strictLint, () => {
       expect(infoSpy).toHaveBeenCalledWith('ESLint found too many warnings (maximum: 0).');
     });
 
-    it('separates the --max-warnings message from the report the formatter produced', async () => {
+    it('separates the --max-warnings message from the report that the formatter produced', async () => {
       using _argv = pointArgvAt(['--max-warnings', '0']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);

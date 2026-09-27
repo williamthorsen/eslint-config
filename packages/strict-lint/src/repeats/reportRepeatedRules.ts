@@ -2,7 +2,7 @@ import type { RepeatReport } from './findRepeatedRules.ts';
 
 /**
  * Writes a comparison's outcome to stderr, where it stays clear of the formatter output and of the counts that decide
- * a run's exit code. A comparison finding nothing writes nothing, as a clean lint run does.
+ * a run's exit code. It writes nothing for a comparison that found nothing, as a clean lint run does.
  */
 export function reportRepeatedRules(report: RepeatReport, configName: string): void {
   const { repeatedRules, unsortableLabels } = report;
@@ -14,7 +14,7 @@ export function reportRepeatedRules(report: RepeatReport, configName: string): v
     for (const label of unsortableLabels) {
       console.error(`strict-lint:   ${label}`);
     }
-    console.error('strict-lint: name the config each extends in sharedConfigs');
+    console.error("strict-lint: add each listed element's source config to sharedConfigs");
     return;
   }
 

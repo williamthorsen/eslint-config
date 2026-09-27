@@ -8,8 +8,8 @@ import { ESLint } from 'eslint';
 import { afterAll, describe, expect, it } from 'vitest';
 
 // Each case runs `strict-lint` and `eslint` against one fixture and compares what they report, since the two must agree
-// on which config governs a file. strict-lint runs as a subprocess, the way it ships; ESLint runs in process, where its
-// own resolution is the reference that the CLI must match.
+// on which config governs a file. strict-lint runs as a subprocess, the way consumers run it; ESLint runs in process,
+// and its own resolution is the reference that the CLI must match.
 
 const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const ROOT_MARKER = 'pnpm-workspace.yaml';
@@ -24,7 +24,7 @@ describe('config resolution (subprocess)', () => {
     }
   });
 
-  it('reports the rules eslint reports for a package carrying its own config', async () => {
+  it('reports the rules eslint reports for a package with its own config', async () => {
     const dir = makeMonorepoFixture();
 
     const [reported, reference] = [ruleIdsFromStrictLint(dir), await ruleIdsFromEslint(dir)];
@@ -47,12 +47,12 @@ describe('config resolution (subprocess)', () => {
     expect(result?.messages[0]?.severity).toBe(2);
   }, 30_000);
 
-  it('falls back to the root config for a file no nearer config governs', () => {
+  it('falls back to the root config for a file governed by no nearer config', () => {
     const dir = makeMonorepoFixture({ 'a.js': "const unused = 1;\nconsole.log('hi');\n" });
 
     const results = reportFromStrictLint(dir, 'a.js');
 
-    // No config sits beside this file, so the root's `no-unused-vars` governs and `no-console` stays unset.
+    // No config is beside this file, so the root's `no-unused-vars` governs and `no-console` stays unset.
     expect(results[0]?.messages.map((message) => message.ruleId)).toStrictEqual(['no-unused-vars']);
   }, 30_000);
 });

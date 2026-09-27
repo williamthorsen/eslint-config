@@ -27,7 +27,7 @@ describe(loadEslintConfig, () => {
     expect(load.status).toBe('loaded');
   }, 90_000);
 
-  it('reports a config Node cannot import rather than throwing', async () => {
+  it('reports a config that Node cannot import rather than throwing', async () => {
     const load = await loadEslintConfig(REPO_ROOT, path.join(REPO_ROOT, 'no-such.config.ts'));
 
     expect(load).toStrictEqual({
@@ -78,7 +78,7 @@ describe(loadEslintConfig, () => {
 
 // region | Helpers
 
-/** Narrows a load to its loaded form, so a case can read the fields only that form carries. */
+/** Narrows a load to its loaded form, so that a case can read the fields present only in that form. */
 function assertLoaded(
   load: Awaited<ReturnType<typeof loadEslintConfig>>,
 ): asserts load is Extract<Awaited<ReturnType<typeof loadEslintConfig>>, { status: 'loaded' }> {
@@ -87,7 +87,9 @@ function assertLoaded(
   }
 }
 
-/** Runs the body against a config module written outside the repository, so no fixture config is authored in it. */
+/**
+ * Runs the body against a config module written outside the repository, so that no fixture config is authored in it.
+ */
 async function withTempConfig(source: string, body: (filePath: string) => Promise<void>): Promise<void> {
   const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'strict-lint-'));
   const filePath = path.join(dir, 'eslint.config.mjs');

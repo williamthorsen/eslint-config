@@ -4,6 +4,7 @@ rules:
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -16,6 +17,7 @@ rules:
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -28,6 +30,7 @@ rules:
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -40,6 +43,7 @@ rules:
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -52,6 +56,7 @@ rules:
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -64,6 +69,7 @@ rules:
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -76,6 +82,7 @@ rules:
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -88,6 +95,7 @@ rules:
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -100,6 +108,7 @@ rules:
     swept-at: 2026-09-26
     detected: false
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -112,6 +121,7 @@ rules:
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -124,6 +134,7 @@ rules:
     swept-at: 2026-09-26
     detected: true
     roots:
+      - packages/strict-lint
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -132,6 +143,76 @@ rules:
       - packages/typescript/tsconfig.json
       - packages/typescript/types
 rejections:
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/README.md
+    phrase: copy of one goes unreported
+    ground: "not the construction: 'goes unreported' is the main verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/README.md
+    phrase: full one does
+    ground: 'not the construction: comparative ellipsis'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/README.md
+    phrase: new ceilings govern
+    ground: 'not the construction: an embedded question, not a relative clause'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/README.md
+    phrase: side effects do not run
+    ground: 'not the construction: compound noun followed by its verb'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/README.md
+    phrase: Under this pattern a stricter rule enters
+    ground: 'not the construction: main clause after a prepositional phrase'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/__tests__/createCeilingResolver.unit.test.ts
+    phrase: nearer one does not mention
+    ground: 'not the construction: the relativizer is already present'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/__tests__/strictLint.unit.test.ts
+    phrase: argv the parser reads
+    ground: 'not the construction: main clause after an introductory phrase'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/__tests__/strictLint.unit.test.ts
+    phrase: outrank the config files
+    ground: 'not the construction: verb and object'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/__tests__/strictLint.unit.test.ts
+    phrase: run returns fully formed
+    ground: 'not the construction: main verb and participle'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/loadStrictLintConfigs.ts
+    phrase: levels' lists concatenated
+    ground: "not the construction: a participle modifying 'lists'"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/repeats/__tests__/findRepeatedRules.tool.test.ts
+    phrase: broad one turned
+    ground: "outside the rule: fused-head relative 'what'"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/repeats/__tests__/sortConfigElements.unit.test.ts
+    phrase: side it came
+    ground: 'outside the rule: fused-head free relative'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/repeats/findRepeatedRules.ts
+    phrase: shared ones resolve
+    ground: "outside the rule: fused-head relative 'what'"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/strict-lint/src/repeats/findRepeatedRules.ts
+    phrase: whenever the run lints
+    ground: 'not the construction: an adverbial clause'
   - rule: reduced-object-relative
     rule-version: '1'
     file: packages/typescript/.readyup/kits/default.ts
@@ -299,6 +380,16 @@ rejections:
     ground: 'not the construction: `inputs` is the subject of `treat`'
   - rule: so
     rule-version: '1'
+    file: packages/strict-lint/README.md
+    phrase: so a run over part of a project measures against less than a full one does
+    ground: a lone so stating a direct result
+  - rule: so
+    rule-version: '1'
+    file: packages/strict-lint/src/__tests__/strictLint.unit.test.ts
+    phrase: no files were linted, so no config was resolved
+    ground: an asserted output string, and a direct result
+  - rule: so
+    rule-version: '1'
     file: packages/typescript/README.md
     phrase: before any importer runs, so a singleton declared there must keep its `const`.
     ground: direct result; no earlier so within three sentences
@@ -342,6 +433,51 @@ rejections:
     file: packages/typescript/src/readiness/eslint-config-contents.ts
     phrase: The plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched.
     ground: states a direct result, and no other clause-joining so is within three sentences
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/README.md
+    phrase: block, where `'off'` disables the rule, and into `maxSeverity`, where it exempts the rule from promotion
+    ground: "outside the rule: each 'where' names a location in the config"
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/README.md
+    phrase: so ceilings are scoped by where it runs
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/src/__tests__/defineConfig.tool.test.ts
+    phrase: from their own directory, where nothing else of the package resolves
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/src/init/__tests__/initCommand.unit.test.ts
+    phrase: A directory where the config belongs
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/src/init/__tests__/initCommand.unit.test.ts
+    phrase: A file where the `.config` directory belongs
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/src/init/initCommand.ts
+    phrase: Reports where the config is in the cascade
+    ground: "outside the rule: 'where' names a position in the cascade"
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/src/loadStrictLintConfigs.ts
+    phrase: where the walk was bounded
+    ground: "outside the rule: 'where' names a place"
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/src/repeats/reportRepeatedRules.ts
+    phrase: to stderr, where it stays clear of the formatter output
+    ground: "outside the rule: 'where' names the output stream"
+  - rule: where
+    rule-version: '1'
+    file: packages/strict-lint/src/strictLint.ts
+    phrase: Reports where the ceilings came from
+    ground: "outside the rule: 'where' names a source"
   - rule: where
     rule-version: '1'
     file: packages/typescript/README.md

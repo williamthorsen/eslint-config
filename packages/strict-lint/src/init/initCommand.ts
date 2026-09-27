@@ -12,7 +12,7 @@ import { parseInitArgs } from './parseInitArgs.ts';
 
 /**
  * Scaffolds a strict-lint config in `targetDir` and returns the exit code for the caller. The command never refuses:
- * a target from which the package cannot be imported still gets its config, plus the install step that makes the
+ * A target from which the package cannot be imported still gets its config, plus the install step that makes the
  * config load.
  */
 export function runInit(argv: string[], targetDir: string): number {
@@ -38,7 +38,7 @@ export function runInit(argv: string[], targetDir: string): number {
   reportProjectRoot(targetDir);
 
   if (!canResolveStrictLint(targetDir)) {
-    console.info('\nInstall it so the config resolves: pnpm add -D @williamthorsen/strict-lint eslint');
+    console.info('\nInstall it so that the config resolves: pnpm add -D @williamthorsen/strict-lint eslint');
   }
 
   return 0;
@@ -46,7 +46,7 @@ export function runInit(argv: string[], targetDir: string): number {
 
 // region | Helpers
 
-/** Reports where the config sits in the cascade, which is what tells the reader which files its ceilings govern. */
+/** Reports where the config is in the cascade, which tells the reader which files its ceilings govern. */
 function reportProjectRoot(targetDir: string): void {
   const projectRoot = findProjectRoot(targetDir);
   const attribution = describeRootSource(projectRoot);

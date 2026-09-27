@@ -31,7 +31,7 @@ export interface RepeatComparison {
  * that both sides set to an equal value. ESLint performs all glob expansion, `files` scoping, and last-wins ordering,
  * because the comparison asks about each real file rather than reconstructing the answer from patterns.
  *
- * An element that sorts to neither side stops the comparison: attributing it wrongly would invite a finding against a
+ * An element that sorts to neither side stops the comparison: Attributing it wrongly would produce a finding against a
  * setting that the consumer never wrote, so the report names the elements instead and lists no repeated rule.
  */
 export async function findRepeatedRules(comparison: RepeatComparison): Promise<RepeatReport> {
@@ -57,7 +57,7 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
   for (const { own: ownRules, shared: sharedRules } of resolved) {
     for (const [ruleId, value] of Object.entries(ownRules)) {
       ownFileCounts.set(ruleId, (ownFileCounts.get(ruleId) ?? 0) + 1);
-      // A resolved rule is always an array, so `undefined` is the shared side leaving the rule unset.
+      // A resolved rule is always an array. `undefined` means that the shared side leaves the rule unset.
       const sharedValue = sharedRules[ruleId];
       if (sharedValue !== undefined && isDeepStrictEqual(value, sharedValue)) {
         repeatFileCounts.set(ruleId, (repeatFileCounts.get(ruleId) ?? 0) + 1);
@@ -65,7 +65,7 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
     }
   }
 
-  // Report only a rule that repeats on every file for which the consumer sets it: on the rest, deleting the repeating
+  // Report only a rule that repeats on every file for which the consumer sets it: On the rest, deleting the repeating
   // entry would change the result. Never report a contested rule, whose file counts agree whenever the run lints one
   // scope alone.
   const contested = findContestedRules(own);
@@ -95,7 +95,7 @@ function createInstance(cwd: string, scaffold: Linter.Config[], side: readonly L
 
 /** Names an element for a diagnostic, falling back to its keys when it has no name. */
 function describeElement(element: Linter.Config): string {
-  return element.name ?? `unnamed config carrying ${Object.keys(element).toSorted().join(', ')}`;
+  return element.name ?? `unnamed config containing ${Object.keys(element).toSorted().join(', ')}`;
 }
 
 /**

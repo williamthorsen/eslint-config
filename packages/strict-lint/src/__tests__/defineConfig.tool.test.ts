@@ -12,15 +12,15 @@ const MANIFEST_PATH = fileURLToPath(new URL('../../package.json', import.meta.ur
 const MODULE_PATH = fileURLToPath(new URL('../defineConfig.ts', import.meta.url));
 
 describe(defineConfig, () => {
-  it('returns the same config object it was given', () => {
+  it('returns the same config object that it was given', () => {
     const maxSeverity: MaxSeverityMap = { 'no-console': 'warn' };
     const config: StrictLintConfig = { maxSeverity };
 
     expect(defineConfig(config)).toBe(config);
   });
 
-  it('rejects a config carrying an unknown property', () => {
-    // @ts-expect-error -- rejecting the unknown key is what this test asserts
+  it('rejects a config with an unknown property', () => {
+    // @ts-expect-error -- this test asserts that the unknown key is rejected
     const config = defineConfig({ maxSeverity: {}, shouldIgnoreAncestor: true });
 
     expect(config).toBeDefined();
@@ -45,7 +45,7 @@ describe(defineConfig, () => {
     }
   });
 
-  it('is the module the `./config` subpath entry names', () => {
+  it('is the module named by the `./config` subpath entry', () => {
     const manifest: unknown = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
     const name = path.basename(MODULE_PATH, '.ts');
 
