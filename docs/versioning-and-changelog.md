@@ -35,11 +35,11 @@ All commits follow the structured format: `{workspace}|{work_type}: {description
 
 ### Breaking changes
 
-Add `!` after the work type to indicate breaking changes: `ts|feat!: Remove deprecated API`
+Add `!` after the work type to indicate breaking changes: `typescript|feat!: Remove deprecated API`
 
 ### Multi-type commits
 
-- Rare `|*` suffix indicates multiple work types in one workspace: `ts|*: Modernize tooling and add tests`
+- Rare `|*` suffix indicates multiple work types in one workspace: `typescript|*: Modernize tooling and add tests`
 - Keep commits focused; avoid mixing unrelated changes
 
 ## Work type rules
