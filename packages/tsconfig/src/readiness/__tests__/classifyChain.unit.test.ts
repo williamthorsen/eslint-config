@@ -15,13 +15,13 @@ const EXTERNAL_BASE_ENTRY = buildChainEntry({
 });
 
 describe(classifyChain, () => {
-  it('reports a chain reaching the base as adopted, with the position it sits at', () => {
+  it('reports a chain reaching the base as adopted, with its position in the chain', () => {
     const chain = buildChain([buildChainEntry({ path: 'packages/api/tsconfig.json' }), BASE_ENTRY]);
 
     expect(classifyChain(chain)).toStrictEqual({ baseIndex: 1, kind: 'adopted' });
   });
 
-  it('reports a chain carrying only a base of another package as an opt-out', () => {
+  it('reports a chain containing only a base of another package as an opt-out', () => {
     const chain = buildChain([buildChainEntry({ path: 'packages/web/tsconfig.json' }), EXTERNAL_BASE_ENTRY]);
 
     expect(classifyChain(chain)).toStrictEqual({ kind: 'external-base' });

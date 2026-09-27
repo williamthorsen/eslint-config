@@ -5,6 +5,7 @@ rules:
     detected: false
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -18,6 +19,7 @@ rules:
     detected: false
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -31,6 +33,7 @@ rules:
     detected: true
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -44,6 +47,7 @@ rules:
     detected: false
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -57,6 +61,7 @@ rules:
     detected: false
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -64,25 +69,25 @@ rules:
       - packages/typescript/src
       - packages/typescript/tsconfig.json
       - packages/typescript/types
+  negative-quantifier:
+    version: '1'
+    swept-at: 2026-09-26
+    detected: true
+    roots:
+      - packages/tsconfig
   plain-speech:
-    version: '7'
+    version: '8'
     swept-at: 2026-09-26
     detected: false
     roots:
-      - packages/strict-lint
-      - packages/typescript/.meta
-      - packages/typescript/.readyup
-      - packages/typescript/README.md
-      - packages/typescript/package.json
-      - packages/typescript/src
-      - packages/typescript/tsconfig.json
-      - packages/typescript/types
+      - packages/tsconfig
   reduced-object-relative:
     version: '1'
     swept-at: 2026-09-26
     detected: true
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -96,6 +101,7 @@ rules:
     detected: true
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -109,6 +115,7 @@ rules:
     detected: false
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -122,6 +129,7 @@ rules:
     detected: true
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -135,6 +143,7 @@ rules:
     detected: true
     roots:
       - packages/strict-lint
+      - packages/tsconfig
       - packages/typescript/.meta
       - packages/typescript/.readyup
       - packages/typescript/README.md
@@ -213,6 +222,36 @@ rejections:
     file: packages/strict-lint/src/repeats/findRepeatedRules.ts
     phrase: whenever the run lints
     ground: 'not the construction: an adverbial clause'
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/tsconfig/.readyup/kits/default.ts
+    phrase: prefix each path in the config being extended
+    ground: "not the construction: 'prefix' is the imperative verb"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/tsconfig/.readyup/kits/default.ts
+    phrase: what runtime a project runs on
+    ground: an embedded question (what runtime ...), not a relative clause
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/tsconfig/README.md
+    phrase: Node projects want
+    ground: "not the construction: a main clause with 'Most Node projects' as subject"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/tsconfig/README.md
+    phrase: the base the next time it changes
+    ground: "outside the rule: the adjunct relative 'the next time it changes' fills no argument position"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/tsconfig/src/readiness/__tests__/base-chain.unit.test.ts
+    phrase: wherever it is in the chain
+    ground: "not the construction: 'wherever' has no lexical head noun"
+  - rule: reduced-object-relative
+    rule-version: '1'
+    file: packages/tsconfig/src/readiness/findEscapingPaths.ts
+    phrase: naming a machine-specific location cannot be shown
+    ground: "not the construction: 'naming' is a participle modifying 'one'"
   - rule: reduced-object-relative
     rule-version: '1'
     file: packages/typescript/.readyup/kits/default.ts
@@ -390,6 +429,16 @@ rejections:
     ground: an asserted output string, and a direct result
   - rule: so
     rule-version: '1'
+    file: packages/tsconfig/.readyup/kits/default.ts
+    phrase: '`.tool-versions` describes one dev machine, so it decides only when no manifest declares one.'
+    ground: states a direct result; no other clause-joining so within three sentences
+  - rule: so
+    rule-version: '1'
+    file: packages/tsconfig/src/readiness/__tests__/findEscapingPaths.unit.test.ts
+    phrase: treats a malformed declaration as a declaration, so the field inherits nothing
+    ground: states a direct result, and the name matches its sibling at the empty-declaration test; separate test names are not one passage
+  - rule: so
+    rule-version: '1'
     file: packages/typescript/README.md
     phrase: before any importer runs, so a singleton declared there must keep its `const`.
     ground: direct result; no earlier so within three sentences
@@ -478,6 +527,16 @@ rejections:
     file: packages/strict-lint/src/strictLint.ts
     phrase: Reports where the ceilings came from
     ground: "outside the rule: 'where' names a source"
+  - rule: where
+    rule-version: '1'
+    file: packages/tsconfig/.readyup/kits/default.ts
+    phrase: an inherited path is fixed where it was written
+    ground: 'names a place: the config file in which the path was written'
+  - rule: where
+    rule-version: '1'
+    file: packages/tsconfig/src/readiness/findEscapingPaths.ts
+    phrase: The config that declared the field, which is where the fix belongs.
+    ground: 'names a place: the config file'
   - rule: where
     rule-version: '1'
     file: packages/typescript/README.md

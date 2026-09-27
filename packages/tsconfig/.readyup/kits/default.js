@@ -193,10 +193,10 @@ var default_default = defineRdyKit({
           fix: `Extend ${BASE_SPECIFIER} from each tsconfig named above, and declare ${PACKAGE_NAME} as a devDependency of each package that names it but cannot resolve it. Adoption: ${ADOPTION_URL}`
         },
         {
-          name: "No tsconfig re-declares an option the base already supplies",
+          name: "No tsconfig re-declares an option that the base already supplies",
           severity: "recommend",
           check: noRedundantOptions,
-          fix: "Delete each option named above: the base already supplies it with the same value"
+          fix: "Delete each option named above: The base already supplies it with the same value"
         }
       ]
     },
@@ -207,14 +207,14 @@ var default_default = defineRdyKit({
           name: `No tsconfig declares an ES year other than the one ${PACKAGE_NAME} sets`,
           skip: skipUnlessBaseEsYearKnown,
           check: everyEsYearMatchesTheBase,
-          fix: "Delete the target or lib declaration named above, so the ES year the base sets applies"
+          fix: "Delete the target or lib declaration named above, so that the ES year set by the base applies"
         },
         {
           name: "The declared Node floor supports the base's ES year",
           severity: "error",
           skip: skipUnlessNodeFloorComparable,
           check: nodeFloorSupportsBaseEsYear,
-          fix: "Raise engines.node to a major implementing the base's ES year: below it, code that typechecks fails at runtime"
+          fix: "Raise engines.node to a major implementing the base's ES year: Below it, code that typechecks fails at runtime"
         }
       ]
     },
@@ -225,7 +225,7 @@ var default_default = defineRdyKit({
           name: "No tsconfig's include, exclude, or files names a path outside its own directory",
           skip: skipUnlessSomeTsconfigWasFound,
           check: noEscapingPaths,
-          fix: "Declare the field named above in the config that owns the directory, listing every path it needs, since a local declaration replaces the inherited one rather than merging and discards the default exclude of node_modules, bower_components, jspm_packages, and outDir; or prefix each path in the config being extended with ${configDir}, which resolves to the consuming config's directory"
+          fix: "Declare the field named above in the config that owns the directory, listing every path that it needs, since a local declaration replaces the inherited one rather than merging and discards the default exclude of node_modules, bower_components, jspm_packages, and outDir; or prefix each path in the config being extended with ${configDir}, which resolves to the consuming config's directory"
         }
       ]
     }

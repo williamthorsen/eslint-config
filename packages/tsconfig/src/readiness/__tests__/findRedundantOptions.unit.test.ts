@@ -51,7 +51,7 @@ describe(findRedundantOptions, () => {
     expect(findRedundantOptions(entries, 2)).toStrictEqual([{ key: 'strict', path: 'tsconfig.json' }]);
   });
 
-  it('exempts a key a config shipped by a dependency also declares', () => {
+  it('exempts a key that a config shipped by a dependency also declares', () => {
     const entries = [
       buildChainEntry({ compilerOptions: { strict: true, target: 'ES2025' }, path: 'packages/web/tsconfig.json' }),
       BASE_ENTRY,
@@ -65,8 +65,8 @@ describe(findRedundantOptions, () => {
     expect(findRedundantOptions(entries, 1)).toStrictEqual([{ key: 'strict', path: 'packages/web/tsconfig.json' }]);
   });
 
-  // A framework base's own files sit nearer than this base once it reaches them by relative path.
-  it('never reports a config a dependency ships, whatever it restates', () => {
+  // A framework base's own files are nearer than this base once it reaches them by relative path.
+  it('never reports a config shipped by a dependency, whatever it restates', () => {
     const entries = [
       buildChainEntry({ path: 'packages/web/tsconfig.json' }),
       buildChainEntry({
@@ -80,7 +80,7 @@ describe(findRedundantOptions, () => {
     expect(findRedundantOptions(entries, 2)).toStrictEqual([]);
   });
 
-  it('ignores a key the base does not declare', () => {
+  it('ignores a key that the base does not declare', () => {
     const entries = [
       buildChainEntry({ compilerOptions: { types: ['node'] }, path: 'packages/api/tsconfig.json' }),
       BASE_ENTRY,

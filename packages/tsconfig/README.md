@@ -1,6 +1,6 @@
 # @williamthorsen/tsconfig
 
-Shared TypeScript base config for Node-only projects. Inlines the settings of [`@tsconfig/strictest`](https://www.npmjs.com/package/@tsconfig/strictest) and adds the Node and build options it leaves out, so a consuming repo declares only what is genuinely its own.
+Shared TypeScript base config for Node-only projects. Inlines the settings of [`@tsconfig/strictest`](https://www.npmjs.com/package/@tsconfig/strictest) and adds the Node and build options that it leaves out, so a consuming repo declares only what is genuinely its own.
 
 <!-- section:release-notes --><!-- /section:release-notes -->
 
@@ -24,7 +24,7 @@ pnpm add -D @williamthorsen/tsconfig
 
 ## Adopting the base
 
-Extend the base from every tsconfig in the repo, not from the root alone. A workspace config reaches it either directly or through a config that does:
+Extend the base from every tsconfig in the repo, not from the root alone. A workspace config extends it either directly or through a config that does:
 
 ```jsonc
 // packages/api/tsconfig.json
@@ -34,9 +34,9 @@ Extend the base from every tsconfig in the repo, not from the root alone. A work
 }
 ```
 
-Every package whose tsconfig names the base by package specifier must also declare it as a devDependency: TypeScript resolves `extends` from the directory of the config that declares it, so a workspace naming a package it does not depend on resolves nothing.
+Every package whose tsconfig names the base by package specifier must also declare it as a devDependency: TypeScript resolves `extends` from the directory of the config that declares it, so a workspace naming a package on which it does not depend resolves nothing.
 
-Once the base is in the chain, delete the options it already supplies with the same value. The inherited value applies either way, and the copy left behind stops tracking the base the next time it changes. An option set to a _different_ value is an override and stays.
+Once the base is in the chain, delete the options that it already supplies with the same value. The inherited value applies either way, and the copy left behind stops tracking the base the next time it changes. An option set to a _different_ value is an override and stays.
 
 A package that extends a framework base such as `astro/tsconfigs/base` or `@tsconfig/svelte` has opted out of this one, which is a supported choice.
 
@@ -54,7 +54,7 @@ Everything `@tsconfig/strictest` sets, plus the Node and build options it omits:
 | `removeComments`             | `true`                            |
 | `target`                     | `"ES2025"`                        |
 
-`target` and `lib` are pinned to a Node 24 floor. `ESNext.Disposable` supplies the explicit-resource-management declarations (`using`, `Disposable`, `DisposableStack`), which Node 24 implements and no numbered lib yet carries.
+`target` and `lib` are pinned to a Node 24 floor. `ESNext.Disposable` supplies the explicit-resource-management declarations (`using`, `Disposable`, `DisposableStack`), which Node 24 implements but the numbered libs do not yet include.
 
 ## What the consumer owns
 
@@ -68,11 +68,11 @@ The base declares none of these:
 
 ## Emitting
 
-The base sets `noEmit: true`, on the assumption that a separate build step owns emit. A consumer that builds with this config directly must override `noEmit` and, if it keeps `allowImportingTsExtensions`, pair that with `rewriteRelativeImportExtensions` so `./foo.ts` specifiers survive the rewrite.
+The base sets `noEmit: true`, on the assumption that a separate build step owns emit. A consumer that builds with this config directly must override `noEmit` and, if it keeps `allowImportingTsExtensions`, pair that with `rewriteRelativeImportExtensions` so that `./foo.ts` specifiers survive the rewrite.
 
 ## Checking the configuration
 
-This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether the workspace tsconfigs are wired for the installed version. It is a migration aid rather than a CI gate: only a Node floor too old to run the base's ES year is reported as an error, and everything else caps at a warning.
+This package ships a [ReadyUp](https://www.npmjs.com/package/readyup) kit that checks whether the workspace tsconfigs are wired for the installed version. It is a migration aid rather than a CI gate: Only a Node floor too old to run the base's ES year is reported as an error, and everything else caps at a warning.
 
 Run it once:
 
@@ -90,15 +90,15 @@ export default defineRdyConfig({
 });
 ```
 
-The `readyup >=0.33.0` optional peer names the version the kit is developed and tested against. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
+The `readyup >=0.33.0` optional peer names the version against which the kit is developed and tested. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
 
 The kit walks each workspace tsconfig's `extends` chain and reports five things:
 
 - **Adoption**: a tsconfig reaching neither this base nor a framework base. A tsconfig naming this base through a specifier that does not resolve is reported separately, as declared but not installed.
-- **Re-declaration**: an option restated with the base's own value. A key that a framework base in the same chain also declares is exempt, since restating it is how a config wins against that base.
+- **Re-declaration**: an option restated with the base's own value. A key that a framework base in the same chain also declares is exempt, since restating it is how a config overrides that base.
 - **Escaping paths**: an `include`, `exclude`, or `files` path resolving outside the directory that holds the tsconfig. A config that is extended hands these fields down resolved against its own directory, so a package inheriting them is governed by paths pointing outside itself; the remedy is a complete local declaration, or `${configDir}` in the config being extended.
 - **ES year**: a `target` or `lib` declaring a year other than the base's, read from the base that the tsconfig extends rather than from a constant compiled into the kit.
-- **Node floor**: an `engines.node` below the major that implements that ES year. This is the one failure `tsc` cannot surface on its own, which is why it alone is an error.
+- **Node floor**: an `engines.node` below the major that implements that ES year. This is the one failure that `tsc` cannot report on its own, which is why it alone is an error.
 
 The kit runs at the version resolved from the project's `node_modules`, so it reports whether the configuration matches that version. It never reports whether that version is current.
 
