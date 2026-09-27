@@ -6,8 +6,8 @@
  * whether the version itself is current.
  *
  * The kit reserves `error` for a failure that breaks or impairs use of the base. Only the Node floor
- * qualifies, because `tsc` cannot see what runtime a project ships on; everything a typecheck would
- * surface on its own caps at `warn`.
+ * qualifies, because `tsc` cannot see what runtime a project runs on; everything a typecheck would
+ * report on its own caps at `warn`.
  */
 import { type CheckOutcome, defineRdyKit, type Progress } from 'readyup';
 import {
@@ -44,7 +44,7 @@ type AdoptedTsconfig = Extract<Adoption, { kind: 'adopted' }>;
 
 type FloorVerdict = { detail: string; kind: 'fail' | 'pass' } | { kind: 'skip'; reason: string };
 
-// Held for the life of one `rdy` run, which is one process targeting one project.
+// Kept for the life of one `rdy` run, which is one process targeting one project.
 const cache: { adoptions?: Adoption[]; chains: Map<string, TsconfigChain | undefined> } = {
   chains: new Map(),
 };
@@ -63,10 +63,10 @@ export default defineRdyKit({
           fix: `Extend ${BASE_SPECIFIER} from each tsconfig named above, and declare ${PACKAGE_NAME} as a devDependency of each package that names it but cannot resolve it. Adoption: ${ADOPTION_URL}`,
         },
         {
-          name: 'No tsconfig re-declares an option the base already supplies',
+          name: 'No tsconfig re-declares an option that the base already supplies',
           severity: 'recommend',
           check: noRedundantOptions,
-          fix: 'Delete each option named above: the base already supplies it with the same value',
+          fix: 'Delete each option named above: The base already supplies it with the same value',
         },
       ],
     },
@@ -77,14 +77,14 @@ export default defineRdyKit({
           name: `No tsconfig declares an ES year other than the one ${PACKAGE_NAME} sets`,
           skip: skipUnlessBaseEsYearKnown,
           check: everyEsYearMatchesTheBase,
-          fix: 'Delete the target or lib declaration named above, so the ES year the base sets applies',
+          fix: 'Delete the target or lib declaration named above, so that the ES year set by the base applies',
         },
         {
           name: "The declared Node floor supports the base's ES year",
           severity: 'error',
           skip: skipUnlessNodeFloorComparable,
           check: nodeFloorSupportsBaseEsYear,
-          fix: "Raise engines.node to a major implementing the base's ES year: below it, code that typechecks fails at runtime",
+          fix: "Raise engines.node to a major implementing the base's ES year: Below it, code that typechecks fails at runtime",
         },
       ],
     },
@@ -95,7 +95,7 @@ export default defineRdyKit({
           name: "No tsconfig's include, exclude, or files names a path outside its own directory",
           skip: skipUnlessSomeTsconfigWasFound,
           check: noEscapingPaths,
-          fix: "Declare the field named above in the config that owns the directory, listing every path it needs, since a local declaration replaces the inherited one rather than merging and discards the default exclude of node_modules, bower_components, jspm_packages, and outDir; or prefix each path in the config being extended with ${configDir}, which resolves to the consuming config's directory",
+          fix: "Declare the field named above in the config that owns the directory, listing every path that it needs, since a local declaration replaces the inherited one rather than merging and discards the default exclude of node_modules, bower_components, jspm_packages, and outDir; or prefix each path in the config being extended with ${configDir}, which resolves to the consuming config's directory",
         },
       ],
     },
@@ -121,7 +121,7 @@ function classifyTsconfig(path: string): Adoption {
     : { kind: classification.kind, path };
 }
 
-/** Removes repeats while keeping first-seen order, so a shared config is named once. */
+/** Removes repeats while keeping first-seen order, so that a shared config is named once. */
 function dedupe(values: readonly string[]): string[] {
   return [...new Set(values)];
 }
@@ -235,7 +235,7 @@ function listPathsOfKind(classified: readonly Adoption[], kind: Adoption['kind']
   return classified.filter((adoption) => adoption.kind === kind).map((adoption) => adoption.path);
 }
 
-/** Lists the directories that may hold a tsconfig: the repo root and every workspace. */
+/** Lists the directories that may contain a tsconfig: the repo root and every workspace. */
 function listTsconfigSearchDirs(): string[] {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
@@ -278,8 +278,8 @@ function noRedundantOptions(): boolean | CheckOutcome {
 }
 
 /**
- * Reads the ES year from the base's own chain entry, so the comparison tracks the version that the
- * consumer extends.
+ * Reads the ES year from the base's own chain entry, so that the comparison tracks the version
+ * that the consumer extends.
  */
 function readBaseEsYear(): string | undefined {
   for (const adoption of listAdoptedTsconfigs()) {

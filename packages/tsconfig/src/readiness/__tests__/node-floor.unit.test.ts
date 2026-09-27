@@ -10,7 +10,7 @@ function esYearForMajor(major: number): string | undefined {
 }
 
 describe(classifyNodeEsYear, () => {
-  it('reports the year for a major the table covers', () => {
+  it('reports the year for a major that the table covers', () => {
     expect(classifyNodeEsYear(24, esYearForMajor)).toStrictEqual({ esYear: 'es2025', kind: 'exact' });
   });
 
@@ -18,7 +18,7 @@ describe(classifyNodeEsYear, () => {
     expect(classifyNodeEsYear(16, esYearForMajor)).toStrictEqual({ esYear: 'es2022', kind: 'under' });
   });
 
-  it('reports a major the table skips as unknown', () => {
+  it('reports a major that the table skips as unknown', () => {
     expect(classifyNodeEsYear(21, esYearForMajor)).toStrictEqual({ kind: 'unknown' });
   });
 
@@ -32,7 +32,7 @@ describe(classifyNodeEsYear, () => {
 });
 
 describe(findLowestNodeMajor, () => {
-  it('takes the lowest major any floor names', () => {
+  it('takes the lowest major named by any floor', () => {
     expect(findLowestNodeMajor(['24', '22.11.0', '24.5'])).toBe(22);
   });
 
@@ -47,7 +47,7 @@ describe(findLowestNodeMajor, () => {
 });
 
 describe(readNodeMajor, () => {
-  it('reads the major from every version shape a floor takes', () => {
+  it('reads the major from every version shape that a floor takes', () => {
     expect(readNodeMajor('24')).toBe(24);
     expect(readNodeMajor('24.5')).toBe(24);
     expect(readNodeMajor('v22.11.0')).toBe(22);

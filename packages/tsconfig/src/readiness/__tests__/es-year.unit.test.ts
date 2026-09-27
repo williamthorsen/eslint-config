@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { isEsYearAtLeast, parseEsYear, readDeclaredEsYear } from '../es-year.ts';
 
 describe(isEsYearAtLeast, () => {
-  it('orders years by the year they name', () => {
+  it('orders years by the year that they name', () => {
     expect(isEsYearAtLeast('es2025', 'es2022')).toBe(true);
     expect(isEsYearAtLeast('es2022', 'es2025')).toBe(false);
   });
@@ -20,7 +20,7 @@ describe(parseEsYear, () => {
   });
 
   // `esnext` names a moving level, and a suffixed lib names a feature group rather than a year.
-  it('returns undefined for every name that carries no year', () => {
+  it('returns undefined for every name without a year', () => {
     expect(parseEsYear('esnext')).toBeUndefined();
     expect(parseEsYear('ESNext.Disposable')).toBeUndefined();
     expect(parseEsYear('ES2025.Iterator')).toBeUndefined();
@@ -42,7 +42,7 @@ describe(readDeclaredEsYear, () => {
     expect(readDeclaredEsYear({ lib: ['ES2025', 'ESNext.Disposable'], target: 'ESNext' })).toBe('es2025');
   });
 
-  it('takes the highest year a lib list names', () => {
+  it('takes the highest year named in a lib list', () => {
     expect(readDeclaredEsYear({ lib: ['ES2020', 'ES2024', 'DOM'] })).toBe('es2024');
   });
 

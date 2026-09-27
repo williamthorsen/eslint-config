@@ -7,7 +7,7 @@ describe(listSearchDirs, () => {
     expect(listSearchDirs(['packages/a', 'packages/b'])).toStrictEqual(['.', 'packages/a', 'packages/b']);
   });
 
-  it('holds the repo root once when the workspace list reports it', () => {
+  it('lists the repo root once when the workspace list reports it', () => {
     expect(listSearchDirs(['.', 'packages/a'])).toStrictEqual(['.', 'packages/a']);
   });
 });

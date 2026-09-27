@@ -12,15 +12,15 @@ export interface EscapingPath {
   /** The config that declared the field, which is where the fix belongs. */
   declaredIn: string;
   field: (typeof FIELDS)[number];
-  /** The offending path, relative to the directory holding the config being judged. */
+  /** The offending path, relative to the directory containing the config being judged. */
   path: string;
 }
 
 /**
  * Lists the paths that a tsconfig's effective `exclude`, `files`, and `include` name outside the
- * directory holding it. The chain's entry config is the one judged; a field that it inherits resolves
- * against the directory of the config that declared it, which is how an inherited path escapes.
- * Resolution is lexical, so a workspace reached through a symlink does not read as an escape.
+ * directory containing it. The chain's entry config is the one judged; a field that it inherits
+ * resolves against the directory of the config that declared it, which is how an inherited path
+ * escapes. Resolution is lexical, so a workspace reached through a symlink does not read as an escape.
  */
 export function findEscapingPaths(entries: readonly TsconfigChainEntry[]): EscapingPath[] {
   const judged = entries[0];
@@ -70,8 +70,8 @@ function findEscapingPathsInField(
 
 /**
  * Resolves one declared path and returns it relative to the judged config, or `undefined` when it
- * stays inside that config's directory. A glob needs no expansion, since an escape lives in the
- * literal segments leading it.
+ * stays inside that config's directory. A glob needs no expansion, since an escape is in the
+ * literal segments that precede it.
  */
 function findOutwardPath(value: string, declaredDir: string, judgedDir: string): string | undefined {
   // TypeScript normalizes separators on every platform, so a backslash separates here too.

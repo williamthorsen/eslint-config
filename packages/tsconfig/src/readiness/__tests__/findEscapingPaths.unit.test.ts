@@ -87,7 +87,7 @@ describe(findEscapingPaths, () => {
     expect(findEscapingPaths(entries)).toStrictEqual([]);
   });
 
-  it('leaves an inherited path alone where the declaring config uses ${configDir}', () => {
+  it('leaves an inherited path alone when the declaring config uses ${configDir}', () => {
     const entries = [
       buildChainEntry({ path: API_CONFIG }),
       buildChainEntry({
@@ -128,7 +128,7 @@ describe(findEscapingPaths, () => {
     ]);
   });
 
-  it('leaves the base alone for a field the consumer declares itself', () => {
+  it('leaves the base alone for a field that the consumer declares itself', () => {
     const entries = [
       buildChainEntry({ config: { exclude: ['dist/'] }, path: API_CONFIG }),
       buildChainEntry({ config: { exclude: ['node_modules'] }, path: ROOT_CONFIG, specifier: '../../tsconfig.json' }),
@@ -147,7 +147,7 @@ describe(findEscapingPaths, () => {
     expect(findEscapingPaths(entries)).toStrictEqual([]);
   });
 
-  // A string is truthy, so it declares the field as an empty array does, and contains no paths to judge.
+  // Because a string is truthy, it declares the field as an empty array does, and it contains no paths to judge.
   it('treats a malformed declaration as a declaration, so the field inherits nothing', () => {
     const entries = [
       buildChainEntry({ config: { include: 'src/' }, path: API_CONFIG }),

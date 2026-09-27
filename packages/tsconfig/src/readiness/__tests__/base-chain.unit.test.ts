@@ -4,7 +4,7 @@ import { findBaseIndex, hasExternalBase, isBaseSpecifier, isConsumerOwnedConfig 
 import { buildChainEntry } from '../test-utils/buildChainEntry.ts';
 
 describe(findBaseIndex, () => {
-  it('locates the base wherever it sits in the chain', () => {
+  it('locates the base wherever it is in the chain', () => {
     const entries = [
       buildChainEntry({ path: 'packages/api/tsconfig.json' }),
       buildChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
@@ -17,7 +17,7 @@ describe(findBaseIndex, () => {
     expect(findBaseIndex(entries)).toBe(2);
   });
 
-  // Under a workspace link the base realpaths inside the repo, so its path does not name the package.
+  // Under a workspace link the base's real path is inside the repo, so that path does not name the package.
   it('locates the base whose path is a workspace directory', () => {
     const entries = [
       buildChainEntry({ path: 'tsconfig.json' }),
@@ -75,7 +75,7 @@ describe(isConsumerOwnedConfig, () => {
     expect(isConsumerOwnedConfig('packages/api/tsconfig.json')).toBe(true);
   });
 
-  it('is false for a config a dependency ships', () => {
+  it('is false for a config shipped by a dependency', () => {
     expect(isConsumerOwnedConfig('node_modules/astro/tsconfigs/base.json')).toBe(false);
     expect(
       isConsumerOwnedConfig('packages/astro/node_modules/.pnpm/astro@7.1.6/node_modules/astro/tsconfigs/strict.json'),
