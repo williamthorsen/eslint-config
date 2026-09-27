@@ -20,7 +20,7 @@ This repo uses [pnpm](https://pnpm.io/) and Node.js. Versions are pinned via `pa
 pnpm install
 ```
 
-The root `eslint.config.ts` imports `packages/typescript/src` directly. `nmr build` serves publishing: it emits the `dist/` that consumers resolve through `node_modules`.
+The root `eslint.config.ts` imports `packages/typescript/src` directly. `nmr build` exists for publishing: It emits the `dist/` that consumers resolve through `node_modules`.
 
 ## Scripts
 
@@ -43,7 +43,7 @@ nmr test:all      # vitest, every tier
 nmr test:coverage # vitest with coverage, the unit and tool tiers
 ```
 
-`nmr` is context-aware: the same command runs different scripts depending on whether it runs in the repo root or a workspace directory. See the [nmr README](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/nmr#readme) for the full command reference.
+`nmr` is context-aware: The same command runs different scripts depending on whether it runs in the repo root or a workspace directory. See the [nmr README](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/nmr#readme) for the full command reference.
 
 ## Releases
 
@@ -54,11 +54,11 @@ Releases are triggered by the **Release** GitHub Actions workflow (manual `workf
 
 Don't push release tags by hand; manual tags can desync `package.json` versions, CHANGELOGs, and the commit history that release-kit reads.
 
-All packages publish publicly to npm.
+All packages are published publicly to npm.
 
 ## Gotchas
 
-- **Root-level Vitest excludes `packages/**`.** Packages carry no Vitest config of their own; `nmr root:test` runs only root-level tests.
+- **Root-level Vitest excludes `packages/**`.** Packages have no Vitest config of their own; `nmr root:test` runs only root-level tests.
 
 ## License
 

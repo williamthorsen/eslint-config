@@ -18,7 +18,7 @@ interface ModuleEdges {
 /**
  * Walks one entry file's static import graph and returns every external runtime package that it can reach, each
  * mapped to the repo-relative source files that import it. A dynamic `import()` is never a module-level declaration,
- * so the opt-in configs behind one never enter the graph.
+ * so the opt-in configs that one loads never enter the graph.
  */
 export function collectStaticExternalImports(entryFile: string, repoRoot: string): Map<string, Set<string>> {
   const importersByPackage = new Map<string, Set<string>>();

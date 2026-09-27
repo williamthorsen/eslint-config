@@ -9,12 +9,12 @@ import { collectStaticExternalImports, parseExternalImports } from './support/co
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-// Published packages whose eager configs reach external consumers. `strict-lint` is absent because it is a CLI
-// with no eager plugin imports.
+// Published packages whose eager configs are loaded by external consumers. `strict-lint` is absent because it is
+// a CLI with no eager plugin imports.
 const packagesUnderGuard = ['typescript'];
 
 // Framework plugins that the package loads only through a dynamic `import()` in `createConfig`. Consumers install
-// them as devDependencies, so they must never surface in the static graph.
+// them as devDependencies, so they must never appear in the static graph.
 const optInPlugins = [
   '@next/eslint-plugin-next',
   '@vitest/eslint-plugin',
