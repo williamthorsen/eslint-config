@@ -87,7 +87,9 @@ function assertLoaded(
   }
 }
 
-/** Runs the body against a config module written outside the repository, so that no fixture config is authored in it. */
+/**
+ * Runs the body against a config module written outside the repository, so that no fixture config is authored in it.
+ */
 async function withTempConfig(source: string, body: (filePath: string) => Promise<void>): Promise<void> {
   const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'strict-lint-'));
   const filePath = path.join(dir, 'eslint.config.mjs');
