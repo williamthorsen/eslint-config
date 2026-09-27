@@ -14,7 +14,7 @@ export function reportRepeatedRules(report: RepeatReport, configName: string): v
     for (const label of unsortableLabels) {
       console.error(`strict-lint:   ${label}`);
     }
-    console.error('strict-lint: name the config each extends in sharedConfigs');
+    console.error("strict-lint: add each listed element's source config to sharedConfigs");
     return;
   }
 

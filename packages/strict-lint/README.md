@@ -194,7 +194,7 @@ Declare every shared source, factory calls included. When strict-lint cannot att
 ```
 strict-lint: shared-config check skipped: 3 config elements could not be sorted
 strict-lint:   UserConfig[0] > UserConfig[0] > vitest/all
-strict-lint: name the config each extends in sharedConfigs
+strict-lint: add each listed element's source config to sharedConfigs
 ```
 
 That is what an undeclared source looks like. `defineConfig` rebuilds the elements that it reaches through `extends`, so an expansion of an unnamed config matches nothing that strict-lint keeps. Add it to `sharedConfigs` and the check runs.

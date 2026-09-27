@@ -30,7 +30,7 @@ describe(reportRepeatedRules, () => {
     expect(lines).toStrictEqual([
       'strict-lint: shared-config check skipped: 1 config element could not be sorted',
       'strict-lint:   UserConfig[0] > vitest/all',
-      'strict-lint: name the config each extends in sharedConfigs',
+      "strict-lint: add each listed element's source config to sharedConfigs",
     ]);
   });
 });
