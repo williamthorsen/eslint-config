@@ -220,7 +220,7 @@ var PACKAGE_NAME = "@williamthorsen/eslint-config-typescript";
 var MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-from-parseroptionsproject`;
 var TS_ESLINT_CONFIG_MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-eslint-configs-to-typescript`;
 var IMPORT_SPECIFIER_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#import-specifiers`;
-var PEER_RANGES = { "peerDependencies": { "@typescript-eslint/utils": "^8.59.1", "eslint": ">=10", "readyup": ">=0.33.0", "typescript": ">=5.7" } };
+var PEER_RANGES = { "peerDependencies": { "@next/eslint-plugin-next": "^16.3.5", "@typescript-eslint/utils": "^8.59.1", "@vitest/eslint-plugin": "^1.6.27", "eslint": ">=10", "eslint-plugin-jest-dom": "^5.10.1", "eslint-plugin-jsx-a11y": "^6.10.2", "eslint-plugin-react": "^7.37.5", "eslint-plugin-react-hooks": "^7.1.1", "eslint-plugin-testing-library": "^7.16.2", "readyup": ">=0.33.0", "typescript": ">=5.7" } };
 var ESLINT_TYPESCRIPT_FLOOR = "10.0.0";
 var installedVersions = /* @__PURE__ */ new Map();
 var tsconfigChains = /* @__PURE__ */ new Map();
