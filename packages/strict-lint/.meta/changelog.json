@@ -1,5 +1,43 @@
 [
   {
+    "version": "14.1.0",
+    "date": "2026-09-29",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Rewrites the hint that the `strict-lint` repeat check prints for a config element that it cannot attribute, replacing \"name the config each extends in sharedConfigs\" with \"add each listed element's source config to sharedConfigs\". (#249)",
+            "hash": "e4e0650354b8ffef4d143d72d7a92225e769d55f",
+            "entry": 1
+          },
+          {
+            "description": "Rewords several other messages that `strict-lint` prints, among them the `init` install hint, the help text, the label for an unnamed config element, and the error for a TypeScript config that uses non-erasable syntax. (#249)",
+            "hash": "e4e0650354b8ffef4d143d72d7a92225e769d55f",
+            "entry": 2
+          }
+        ]
+      },
+      {
+        "title": "📚 Documentation",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Revises the comments under `packages/strict-lint/` to follow the comment-discipline rules, adding descriptions to the undocumented functions and test helpers, removing comments that restate the code or record its history, and correcting the descriptions of `runInit` and the `formattedText` test helper, which misstated what each does. (#235)",
+            "hash": "c5938140f1befda21638ba1a20b29f0f205821ea",
+            "entry": 1
+          },
+          {
+            "description": "Revises the `@williamthorsen/strict-lint` README, code comments, and test titles to align with plain-speech doctrine and writing conventions. (#249)",
+            "hash": "e4e0650354b8ffef4d143d72d7a92225e769d55f",
+            "entry": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "14.0.0",
     "date": "2026-09-08",
     "sections": [
@@ -11,6 +49,7 @@
             "description": "Stop exempting vitest from n/no-extraneous-import (#219)",
             "body": "- Removes the `allowModules: ['vitest']` option from `n/no-extraneous-import`, so the rule now reports `vitest` in any workspace whose own `package.json` does not declare it.\n\nMigration: Declare `vitest` in the `devDependencies` of every workspace that imports it; in a pnpm workspace, a catalog entry (`\"vitest\": \"catalog:\"`) declares it without repeating the version. To keep the old behavior instead, set `'n/no-extraneous-import': ['error', { allowModules: ['vitest'] }]` in the consuming config's own `rules` block.",
             "breaking": true,
+            "migration": "Declare `vitest` in the `devDependencies` of every workspace that imports it; in a pnpm workspace, a catalog entry (`\"vitest\": \"catalog:\"`) declares it without repeating the version. To keep the old behavior instead, set `'n/no-extraneous-import': ['error', { allowModules: ['vitest'] }]` in the consuming config's own `rules` block.",
             "hash": "6c19f6d06b76f0d3ab8e92d6f1c1fd07bfd09427"
           }
         ]
@@ -40,6 +79,7 @@
             "description": "Require a relative specifier to name its TypeScript source (#209)",
             "body": "- Adds an `import-x/resolver` default to `@williamthorsen/eslint-config-typescript`. The default sets `extensionAlias` and is scoped to TypeScript files, so `import-x/no-cycle` reports a cycle among specifiers ending in `.js` and a JavaScript source still resolves `./b.js` to `b.js`.\n- Raises the `typescript` peer range to `>=5.7`, the first version in which a project emitting with `tsc` can write the required spelling.\n- Sets `rewriteRelativeImportExtensions` in `@williamthorsen/tsconfig`'s base, so that a build that clears `noEmit` compiles a TypeScript-extension import.\n\nMigration: Upgrade `typescript` to 5.7 or later, rewrite each relative specifier naming a TypeScript file to end in that file's own extension (`./b.ts`, not `./b.js`), and in the tsconfig owning those sources set `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`, or set `rewriteRelativeImportExtensions`. Do the rewrite by hand or with a codemod, and do not apply the editor suggestion that `import-x/extensions` offers: it appends the resolved extension rather than replacing the written one, turning `./b.js` into `./b.js.ts`. `docs/migrating-to-v15.md` walks through each step.",
             "breaking": true,
+            "migration": "Upgrade `typescript` to 5.7 or later, rewrite each relative specifier naming a TypeScript file to end in that file's own extension (`./b.ts`, not `./b.js`), and in the tsconfig owning those sources set `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`, or set `rewriteRelativeImportExtensions`. Do the rewrite by hand or with a codemod, and do not apply the editor suggestion that `import-x/extensions` offers: it appends the resolved extension rather than replacing the written one, turning `./b.js` into `./b.js.ts`. `docs/migrating-to-v15.md` walks through each step.",
             "hash": "bcfb56d00650e047d435674df52f90c780842158"
           }
         ]
@@ -51,6 +91,7 @@
           {
             "description": "Point strict-lint's bin at a wrapper that exists at link time (#208)",
             "body": "- Fixes the `strict-lint` bin link, which pnpm failed to create whenever the package was installed before its build output existed, leaving `pnpm exec strict-lint` broken for the life of the `node_modules` tree.\n\nMigration: Delete `node_modules` and reinstall in any tree whose `strict-lint` link is already missing, since a later install does not create it, `--force` included.",
+            "migration": "Delete `node_modules` and reinstall in any tree whose `strict-lint` link is already missing, since a later install does not create it, `--force` included.",
             "hash": "85c0d9e16e67d47603bb8024083cc8dccf718453"
           }
         ]
@@ -125,6 +166,7 @@
             "description": "Enforce package-json/specify-peers-locally (#165)",
             "body": "Enforces `package-json/specify-peers-locally`. Every peer dependency a package declares must also appear in its own `devDependencies`; in a pnpm workspace a catalog entry satisfies it without repeating the version.\n\nMigration: A consumer relying on the workspace root's hoisting or on pnpm's `autoInstallPeers` to resolve its peers gets new errors until each peer is declared locally.",
             "breaking": true,
+            "migration": "A consumer relying on the workspace root's hoisting or on pnpm's `autoInstallPeers` to resolve its peers gets new errors until each peer is declared locally.",
             "hash": "5d8423112c49df8da8ffcd60b5a04ee840f9d637"
           }
         ]
@@ -310,7 +352,7 @@
         "items": [
           {
             "description": "Bound config discovery and remove the built-in allowlist (#115)",
-            "body": "`strict-lint` now stops at the project root when walking up the directory tree to find configs. Within the project, all configs on the path from the project root to the directory where the command is run are merged; later settings prevail. A new `--debug` flag reports the resolved project root and the config files that contributed.\r\n\r\n`@williamthorsen/strict-lint` no longer carries built-in exemptions: The style and modernization rules that used to stay warnings now fail the lint run unless a config exempts them. Projects that want the previous exemptions can now import them from `@williamthorsen/eslint-config-typescript`, which exports that set of downgrades as `advisoryRuleSeverities`.",
+            "body": "`strict-lint` now stops at the project root when walking up the directory tree to find configs. Within the project, all configs on the path from the project root to the directory where the command is run are merged; later settings prevail. A new `--debug` flag reports the resolved project root and the config files that contributed.\n\n`@williamthorsen/strict-lint` no longer carries built-in exemptions: The style and modernization rules that used to stay warnings now fail the lint run unless a config exempts them. Projects that want the previous exemptions can now import them from `@williamthorsen/eslint-config-typescript`, which exports that set of downgrades as `advisoryRuleSeverities`.",
             "breaking": true,
             "hash": "c54ee1ffb28d974a551e32f8b03387a08101050e"
           }
@@ -391,7 +433,6 @@
           {
             "description": "Upgrade dependencies to latest and drop Node 18/20 support (#78)",
             "body": "Consuming a published config now requires ESLint 10 and Node `^22.13.0 || >=24`; support for Node 18 and 20 is dropped.",
-            "breaking": true,
             "hash": "75ee76c17e9219773e65f608b56ccf6b9443cb74"
           }
         ]

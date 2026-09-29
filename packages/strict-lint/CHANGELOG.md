@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 14.1.0 — 2026-09-29
+
+### 🎉 Features
+
+- Rewrites the hint that the `strict-lint` repeat check prints for a config element that it cannot attribute, replacing "name the config each extends in sharedConfigs" with "add each listed element's source config to sharedConfigs". (#249)
+- Rewords several other messages that `strict-lint` prints, among them the `init` install hint, the help text, the label for an unnamed config element, and the error for a TypeScript config that uses non-erasable syntax. (#249)
+
+### 📚 Documentation
+
+- Revises the comments under `packages/strict-lint/` to follow the comment-discipline rules, adding descriptions to the undocumented functions and test helpers, removing comments that restate the code or record its history, and correcting the descriptions of `runInit` and the `formattedText` test helper, which misstated what each does. (#235)
+- Revises the `@williamthorsen/strict-lint` README, code comments, and test titles to align with plain-speech doctrine and writing conventions. (#249)
+
 ## 14.0.0 — 2026-09-08
 
 ### 🎉 Features
@@ -230,7 +242,7 @@ All notable changes to this project will be documented in this file.
 
 ### 📦 Dependencies
 
-- 🚨 **Breaking:** Upgrade dependencies to latest and drop Node 18/20 support (#78)
+- Upgrade dependencies to latest and drop Node 18/20 support (#78)
 
   Consuming a published config now requires ESLint 10 and Node `^22.13.0 || >=24`; support for Node 18 and 20 is dropped.
 

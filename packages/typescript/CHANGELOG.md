@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
+## 17.1.0 — 2026-09-29
+
+### 🎉 Features
+
+- Rewords the `no-split-imports` report and rule description, which said that one statement could "carry" every binding, to say that it can "import" them, and the `no-floating-disposable` report, which said "so it is released", to state the purpose with "so that it is released". (#245)
+- Rewords the messages that the package's ReadyUp kit reports: The peer checks name "the peer range declared by this config", the Next-plugin checks and skip reason say that a config "enables" the plugin, and the source-path detail reads "imported by source path from". (#248)
+- Makes the default config of `@williamthorsen/eslint-config-typescript` skip every untracked path that git ignores in the repository containing the working directory, whether a root or nested `.gitignore`, `.git/info/exclude`, or `core.excludesFile` declares the pattern, while tracked files are still linted. (#254)
+
+### 🐛 Bug fixes
+
+- Fixes the `createConfig` factories failing to import their plugins under pnpm's `hoist=false`, or loading a version that the consumer did not declare, by declaring each plugin as an optional peer dependency with a caret range on the version that the package tests against. (#255)
+
+### 🧪 Tests
+
+- Adds `__tests__/package-readme-links.unit.test.ts`, which fails with the README and target of each inline link or reference definition in a `packages/*/README.md` whose relative path resolves outside that package's directory. (#226)
+- Adds a unit test that fails when a plugin imported by a `createConfig` factory is missing from `peerDependencies` or is not marked optional in `peerDependenciesMeta`. (#255)
+
+### ⚙️ Tooling
+
+- Changes the root `prepare` script to run `lefthook install` only when `lefthook check-install` reports missing or stale hooks, so that `pnpm install` no longer fails where `.git/hooks` is read-only. (#254)
+
+### 📚 Documentation
+
+- Replaces the four `../../docs/` migration-guide links in `packages/typescript/README.md` with absolute GitHub URLs on `main`, because the published tarball contains no `docs/` directory and the relative links broke wherever the README was read outside the repo. (#226)
+- Revises the comments under `packages/typescript/src/plugins/` to follow the comment-discipline rules, adding a description to each rule's `create` and its helpers and removing comments that restate the code or record its history. (#233)
+- Revises the comments in `packages/typescript` outside `src/plugins/` to follow the comment-discipline rules, adding descriptions to the undocumented config factories and helpers and removing comments that restate rule documentation, record the code's history, or hold commented-out rules. (#234)
+- Revises the comments under `packages/tsconfig/` to follow the comment-discipline rules, adding the missing comment on `target` in `tsconfig.base.json` and removing test comments that restate the description of the function under test. (#236)
+- Revises the comments and test titles of the custom rules and their typed rule tester to follow the plain-speech and writing conventions. (#245)
+- Revises the prose in `packages/typescript/README.md` to follow the plain-speech and writing conventions. (#246)
+- Revises the comments and test titles under `packages/typescript/src` and in the kit source to follow the plain-speech and writing conventions. (#248)
+
 ## 17.0.0 — 2026-09-08
 
 ### 🎉 Features
@@ -385,7 +416,7 @@ All notable changes to this project will be documented in this file.
 
 ### 📦 Dependencies
 
-- 🚨 **Breaking:** Upgrade dependencies to latest and drop Node 18/20 support (#78)
+- Upgrade dependencies to latest and drop Node 18/20 support (#78)
 
   Consuming a published config now requires ESLint 10 and Node `^22.13.0 || >=24`; support for Node 18 and 20 is dropped.
 
@@ -417,7 +448,7 @@ All notable changes to this project will be documented in this file.
 
   Replaces static imports of the 5 optional config modules (`jsx-a11y`, `next`, `react`, `testing-library`, `vitest`) with inline dynamic `import()` wrappers in `createConfig`. Fixes the `./plugins` export path, which incorrectly pointed to `configs/index.js` instead of `plugins/index.js`.
 
-## 5.12.2 — 2026-03-09
+## 5.12.2 — 2026-03-12
 
 ### 🎉 Features
 

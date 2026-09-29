@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.10.0 — 2026-09-29
+
+### 🎉 Features
+
+- Rewords the messages that the package's ReadyUp kit reports: The redundant-option check is now named "No tsconfig re-declares an option that the base already supplies", and the fix hints for the redundant-option, ES-year, Node-floor, and escaping-path checks are reworded. (#250)
+
+### 📚 Documentation
+
+- Revises the comments in `packages/typescript` outside `src/plugins/` to follow the comment-discipline rules, adding descriptions to the undocumented config factories and helpers and removing comments that restate rule documentation, record the code's history, or hold commented-out rules. (#234)
+- Revises the comments under `packages/tsconfig/` to follow the comment-discipline rules, adding the missing comment on `target` in `tsconfig.base.json` and removing test comments that restate the description of the function under test. (#236)
+- Revises the `@williamthorsen/tsconfig` README, code comments, and test titles to follow the plain-speech and writing conventions. (#250)
+
 ## 0.9.0 — 2026-09-08
 
 ### 🎉 Features
