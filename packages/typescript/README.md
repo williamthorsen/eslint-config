@@ -361,15 +361,15 @@ export default defineConfig(config, {
 
 `patterns.testFiles` covers JavaScript as well as TypeScript test files. Three of the Vitest rules read type information (`unbound-method`, `valid-title`, and `prefer-describe-function-title`), and each aborts the ESLint run rather than degrading when a file has no parser services, so `createConfig.vitest()` disables all three on JavaScript globs. That makes the scoping above safe whether or not the JavaScript test files get a type-aware parser.
 
-| Method                               | Loads                                              |
-| ------------------------------------ | -------------------------------------------------- |
-| `createConfig.react()`               | `eslint-plugin-react`, `eslint-plugin-react-hooks` |
-| `createConfig.next()`                | `@next/eslint-plugin-next`                         |
-| `createConfig.jsxA11y()`             | `eslint-plugin-jsx-a11y`                           |
-| `createConfig.reactTestingLibrary()` | `eslint-plugin-testing-library`                    |
-| `createConfig.vitest()`              | `@vitest/eslint-plugin`                            |
+| Method                               | Loads                                                     |
+| ------------------------------------ | --------------------------------------------------------- |
+| `createConfig.react()`               | `eslint-plugin-react`, `eslint-plugin-react-hooks`        |
+| `createConfig.next()`                | `@next/eslint-plugin-next`                                |
+| `createConfig.jsxA11y()`             | `eslint-plugin-jsx-a11y`                                  |
+| `createConfig.reactTestingLibrary()` | `eslint-plugin-jest-dom`, `eslint-plugin-testing-library` |
+| `createConfig.vitest()`              | `@vitest/eslint-plugin`                                   |
 
-These plugins are declared as `devDependencies` of this package. A project that uses them installs them itself.
+This package declares these plugins as optional [peer dependencies](#peer-dependencies). A project that calls a factory declares that factory's plugins itself, and pnpm links them to this package from that declaration.
 
 `createConfig.react()` pins `settings.react.version` to a recent default, because `eslint-plugin-react`'s `'detect'` mode is incompatible with ESLint 10 (it calls a removed API). Override it to match the project's React version by appending a settings block:
 
@@ -478,14 +478,21 @@ An unscoped block applies `'warn'` everywhere, including in test files, in which
 
 ## Peer dependencies
 
-| Dependency                 | Required   |
-| -------------------------- | ---------- |
-| `@typescript-eslint/utils` | `^8.59.1`  |
-| `eslint`                   | `>=10`     |
-| `readyup`                  | `>=0.33.0` |
-| `typescript`               | `>=5.7`    |
+| Dependency                      | Range      | Optional |
+| ------------------------------- | ---------- | -------- |
+| `@next/eslint-plugin-next`      | `^16.3.5`  | Yes      |
+| `@typescript-eslint/utils`      | `^8.59.1`  |          |
+| `@vitest/eslint-plugin`         | `^1.6.27`  | Yes      |
+| `eslint`                        | `>=10`     |          |
+| `eslint-plugin-jest-dom`        | `^5.10.1`  | Yes      |
+| `eslint-plugin-jsx-a11y`        | `^6.10.2`  | Yes      |
+| `eslint-plugin-react`           | `^7.37.5`  | Yes      |
+| `eslint-plugin-react-hooks`     | `^7.1.1`   | Yes      |
+| `eslint-plugin-testing-library` | `^7.16.2`  | Yes      |
+| `readyup`                       | `>=0.33.0` | Yes      |
+| `typescript`                    | `>=5.7`    |          |
 
-`readyup` is optional, needed only to run the readiness kit described below.
+`readyup` is needed only to run the readiness kit described below, and each plugin only for the [framework config](#framework-configs-lazy-loaded) that loads it.
 
 ## Checking the configuration
 
