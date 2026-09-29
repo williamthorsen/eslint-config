@@ -1,3 +1,5 @@
+<!-- readme-type: config -->
+
 # @williamthorsen/eslint-config-typescript
 
 Flat-config ESLint preset for TypeScript projects. Covers TypeScript, JavaScript, JSON, YAML, and `package.json` from a single default export, with opt-in framework configs for React, Next.js, JSX A11y, Vitest, and React Testing Library.
@@ -30,6 +32,8 @@ export default defineConfig(tsConfig, {
   // project overrides
 });
 ```
+
+Spread the default export or pass it as an argument to `defineConfig`, as above; never place it in `extends`, which rejects the `basePath` of its git-ignores block.
 
 Everything this package exports is typed with ESLint core's own `Config`, so the same composition typechecks unchanged in an `eslint.config.ts`: no `tseslint.config()`, type assertion, or widening cast.
 
@@ -412,7 +416,9 @@ export default defineConfig({
 
 ## Ignore lists
 
-Two lists of globs, neither applied by the preset. A consumer opts in by spreading them into `globalIgnores`:
+The preset skips every untracked path that git ignores in the repository containing the working directory, whether the pattern comes from a `.gitignore` at any depth, `.git/info/exclude`, or `core.excludesFile`. A tracked file is linted whatever pattern matches it. The preset reads the list once, when the config loads, so a long-lived process such as an editor lints a newly ignored path until it reloads the config. Outside a repository, or where git cannot run, the preset lints as it would without the list.
+
+The package also exports two lists of globs, which the preset does not apply. A consumer opts in by spreading them into `globalIgnores`:
 
 ```js
 import { defineConfig, globalIgnores } from 'eslint/config';
