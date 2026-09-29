@@ -49,7 +49,7 @@ describe(buildGitIgnores, () => {
   });
 
   it('ignores a path matched by core.excludesFile', async () => {
-    // The test setup pins `core.excludesFile` through `GIT_CONFIG_COUNT`, which outranks every config file.
+    // Clear `GIT_CONFIG_COUNT`, through which the environment may inject config that outranks every config file.
     using tree = createRepo({ '.playwright-mcp/page.yml': '', 'config.yml': '' }, (repo) => {
       const excludesFile = repo.write('.git/global-excludes', '.playwright-mcp/\n');
       vi.stubEnv('GIT_CONFIG_COUNT', '0');
@@ -90,6 +90,16 @@ describe(buildGitIgnores, () => {
 
     await expect(linter.isPathIgnored('dropped.gen.ts')).resolves.toBe(true);
     await expect(linter.isPathIgnored('kept.gen.ts')).resolves.toBe(false);
+  });
+
+  it('lints a tracked file inside an ignored directory', async () => {
+    using tree = createRepo({ '.gitignore': 'build/\n', 'build/keep.ts': '', 'build/drop.ts': '' });
+    git(tree.dir, 'add', '--force', 'build/keep.ts');
+
+    const linter = buildLinter(tree.dir);
+
+    await expect(linter.isPathIgnored('build/drop.ts')).resolves.toBe(true);
+    await expect(linter.isPathIgnored('build/keep.ts')).resolves.toBe(false);
   });
 
   // Each sibling matches the unescaped name read as a glob, so it is linted only if the name is matched literally.
