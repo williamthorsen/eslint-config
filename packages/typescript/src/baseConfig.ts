@@ -2,9 +2,11 @@ import { type Config, defineConfig } from 'eslint/config';
 import globals from 'globals';
 
 import { configs } from './configs/configs.ts';
+import { buildGitIgnores } from './ignores/git.ts';
 import { codeFiles, javaScriptFiles, testFiles, typeScriptFiles } from './patterns.ts';
 
 export const baseConfig: Config[] = [
+  ...buildGitIgnores(process.cwd()),
   ...defineConfig({
     files: typeScriptFiles,
     extends: [
