@@ -110,6 +110,21 @@ Every `package.json` must declare `author` and `engines`, and may not contain an
 
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely.
 
+## Import order
+
+`simple-import-sort/imports` sorts a module's imports into groups separated by a blank line, in this order:
+
+1. Node built-ins with the `node:` prefix
+2. Packages, such as `zod` or `@scope/pkg`
+3. `@/` aliases
+4. `~` aliases
+5. `#` subpath imports
+6. Any other absolute specifier, such as `$lib/foo`
+7. Relative imports
+8. Side-effect imports, such as `import './styles.css'`
+
+Side-effect imports sort last and keep their source order, so a stylesheet follows the modules whose styles it overrides. The rule reports at `warn`, which `strict-lint` promotes to an error. To use another order, set `groups` on `simple-import-sort/imports` in a config object after this one.
+
 ## Type imports
 
 A module's type and value imports go in one statement, with `type` on the specifier:
