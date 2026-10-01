@@ -11,7 +11,6 @@ const rules: Linter.RulesRecord = {
       groups: [
         ['^node:'], // built-ins
         [String.raw`^@?\w`], // packages
-        [String.raw`^\u0000"`], // side-effect imports
 
         // absolute internal imports
         // Common aliases
@@ -20,11 +19,14 @@ const rules: Linter.RulesRecord = {
         ['^#'], // Node subpath imports
         // TODO: Inject package aliases via `config.settings`
         // [`^(${packageAliases.join('|')})(/.*|$)`],
+        ['^'], // any other absolute import; a group that matches more characters takes precedence
 
         // relative internal imports
         [String.raw`^\.`],
-        [String.raw`^\u0020*(?:\u0020*import|\u0020*export)`],
-        ['^[^.]'], // scss imports
+
+        // Side-effect imports, which the plugin prefixes with a NUL character. They sort last and keep their source
+        // order, so a stylesheet follows the modules whose styles it overrides.
+        [String.raw`^\u0000`],
       ],
     },
   ],
