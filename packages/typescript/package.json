@@ -54,7 +54,7 @@
     "eslint-plugin-import-x": "4.17.1",
     "eslint-plugin-jsonc": "3.4.2",
     "eslint-plugin-n": "catalog:",
-    "eslint-plugin-package-json": "1.9.0",
+    "eslint-plugin-package-json": "1.10.0",
     "eslint-plugin-promise": "7.3.0",
     "eslint-plugin-simple-import-sort": "14.0.0",
     "eslint-plugin-unicorn": "74.0.0",
