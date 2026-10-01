@@ -5,9 +5,6 @@
   "compilerOptions": {
     // Modern transformation by React 17+
     "jsx": "react-jsx",
-    "paths": {
-      "~/*": ["./*"],
-    },
     "types": ["node"],
   },
   // prettier-ignore

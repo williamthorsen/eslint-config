@@ -10,4 +10,5 @@ export default defineVitestConfig({
       coverage: { exclude: ['**/bin/**'] },
     },
   },
+  tsconfigPaths: true,
 });

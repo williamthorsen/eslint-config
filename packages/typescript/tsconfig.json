@@ -1,6 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "#src/*": ["./src/*"],
+    },
+    // On, the option makes a `.ts` extension on a `#src/` import error TS2877. `nmr-compile` turns it back on for
+    // emit and rewrites the alias to a relative `.js` specifier itself.
+    "rewriteRelativeImportExtensions": false,
+  },
   // prettier-ignore
   "include": [
     ".readyup/**/*.ts",
