@@ -66,7 +66,7 @@ A pattern mapping whose target contains the extension, such as `"#src/*": "./src
 
 TypeScript rejects a `.ts` specifier unless the tsconfig owning the file sets `rewriteRelativeImportExtensions`, which rewrites the extension in output and declarations, or `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`. The first arrived in TypeScript 5.7, which is the peer floor declared by this package. The kit below reports a tsconfig setting neither.
 
-`rewriteRelativeImportExtensions` rewrites a relative specifier alone. In a tsconfig that emits, a `#` specifier ending in `.ts` is error TS2877, so a package compiled by `tsc` needs a build step that rewrites the alias to a relative specifier.
+`rewriteRelativeImportExtensions` rewrites a relative specifier alone. In a tsconfig that emits, a `#` specifier ending in `.ts` is error TS2877, so a package compiled by `tsc` needs a build step that rewrites the alias to a relative specifier, or restores the exemption with the override above.
 
 ESLint merges `settings` deeply, so an override adding a resolver key of its own keeps the shipped alias; see the [`paths` snippet](#import-cycles).
 
