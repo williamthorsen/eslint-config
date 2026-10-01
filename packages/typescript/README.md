@@ -48,9 +48,25 @@ The TypeScript rules are type-aware, and the preset enables typescript-eslint's 
 
 A relative specifier names the TypeScript source that it reaches: `./m.ts`, never `./m.js`. `import-x/extensions` reports the `.js` spelling, and the config supplies an `import-x` resolver default that sets `extensionAlias` so that the rule reads the file to which the specifier resolves. The alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source keeps naming the JavaScript file that it loads.
 
-The rule enforces relative specifiers alone: Every bare specifier holding a slash is exempt, which lets a package import its own subpath export. A non-relative alias such as `src/foo/bar` is indistinguishable from one and goes unchecked too.
+The rule enforces relative specifiers and multi-segment `#` subpath imports, such as `#src/utils/assert.ts`. Every other bare specifier holding a slash is exempt, which lets a package import its own subpath export. A non-relative alias such as `src/foo/bar` is indistinguishable from one and goes unchecked too. A one-segment `#` specifier such as `#config` is exempt as well, because it usually names an exact mapping to a file and cannot take an extension.
+
+A pattern mapping whose target contains the extension, such as `"#src/*": "./src/*.ts"`, makes the extensionless specifier the correct one. A project using one restores the exemption by restating the rule's options:
+
+```ts
+{
+  rules: {
+    'import-x/extensions': [
+      'error',
+      'ignorePackages',
+      { checkTypeImports: true, pathGroupOverrides: [{ pattern: '*/**', action: 'ignore' }] },
+    ],
+  },
+}
+```
 
 TypeScript rejects a `.ts` specifier unless the tsconfig owning the file sets `rewriteRelativeImportExtensions`, which rewrites the extension in output and declarations, or `allowImportingTsExtensions` alongside `noEmit` or `emitDeclarationOnly`. The first arrived in TypeScript 5.7, which is the peer floor declared by this package. The kit below reports a tsconfig setting neither.
+
+`rewriteRelativeImportExtensions` rewrites a relative specifier alone. In a tsconfig that emits, a `#` specifier ending in `.ts` is error TS2877, so a package compiled by `tsc` needs a build step that rewrites the alias to a relative specifier.
 
 ESLint merges `settings` deeply, so an override adding a resolver key of its own keeps the shipped alias; see the [`paths` snippet](#import-cycles).
 
