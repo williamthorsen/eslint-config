@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 18.0.0 — 2026-10-01
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Extends `import-x/extensions` to a multi-segment `#` subpath import such as `#src/utils/assert`, which the `*/**` exemption for package subpaths used to cover; a one-segment specifier such as `#config` stays exempt, because it usually maps to one file and cannot take an extension. (#258)
+- 🚨 **Breaking:** Adds a `^#` group to `simple-import-sort/imports` after the `@/` and `~` alias groups, so that a `#` import sorts before relative imports instead of falling into the trailing catch-all. (#258)
+
 ## 17.1.0 — 2026-09-29
 
 ### 🎉 Features

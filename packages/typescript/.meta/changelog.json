@@ -1,5 +1,31 @@
 [
   {
+    "version": "18.0.0",
+    "date": "2026-10-01",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Extends `import-x/extensions` to a multi-segment `#` subpath import such as `#src/utils/assert`, which the `*/**` exemption for package subpaths used to cover; a one-segment specifier such as `#config` stays exempt, because it usually maps to one file and cannot take an extension. (#258)",
+            "breaking": true,
+            "migration": "Add the `.ts` extension to each multi-segment `#` import of a TypeScript source, by hand, since the rule offers the spelling as a suggestion rather than an autofix; a package that `tsc` compiles with emit raises TS2877 on that spelling, and a pattern mapping whose target contains the extension, such as `\"#src/*\": \"./src/*.ts\"`, needs the `pathGroupOverrides` override in the README's \"Import specifiers\" section.",
+            "hash": "9a98f8eb214271edb5956bc538f6b2730357fc88",
+            "entry": 1
+          },
+          {
+            "description": "Adds a `^#` group to `simple-import-sort/imports` after the `@/` and `~` alias groups, so that a `#` import sorts before relative imports instead of falling into the trailing catch-all. (#258)",
+            "breaking": true,
+            "migration": "Run `eslint --fix` to move each `#` import after the alias imports and before the relative ones; the rule reports at `warn`, which `@williamthorsen/strict-lint` promotes to an error.",
+            "hash": "9a98f8eb214271edb5956bc538f6b2730357fc88",
+            "entry": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "17.1.0",
     "date": "2026-09-29",
     "sections": [
