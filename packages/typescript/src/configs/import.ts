@@ -14,15 +14,23 @@ const settings = {
 };
 
 const rules: Linter.RulesRecord = {
-  // The override exempts every bare specifier containing a slash, so a non-relative alias such as `src/foo/bar`
-  // loses enforcement with it; a relative specifier keeps it, its leading dot unmatched by `*`.
+  // The `*/**` override exempts every bare specifier containing a slash, so a non-relative alias such as
+  // `src/foo/bar` loses enforcement with it; a relative specifier keeps it, its leading dot unmatched by `*`.
+  // A multi-segment `#` subpath import is enforced, because the first matching override wins. A one-segment
+  // `#` specifier is usually an exact mapping to a file, which cannot take an extension, so `#*` stays exempt.
   // The plugin reads this object as the extension map unless it contains `pattern`, `ignorePackages`, or
   // `checkTypeImports`; on that branch `pathGroupOverrides` is silently discarded.
   // Option shapes and plugin behaviors: un-ts/eslint-plugin-import-x#508, #509.
   'import-x/extensions': [
     'error',
     'ignorePackages',
-    { checkTypeImports: true, pathGroupOverrides: [{ pattern: '*/**', action: 'ignore' }] },
+    {
+      checkTypeImports: true,
+      pathGroupOverrides: [
+        { pattern: '#*/**', action: 'enforce' },
+        { pattern: '*/**', action: 'ignore' },
+      ],
+    },
   ],
 
   // `ignoreExternal` keeps the traversal out of `node_modules`, which takes 20 times as long as the rest of the walk.

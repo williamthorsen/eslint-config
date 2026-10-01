@@ -1,0 +1,9 @@
+{
+  "name": "fixtures-subpath-imports",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#src/*": "./src/*",
+    "#target": "./src/target.ts"
+  }
+}
