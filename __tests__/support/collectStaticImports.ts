@@ -69,7 +69,10 @@ function readSourceFile(file: string): ts.SourceFile {
   return ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, scriptKindFor(file));
 }
 
-/** Splits a module's runtime import and export-from specifiers into relative paths, subpath imports, and external package names. */
+/**
+ * Splits a module's runtime import and export-from specifiers into relative paths, subpath imports, and external
+ * package names.
+ */
 function collectEdges(sourceFile: ts.SourceFile): ModuleEdges {
   const relative: string[] = [];
   const subpath: string[] = [];
@@ -150,8 +153,9 @@ function isNodeBuiltin(specifier: string): boolean {
 }
 
 /**
- * Resolves a `#` subpath import against the wildcard patterns in the `imports` map of the importing file's nearest `package.json`. Returns
- * the specifier unchanged when no pattern matches, which the walk then reports as an unresolved edge.
+ * Resolves a `#` subpath import against the wildcard patterns in the `imports` map of the importing file's nearest
+ * `package.json`. Returns the specifier unchanged when no pattern matches, which the walk then reports as an
+ * unresolved edge.
  */
 function resolveSubpathImport(specifier: string, importer: string): string {
   const manifestPath = findNearestManifest(path.dirname(importer));
