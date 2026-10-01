@@ -22,6 +22,9 @@
     "dist/esm/bin/*.js"
   ],
   "type": "module",
+  "imports": {
+    "#src/*": "./src/*"
+  },
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",

@@ -67,15 +67,16 @@ describe('eager-config dependency guard', () => {
 });
 
 describe('import-graph classification', () => {
-  it('collects value and scoped-subpath imports but not type-only, dynamic, or builtin', () => {
+  it('collects value and scoped-subpath imports but not type-only, dynamic, builtin, or # subpath', () => {
     const source = [
       "import valuePlugin from 'eslint-plugin-value';",
+      "import { local } from '#src/local.ts';",
       "import * as namespaced from '@scope/pkg/subpath';",
       "import type { Type } from 'type-only-pkg';",
       "import { type NamedType } from 'all-named-type-pkg';",
       "import fs from 'node:fs';",
       "async function load() { return import('dynamic-only-pkg'); }",
-      'export const used = [valuePlugin, namespaced, load];',
+      'export const used = [valuePlugin, namespaced, local, load];',
     ].join('\n');
 
     expect(parseExternalImports(source)).toStrictEqual(['@scope/pkg', 'eslint-plugin-value']);

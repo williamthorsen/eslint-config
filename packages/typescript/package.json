@@ -18,6 +18,9 @@
   "author": "William Thorsen <william@thorsen.dev> (https://github.com/williamthorsen)",
   "sideEffects": false,
   "type": "module",
+  "imports": {
+    "#src/*": "./src/*"
+  },
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
