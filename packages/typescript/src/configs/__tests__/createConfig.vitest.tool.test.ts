@@ -1,7 +1,8 @@
 import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import { baseConfig } from '../../baseConfig.ts';
+import { baseConfig } from '#src/baseConfig.ts';
+
 import { configs } from '../configs.ts';
 import { createConfig } from '../createConfig.ts';
 import { fixtureWiring, lintFixture } from '../test-utils/lintFixture.ts';

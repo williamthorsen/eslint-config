@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { baseConfig } from '../../baseConfig.ts';
+import { baseConfig } from '#src/baseConfig.ts';
+
 import { factoryCases } from '../test-utils/factoryCases.ts';
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 

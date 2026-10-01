@@ -5,9 +5,9 @@
   "compilerOptions": {
     // Modern transformation by React 17+
     "jsx": "react-jsx",
-    "paths": {
-      "~/*": ["./*"],
-    },
+    // On, the option makes a `.ts` extension on a `#src/` import error TS2877. `nmr-compile` turns it back on for
+    // emit and rewrites the alias to a relative `.js` specifier itself.
+    "rewriteRelativeImportExtensions": false,
     "types": ["node"],
   },
   // prettier-ignore

@@ -3,7 +3,7 @@ import { defineConfig } from 'eslint/config';
 import promisePlugin from 'eslint-plugin-promise';
 import tseslint from 'typescript-eslint';
 
-import skyPilotPlugin from '../plugins/eslint-plugin-sky-pilot.ts';
+import skyPilotPlugin from '#src/plugins/eslint-plugin-sky-pilot.ts';
 
 const rules: Linter.RulesRecord = {
   // Disable rules inappropriate for TypeScript

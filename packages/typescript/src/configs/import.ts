@@ -2,7 +2,8 @@ import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
 import importXPlugin from 'eslint-plugin-import-x';
 
-import { patterns } from '../patterns.ts';
+import { patterns } from '#src/patterns.ts';
+
 import { importResolverOptions } from './importResolverOptions.ts';
 
 // The plugin's `ExportMap` opens only a file whose extension appears here, and the key defaults to

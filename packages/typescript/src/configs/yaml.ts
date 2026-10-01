@@ -3,7 +3,7 @@ import { defineConfig } from 'eslint/config';
 import rawYamlPlugin from 'eslint-plugin-yml';
 import * as yamlParser from 'yaml-eslint-parser';
 
-import { getSafeLinterPlugin } from '../utils/isLinterPlugin.ts';
+import { getSafeLinterPlugin } from '#src/utils/isLinterPlugin.ts';
 
 const yamlPlugin = getSafeLinterPlugin(rawYamlPlugin);
 

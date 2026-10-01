@@ -10,7 +10,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 
 // The root config extends `@williamthorsen/tsconfig/tsconfig.base.json` by package name, so parsing it resolves the
 // base the way a published consumer does.
-const options = parseRootConfig();
+const options = parseConfig(path.join(repoRoot, 'tsconfig.json'));
 
 const consumerOwnedKeys = new Set(['jsx', 'paths', 'types']);
 
@@ -57,7 +57,7 @@ describe('@williamthorsen/tsconfig base config', () => {
 
   it('resolves the consumer-owned keys that the root declares', () => {
     expect(options.types).toStrictEqual(['node']);
-    expect(options.paths).toStrictEqual({ '~/*': ['./*'] });
+    expect(options.paths).toBeUndefined();
     expect(options.jsx).toBe(ts.JsxEmit.ReactJSX);
   });
 
@@ -71,7 +71,9 @@ describe('@williamthorsen/tsconfig base config', () => {
   it('anchors path aliases to the consumer, not to itself', () => {
     // `paths` moving into the base would leave `options.paths` byte-identical and silently
     // re-anchor every alias to the base's own directory inside node_modules.
-    expect(options['pathsBasePath']).toBe(repoRoot);
+    const packageDirectory = path.join(repoRoot, 'packages', 'typescript');
+
+    expect(parseConfig(path.join(packageDirectory, 'tsconfig.json'))['pathsBasePath']).toBe(packageDirectory);
   });
 
   it('extends no package', () => {
@@ -100,9 +102,8 @@ describe('@williamthorsen/tsconfig base config', () => {
   });
 });
 
-/** Parses the repo-root tsconfig with its `extends` chain resolved, throwing on any error diagnostic. */
-function parseRootConfig(): ts.CompilerOptions {
-  const configPath = path.join(repoRoot, 'tsconfig.json');
+/** Parses a tsconfig with its `extends` chain resolved, throwing on any error diagnostic. */
+function parseConfig(configPath: string): ts.CompilerOptions {
   const host: ts.ParseConfigFileHost = {
     ...ts.sys,
     onUnRecoverableConfigFileDiagnostic: (diagnostic) => {

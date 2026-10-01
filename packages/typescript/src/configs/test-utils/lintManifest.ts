@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import { ESLint } from 'eslint';
 
-import packageJsonConfig from '../package-json.ts';
+import packageJsonConfig from '#src/configs/package-json.ts';
 
 // ESLint reports `File ignored because outside of base path` in place of any rule output for a path outside
 // its `cwd`, so the subject is in the directory from which the linter runs. The file need not exist on disk.

@@ -1,7 +1,8 @@
 import type { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
 
-import { ensurePluginRules } from '../utils/ensurePluginRules.ts';
+import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
+
 import memoizedFunctionsReturnedByHookRule from './rules/memoized-functions-returned-by-hook.ts';
 
 const skyPilotReactPlugin: ESLint.Plugin = {

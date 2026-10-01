@@ -2,8 +2,9 @@ import type { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import { fixtureWiring, lintFixture } from '../../../configs/test-utils/lintFixture.ts';
-import { ensurePluginRules } from '../../../utils/ensurePluginRules.ts';
+import { fixtureWiring, lintFixture } from '#src/configs/test-utils/lintFixture.ts';
+import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
+
 import noTypeCycleRule from '../no-type-cycle.ts';
 
 const ruleId = 'sky-pilot/no-type-cycle';

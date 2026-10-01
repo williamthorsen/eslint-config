@@ -1,6 +1,6 @@
 import type { Config } from 'eslint/config';
 
-import { createConfig } from '../createConfig.ts';
+import { createConfig } from '#src/configs/createConfig.ts';
 
 export const factoryCases: { name: string; load: () => Promise<Config[]>; fixture: string }[] = [
   { name: 'jsxA11y', load: createConfig.jsxA11y, fixture: 'component.tsx' },

@@ -5,7 +5,8 @@ import path from 'node:path';
 import { disposeOnTestFinished, listConsoleLines, silenceConsole } from '@williamthorsen/toolbelt.vitest/candidate';
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { STRICT_LINT_CONFIG_NAME } from '../../loadStrictLintConfigs.ts';
+import { STRICT_LINT_CONFIG_NAME } from '#src/loadStrictLintConfigs.ts';
+
 import { CONFIG_TEMPLATE } from '../configTemplate.ts';
 import { runInit } from '../initCommand.ts';
 

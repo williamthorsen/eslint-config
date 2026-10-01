@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 
@@ -25,6 +27,15 @@ const config = defineConfig([
       },
     },
   },
+  // Resolve each compiled package's `#src/` alias through its own tsconfig `paths`.
+  ...['strict-lint', 'typescript'].map((name) => ({
+    files: [`packages/${name}/**`],
+    settings: {
+      'import-x/resolver': {
+        node: { tsconfig: { configFile: path.join(import.meta.dirname, 'packages', name, 'tsconfig.json') } },
+      },
+    },
+  })),
   {
     files: codeFiles,
     languageOptions: {

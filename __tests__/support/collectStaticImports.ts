@@ -8,10 +8,12 @@ const nodeBuiltins = new Set(builtinModules);
 
 /**
  * The static import/export edges of a single module, split by how the guard treats them: The walk follows
- * `relative` edges into the package's own source, and the guard checks `external` names against the manifest.
+ * `relative` and `subpath` (`#`-prefixed) edges into the package's own source, and the guard checks `external`
+ * names against the manifest.
  */
 interface ModuleEdges {
   relative: string[];
+  subpath: string[];
   external: string[];
 }
 
@@ -47,6 +49,9 @@ export function collectStaticExternalImports(entryFile: string, repoRoot: string
     for (const relative of edges.relative) {
       walk(path.resolve(path.dirname(file), relative));
     }
+    for (const subpath of edges.subpath) {
+      walk(resolveSubpathImport(subpath, file));
+    }
   }
 
   walk(entryFile);
@@ -64,9 +69,13 @@ function readSourceFile(file: string): ts.SourceFile {
   return ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, scriptKindFor(file));
 }
 
-/** Splits a module's runtime import and export-from specifiers into relative paths and external package names. */
+/**
+ * Splits a module's runtime import and export-from specifiers into relative paths, subpath imports, and external
+ * package names.
+ */
 function collectEdges(sourceFile: ts.SourceFile): ModuleEdges {
   const relative: string[] = [];
+  const subpath: string[] = [];
   const external: string[] = [];
 
   for (const statement of sourceFile.statements) {
@@ -76,12 +85,14 @@ function collectEdges(sourceFile: ts.SourceFile): ModuleEdges {
     }
     if (specifier.startsWith('.')) {
       relative.push(specifier);
+    } else if (specifier.startsWith('#')) {
+      subpath.push(specifier);
     } else if (!isNodeBuiltin(specifier)) {
       external.push(toPackageName(specifier));
     }
   }
 
-  return { relative, external };
+  return { relative, subpath, external };
 }
 
 /**
@@ -139,6 +150,50 @@ function isNodeBuiltin(specifier: string): boolean {
     return true;
   }
   return nodeBuiltins.has(specifier);
+}
+
+/**
+ * Resolves a `#` subpath import against the wildcard patterns in the `imports` map of the importing file's nearest
+ * `package.json`. Returns the specifier unchanged when no pattern matches, which the walk then reports as an
+ * unresolved edge.
+ */
+function resolveSubpathImport(specifier: string, importer: string): string {
+  const manifestPath = findNearestManifest(path.dirname(importer));
+  if (manifestPath === undefined) {
+    return specifier;
+  }
+  const manifest: unknown = JSON.parse(readFileSync(manifestPath, 'utf8'));
+  const imports = isRecord(manifest) && isRecord(manifest['imports']) ? manifest['imports'] : {};
+  for (const [pattern, target] of Object.entries(imports)) {
+    const patternStar = pattern.indexOf('*');
+    const targetStar = typeof target === 'string' ? target.indexOf('*') : -1;
+    if (typeof target !== 'string' || patternStar === -1 || targetStar === -1) {
+      continue;
+    }
+    const prefix = pattern.slice(0, patternStar);
+    const suffix = pattern.slice(patternStar + 1);
+    if (specifier.startsWith(prefix) && specifier.endsWith(suffix)) {
+      const match = specifier.slice(prefix.length, specifier.length - suffix.length);
+      const resolved = target.slice(0, targetStar) + match + target.slice(targetStar + 1);
+      return path.resolve(path.dirname(manifestPath), resolved);
+    }
+  }
+  return specifier;
+}
+
+/** Finds the `package.json` in `directory` or its nearest ancestor that contains one. */
+function findNearestManifest(directory: string): string | undefined {
+  const candidate = path.join(directory, 'package.json');
+  if (existsSync(candidate)) {
+    return candidate;
+  }
+  const parent = path.dirname(directory);
+  return parent === directory ? undefined : findNearestManifest(parent);
+}
+
+/** Reports whether a value is a non-array object. */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /** Resolves an import path to a source file by trying the TypeScript extensions and directory indexes. */

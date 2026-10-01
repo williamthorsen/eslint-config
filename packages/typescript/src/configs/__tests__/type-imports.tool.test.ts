@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { baseConfig } from '../../baseConfig.ts';
+import { baseConfig } from '#src/baseConfig.ts';
+
 import { fixText } from '../test-utils/fixText.ts';
 
 const MODULE = "'./type-imports-module.ts'";
