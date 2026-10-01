@@ -17,6 +17,7 @@ const rules: Linter.RulesRecord = {
         // Common aliases
         ['^@/'],
         ['^~'],
+        ['^#'], // Node subpath imports
         // TODO: Inject package aliases via `config.settings`
         // [`^(${packageAliases.join('|')})(/.*|$)`],
 
