@@ -1,7 +1,8 @@
 import { Linter } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
-import { ensurePluginRules } from '../../../utils/ensurePluginRules.ts';
+import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
+
 import rule from '../no-unused-map.ts';
 
 // The rule-tester conformance tables live in `no-unused-map.rules.tool.test.ts`. This file covers a case that the rule

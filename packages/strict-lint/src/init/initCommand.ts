@@ -3,9 +3,10 @@ import path from 'node:path';
 import { type FileReconciliation, reconcileFile } from '@williamthorsen/toolbelt.filesystem';
 import { findProjectRoot } from '@williamthorsen/toolbelt.packaging';
 
-import { describeRootSource } from '../common/describeRootSource.ts';
-import { STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
-import { showInitUsage } from '../usage.ts';
+import { describeRootSource } from '#src/common/describeRootSource.ts';
+import { STRICT_LINT_CONFIG_NAME } from '#src/loadStrictLintConfigs.ts';
+import { showInitUsage } from '#src/usage.ts';
+
 import { canResolveStrictLint } from './canResolveStrictLint.ts';
 import { CONFIG_TEMPLATE } from './configTemplate.ts';
 import { parseInitArgs } from './parseInitArgs.ts';

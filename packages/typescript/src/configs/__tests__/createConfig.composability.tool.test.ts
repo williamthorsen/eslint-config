@@ -1,7 +1,8 @@
 import { defineConfig } from 'eslint/config';
 import { assert, describe, expect, it } from 'vitest';
 
-import { skyPilot } from '../../plugins/index.ts';
+import { skyPilot } from '#src/plugins/index.ts';
+
 import { createConfig } from '../createConfig.ts';
 import { factoryCases } from '../test-utils/factoryCases.ts';
 import { fixtureWiring, lintFixture } from '../test-utils/lintFixture.ts';

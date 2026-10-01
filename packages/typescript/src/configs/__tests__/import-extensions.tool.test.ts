@@ -2,7 +2,8 @@ import type { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import { baseConfig } from '../../baseConfig.ts';
+import { baseConfig } from '#src/baseConfig.ts';
+
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
 // The resolver alias that the config provides makes the extension rule read `q.ts` for a specifier written

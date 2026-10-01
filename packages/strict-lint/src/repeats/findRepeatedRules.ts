@@ -2,8 +2,9 @@ import { isDeepStrictEqual } from 'node:util';
 
 import { ESLint, type Linter } from 'eslint';
 
-import { isRecord } from '../common/isRecord.ts';
-import { isRuleSeverity, toSeverityNumber } from '../common/severity.ts';
+import { isRecord } from '#src/common/isRecord.ts';
+import { isRuleSeverity, toSeverityNumber } from '#src/common/severity.ts';
+
 import { buildPluginScaffold } from './buildPluginScaffold.ts';
 import { sortConfigElements } from './sortConfigElements.ts';
 

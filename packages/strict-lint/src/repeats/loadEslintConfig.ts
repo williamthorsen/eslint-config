@@ -2,7 +2,7 @@ import { pathToFileURL } from 'node:url';
 
 import { ESLint, type Linter } from 'eslint';
 
-import { isRecord } from '../common/isRecord.ts';
+import { isRecord } from '#src/common/isRecord.ts';
 
 /** The outcome of reading the ESLint config governing a run. */
 export type EslintConfigLoad =

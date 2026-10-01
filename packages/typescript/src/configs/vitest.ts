@@ -1,7 +1,7 @@
 import type { Linter } from 'eslint';
 import { type Config, defineConfig } from 'eslint/config';
 
-import { javaScriptFiles } from '../patterns.ts';
+import { javaScriptFiles } from '#src/patterns.ts';
 
 // Modifications of rules that are not in the "recommended" config.
 const modifiedStrictRules: Linter.RulesRecord = {

@@ -1,7 +1,8 @@
 import type { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
 
-import { ensurePluginRules } from '../utils/ensurePluginRules.ts';
+import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
+
 import noFloatingDisposableRule from './rules/no-floating-disposable.ts';
 import noSplitImportsRule from './rules/no-split-imports.ts';
 import noTypeCycleRule from './rules/no-type-cycle.ts';

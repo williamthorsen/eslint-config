@@ -1,7 +1,8 @@
 import type { ESLint } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
-import { baseConfig } from '../../baseConfig.ts';
+import { baseConfig } from '#src/baseConfig.ts';
+
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
 // `settings['import-x/extensions']` lets the rule's module graph open a TypeScript file at all, and the

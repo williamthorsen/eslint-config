@@ -3,7 +3,7 @@ import { defineConfig } from 'eslint/config';
 import rawJsoncPlugin from 'eslint-plugin-jsonc';
 import * as jsonParser from 'jsonc-eslint-parser';
 
-import { getSafeLinterPlugin } from '../utils/isLinterPlugin.ts';
+import { getSafeLinterPlugin } from '#src/utils/isLinterPlugin.ts';
 
 const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
 

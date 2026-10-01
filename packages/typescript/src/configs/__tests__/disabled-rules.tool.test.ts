@@ -1,7 +1,8 @@
 import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import { baseConfig } from '../../baseConfig.ts';
+import { baseConfig } from '#src/baseConfig.ts';
+
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
 const disabledRuleIds = ['unicorn/no-for-each', 'unicorn/prefer-simple-condition-first'];
