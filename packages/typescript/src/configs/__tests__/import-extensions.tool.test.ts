@@ -71,6 +71,15 @@ describe('the extension rule that the import config sets', () => {
     ]);
   });
 
+  // `#target` is an exact mapping to `./src/target.ts`, so its specifier cannot carry an extension: `#target.ts`
+  // resolves to nothing.
+  it('reports a multi-segment `#` import that omits its extension, and no other `#` import', async () => {
+    const results = await lintFixture([...baseConfig, typedParserSettings], 'subpath-imports/src/importer.ts');
+
+    expect(results[0]?.fatalErrorCount).toBe(0);
+    expect(listExtensionMessages(results)).toStrictEqual(['Missing file extension "ts" for "#src/target"']);
+  });
+
   // ESLint merges `settings` deeply, which lets a consumer add a resolver key without displacing the
   // config's own `extensionAlias`. The README documents the override on that basis.
   it('keeps the alias when a later config adds a resolver key of its own', async () => {
