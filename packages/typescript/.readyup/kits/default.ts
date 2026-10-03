@@ -365,7 +365,7 @@ function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   if (content.includes(PACKAGE_NAME)) return true;
 
   const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
-  return providerDir === undefined ? false : { ok: true, detail: `imported by source path from ${providerDir}` };
+  return providerDir !== undefined && { ok: true, detail: `imported by source path from ${providerDir}` };
 }
 
 /** Skips the enumeration check when no eslint config's nearest tsconfig covers it or names a TypeScript file beside it. */
@@ -379,9 +379,10 @@ function skipUnlessEnumerated(): false | string {
 function skipUnlessEslintLoadsTypeScript(): false | string {
   const installed = readInstalledVersion('eslint');
   if (installed === undefined) return 'eslint is not installed';
-  return compareVersions(installed, ESLINT_TYPESCRIPT_FLOOR) >= 0
-    ? false
-    : 'eslint is below 10, which cannot load a TypeScript eslint config';
+  return (
+    compareVersions(installed, ESLINT_TYPESCRIPT_FLOOR) < 0 &&
+    'eslint is below 10, which cannot load a TypeScript eslint config'
+  );
 }
 
 /**
@@ -390,15 +391,19 @@ function skipUnlessEslintLoadsTypeScript(): false | string {
  * re-export is still judged on the value that it writes.
  */
 function skipUnlessNextRootDirApplies(): false | string {
-  if (listEslintConfigsMatching(enablesNextPlugin).length > 0) return false;
-  if (listEslintConfigsMatching(setsNextRootDir).length > 0) return false;
+  if (
+    listEslintConfigsMatching(enablesNextPlugin).length > 0 ||
+    listEslintConfigsMatching(setsNextRootDir).length > 0
+  ) {
+    return false;
+  }
   return 'No eslint config enables the Next plugin or sets settings.next.rootDir';
 }
 
 /** Skips a peer floor check when either side of the comparison is unavailable. */
 function skipUnlessPeerComparable(name: string): false | string {
   const comparison = comparePeer(name);
-  return comparison.kind === 'comparable' ? false : comparison.reason;
+  return comparison.kind !== 'comparable' && comparison.reason;
 }
 
 /**
@@ -406,7 +411,7 @@ function skipUnlessPeerComparable(name: string): false | string {
  * no TypeScript source.
  */
 function skipUnlessTsconfigPresent(): false | string {
-  return listRepoTsconfigs().length > 0 ? false : 'The repo declares no tsconfig';
+  return listRepoTsconfigs().length === 0 && 'The repo declares no tsconfig';
 }
 
 /** Passes when any eslint config anchors the project service with tsconfigRootDir. */

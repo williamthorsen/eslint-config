@@ -11,7 +11,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "d1952ca5",
+          "hash": "e8776bde",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -21,7 +21,7 @@
           "path": "../src/readiness/base-chain.ts"
         },
         {
-          "hash": "4f053be6",
+          "hash": "f8442965",
           "kind": "module",
           "path": "../src/readiness/classifyChain.ts"
         },
@@ -55,8 +55,8 @@
       "path": "kits/default.js",
       "readyupVersion": "0.39.0",
       "source": "kits/default.ts",
-      "sourceHash": "d1952ca5",
-      "targetHash": "fc93a3da"
+      "sourceHash": "e8776bde",
+      "targetHash": "2332495b"
     }
   ]
 }

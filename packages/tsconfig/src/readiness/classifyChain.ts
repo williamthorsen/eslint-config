@@ -20,5 +20,5 @@ export function classifyChain(chain: TsconfigChain): ChainClassification {
   const baseIndex = findBaseIndex(chain.entries);
   if (baseIndex !== undefined) return { baseIndex, kind: 'adopted' };
 
-  return hasExternalBase(chain.entries) ? { kind: 'external-base' } : { kind: 'unadopted' };
+  return { kind: hasExternalBase(chain.entries) ? 'external-base' : 'unadopted' };
 }

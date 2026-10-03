@@ -24,7 +24,6 @@ export const advisoryRuleSeverities = {
   'unicorn/prefer-string-raw': 'warn',
   'unicorn/prefer-string-slice': 'warn',
   'unicorn/prefer-string-starts-ends-with': 'warn',
-  'unicorn/prefer-ternary': 'warn',
   'unicorn/prefer-top-level-await': 'warn',
   'unicorn/prefer-type-error': 'warn',
   'unicorn/text-encoding-identifier-case': 'warn',

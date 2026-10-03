@@ -449,7 +449,7 @@ function rootEslintConfigExtendsThisPackage() {
   if (content === void 0) return false;
   if (content.includes(PACKAGE_NAME)) return true;
   const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
-  return providerDir === void 0 ? false : { ok: true, detail: `imported by source path from ${providerDir}` };
+  return providerDir !== void 0 && { ok: true, detail: `imported by source path from ${providerDir}` };
 }
 function skipUnlessEnumerated() {
   const judged = listInputJudgements();
@@ -459,19 +459,20 @@ function skipUnlessEnumerated() {
 function skipUnlessEslintLoadsTypeScript() {
   const installed = readInstalledVersion("eslint");
   if (installed === void 0) return "eslint is not installed";
-  return compareVersions(installed, ESLINT_TYPESCRIPT_FLOOR) >= 0 ? false : "eslint is below 10, which cannot load a TypeScript eslint config";
+  return compareVersions(installed, ESLINT_TYPESCRIPT_FLOOR) < 0 && "eslint is below 10, which cannot load a TypeScript eslint config";
 }
 function skipUnlessNextRootDirApplies() {
-  if (listEslintConfigsMatching(enablesNextPlugin).length > 0) return false;
-  if (listEslintConfigsMatching(setsNextRootDir).length > 0) return false;
+  if (listEslintConfigsMatching(enablesNextPlugin).length > 0 || listEslintConfigsMatching(setsNextRootDir).length > 0) {
+    return false;
+  }
   return "No eslint config enables the Next plugin or sets settings.next.rootDir";
 }
 function skipUnlessPeerComparable(name) {
   const comparison = comparePeer(name);
-  return comparison.kind === "comparable" ? false : comparison.reason;
+  return comparison.kind !== "comparable" && comparison.reason;
 }
 function skipUnlessTsconfigPresent() {
-  return listRepoTsconfigs().length > 0 ? false : "The repo declares no tsconfig";
+  return listRepoTsconfigs().length === 0 && "The repo declares no tsconfig";
 }
 function tsconfigRootDirAnchored() {
   if (listEslintConfigsMatching(setsTsconfigRootDir).length > 0) return true;
