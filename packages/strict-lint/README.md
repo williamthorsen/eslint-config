@@ -92,7 +92,7 @@ import type { Linter } from 'eslint';
 
 export const severities = {
   'unicorn/no-array-reduce': 'warn',
-  'unicorn/prefer-ternary': 'off',
+  'unicorn/no-lonely-if': 'off',
 } satisfies Record<string, Linter.RuleSeverity>;
 ```
 
@@ -127,7 +127,7 @@ import { defineConfig } from '@williamthorsen/strict-lint/config';
 export default defineConfig({
   maxSeverity: {
     // this package is already clean of the rule, so let it fail the build here
-    'unicorn/prefer-ternary': 'error',
+    'unicorn/no-lonely-if': 'error',
   },
 });
 ```
@@ -138,7 +138,7 @@ Setting it to `undefined` drops it the same way. Use this when the spread map is
 export default defineConfig({
   maxSeverity: {
     ...sharedSeverities,
-    'unicorn/prefer-ternary': undefined,
+    'unicorn/no-lonely-if': undefined,
   },
 });
 ```
