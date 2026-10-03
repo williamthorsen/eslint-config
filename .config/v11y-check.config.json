@@ -2,7 +2,15 @@
   "$schema": "https://github.com/williamthorsen/node-monorepo-tools/raw/audit-deps-v0.6.0/packages/audit-deps/schemas/config.json",
   "dev": {
     "severityThreshold": "moderate",
-    "allowlist": []
+    "allowlist": [
+      {
+        "addedAt": "2026-10-03T15:50:28.676Z",
+        "id": "1240992",
+        "path": "packages__typescript>@next/eslint-plugin-next>fast-glob>micromatch>braces",
+        "reason": "Added by v11y sync at 2026-10-03 15:50:28 UTC",
+        "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm"
+      }
+    ]
   },
   "prod": {
     "severityThreshold": "low",

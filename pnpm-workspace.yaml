@@ -9,10 +9,10 @@ allowBuilds:
   unrs-resolver: false
 
 catalog:
-  '@williamthorsen/toolbelt.vitest': '0.10.1'
+  '@williamthorsen/toolbelt.vitest': '0.10.2'
   eslint: '10.11.0'
-  eslint-plugin-n: '18.3.0'
-  readyup: '0.38.0'
+  eslint-plugin-n: '18.4.0'
+  readyup: '0.39.0'
   typescript: '6.0.3'
   typescript-eslint: '8.70.1'
   vitest: '4.1.11'
