@@ -57,7 +57,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/prefer-string-replace-all': 'off', // 🔴⚫ Its auto-fixes are not yet trusted
   'unicorn/prefer-string-slice': 'warn', // 🔴🟠
   'unicorn/prefer-string-starts-ends-with': 'warn', // 🔴🟠
-  'unicorn/prefer-ternary': 'warn', // 🔴🟠
+  'unicorn/prefer-ternary': 'off', // 🔴⚫ Reports a guard `if` followed by a `return`, working against early returns
   'unicorn/prefer-top-level-await': 'warn', // 🔴🟠
   'unicorn/prefer-type-error': 'warn', // 🔴🟠
   'unicorn/prevent-abbreviations': 'off', // 🔴⚫
