@@ -12,15 +12,15 @@ const create: TSESLint.RuleCreateFunction<'undefinedWithNumber'> = (context) => 
       }
 
       const [arg] = node.arguments;
-      if (arg) {
-        const tsNode = parserServices.esTreeNodeToTSNodeMap.get(arg);
-        const type = checker.getTypeAtLocation(tsNode);
-        if (checker.typeToString(type).includes('undefined')) {
-          context.report({
-            node: arg,
-            messageId: 'undefinedWithNumber',
-          });
-        }
+      if (!arg) return;
+
+      const tsNode = parserServices.esTreeNodeToTSNodeMap.get(arg);
+      const type = checker.getTypeAtLocation(tsNode);
+      if (checker.typeToString(type).includes('undefined')) {
+        context.report({
+          node: arg,
+          messageId: 'undefinedWithNumber',
+        });
       }
     },
   };

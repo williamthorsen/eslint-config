@@ -44,7 +44,7 @@ function classifyChain(chain) {
   }
   const baseIndex = findBaseIndex(chain.entries);
   if (baseIndex !== void 0) return { baseIndex, kind: "adopted" };
-  return hasExternalBase(chain.entries) ? { kind: "external-base" } : { kind: "unadopted" };
+  return { kind: hasExternalBase(chain.entries) ? "external-base" : "unadopted" };
 }
 
 // src/readiness/es-year.ts
@@ -320,7 +320,7 @@ function listTsconfigSearchDirs() {
 }
 function nodeFloorSupportsBaseEsYear() {
   const verdict = judgeNodeFloor();
-  return verdict.kind === "skip" ? true : { ok: verdict.kind === "pass", detail: verdict.detail };
+  return verdict.kind === "skip" || { ok: verdict.kind === "pass", detail: verdict.detail };
 }
 function noEscapingPaths() {
   const judged = findTsconfigs().flatMap((path) => {
@@ -368,19 +368,19 @@ function resolveDirPath(dir, basename) {
   return dir === "." ? basename : `${dir}/${basename}`;
 }
 function skipUnlessBaseEsYearKnown() {
-  return readBaseEsYear() === void 0 ? NO_BASE_ES_YEAR : false;
+  return readBaseEsYear() === void 0 && NO_BASE_ES_YEAR;
 }
 function skipUnlessNodeFloorComparable() {
   const verdict = judgeNodeFloor();
-  return verdict.kind === "skip" ? verdict.reason : false;
+  return verdict.kind === "skip" && verdict.reason;
 }
 function skipUnlessSomeTsconfigIsAccountable() {
   const classified = classifyAdoptions();
   if (classified.length === 0) return "no workspace tsconfig was found";
-  return classified.some((adoption) => adoption.kind !== "external-base") ? false : "every workspace tsconfig extends a base belonging to another package";
+  return classified.every((adoption) => adoption.kind === "external-base") && "every workspace tsconfig extends a base belonging to another package";
 }
 function skipUnlessSomeTsconfigWasFound() {
-  return findTsconfigs().length === 0 ? "no workspace tsconfig was found" : false;
+  return findTsconfigs().length === 0 && "no workspace tsconfig was found";
 }
 export {
   default_default as default

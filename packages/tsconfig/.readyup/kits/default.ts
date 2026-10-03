@@ -243,7 +243,7 @@ function listTsconfigSearchDirs(): string[] {
 /** Fails when the lowest declared Node floor predates the ES year set by the base. */
 function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
   const verdict = judgeNodeFloor();
-  return verdict.kind === 'skip' ? true : { ok: verdict.kind === 'pass', detail: verdict.detail };
+  return verdict.kind === 'skip' || { ok: verdict.kind === 'pass', detail: verdict.detail };
 }
 
 /** Fails when a workspace tsconfig is governed by an include, exclude, or files path outside its own directory. */
@@ -313,27 +313,28 @@ function resolveDirPath(dir: string, basename: string): string {
 
 /** Skips the ES year check until some chain reaches a base declaring one. */
 function skipUnlessBaseEsYearKnown(): false | string {
-  return readBaseEsYear() === undefined ? NO_BASE_ES_YEAR : false;
+  return readBaseEsYear() === undefined && NO_BASE_ES_YEAR;
 }
 
 /** Skips the Node floor check when either side of the comparison is unavailable. */
 function skipUnlessNodeFloorComparable(): false | string {
   const verdict = judgeNodeFloor();
-  return verdict.kind === 'skip' ? verdict.reason : false;
+  return verdict.kind === 'skip' && verdict.reason;
 }
 
 /** Skips the adoption check when every tsconfig found extends a base belonging to another package. */
 function skipUnlessSomeTsconfigIsAccountable(): false | string {
   const classified = classifyAdoptions();
   if (classified.length === 0) return 'no workspace tsconfig was found';
-  return classified.some((adoption) => adoption.kind !== 'external-base')
-    ? false
-    : 'every workspace tsconfig extends a base belonging to another package';
+  return (
+    classified.every((adoption) => adoption.kind === 'external-base') &&
+    'every workspace tsconfig extends a base belonging to another package'
+  );
 }
 
 /** Skips the escaping-path check when the project has no tsconfig to judge. */
 function skipUnlessSomeTsconfigWasFound(): false | string {
-  return findTsconfigs().length === 0 ? 'no workspace tsconfig was found' : false;
+  return findTsconfigs().length === 0 && 'no workspace tsconfig was found';
 }
 
 // endregion | Helpers

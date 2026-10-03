@@ -52,14 +52,14 @@ function checkReturnedFunctions(
     }
 
     // Resolve a shorthand property to the local function that it names.
-    if (prop.shorthand && prop.key.type === AST_NODE_TYPES.Identifier) {
-      const functionNode = findFunctionByName(node, prop.key.name);
-      if (functionNode && !isUseCallbackOrUseMemo(functionNode.parent)) {
-        context.report({
-          node: functionNode,
-          messageId: 'memoizedFunctionsReturnedByHook',
-        });
-      }
+    if (!prop.shorthand || prop.key.type !== AST_NODE_TYPES.Identifier) continue;
+
+    const functionNode = findFunctionByName(node, prop.key.name);
+    if (functionNode && !isUseCallbackOrUseMemo(functionNode.parent)) {
+      context.report({
+        node: functionNode,
+        messageId: 'memoizedFunctionsReturnedByHook',
+      });
     }
   }
 }
