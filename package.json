@@ -44,7 +44,7 @@
     "vitest": "catalog:",
     "zod": "4.6.5"
   },
-  "packageManager": "pnpm@12.7.0",
+  "packageManager": "pnpm@12.8.1",
   "engines": {
     "node": ">=24"
   }
