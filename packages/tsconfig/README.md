@@ -1,3 +1,5 @@
+<!-- readme-type: config -->
+
 # @williamthorsen/tsconfig
 
 Shared TypeScript base config for Node-only projects. Inlines the settings of [`@tsconfig/strictest`](https://www.npmjs.com/package/@tsconfig/strictest) and adds the Node and build options that it leaves out, so a consuming repo declares only what is genuinely its own.
@@ -80,13 +82,13 @@ Run it once:
 pnpm exec rdy run --from npm:@williamthorsen/tsconfig
 ```
 
-Or list it in `.config/readyup.config.ts` to include it in every `rdy run --packages`:
+Or list it in `.config/readyup.config.ts` to include it in every `rdy run --sources`:
 
 ```ts
 import { defineRdyConfig } from 'readyup';
 
 export default defineRdyConfig({
-  packages: ['@williamthorsen/tsconfig'],
+  sources: ['npm:@williamthorsen/tsconfig'],
 });
 ```
 

@@ -535,13 +535,13 @@ Run it once:
 pnpm exec rdy run --from npm:@williamthorsen/eslint-config-typescript
 ```
 
-Or list it in `.config/readyup.config.ts` to include it in every `rdy run --packages`:
+Or list it in `.config/readyup.config.ts` to include it in every `rdy run --sources`:
 
 ```ts
 import { defineRdyConfig } from 'readyup';
 
 export default defineRdyConfig({
-  packages: ['@williamthorsen/eslint-config-typescript'],
+  sources: ['npm:@williamthorsen/eslint-config-typescript'],
 });
 ```
 
