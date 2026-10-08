@@ -44,8 +44,10 @@
     }
   },
   "files": [
+    ".meta/changelog.json",
     ".readyup/kits/*.js",
     ".readyup/manifest.json",
+    "CHANGELOG.md",
     "dist"
   ],
   "scripts": {

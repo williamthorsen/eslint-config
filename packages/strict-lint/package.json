@@ -39,7 +39,9 @@
     "strict-lint": "bin/strict-lint.js"
   },
   "files": [
+    ".meta/changelog.json",
     "bin",
+    "CHANGELOG.md",
     "dist"
   ],
   "scripts": {
