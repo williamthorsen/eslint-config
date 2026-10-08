@@ -20,6 +20,14 @@ concurrency:
 
 jobs:
   code-quality:
-    uses: williamthorsen/.github/.github/workflows/code-quality-pnpm-workflow.yaml@v7
+    uses: williamthorsen/.github/.github/workflows/code-quality-pnpm-workflow.yaml@v8
     with:
-      check-command: pnpm exec nmr ci
+      # The legs together run `nmr ci`: `build`, then the `check:strict` override in `.config/nmr.config.ts`.
+      # `build` has a leg of its own because no other leg reads its output.
+      check-commands: >-
+        [
+          { "name": "build", "command": "pnpm exec nmr build" },
+          { "name": "lint", "command": "pnpm exec nmr lint:strict" },
+          { "name": "static", "command": "pnpm exec nmr typecheck && pnpm exec nmr fmt:check && pnpm exec nmr verify:kits" },
+          { "name": "test", "command": "pnpm exec nmr test:coverage" }
+        ]

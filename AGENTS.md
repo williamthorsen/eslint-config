@@ -21,6 +21,8 @@ This repo runs on [`@williamthorsen/nmr`](https://www.npmjs.com/package/@william
 
 Iterate with `nmr check`, and run `nmr ci` before pushing. `nmr ci` adds a recursive build, `strict-lint` in place of `eslint`, coverage, and a fresh compile of both kits, so it is the slow gate rather than the inner loop. It is also the only one of the two that catches declaration-emit diagnostics, lint warnings, coverage shortfalls, and a stale kit bundle.
 
+CI does not run `nmr ci` itself: `.github/workflows/code-quality.yaml` runs its constituents as four parallel legs (`build`, `lint`, `static`, `test`), each on its own runner. The legs restate the `check:strict` override in `.config/nmr.config.ts`, so a step added to that override runs in CI only once a leg names it too.
+
 Releases are triggered via the **Release** GitHub Actions workflow (`workflow_dispatch`), which uses release-kit to bump versions, regenerate CHANGELOGs, and push tags. Tag pushes (`<workspace>-v<semver>`) then trigger the **Publish** and **Create GitHub Release** workflows. Don't push release tags by hand.
 
 ## Commit conventions
