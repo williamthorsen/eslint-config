@@ -110,6 +110,22 @@ Every `package.json` must declare `author` and `engines`, and may not contain an
 
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely.
 
+## File length
+
+`max-lines` caps a source file at 300 lines and a test file (one matched by [`patterns.testFiles`](#file-patterns)) at 500, counting neither blank lines nor comments. A test file takes the higher ceiling because its fixtures and case tables repeat setup that source code would factor out. The rule reports at `warn` and is listed in [`advisoryRuleSeverities`](#advisory-rule-severities), so it stays a warning under `strict-lint` when that map caps promotion; otherwise `strict-lint` promotes it to an error.
+
+To exempt generated files or change a ceiling, add a scoped block after this config:
+
+```ts
+export default defineConfig(
+  tsConfig,
+  { files: ['src/generated/**'], rules: { 'max-lines': 'off' } },
+  { files: ['scripts/**'], rules: { 'max-lines': ['warn', { max: 400, skipBlankLines: true, skipComments: true }] } },
+);
+```
+
+A block that sets a ceiling restates `skipBlankLines` and `skipComments`, because an options object replaces the earlier one rather than merging with it.
+
 ## Import order
 
 `simple-import-sort/imports` sorts a module's imports into groups separated by a blank line, in this order:
@@ -483,7 +499,7 @@ Only the readyup entries are scoped, because `.readyup/` also contains authored 
 
 ## Advisory rule severities
 
-`advisoryRuleSeverities` maps the rules that this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `sky-pilot/no-split-imports`, most of the `unicorn` `prefer-*` set, and their neighbours) to `'warn'`, because they report style and modernization advice rather than defects. Rules that this config disables outright are not included.
+`advisoryRuleSeverities` maps the rules that this config sets (`@typescript-eslint/no-deprecated`, the two type-import rules `@typescript-eslint/no-import-type-side-effects` and `sky-pilot/no-split-imports`, most of the `unicorn` `prefer-*` set, `max-lines`, and their neighbours) to `'warn'`, because they report style, structure, and modernization advice rather than defects. Rules that this config disables outright are not included.
 
 Use it with [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) to exempt them from error promotion, so that a stricter CI run still fails on genuine defects only:
 
