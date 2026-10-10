@@ -11,6 +11,18 @@ export const ESLINT_CONFIG_BASENAMES = [
   'eslint.config.cts',
 ];
 
+/**
+ * Finds the tsconfig owning a file, which is the nearest `tsconfig.json` at or above its directory.
+ * That is the config that the project service resolves; a sibling under another basename owns nothing.
+ */
+export function findOwningTsconfig(filePath: string, exists: (path: string) => boolean): string | undefined {
+  const slash = filePath.lastIndexOf('/');
+  const dir = slash === -1 ? '.' : filePath.slice(0, slash);
+  return listAncestorDirs(dir)
+    .map((ancestor) => resolveDirPath(ancestor, 'tsconfig.json'))
+    .find((candidate) => exists(candidate));
+}
+
 /** Reports whether an eslint config path names a TypeScript config. */
 export function isTypeScriptEslintConfig(configPath: string): boolean {
   return /\.[cm]?ts$/.test(configPath);

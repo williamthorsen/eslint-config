@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ESLINT_CONFIG_BASENAMES,
+  findOwningTsconfig,
   isTypeScriptEslintConfig,
   listAncestorDirs,
   listEslintConfigCandidates,
@@ -16,6 +17,25 @@ describe('ESLINT_CONFIG_BASENAMES', () => {
     const lastJavaScript = ESLINT_CONFIG_BASENAMES.findLastIndex((basename) => !isTypeScriptEslintConfig(basename));
 
     expect(lastJavaScript).toBeLessThan(firstTypeScript);
+  });
+});
+
+describe(findOwningTsconfig, () => {
+  it('returns the nearest tsconfig.json at or above the file', () => {
+    const present = new Set(['tsconfig.json', 'packages/app/tsconfig.json']);
+
+    expect(findOwningTsconfig('packages/app/src/eslint.config.ts', (path) => present.has(path))).toBe(
+      'packages/app/tsconfig.json',
+    );
+    expect(findOwningTsconfig('packages/lib/eslint.config.ts', (path) => present.has(path))).toBe('tsconfig.json');
+  });
+
+  it('checks the root for a file at the root', () => {
+    expect(findOwningTsconfig('eslint.config.ts', (path) => path === 'tsconfig.json')).toBe('tsconfig.json');
+  });
+
+  it('returns undefined when no tsconfig.json exists on the path to the root', () => {
+    expect(findOwningTsconfig('packages/app/eslint.config.ts', () => false)).toBeUndefined();
   });
 });
 
