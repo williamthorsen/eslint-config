@@ -1,6 +1,8 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import ts from 'typescript';
 
+import { findEnclosingBlock, findEnclosingFunction, isWithin } from './utils/ast-ancestry.ts';
+
 type MessageId = 'bindWithKeyword' | 'floatingDisposable' | 'unboundDisposable';
 
 interface Options {
@@ -8,17 +10,9 @@ interface Options {
   checkDeclarations: boolean;
 }
 
-type EnclosingFunction = TSESTree.ArrowFunctionExpression | TSESTree.FunctionDeclaration | TSESTree.FunctionExpression;
 type ReferenceIdentifier = TSESTree.Identifier | TSESTree.JSXIdentifier;
 type ResourceExpression = TSESTree.CallExpression | TSESTree.NewExpression;
 type TypedServices = NonNullable<ReturnType<typeof getTypedServicesOrNull>>;
-
-const blockNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.BlockStatement,
-  AST_NODE_TYPES.Program,
-  AST_NODE_TYPES.StaticBlock,
-  AST_NODE_TYPES.SwitchCase,
-]);
 
 // Callees whose disposable result is safe to discard. Node's timer globals return a `Timeout` implementing
 // `Symbol.dispose`, and discarding it is the point of `setTimeout(fn, ms);`. `node:crypto`'s factories return a
@@ -35,12 +29,6 @@ const defaultAllow: readonly string[] = [
   'setInterval',
   'setTimeout',
 ];
-
-const functionNodeTypes: ReadonlySet<AST_NODE_TYPES> = new Set([
-  AST_NODE_TYPES.ArrowFunctionExpression,
-  AST_NODE_TYPES.FunctionDeclaration,
-  AST_NODE_TYPES.FunctionExpression,
-]);
 
 /** Reports a disposable resource that is discarded, or declared without `using` in a scope that could release it. */
 const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (context) => {
@@ -130,26 +118,6 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
 
 // region | Helper functions
 
-/** Returns the nearest statement list enclosing the node: the scope at which a `using` binding would be released. */
-function findEnclosingBlock(node: TSESTree.Node): TSESTree.Node | undefined {
-  for (const ancestor of listAncestors(node)) {
-    if (blockNodeTypes.has(ancestor.type)) {
-      return ancestor;
-    }
-  }
-  return undefined;
-}
-
-/** Returns the nearest function enclosing the node, or undefined when the node is at module or class level. */
-function findEnclosingFunction(node: TSESTree.Node): EnclosingFunction | undefined {
-  for (const ancestor of listAncestors(node)) {
-    if (isEnclosingFunction(ancestor)) {
-      return ancestor;
-    }
-  }
-  return undefined;
-}
-
 /**
  * Returns type-aware parser services, or null when the parser supplies none or the configuration provides no program.
  * `getParserServices` throws for a non-TypeScript parser even with `allowWithoutFullTypeInformation`, making the throw
@@ -210,11 +178,6 @@ function isDisposalAccess(identifier: ReferenceIdentifier): boolean {
     property.property.type === AST_NODE_TYPES.Identifier &&
     (property.property.name === 'asyncDispose' || property.property.name === 'dispose')
   );
-}
-
-/** Returns true if the node is a function in whose body a resource's references would be captured. */
-function isEnclosingFunction(node: TSESTree.Node): node is EnclosingFunction {
-  return functionNodeTypes.has(node.type);
 }
 
 /**
@@ -304,23 +267,6 @@ function isScopeBound(
       !isContinuationRegistration(identifier, services)
     );
   });
-}
-
-/** Returns true if the node's source range falls inside the container's. */
-function isWithin(node: TSESTree.Node, container: TSESTree.Node): boolean {
-  return node.range[0] >= container.range[0] && node.range[1] <= container.range[1];
-}
-
-/**
- * Yields the node's ancestors, nearest first, ending at the `Program` in which it is rooted. The walk tests for
- * `Program` because ESLint sets its parent to `null`, which `TSESTree.Node['parent']` declares non-nullable.
- */
-function* listAncestors(node: TSESTree.Node): Generator<TSESTree.Node> {
-  let current: TSESTree.Node = node;
-  while (current.type !== AST_NODE_TYPES.Program) {
-    current = current.parent;
-    yield current;
-  }
 }
 
 /**
