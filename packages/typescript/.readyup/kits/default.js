@@ -6,7 +6,6 @@ export const __readyupVersion = "0.40.0";
 // .readyup/kits/default.ts
 import { defineRdyKit } from "readyup";
 import {
-  compareVersions,
   discoverWorkspaces,
   fileExists,
   getJsonValue,
@@ -93,6 +92,11 @@ var ESLINT_CONFIG_BASENAMES = [
   "eslint.config.mts",
   "eslint.config.cts"
 ];
+function findOwningTsconfig(filePath, exists) {
+  const slash = filePath.lastIndexOf("/");
+  const dir = slash === -1 ? "." : filePath.slice(0, slash);
+  return listAncestorDirs(dir).map((ancestor) => resolveDirPath(ancestor, "tsconfig.json")).find((candidate) => exists(candidate));
+}
 function isTypeScriptEslintConfig(configPath) {
   return /\.[cm]?ts$/.test(configPath);
 }
@@ -131,6 +135,37 @@ function listSearchDirs(workspaceDirs) {
   return [.../* @__PURE__ */ new Set([".", ...workspaceDirs])];
 }
 
+// src/readiness/peer-floor.ts
+import { compareVersions } from "readyup/check-utils";
+
+// src/readiness/readVersionFloor.ts
+var SINGLE_COMPARATOR = /^(?:>=|\^|~)?(\d+)(?:\.(\d+))?(?:\.(\d+))?$/;
+function readVersionFloor(range) {
+  const match = SINGLE_COMPARATOR.exec(range.trim());
+  if (match === null) return void 0;
+  const [, major, minor, patch] = match;
+  return `${major}.${minor ?? "0"}.${patch ?? "0"}`;
+}
+
+// src/readiness/peer-floor.ts
+function comparePeer({ installed, name, owner, range }) {
+  if (range === void 0) return { kind: "unknown", reason: `${owner} declares no ${name} peer` };
+  const floor = readVersionFloor(range);
+  if (floor === void 0) return { kind: "unknown", reason: `peer range "${range}" names no single floor` };
+  if (installed === void 0) return { kind: "unknown", reason: `${name} is not installed` };
+  return { floor, installed, kind: "comparable", range };
+}
+function judgePeerFloor({ floor, installed, range }) {
+  return compareVersions(installed, floor) >= 0 ? { ok: true, detail: `${installed} satisfies the ${range} peer range` } : { ok: false, detail: `${installed} is below the ${range} peer range` };
+}
+function pickLowestVersion(versions) {
+  let lowest;
+  for (const version of versions) {
+    if (lowest === void 0 || compareVersions(version, lowest) < 0) lowest = version;
+  }
+  return lowest;
+}
+
 // src/readiness/permitsTsExtensionImports.ts
 var PERMITTING_OPTIONS = ["allowImportingTsExtensions", "rewriteRelativeImportExtensions"];
 function permitsTsExtensionImports(entries) {
@@ -143,13 +178,12 @@ function readNearestOption(entries, option) {
   return void 0;
 }
 
-// src/readiness/readVersionFloor.ts
-var SINGLE_COMPARATOR = /^(?:>=|\^|~)?(\d+)(?:\.(\d+))?(?:\.(\d+))?$/;
-function readVersionFloor(range) {
-  const match = SINGLE_COMPARATOR.exec(range.trim());
-  if (match === null) return void 0;
-  const [, major, minor, patch] = match;
-  return `${major}.${minor ?? "0"}.${patch ?? "0"}`;
+// src/readiness/skipBelowTypeScriptConfigSupport.ts
+import { compareVersions as compareVersions2 } from "readyup/check-utils";
+var ESLINT_TYPESCRIPT_FLOOR = "10.0.0";
+function skipBelowTypeScriptConfigSupport(installed) {
+  if (installed === void 0) return "eslint is not installed";
+  return compareVersions2(installed, ESLINT_TYPESCRIPT_FLOOR) < 0 && "eslint is below 10, which cannot load a TypeScript eslint config";
 }
 
 // src/readiness/tsconfig-inputs.ts
@@ -221,7 +255,6 @@ var MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/p
 var TS_ESLINT_CONFIG_MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-eslint-configs-to-typescript`;
 var IMPORT_SPECIFIER_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#import-specifiers`;
 var PEER_RANGES = { "peerDependencies": { "@next/eslint-plugin-next": "^16.3.5", "@typescript-eslint/utils": "^8.59.1", "@vitest/eslint-plugin": "^1.6.27", "eslint": ">=10", "eslint-plugin-jest-dom": "^5.10.1", "eslint-plugin-jsx-a11y": "^6.10.2", "eslint-plugin-react": "^7.37.5", "eslint-plugin-react-hooks": "^7.1.1", "eslint-plugin-testing-library": "^7.16.2", "readyup": ">=0.33.0", "typescript": ">=5.7" } };
-var ESLINT_TYPESCRIPT_FLOOR = "10.0.0";
 var installedVersions = /* @__PURE__ */ new Map();
 var tsconfigChains = /* @__PURE__ */ new Map();
 var default_default = defineRdyKit({
@@ -326,19 +359,11 @@ var default_default = defineRdyKit({
   ]
 });
 function checkPeerFloor(name) {
-  const comparison = comparePeer(name);
-  if (comparison.kind === "unknown") return { ok: false, detail: comparison.reason };
-  const { floor, installed, range } = comparison;
-  return compareVersions(installed, floor) >= 0 ? { ok: true, detail: `${installed} satisfies the ${range} peer range` } : { ok: false, detail: `${installed} is below the ${range} peer range` };
+  const comparison = comparePeerVersions(name);
+  return comparison.kind === "unknown" ? { ok: false, detail: comparison.reason } : judgePeerFloor(comparison);
 }
-function comparePeer(name) {
-  const range = readPeerRange(name);
-  if (range === void 0) return { kind: "unknown", reason: `${PACKAGE_NAME} declares no ${name} peer` };
-  const floor = readVersionFloor(range);
-  if (floor === void 0) return { kind: "unknown", reason: `peer range "${range}" names no single floor` };
-  const installed = readInstalledVersion(name);
-  if (installed === void 0) return { kind: "unknown", reason: `${name} is not installed` };
-  return { floor, installed, kind: "comparable", range };
+function comparePeerVersions(name) {
+  return comparePeer({ installed: readInstalledVersion(name), name, owner: PACKAGE_NAME, range: readPeerRange(name) });
 }
 function eslintConfigEnumerated() {
   const offenders = [];
@@ -353,11 +378,6 @@ function eslintConfigEnumerated() {
 function findEslintConfigs() {
   return listEslintConfigCandidates(listRepoSearchDirs()).filter((configPath) => fileExists(configPath));
 }
-function findOwningTsconfig(filePath) {
-  const slash = filePath.lastIndexOf("/");
-  const dir = slash === -1 ? "." : filePath.slice(0, slash);
-  return listAncestorDirs(dir).map((ancestor) => resolveDirPath(ancestor, "tsconfig.json")).find((candidate) => fileExists(candidate));
-}
 function findRootEslintConfig() {
   return ESLINT_CONFIG_BASENAMES.find((basename) => fileExists(basename));
 }
@@ -369,7 +389,7 @@ function listEslintConfigsMatching(matches) {
 }
 function listInputJudgements() {
   return findEslintConfigs().flatMap((configPath) => {
-    const tsconfigPath = findOwningTsconfig(configPath);
+    const tsconfigPath = findOwningTsconfig(configPath, fileExists);
     if (tsconfigPath === void 0) return [];
     const chain = readChain(tsconfigPath);
     if (chain === void 0) return [];
@@ -427,14 +447,12 @@ function readChain(tsconfigPath) {
 function readInstalledVersion(name) {
   const cached = installedVersions.get(name);
   if (cached !== void 0 || installedVersions.has(name)) return cached;
-  let lowest;
-  for (const dir of listRepoSearchDirs()) {
+  const versions = listRepoSearchDirs().flatMap((dir) => {
     const manifest = readJsonFile(resolveDirPath(dir, `node_modules/${name}/package.json`));
-    if (manifest === void 0) continue;
-    const version = getJsonValue(manifest, "version");
-    if (typeof version !== "string") continue;
-    if (lowest === void 0 || compareVersions(version, lowest) < 0) lowest = version;
-  }
+    const version = manifest === void 0 ? void 0 : getJsonValue(manifest, "version");
+    return typeof version === "string" ? [version] : [];
+  });
+  const lowest = pickLowestVersion(versions);
   installedVersions.set(name, lowest);
   return lowest;
 }
@@ -457,9 +475,7 @@ function skipUnlessEnumerated() {
   return "No tsconfig owning an eslint config enumerates a sibling TypeScript file by name";
 }
 function skipUnlessEslintLoadsTypeScript() {
-  const installed = readInstalledVersion("eslint");
-  if (installed === void 0) return "eslint is not installed";
-  return compareVersions(installed, ESLINT_TYPESCRIPT_FLOOR) < 0 && "eslint is below 10, which cannot load a TypeScript eslint config";
+  return skipBelowTypeScriptConfigSupport(readInstalledVersion("eslint"));
 }
 function skipUnlessNextRootDirApplies() {
   if (listEslintConfigsMatching(enablesNextPlugin).length > 0 || listEslintConfigsMatching(setsNextRootDir).length > 0) {
@@ -468,7 +484,7 @@ function skipUnlessNextRootDirApplies() {
   return "No eslint config enables the Next plugin or sets settings.next.rootDir";
 }
 function skipUnlessPeerComparable(name) {
-  const comparison = comparePeer(name);
+  const comparison = comparePeerVersions(name);
   return comparison.kind !== "comparable" && comparison.reason;
 }
 function skipUnlessTsconfigPresent() {

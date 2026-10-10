@@ -11,7 +11,6 @@
  */
 import { type CheckOutcome, defineRdyKit, pickJson } from 'readyup';
 import {
-  compareVersions,
   discoverWorkspaces,
   fileExists,
   getJsonValue,
@@ -31,14 +30,15 @@ import {
 } from '../../src/readiness/eslint-config-contents.ts';
 import {
   ESLINT_CONFIG_BASENAMES,
-  listAncestorDirs,
+  findOwningTsconfig,
   listEslintConfigCandidates,
   listShadowedEslintConfigDirs,
   resolveDirPath,
 } from '../../src/readiness/eslint-config-paths.ts';
 import { listSearchDirs } from '../../src/readiness/listSearchDirs.ts';
+import { comparePeer, judgePeerFloor, type PeerComparison, pickLowestVersion } from '../../src/readiness/peer-floor.ts';
 import { permitsTsExtensionImports } from '../../src/readiness/permitsTsExtensionImports.ts';
-import { readVersionFloor } from '../../src/readiness/readVersionFloor.ts';
+import { skipBelowTypeScriptConfigSupport } from '../../src/readiness/skipBelowTypeScriptConfigSupport.ts';
 import { type InputCoverage, judgeInputCoverage } from '../../src/readiness/tsconfig-inputs.ts';
 
 const PACKAGE_NAME = '@williamthorsen/eslint-config-typescript';
@@ -48,12 +48,6 @@ const IMPORT_SPECIFIER_URL = `https://github.com/williamthorsen/eslint-config/tr
 
 // Inlined at compile time, so the floors track the package's own peer ranges instead of a copy.
 const PEER_RANGES = pickJson('../../package.json', ['peerDependencies']);
-
-// The first eslint major that loads a TypeScript config, below which a shadowed config is expected.
-const ESLINT_TYPESCRIPT_FLOOR = '10.0.0';
-
-type PeerComparison =
-  { floor: string; installed: string; kind: 'comparable'; range: string } | { kind: 'unknown'; reason: string };
 
 interface InputJudgement {
   configPath: string;
@@ -172,26 +166,13 @@ export default defineRdyKit({
 
 /** Compares a peer dependency's installed version against the floor that this package's peer range sets. */
 function checkPeerFloor(name: string): boolean | CheckOutcome {
-  const comparison = comparePeer(name);
-  if (comparison.kind === 'unknown') return { ok: false, detail: comparison.reason };
-  const { floor, installed, range } = comparison;
-  return compareVersions(installed, floor) >= 0
-    ? { ok: true, detail: `${installed} satisfies the ${range} peer range` }
-    : { ok: false, detail: `${installed} is below the ${range} peer range` };
+  const comparison = comparePeerVersions(name);
+  return comparison.kind === 'unknown' ? { ok: false, detail: comparison.reason } : judgePeerFloor(comparison);
 }
 
-/** Resolves the two versions that a peer floor check compares, or the reason they cannot be compared. */
-function comparePeer(name: string): PeerComparison {
-  const range = readPeerRange(name);
-  if (range === undefined) return { kind: 'unknown', reason: `${PACKAGE_NAME} declares no ${name} peer` };
-
-  const floor = readVersionFloor(range);
-  if (floor === undefined) return { kind: 'unknown', reason: `peer range "${range}" names no single floor` };
-
-  const installed = readInstalledVersion(name);
-  if (installed === undefined) return { kind: 'unknown', reason: `${name} is not installed` };
-
-  return { floor, installed, kind: 'comparable', range };
+/** Pairs a peer's declared range with its installed version. */
+function comparePeerVersions(name: string): PeerComparison {
+  return comparePeer({ installed: readInstalledVersion(name), name, owner: PACKAGE_NAME, range: readPeerRange(name) });
 }
 
 /** Fails when a tsconfig's enumerated inputs omit an eslint config located among the files that they name. */
@@ -211,18 +192,6 @@ function findEslintConfigs(): string[] {
   return listEslintConfigCandidates(listRepoSearchDirs()).filter((configPath) => fileExists(configPath));
 }
 
-/**
- * Finds the tsconfig owning a file, which is the nearest `tsconfig.json` at or above its directory.
- * That is the config that the project service resolves; a sibling under another basename owns nothing.
- */
-function findOwningTsconfig(filePath: string): string | undefined {
-  const slash = filePath.lastIndexOf('/');
-  const dir = slash === -1 ? '.' : filePath.slice(0, slash);
-  return listAncestorDirs(dir)
-    .map((ancestor) => resolveDirPath(ancestor, 'tsconfig.json'))
-    .find((candidate) => fileExists(candidate));
-}
-
 /** Resolves the root eslint config as the loader does, taking the first basename in precedence order. */
 function findRootEslintConfig(): string | undefined {
   return ESLINT_CONFIG_BASENAMES.find((basename) => fileExists(basename));
@@ -239,7 +208,7 @@ function listEslintConfigsMatching(matches: (content: string) => boolean): strin
 /** Judges how each eslint config is treated by the inputs of the tsconfig owning it. */
 function listInputJudgements(): InputJudgement[] {
   return findEslintConfigs().flatMap((configPath) => {
-    const tsconfigPath = findOwningTsconfig(configPath);
+    const tsconfigPath = findOwningTsconfig(configPath, fileExists);
     if (tsconfigPath === undefined) return [];
     const chain = readChain(tsconfigPath);
     if (chain === undefined) return [];
@@ -333,14 +302,12 @@ function readInstalledVersion(name: string): string | undefined {
   const cached = installedVersions.get(name);
   if (cached !== undefined || installedVersions.has(name)) return cached;
 
-  let lowest: string | undefined;
-  for (const dir of listRepoSearchDirs()) {
+  const versions = listRepoSearchDirs().flatMap((dir) => {
     const manifest = readJsonFile(resolveDirPath(dir, `node_modules/${name}/package.json`));
-    if (manifest === undefined) continue;
-    const version = getJsonValue(manifest, 'version');
-    if (typeof version !== 'string') continue;
-    if (lowest === undefined || compareVersions(version, lowest) < 0) lowest = version;
-  }
+    const version = manifest === undefined ? undefined : getJsonValue(manifest, 'version');
+    return typeof version === 'string' ? [version] : [];
+  });
+  const lowest = pickLowestVersion(versions);
   installedVersions.set(name, lowest);
   return lowest;
 }
@@ -377,12 +344,7 @@ function skipUnlessEnumerated(): false | string {
 
 /** Skips the shadowing check below eslint 10, which can load only a JavaScript config. */
 function skipUnlessEslintLoadsTypeScript(): false | string {
-  const installed = readInstalledVersion('eslint');
-  if (installed === undefined) return 'eslint is not installed';
-  return (
-    compareVersions(installed, ESLINT_TYPESCRIPT_FLOOR) < 0 &&
-    'eslint is below 10, which cannot load a TypeScript eslint config'
-  );
+  return skipBelowTypeScriptConfigSupport(readInstalledVersion('eslint'));
 }
 
 /**
@@ -402,7 +364,7 @@ function skipUnlessNextRootDirApplies(): false | string {
 
 /** Skips a peer floor check when either side of the comparison is unavailable. */
 function skipUnlessPeerComparable(name: string): false | string {
-  const comparison = comparePeer(name);
+  const comparison = comparePeerVersions(name);
   return comparison.kind !== 'comparable' && comparison.reason;
 }
 

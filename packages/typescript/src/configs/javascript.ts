@@ -8,6 +8,7 @@ const rules: Linter.RulesRecord = {
   complexity: 'warn',
   eqeqeq: ['error', 'always'],
   'guard-for-in': 'error',
+  'max-lines': ['warn', { max: 300, skipBlankLines: true, skipComments: true }],
   'no-alert': 'error',
   'no-cond-assign': ['error', 'always'],
   'no-console': ['error', { allow: ['debug', 'error', 'info', 'warn'] }],

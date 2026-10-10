@@ -45,6 +45,7 @@ export const baseConfig: Config[] = [
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/unbound-method': 'off',
+      'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }],
       'sky-pilot/prefer-function-declaration': 'off',
       'unicorn/consistent-function-scoping': 'off',
       'unicorn/no-thenable': 'off',
