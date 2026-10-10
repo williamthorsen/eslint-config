@@ -1,11 +1,13 @@
 /**
- * Rules that report style and modernization advice rather than defects. Spread the map into a strict-lint
+ * Rules that report style, structure, and modernization advice rather than defects. Spread the map into a strict-lint
  * `maxSeverity` to exempt them from error promotion, or into a flat-config `rules` block to set them directly.
  */
 export const advisoryRuleSeverities = {
   '@typescript-eslint/no-deprecated': 'warn',
   '@typescript-eslint/no-import-type-side-effects': 'warn',
   '@typescript-eslint/no-unnecessary-type-arguments': 'warn',
+
+  'max-lines': 'warn',
 
   'sky-pilot/no-split-imports': 'warn',
 

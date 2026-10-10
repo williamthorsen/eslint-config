@@ -6,6 +6,8 @@ import { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { advisoryRuleSeverities } from '../advisoryRuleSeverities.ts';
+import { baseConfig } from '../baseConfig.ts';
 import { gitIgnoresConfigName } from '../ignores/git.ts';
 
 describe('baseConfig', () => {
@@ -36,6 +38,30 @@ describe('baseConfig', () => {
     const baseConfig = await importBaseConfig();
 
     expect(baseConfig.map((block) => block.name)).not.toContain(gitIgnoresConfigName);
+  });
+
+  it.each([
+    ['src/main.ts', 300],
+    ['src/main.js', 300],
+    ['src/__tests__/main.unit.test.ts', 500],
+    ['src/__tests__/main.test.js', 500],
+  ])('caps %s at %i counted lines', async (filePath, max) => {
+    const linter = new ESLint({ overrideConfig: baseConfig, overrideConfigFile: true });
+
+    const config: unknown = await linter.calculateConfigForFile(filePath);
+
+    expect(config).toHaveProperty(['rules', 'max-lines'], [1, { max, skipBlankLines: true, skipComments: true }]);
+  });
+
+  it('keeps the ceiling when advisoryRuleSeverities sets the severity', async () => {
+    const linter = new ESLint({
+      overrideConfig: [...baseConfig, { rules: { ...advisoryRuleSeverities } }],
+      overrideConfigFile: true,
+    });
+
+    const config: unknown = await linter.calculateConfigForFile('src/main.ts');
+
+    expect(config).toHaveProperty(['rules', 'max-lines'], [1, { max: 300, skipBlankLines: true, skipComments: true }]);
   });
 });
 
