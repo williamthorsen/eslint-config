@@ -24,11 +24,11 @@
     "@vitest/coverage-v8": "4.1.11",
     "@williamthorsen/eslint-config-typescript": "workspace:*",
     "@williamthorsen/nmr": "0.43.0",
-    "@williamthorsen/release-kit": "14.0.0",
+    "@williamthorsen/release-kit": "14.1.0",
     "@williamthorsen/strict-lint": "workspace:*",
     "@williamthorsen/toolbelt.vitest": "catalog:",
     "@williamthorsen/tsconfig": "workspace:*",
-    "codeassembly": "0.16.0",
+    "codeassembly": "0.17.0",
     "eslint": "catalog:",
     "eslint-plugin-n": "catalog:",
     "globals": "17.13.0",
@@ -44,7 +44,7 @@
     "vitest": "catalog:",
     "zod": "4.6.5"
   },
-  "packageManager": "pnpm@12.9.0",
+  "packageManager": "pnpm@12.9.1",
   "engines": {
     "node": ">=24"
   }
