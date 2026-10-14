@@ -47,7 +47,7 @@ export default defineConfig({
   maxSeverity: {
     // cap these below error so that they stay warnings
     'unicorn/no-array-reduce': 'warn',
-    'unicorn/no-nested-ternary': 'warn',
+    'unicorn/no-lonely-if': 'warn',
   },
 });
 ```

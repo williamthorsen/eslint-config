@@ -7,3 +7,8 @@ export function report(items: readonly string[], isVerbose: boolean): void {
     });
   }
 }
+
+export function describeCount(count: number): string {
+  // An unparenthesized ternary in the alternate, the form in which Prettier writes it, is what `unicorn/no-nested-ternary` reports.
+  return count === 0 ? 'none' : count === 1 ? 'one' : 'many';
+}

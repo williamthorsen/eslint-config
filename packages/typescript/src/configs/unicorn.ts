@@ -25,7 +25,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-named-default': 'off', // 🔴⚫ `{ default as x }` emits identically to `import x`; no defect content
   'unicorn/no-negated-condition': 'off', // 🔴⚫ Too prescriptive
   'unicorn/no-non-function-verb-prefix': 'off', // 🔴⚫ Flags verb-named holders like the `createConfig` factory map
-  'unicorn/no-nested-ternary': 'warn', // 🔴🟠
+  'unicorn/no-nested-ternary': 'off', // 🔴⚫ Its fix adds parentheses that Prettier removes, so `eslint --fix` and Prettier undo each other
   'unicorn/no-for-loop': 'off', // 🔴⚫ Traditional for loops are sometimes clearer
   'unicorn/no-null': 'off', // 🔴⚫
   'unicorn/no-process-exit': 'off', // 🔴⚫ Needed in CLI tools and scripts
