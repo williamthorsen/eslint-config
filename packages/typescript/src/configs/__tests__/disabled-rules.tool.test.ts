@@ -5,7 +5,7 @@ import { baseConfig } from '#src/baseConfig.ts';
 
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
-const disabledRuleIds = ['unicorn/no-for-each', 'unicorn/prefer-simple-condition-first'];
+const disabledRuleIds = ['unicorn/no-for-each', 'unicorn/no-nested-ternary', 'unicorn/prefer-simple-condition-first'];
 
 const reEnabled: Config = {
   rules: Object.fromEntries(disabledRuleIds.map((ruleId) => [ruleId, 'error'])),
