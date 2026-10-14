@@ -14,7 +14,7 @@ catalog:
   eslint-plugin-n: '18.4.1'
   readyup: '0.40.0'
   typescript: '6.0.3'
-  typescript-eslint: '8.71.0'
+  typescript-eslint: '8.71.1'
   vitest: '4.1.11'
 
 peerDependencyRules:

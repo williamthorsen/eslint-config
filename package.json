@@ -23,8 +23,8 @@
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "4.1.11",
     "@williamthorsen/eslint-config-typescript": "workspace:*",
-    "@williamthorsen/nmr": "0.43.0",
-    "@williamthorsen/release-kit": "14.1.0",
+    "@williamthorsen/nmr": "0.46.2",
+    "@williamthorsen/release-kit": "14.2.1",
     "@williamthorsen/strict-lint": "workspace:*",
     "@williamthorsen/toolbelt.vitest": "catalog:",
     "@williamthorsen/tsconfig": "workspace:*",
@@ -33,18 +33,18 @@
     "eslint-plugin-n": "catalog:",
     "globals": "17.13.0",
     "jiti": "2.7.0",
-    "lefthook": "2.1.16",
+    "lefthook": "2.1.17",
     "prettier": "3.9.9",
     "readyup": "catalog:",
     "rimraf": "6.1.3",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
-    "v11y-check": "0.19.1",
-    "vite": "8.3.2",
+    "v11y-check": "0.19.2",
+    "vite": "8.3.3",
     "vitest": "catalog:",
     "zod": "4.6.5"
   },
-  "packageManager": "pnpm@12.9.1",
+  "packageManager": "pnpm@12.10.1",
   "engines": {
     "node": ">=24"
   }
