@@ -2,6 +2,28 @@
   "version": 1,
   "kits": [
     {
+      "checklistChecks": [
+        {
+          "checklist": "adoption",
+          "checks": [
+            "Every workspace tsconfig extends @williamthorsen/tsconfig",
+            "No tsconfig re-declares an option that the base already supplies"
+          ]
+        },
+        {
+          "checklist": "alignment",
+          "checks": [
+            "No tsconfig declares an ES year other than the one @williamthorsen/tsconfig sets",
+            "The declared Node floor supports the base's ES year"
+          ]
+        },
+        {
+          "checklist": "hygiene",
+          "checks": [
+            "No tsconfig's include, exclude, or files names a path outside its own directory"
+          ]
+        }
+      ],
       "checklists": [
         "adoption",
         "alignment",
@@ -53,10 +75,10 @@
       ],
       "name": "default",
       "path": "kits/default.js",
-      "readyupVersion": "0.40.0",
+      "readyupVersion": "0.41.0",
       "source": "kits/default.ts",
       "sourceHash": "e8776bde",
-      "targetHash": "e13af1e3"
+      "targetHash": "2748686b"
     }
   ]
 }

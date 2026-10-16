@@ -2,6 +2,40 @@
   "version": 1,
   "kits": [
     {
+      "checklistChecks": [
+        {
+          "checklist": "peers",
+          "checks": [
+            "eslint satisfies the peer range declared by this config",
+            "typescript satisfies the peer range declared by this config"
+          ]
+        },
+        {
+          "checklist": "config",
+          "checks": [
+            "A root eslint config exists",
+            "The root eslint config extends @williamthorsen/eslint-config-typescript",
+            "No JavaScript eslint config shadows a TypeScript one",
+            "An eslint config anchors the project service with tsconfigRootDir",
+            "An eslint config sets settings.next.rootDir",
+            "Every settings.next.rootDir is absolute"
+          ]
+        },
+        {
+          "checklist": "tsconfig",
+          "checks": [
+            "The repo's tsconfigs permit a TypeScript-extension import",
+            "A tsconfig enumerating an eslint config's siblings names the config itself"
+          ]
+        },
+        {
+          "checklist": "projectservice",
+          "checks": [
+            "No eslint config sets parserOptions.project",
+            "No tsconfig.eslint.json files remain"
+          ]
+        }
+      ],
       "checklists": [
         "peers",
         "config",
@@ -67,10 +101,10 @@
       ],
       "name": "default",
       "path": "kits/default.js",
-      "readyupVersion": "0.40.0",
+      "readyupVersion": "0.41.0",
       "source": "kits/default.ts",
       "sourceHash": "21d8cc0b",
-      "targetHash": "b587f77d"
+      "targetHash": "7dab8ea1"
     }
   ]
 }
