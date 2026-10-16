@@ -1,5 +1,44 @@
 [
   {
+    "version": "14.2.0",
+    "date": "2026-10-16",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Ships `CHANGELOG.md` and the machine-readable `.meta/changelog.json` in the tarball of each published package, so that consumers receive the release history with the package. (#267)",
+            "hash": "c762a7d1dc34ddefc1cb2e4db74ca46eb70b2b0f",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Rewrites the imports in `strict-lint` and `typescript` that climb with `..` to a target outside the importing file's directory as `#src/` specifiers, and leaves a test's single `..` to the directory beside its `__tests__/` relative. (#260)",
+            "hash": "f869618c8009da96a85821b694e332f2c7341e95",
+            "entry": 2
+          }
+        ]
+      },
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Replaces the root tsconfig's unused `~/*` alias with a `#src/*` alias that `strict-lint` and `typescript` each declare in their tsconfig `paths` and, for jiti and Node, which do not read `paths`, in their `package.json` `imports`, and configures Vitest and the `import-x` resolver in `eslint.config.ts` to resolve it. (#260)",
+            "hash": "f869618c8009da96a85821b694e332f2c7341e95",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "14.1.0",
     "date": "2026-09-29",
     "sections": [

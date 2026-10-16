@@ -1,5 +1,109 @@
 [
   {
+    "version": "19.0.0",
+    "date": "2026-10-16",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Upgrades `eslint-plugin-unicorn` from 74.0.0 to 76.0.0, which adds eight error-level rules to the `unicorn` config (`no-async-iterator-callback`, `no-unused-builtin-method-return`, `no-unused-iterator-helper`, `no-useless-set-construction`, `no-using-resource-escape`, `prefer-combined-guards`, `prefer-iterator-zip`, and `prefer-temporal-conversion`) and widens `prefer-continue`, `prefer-early-return`, `prefer-logical-operator-over-ternary`, and `prefer-minimal-ternary` to report more code shapes. (#262)",
+            "breaking": true,
+            "migration": "Before upgrading, fix the code that the new error-level rules report or lower their severity in the local config, and rename any local setting for the deprecated `unicorn/no-unused-array-method-return` to `unicorn/no-unused-builtin-method-return`, its replacement.",
+            "hash": "d9234640a4ffd1f305d86c51b66ac1b1d9bc8e18",
+            "entry": 1
+          },
+          {
+            "description": "Turns off `unicorn/prefer-ternary`, which since unicorn 75 reports a guard `if` that returns followed by a `return` and asks for a ternary in its place, against the early-return style that `unicorn/prefer-early-return` enforces. (#262)",
+            "hash": "d9234640a4ffd1f305d86c51b66ac1b1d9bc8e18",
+            "entry": 2
+          },
+          {
+            "description": "Ships `CHANGELOG.md` and the machine-readable `.meta/changelog.json` in the tarball of each published package, so that consumers receive the release history with the package. (#267)",
+            "hash": "c762a7d1dc34ddefc1cb2e4db74ca46eb70b2b0f",
+            "entry": 1
+          },
+          {
+            "description": "Enables `max-lines` at `warn` with a ceiling of 300 lines for a source file and 500 for a file matched by `patterns.testFiles`, counting neither blank lines nor comments, and adds the rule to `advisoryRuleSeverities` so that `strict-lint` keeps it a warning when that map caps severity. (#268)",
+            "breaking": true,
+            "migration": "Split each file that `max-lines` reports, or add a scoped config block that sets the rule to `'off'` or raises `max`; a block that sets `max` must restate `skipBlankLines: true` and `skipComments: true`, because its options object replaces the inherited one rather than merging with it.",
+            "hash": "ec52214c5e843bb24510426ce98877272f347e02",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "🐛 Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Fixes the issue that `simple-import-sort/imports` sorted a package whose name starts with `import` or `export`, such as `import-meta-resolve`, after relative imports instead of with the other packages. (#259)",
+            "breaking": true,
+            "migration": "Run `eslint --fix` to move each such import into the packages group; until then, `@williamthorsen/strict-lint` reports the file as an error.",
+            "hash": "e364ae8a3653613960042db5dc013bb656844679",
+            "entry": 1
+          },
+          {
+            "description": "Fixes the issue that `simple-import-sort/imports` sorted an absolute specifier not matched by any other group, such as `$lib/foo`, after relative imports, and gives such a specifier its own group before relative imports. (#259)",
+            "breaking": true,
+            "migration": "Run `eslint --fix` to move each such import into the new group before relative imports.",
+            "hash": "e364ae8a3653613960042db5dc013bb656844679",
+            "entry": 2
+          },
+          {
+            "description": "Fixes the issue that `eslint --fix` and Prettier undid each other's edits to a nested ternary, by turning off `unicorn/no-nested-ternary`, whose autofix adds parentheses that Prettier removes. (#270)",
+            "hash": "6c912e65c19473cb4015f323d0088e5eb789d26b",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Rewrites the imports in `strict-lint` and `typescript` that climb with `..` to a target outside the importing file's directory as `#src/` specifiers, and leaves a test's single `..` to the directory beside its `__tests__/` relative. (#260)",
+            "hash": "f869618c8009da96a85821b694e332f2c7341e95",
+            "entry": 2
+          },
+          {
+            "description": "Rewrites the code reported by unicorn 76's new and widened rules in both readyup kits, `classifyChain`, and the `memoized-functions-returned-by-hook` and `no-undefined-with-number` rules, without changing what any of them returns. (#262)",
+            "hash": "d9234640a4ffd1f305d86c51b66ac1b1d9bc8e18",
+            "entry": 3
+          }
+        ]
+      },
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Replaces the root tsconfig's unused `~/*` alias with a `#src/*` alias that `strict-lint` and `typescript` each declare in their tsconfig `paths` and, for jiti and Node, which do not read `paths`, in their `package.json` `imports`, and configures Vitest and the `import-x` resolver in `eslint.config.ts` to resolve it. (#260)",
+            "hash": "f869618c8009da96a85821b694e332f2c7341e95",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "📚 Documentation",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Documents the import order in a new \"Import order\" section of the package README, including how a consumer sets another order. (#259)",
+            "hash": "e364ae8a3653613960042db5dc013bb656844679",
+            "entry": 3
+          },
+          {
+            "description": "Updates the readyup kit instructions in the `@williamthorsen/eslint-config-typescript` and `@williamthorsen/tsconfig` READMEs to the readyup 0.40 form, which lists the kit under `sources` as an `npm:` entry and runs it with `rdy run --sources`. (#265)",
+            "hash": "a20621bcb43644b12ef7b07a10a07c3333cdbccf",
+            "entry": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "18.0.0",
     "date": "2026-10-01",
     "sections": [
@@ -67,24 +171,8 @@
         "audience": "dev",
         "items": [
           {
-            "description": "Adds `__tests__/package-readme-links.unit.test.ts`, which fails with the README and target of each inline link or reference definition in a `packages/*/README.md` whose relative path resolves outside that package's directory. (#226)",
-            "hash": "b61dd5e71680ca09c6a036e4b638a169886050fd",
-            "entry": 2
-          },
-          {
             "description": "Adds a unit test that fails when a plugin imported by a `createConfig` factory is missing from `peerDependencies` or is not marked optional in `peerDependenciesMeta`. (#255)",
             "hash": "81698f2b572b4705c3449fa7339649232e797056",
-            "entry": 2
-          }
-        ]
-      },
-      {
-        "title": "⚙️ Tooling",
-        "audience": "dev",
-        "items": [
-          {
-            "description": "Changes the root `prepare` script to run `lefthook install` only when `lefthook check-install` reports missing or stale hooks, so that `pnpm install` no longer fails where `.git/hooks` is read-only. (#254)",
-            "hash": "d18536053ae698f34a0db319bc146972e73cc6d9",
             "entry": 2
           }
         ]
@@ -106,11 +194,6 @@
           {
             "description": "Revises the comments in `packages/typescript` outside `src/plugins/` to follow the comment-discipline rules, adding descriptions to the undocumented config factories and helpers and removing comments that restate rule documentation, record the code's history, or hold commented-out rules. (#234)",
             "hash": "e9989e0c500c55ee9dd42fcc0100effeee688c64",
-            "entry": 1
-          },
-          {
-            "description": "Revises the comments under `packages/tsconfig/` to follow the comment-discipline rules, adding the missing comment on `target` in `tsconfig.base.json` and removing test comments that restate the description of the function under test. (#236)",
-            "hash": "0b6d6e9ba21954de6bca3c153cdf50c0531bd8ac",
             "entry": 1
           },
           {

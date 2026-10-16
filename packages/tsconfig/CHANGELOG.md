@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.11.0 — 2026-10-16
+
+### 🎉 Features
+
+- Ships `CHANGELOG.md` and the machine-readable `.meta/changelog.json` in the tarball of each published package, so that consumers receive the release history with the package. (#267)
+
+### ♻️ Refactoring
+
+- Rewrites the code reported by unicorn 76's new and widened rules in both readyup kits, `classifyChain`, and the `memoized-functions-returned-by-hook` and `no-undefined-with-number` rules, without changing what any of them returns. (#262)
+
+### 📚 Documentation
+
+- Updates the readyup kit instructions in the `@williamthorsen/eslint-config-typescript` and `@williamthorsen/tsconfig` READMEs to the readyup 0.40 form, which lists the kit under `sources` as an `npm:` entry and runs it with `rdy run --sources`. (#265)
+
 ## 0.10.0 — 2026-09-29
 
 ### 🎉 Features
@@ -10,7 +24,6 @@ All notable changes to this project will be documented in this file.
 
 ### 📚 Documentation
 
-- Revises the comments in `packages/typescript` outside `src/plugins/` to follow the comment-discipline rules, adding descriptions to the undocumented config factories and helpers and removing comments that restate rule documentation, record the code's history, or hold commented-out rules. (#234)
 - Revises the comments under `packages/tsconfig/` to follow the comment-discipline rules, adding the missing comment on `target` in `tsconfig.base.json` and removing test comments that restate the description of the function under test. (#236)
 - Revises the `@williamthorsen/tsconfig` README, code comments, and test titles to follow the plain-speech and writing conventions. (#250)
 

@@ -1,5 +1,44 @@
 [
   {
+    "version": "0.11.0",
+    "date": "2026-10-16",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Ships `CHANGELOG.md` and the machine-readable `.meta/changelog.json` in the tarball of each published package, so that consumers receive the release history with the package. (#267)",
+            "hash": "c762a7d1dc34ddefc1cb2e4db74ca46eb70b2b0f",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Rewrites the code reported by unicorn 76's new and widened rules in both readyup kits, `classifyChain`, and the `memoized-functions-returned-by-hook` and `no-undefined-with-number` rules, without changing what any of them returns. (#262)",
+            "hash": "d9234640a4ffd1f305d86c51b66ac1b1d9bc8e18",
+            "entry": 3
+          }
+        ]
+      },
+      {
+        "title": "📚 Documentation",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Updates the readyup kit instructions in the `@williamthorsen/eslint-config-typescript` and `@williamthorsen/tsconfig` READMEs to the readyup 0.40 form, which lists the kit under `sources` as an `npm:` entry and runs it with `rdy run --sources`. (#265)",
+            "hash": "a20621bcb43644b12ef7b07a10a07c3333cdbccf",
+            "entry": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.10.0",
     "date": "2026-09-29",
     "sections": [
@@ -18,11 +57,6 @@
         "title": "📚 Documentation",
         "audience": "dev",
         "items": [
-          {
-            "description": "Revises the comments in `packages/typescript` outside `src/plugins/` to follow the comment-discipline rules, adding descriptions to the undocumented config factories and helpers and removing comments that restate rule documentation, record the code's history, or hold commented-out rules. (#234)",
-            "hash": "e9989e0c500c55ee9dd42fcc0100effeee688c64",
-            "entry": 1
-          },
           {
             "description": "Revises the comments under `packages/tsconfig/` to follow the comment-discipline rules, adding the missing comment on `target` in `tsconfig.base.json` and removing test comments that restate the description of the function under test. (#236)",
             "hash": "0b6d6e9ba21954de6bca3c153cdf50c0531bd8ac",

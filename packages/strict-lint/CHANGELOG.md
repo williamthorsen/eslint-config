@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 14.2.0 — 2026-10-16
+
+### 🎉 Features
+
+- Ships `CHANGELOG.md` and the machine-readable `.meta/changelog.json` in the tarball of each published package, so that consumers receive the release history with the package. (#267)
+
+### ♻️ Refactoring
+
+- Rewrites the imports in `strict-lint` and `typescript` that climb with `..` to a target outside the importing file's directory as `#src/` specifiers, and leaves a test's single `..` to the directory beside its `__tests__/` relative. (#260)
+
+### ⚙️ Tooling
+
+- Replaces the root tsconfig's unused `~/*` alias with a `#src/*` alias that `strict-lint` and `typescript` each declare in their tsconfig `paths` and, for jiti and Node, which do not read `paths`, in their `package.json` `imports`, and configures Vitest and the `import-x` resolver in `eslint.config.ts` to resolve it. (#260)
+
 ## 14.1.0 — 2026-09-29
 
 ### 🎉 Features

@@ -1,6 +1,6 @@
 {
   "name": "@williamthorsen/eslint-config-typescript",
-  "version": "18.0.0",
+  "version": "19.0.0",
   "description": "ESLint config for TypeScript, JSON & YML",
   "keywords": [
     "eslint-config"

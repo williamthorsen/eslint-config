@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## 19.0.0 — 2026-10-16
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Upgrades `eslint-plugin-unicorn` from 74.0.0 to 76.0.0, which adds eight error-level rules to the `unicorn` config (`no-async-iterator-callback`, `no-unused-builtin-method-return`, `no-unused-iterator-helper`, `no-useless-set-construction`, `no-using-resource-escape`, `prefer-combined-guards`, `prefer-iterator-zip`, and `prefer-temporal-conversion`) and widens `prefer-continue`, `prefer-early-return`, `prefer-logical-operator-over-ternary`, and `prefer-minimal-ternary` to report more code shapes. (#262)
+- Turns off `unicorn/prefer-ternary`, which since unicorn 75 reports a guard `if` that returns followed by a `return` and asks for a ternary in its place, against the early-return style that `unicorn/prefer-early-return` enforces. (#262)
+- Ships `CHANGELOG.md` and the machine-readable `.meta/changelog.json` in the tarball of each published package, so that consumers receive the release history with the package. (#267)
+- 🚨 **Breaking:** Enables `max-lines` at `warn` with a ceiling of 300 lines for a source file and 500 for a file matched by `patterns.testFiles`, counting neither blank lines nor comments, and adds the rule to `advisoryRuleSeverities` so that `strict-lint` keeps it a warning when that map caps severity. (#268)
+
+### 🐛 Bug fixes
+
+- 🚨 **Breaking:** Fixes the issue that `simple-import-sort/imports` sorted a package whose name starts with `import` or `export`, such as `import-meta-resolve`, after relative imports instead of with the other packages. (#259)
+- 🚨 **Breaking:** Fixes the issue that `simple-import-sort/imports` sorted an absolute specifier not matched by any other group, such as `$lib/foo`, after relative imports, and gives such a specifier its own group before relative imports. (#259)
+- Fixes the issue that `eslint --fix` and Prettier undid each other's edits to a nested ternary, by turning off `unicorn/no-nested-ternary`, whose autofix adds parentheses that Prettier removes. (#270)
+
+### ♻️ Refactoring
+
+- Rewrites the imports in `strict-lint` and `typescript` that climb with `..` to a target outside the importing file's directory as `#src/` specifiers, and leaves a test's single `..` to the directory beside its `__tests__/` relative. (#260)
+- Rewrites the code reported by unicorn 76's new and widened rules in both readyup kits, `classifyChain`, and the `memoized-functions-returned-by-hook` and `no-undefined-with-number` rules, without changing what any of them returns. (#262)
+
+### ⚙️ Tooling
+
+- Replaces the root tsconfig's unused `~/*` alias with a `#src/*` alias that `strict-lint` and `typescript` each declare in their tsconfig `paths` and, for jiti and Node, which do not read `paths`, in their `package.json` `imports`, and configures Vitest and the `import-x` resolver in `eslint.config.ts` to resolve it. (#260)
+
+### 📚 Documentation
+
+- Documents the import order in a new "Import order" section of the package README, including how a consumer sets another order. (#259)
+- Updates the readyup kit instructions in the `@williamthorsen/eslint-config-typescript` and `@williamthorsen/tsconfig` READMEs to the readyup 0.40 form, which lists the kit under `sources` as an `npm:` entry and runs it with `rdy run --sources`. (#265)
+
 ## 18.0.0 — 2026-10-01
 
 ### 🎉 Features
@@ -23,19 +52,13 @@ All notable changes to this project will be documented in this file.
 
 ### 🧪 Tests
 
-- Adds `__tests__/package-readme-links.unit.test.ts`, which fails with the README and target of each inline link or reference definition in a `packages/*/README.md` whose relative path resolves outside that package's directory. (#226)
 - Adds a unit test that fails when a plugin imported by a `createConfig` factory is missing from `peerDependencies` or is not marked optional in `peerDependenciesMeta`. (#255)
-
-### ⚙️ Tooling
-
-- Changes the root `prepare` script to run `lefthook install` only when `lefthook check-install` reports missing or stale hooks, so that `pnpm install` no longer fails where `.git/hooks` is read-only. (#254)
 
 ### 📚 Documentation
 
 - Replaces the four `../../docs/` migration-guide links in `packages/typescript/README.md` with absolute GitHub URLs on `main`, because the published tarball contains no `docs/` directory and the relative links broke wherever the README was read outside the repo. (#226)
 - Revises the comments under `packages/typescript/src/plugins/` to follow the comment-discipline rules, adding a description to each rule's `create` and its helpers and removing comments that restate the code or record its history. (#233)
 - Revises the comments in `packages/typescript` outside `src/plugins/` to follow the comment-discipline rules, adding descriptions to the undocumented config factories and helpers and removing comments that restate rule documentation, record the code's history, or hold commented-out rules. (#234)
-- Revises the comments under `packages/tsconfig/` to follow the comment-discipline rules, adding the missing comment on `target` in `tsconfig.base.json` and removing test comments that restate the description of the function under test. (#236)
 - Revises the comments and test titles of the custom rules and their typed rule tester to follow the plain-speech and writing conventions. (#245)
 - Revises the prose in `packages/typescript/README.md` to follow the plain-speech and writing conventions. (#246)
 - Revises the comments and test titles under `packages/typescript/src` and in the kit source to follow the plain-speech and writing conventions. (#248)
