@@ -42,9 +42,11 @@ const rules: Linter.RulesRecord = {
     },
   ], // 🔴🟠
   'unicorn/prefer-global-this': 'warn', // 🔴🟠
+  'unicorn/prefer-combined-guards': 'off', // 🔴⚫ Separate guards each state one reason to exit; its fix merges them into one condition
   'unicorn/prefer-default-parameters': 'off', // 🔴⚫ Incorrectly handles `null`
   'unicorn/prefer-dom-node-text-content': 'warn', // 🔴🟠
   'unicorn/prefer-includes': 'warn', // 🔴🟠
+  'unicorn/prefer-iterator-zip': 'off', // 🔴⚫ Suggests `Iterator.zip()`, which Node 24 and the `ES2025` lib don't provide
   'unicorn/prefer-math-min-max': 'off', // 🔴⚫ Ternary is often more readable than Math.min/Math.max
   'unicorn/prefer-node-protocol': 'warn', // 🔴🟠
   'unicorn/prefer-number-coercion': 'off', // 🔴⚫ Number() and parseInt() differ; the auto-fix can change behavior
