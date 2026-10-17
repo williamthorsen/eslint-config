@@ -110,7 +110,7 @@ Every `package.json` must declare `author` and `engines`, and may not contain an
 
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely.
 
-Config files (`*.config.*` and `.*rc.*` code files) have `unicorn/no-top-level-side-effects` turned off, because a tool loads them rather than a module importing them, so `export default defineConfig(…)` does not report whichever helper it calls. Elsewhere, the rule treats a [readyup](https://www.npmjs.com/package/readyup) kit's `export default defineRdyKit(…)` as pure.
+Config files (`*.config.*` and `.*rc.*` code files) and [readyup](https://www.npmjs.com/package/readyup) kit entry files (code files directly under a `.readyup/kits/` directory) have `unicorn/no-top-level-side-effects` turned off, because a tool loads them rather than a module importing them, so `export default defineConfig(…)` does not report whichever helper it calls, and a kit's `checks` can hold an array that a call builds. The rule stays on for the modules in a `.readyup/kits/` subdirectory, which a kit imports. Elsewhere, the rule treats a readyup kit's `export default defineRdyKit(…)` as pure.
 
 ## File length
 

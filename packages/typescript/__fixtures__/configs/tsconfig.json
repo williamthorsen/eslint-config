@@ -7,5 +7,5 @@
     "paths": { "@fixture/*": ["./*"] },
     "types": [],
   },
-  "include": ["**/*.ts", "**/.*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/.*.ts", "**/.readyup/**/*.ts", "**/*.tsx"],
 }

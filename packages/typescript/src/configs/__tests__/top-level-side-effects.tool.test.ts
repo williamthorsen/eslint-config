@@ -12,6 +12,8 @@ describe('unicorn/no-top-level-side-effects', () => {
     { fixture: 'side-effects/tool.config.ts', isReported: false },
     { fixture: 'side-effects/.toolrc.ts', isReported: false },
     { fixture: 'side-effects/kit.ts', isReported: false },
+    { fixture: 'side-effects/.readyup/kits/default.ts', isReported: false },
+    { fixture: 'side-effects/.readyup/kits/checks/build-checks.ts', isReported: true },
   ])('reports a default-exported call in $fixture: $isReported', async ({ fixture, isReported }) => {
     const results = await lintFixture([...baseConfig, typedParserSettings], fixture);
 
