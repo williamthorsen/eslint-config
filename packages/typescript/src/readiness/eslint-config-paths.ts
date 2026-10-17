@@ -49,6 +49,11 @@ export function listEslintConfigCandidates(dirs: readonly string[]): string[] {
   return dirs.flatMap((dir) => ESLINT_CONFIG_BASENAMES.map((basename) => resolveDirPath(dir, basename)));
 }
 
+/** Lists the eslint config paths that name a JavaScript config, in input order. */
+export function listJavaScriptEslintConfigs(eslintConfigPaths: readonly string[]): string[] {
+  return eslintConfigPaths.filter((configPath) => !isTypeScriptEslintConfig(configPath));
+}
+
 /**
  * Lists the directories containing both a JavaScript and a TypeScript eslint config.
  * The loader resolves the JavaScript basename first, so the TypeScript sibling that extends this package never runs.
