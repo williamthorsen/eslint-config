@@ -1,5 +1,22 @@
 [
   {
+    "version": "20.1.1",
+    "date": "2026-10-17",
+    "sections": [
+      {
+        "title": "🐛 Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Fixes the issue that `unicorn/no-unnecessary-parameters` reported a test helper's parameter that receives the same value from every call, by turning the rule off for test files in the base config and keeping it at error for other files. (#280)",
+            "hash": "df3750bc40f76fc5cabcc4457d6c2977a1193cf9",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "20.1.0",
     "date": "2026-10-17",
     "sections": [

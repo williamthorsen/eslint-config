@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 20.1.1 — 2026-10-17
+
+### 🐛 Bug fixes
+
+- Fixes the issue that `unicorn/no-unnecessary-parameters` reported a test helper's parameter that receives the same value from every call, by turning the rule off for test files in the base config and keeping it at error for other files. (#280)
+
 ## 20.1.0 — 2026-10-17
 
 ### 🎉 Features
