@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 20.1.0 — 2026-10-17
+
+### 🎉 Features
+
+- Adds `defineAppConfig`, `defineBackground`, `defineContentScript`, `defineUnlistedScript`, and `defineWxtPlugin` from the WXT browser-extension framework to the functions that `unicorn/no-top-level-side-effects` treats as pure when they are imported from `#imports` or from the matching `wxt/utils/define-*` module, a condition that excludes a call that WXT auto-imports. (#278)
+
+### 🐛 Bug fixes
+
+- Fixes the issue that `unicorn/no-top-level-side-effects` reported a readyup kit entry file (a code file directly under `.readyup/kits/`) whose `defineRdyKit` call passed a value built by a call, by turning the rule off for those files while keeping it on for the modules in a `.readyup/kits/` subdirectory. (#276)
+
 ## 20.0.0 — 2026-10-17
 
 ### 🎉 Features
