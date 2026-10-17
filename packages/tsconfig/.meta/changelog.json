@@ -1,5 +1,22 @@
 [
   {
+    "version": "0.11.1",
+    "date": "2026-10-17",
+    "sections": [
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Returns the single value directly from `flatMap` callbacks in the readiness predicates and kits of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, rather than wrapping it in a one-element array. (#273)",
+            "hash": "1041ba308e4415a8f7a0ebd80d3aad743a848fe1",
+            "entry": 4
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.11.0",
     "date": "2026-10-16",
     "sections": [

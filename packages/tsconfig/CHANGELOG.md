@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.11.1 — 2026-10-17
+
+### ♻️ Refactoring
+
+- Returns the single value directly from `flatMap` callbacks in the readiness predicates and kits of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, rather than wrapping it in a one-element array. (#273)
+
 ## 0.11.0 — 2026-10-16
 
 ### 🎉 Features

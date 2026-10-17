@@ -1,5 +1,22 @@
 [
   {
+    "version": "14.2.1",
+    "date": "2026-10-17",
+    "sections": [
+      {
+        "title": "🧪 Tests",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Removes test-helper parameters to which every call passed the same value, renaming each helper for the value that it now uses. (#273)",
+            "hash": "1041ba308e4415a8f7a0ebd80d3aad743a848fe1",
+            "entry": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "14.2.0",
     "date": "2026-10-16",
     "sections": [

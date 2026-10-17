@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## 20.0.0 — 2026-10-17
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Upgrades `eslint-plugin-unicorn` from 76.0.0 to 78.0.0, whose new and widened recommended rules are errors and can report code that passed lint before. (#273)
+- Turns off `unicorn/no-asterisk-prefix-in-documentation-comments`, which reports the leading asterisks of standard JSDoc blocks. (#273)
+- Turns off `unicorn/no-top-level-side-effects` in `*.config.*` and `.*rc.*` code files, which a tool loads rather than a module imports, and configures the rule elsewhere to treat readyup's `defineRdyKit` as pure. (#273)
+- Adds the readiness-kit check "Every eslint config is TypeScript", which warns on each JavaScript eslint config from ESLint 10 on and links the README's section on migrating to `eslint.config.ts`. (#274)
+
+### 🐛 Bug fixes
+
+- Fixes the issue that the config reported consecutive guards with a shared exit as errors under `unicorn/prefer-combined-guards`, whose autofix merges them into one `||` condition, by turning the rule off. (#272)
+- Fixes the issue that the config reported parallel-array loops as errors under `unicorn/prefer-iterator-zip`, which suggests `Iterator.zip()` even though Node 24 doesn't provide it and the `ES2025` lib doesn't declare it, by turning the rule off. (#272)
+
+### ♻️ Refactoring
+
+- Returns the single value directly from `flatMap` callbacks in the readiness predicates and kits of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, rather than wrapping it in a one-element array. (#273)
+
+### 🧪 Tests
+
+- Removes test-helper parameters to which every call passed the same value, renaming each helper for the value that it now uses. (#273)
+
 ## 19.0.0 — 2026-10-16
 
 ### 🎉 Features

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 14.2.1 — 2026-10-17
+
+### 🧪 Tests
+
+- Removes test-helper parameters to which every call passed the same value, renaming each helper for the value that it now uses. (#273)
+
 ## 14.2.0 — 2026-10-16
 
 ### 🎉 Features
