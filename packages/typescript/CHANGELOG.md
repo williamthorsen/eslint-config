@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 20.1.2 — 2026-10-17
+
+### 🐛 Bug fixes
+
+- Fixes the issue that `unicorn/no-top-level-side-effects` reported `export default defineCliConfig(…)` in a Sanity CLI config file (`sanity.cli.*`), which the Sanity CLI loads by name, like the `*.config.*` and `.*rc.*` files that the rule already skips. (#282)
+
 ## 20.1.1 — 2026-10-17
 
 ### 🐛 Bug fixes
