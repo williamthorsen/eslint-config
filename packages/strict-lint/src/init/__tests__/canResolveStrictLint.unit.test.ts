@@ -35,7 +35,7 @@ describe(canResolveStrictLint, () => {
 
   it('reports no package when node_modules contains a different package', () => {
     const dir = makeTree({});
-    writeFile(path.join(dir, 'node_modules/@williamthorsen/tsconfig/package.json'), '{}');
+    writeEmptyJsonFile(path.join(dir, 'node_modules/@williamthorsen/tsconfig/package.json'));
 
     expect(canResolveStrictLint(dir)).toBe(false);
   });
@@ -44,7 +44,7 @@ describe(canResolveStrictLint, () => {
   it('follows a symlinked install', () => {
     const dir = makeTree({});
     const store = path.join(dir, 'store/strict-lint');
-    writeFile(path.join(store, 'package.json'), '{}');
+    writeEmptyJsonFile(path.join(store, 'package.json'));
     const linkParent = path.join(dir, 'node_modules/@williamthorsen');
     fs.mkdirSync(linkParent, { recursive: true });
     fs.symlinkSync(store, path.join(linkParent, 'strict-lint'), 'dir');
@@ -61,15 +61,15 @@ function makeTree({ install }: { install?: string }): string {
   createdDirs.push(dir);
   fs.mkdirSync(path.join(dir, 'packages/pkg/src'), { recursive: true });
   if (install !== undefined) {
-    writeFile(path.join(dir, install, 'node_modules/@williamthorsen/strict-lint/package.json'), '{}');
+    writeEmptyJsonFile(path.join(dir, install, 'node_modules/@williamthorsen/strict-lint/package.json'));
   }
   return dir;
 }
 
-/** Writes a file, creating its parent directories. */
-function writeFile(filePath: string, content: string): void {
+/** Writes an empty JSON object to a file, creating its parent directories. */
+function writeEmptyJsonFile(filePath: string): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, content);
+  fs.writeFileSync(filePath, '{}');
 }
 
 // endregion | Helpers
