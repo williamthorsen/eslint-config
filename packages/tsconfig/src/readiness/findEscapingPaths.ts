@@ -64,7 +64,7 @@ function findEscapingPathsInField(
     .filter((value: unknown): value is string => typeof value === 'string')
     .flatMap((value) => {
       const outward = findOutwardPath(value, declaredDir, judgedDir);
-      return outward === undefined ? [] : [{ declaredIn: declaring.path, field, path: outward }];
+      return outward === undefined ? [] : { declaredIn: declaring.path, field, path: outward };
     });
 }
 

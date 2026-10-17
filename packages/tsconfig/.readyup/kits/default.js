@@ -62,7 +62,7 @@ function readDeclaredEsYear(compilerOptions) {
   if (targetYear !== void 0) return targetYear;
   const libYears = toStringArray(compilerOptions["lib"]).flatMap((entry) => {
     const year = parseEsYear(entry);
-    return year === void 0 ? [] : [year];
+    return year === void 0 ? [] : year;
   });
   return libYears.toSorted().at(-1);
 }
@@ -97,7 +97,7 @@ function findEscapingPathsInField(entries, field, judgedDir) {
   const declaredDir = dirname(declaring.path);
   return declared.filter((value) => typeof value === "string").flatMap((value) => {
     const outward = findOutwardPath(value, declaredDir, judgedDir);
-    return outward === void 0 ? [] : [{ declaredIn: declaring.path, field, path: outward }];
+    return outward === void 0 ? [] : { declaredIn: declaring.path, field, path: outward };
   });
 }
 function findOutwardPath(value, declaredDir, judgedDir) {
@@ -155,7 +155,7 @@ function classifyNodeEsYear(major, esYearForMajor) {
 function findLowestNodeMajor(floors) {
   const majors = floors.flatMap((floor) => {
     const major = readNodeMajor(floor);
-    return major === void 0 ? [] : [major];
+    return major === void 0 ? [] : major;
   });
   return majors.length === 0 ? void 0 : Math.min(...majors);
 }
@@ -306,7 +306,7 @@ function listDeclaredNodeFloors() {
     const manifest = readJsonFile(resolveDirPath(dir, "package.json"));
     if (manifest === void 0) return [];
     const floor = readEnginesNodeFloor(manifest);
-    return floor.kind === "found" ? [floor.floor] : [];
+    return floor.kind === "found" ? floor.floor : [];
   });
   if (engineFloors.length > 0) return engineFloors;
   const toolVersionsFloor = readToolVersionsNode();
@@ -325,7 +325,7 @@ function nodeFloorSupportsBaseEsYear() {
 function noEscapingPaths() {
   const judged = findTsconfigs().flatMap((path) => {
     const chain = readChain(path);
-    return chain === void 0 ? [] : [{ escapes: findEscapingPaths(chain.entries), path }];
+    return chain === void 0 ? [] : { escapes: findEscapingPaths(chain.entries), path };
   });
   const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
   const progress = {

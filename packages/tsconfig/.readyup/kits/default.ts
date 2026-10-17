@@ -222,7 +222,7 @@ function listDeclaredNodeFloors(): string[] {
     const manifest = readJsonFile(resolveDirPath(dir, 'package.json'));
     if (manifest === undefined) return [];
     const floor = readEnginesNodeFloor(manifest);
-    return floor.kind === 'found' ? [floor.floor] : [];
+    return floor.kind === 'found' ? floor.floor : [];
   });
   if (engineFloors.length > 0) return engineFloors;
 
@@ -250,7 +250,7 @@ function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
 function noEscapingPaths(): boolean | CheckOutcome {
   const judged = findTsconfigs().flatMap((path) => {
     const chain = readChain(path);
-    return chain === undefined ? [] : [{ escapes: findEscapingPaths(chain.entries), path }];
+    return chain === undefined ? [] : { escapes: findEscapingPaths(chain.entries), path };
   });
   const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
   const progress: Progress = {
