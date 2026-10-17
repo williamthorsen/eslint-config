@@ -4,6 +4,18 @@ import unicornPlugin from 'eslint-plugin-unicorn';
 
 import { configFiles, readyupKitEntryFiles } from '#src/patterns.ts';
 
+// A readyup kit's default export is a pure declaration, as is a WXT entrypoint's, which WXT imports at build time to
+// read its options.
+const pureExportsBySource: Record<string, string[]> = {
+  '#imports': ['defineAppConfig', 'defineBackground', 'defineContentScript', 'defineUnlistedScript', 'defineWxtPlugin'],
+  readyup: ['defineRdyKit'],
+  'wxt/utils/define-app-config': ['defineAppConfig'],
+  'wxt/utils/define-background': ['defineBackground'],
+  'wxt/utils/define-content-script': ['defineContentScript'],
+  'wxt/utils/define-unlisted-script': ['defineUnlistedScript'],
+  'wxt/utils/define-wxt-plugin': ['defineWxtPlugin'],
+};
+
 // see https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/readme.md
 const rules: Linter.RulesRecord = {
   // Downgrade or disable overly prescriptive rules
@@ -32,8 +44,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-for-loop': 'off', // 🔴⚫ Traditional for loops are sometimes clearer
   'unicorn/no-null': 'off', // 🔴⚫
   'unicorn/no-process-exit': 'off', // 🔴⚫ Needed in CLI tools and scripts
-  // A readyup kit's default export is a pure declaration.
-  'unicorn/no-top-level-side-effects': ['error', { allow: { readyup: ['defineRdyKit'] } }],
+  'unicorn/no-top-level-side-effects': ['error', { allow: pureExportsBySource }],
   'unicorn/no-useless-undefined': 'warn', // 🔴🟠
   'unicorn/number-literal-case': ['warn', { hexadecimalValue: 'lowercase' }], // to align with Prettier
   'unicorn/numeric-separators-style': [
