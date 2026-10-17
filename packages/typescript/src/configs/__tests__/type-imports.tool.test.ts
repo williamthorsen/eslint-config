@@ -96,7 +96,7 @@ const rows: Row[] = [
 
 const cases = rows.flatMap((row) =>
   row.imports.length === 1
-    ? [{ id: row.id, row, source: renderSource(row.imports, row.usage) }]
+    ? { id: row.id, row, source: renderSource(row.imports, row.usage) }
     : [
         { id: `${row.id} (as written)`, row, source: renderSource(row.imports, row.usage) },
         { id: `${row.id} (reversed)`, row, source: renderSource(row.imports.toReversed(), row.usage) },
