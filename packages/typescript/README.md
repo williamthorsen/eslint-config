@@ -110,6 +110,8 @@ Every `package.json` must declare `author` and `engines`, and may not contain an
 
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely.
 
+Config files (`*.config.*` and `.*rc.*` code files) have `unicorn/no-top-level-side-effects` turned off, because a tool loads them rather than a module importing them, so `export default defineConfig(…)` does not report whichever helper it calls. Elsewhere, the rule treats a [readyup](https://www.npmjs.com/package/readyup) kit's `export default defineRdyKit(…)` as pure.
+
 ## File length
 
 `max-lines` caps a source file at 300 lines and a test file (one matched by [`patterns.testFiles`](#file-patterns)) at 500, counting neither blank lines nor comments. A test file takes the higher ceiling because its fixtures and case tables repeat setup that source code would factor out. The rule reports at `warn` and is listed in [`advisoryRuleSeverities`](#advisory-rule-severities), so it stays a warning under `strict-lint` when that map caps promotion; otherwise `strict-lint` promotes it to an error.

@@ -2,6 +2,8 @@ import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
 import unicornPlugin from 'eslint-plugin-unicorn';
 
+import { configFiles } from '#src/patterns.ts';
+
 // see https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/readme.md
 const rules: Linter.RulesRecord = {
   // Downgrade or disable overly prescriptive rules
@@ -17,6 +19,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/name-replacements': 'off', // 🔴⚫ Abbreviations are allowed
   'unicorn/no-array-callback-reference': 'off', // 🔴⚫ Overly prescriptive
   'unicorn/no-array-reduce': 'warn', // 🔴🟠
+  'unicorn/no-asterisk-prefix-in-documentation-comments': 'off', // 🔴⚫ Conflicts with standard JSDoc
   'unicorn/no-await-expression-member': 'off', // 🔴⚫
   'unicorn/no-barrel-files': 'off', // ⚫⚫ Superseded by sky-pilot/no-unpublished-barrel, which exempts a published entry point
   'unicorn/no-break-in-nested-loop': 'off', // 🔴⚫ Break/continue in nested loops is idiomatic; extracting a function is overkill
@@ -29,6 +32,8 @@ const rules: Linter.RulesRecord = {
   'unicorn/no-for-loop': 'off', // 🔴⚫ Traditional for loops are sometimes clearer
   'unicorn/no-null': 'off', // 🔴⚫
   'unicorn/no-process-exit': 'off', // 🔴⚫ Needed in CLI tools and scripts
+  // A readyup kit's default export is a pure declaration.
+  'unicorn/no-top-level-side-effects': ['error', { allow: { readyup: ['defineRdyKit'] } }],
   'unicorn/no-useless-undefined': 'warn', // 🔴🟠
   'unicorn/number-literal-case': ['warn', { hexadecimalValue: 'lowercase' }], // to align with Prettier
   'unicorn/numeric-separators-style': [
@@ -69,9 +74,18 @@ const rules: Linter.RulesRecord = {
   'unicorn/text-encoding-identifier-case': 'warn', // 🔴🟠
 };
 
-const config = defineConfig({
-  extends: [unicornPlugin.configs.recommended],
-  rules,
-});
+const config = defineConfig(
+  {
+    extends: [unicornPlugin.configs.recommended],
+    rules,
+  },
+  // A tool loads a config file; nothing imports it, so its top-level calls are not side effects of an import.
+  {
+    files: configFiles,
+    rules: {
+      'unicorn/no-top-level-side-effects': 'off',
+    },
+  },
+);
 
 export default config;
