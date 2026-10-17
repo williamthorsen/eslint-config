@@ -2,7 +2,7 @@
 
 An `eslint.config.js` is type-checked by nothing: A misspelled `files` key or a malformed `languageOptions` block becomes lint config that silently fails to apply. ESLint 10 loads `eslint.config.ts` natively through `jiti`, so renaming the config brings it into the compiler and the project service, where those mistakes are reported as errors.
 
-The [readiness kit](../packages/typescript/README.md#checking-the-configuration) reports the two tsconfig prerequisites that steps 5 and 6 name, and errors when a `.js` config shares a directory with a `.ts` one: Because the loaders resolve the JavaScript basename first, the TypeScript config never runs.
+The [readiness kit](../packages/typescript/README.md#checking-the-configuration) warns on each eslint config that is still JavaScript, reports the two tsconfig prerequisites that steps 5 and 6 name, and errors when a `.js` config shares a directory with a `.ts` one: Because the loaders resolve the JavaScript basename first, the TypeScript config never runs.
 
 ## Prerequisites
 

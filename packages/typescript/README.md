@@ -90,7 +90,7 @@ Earlier versions left type-information wiring to the consumer, which set `parser
 
 ## Migrating ESLint configs to TypeScript
 
-ESLint 10 loads `eslint.config.ts` natively, which brings the config into the compiler and the project service. Renaming it has two tsconfig prerequisites, both reported by the kit below. See [Migrating ESLint configs to TypeScript](https://github.com/williamthorsen/eslint-config/blob/main/docs/migrating-eslint-configs-to-typescript.md).
+ESLint 10 loads `eslint.config.ts` natively, which brings the config into the compiler and the project service. From ESLint 10 on, the kit below warns on each eslint config that is still JavaScript. Renaming it has two tsconfig prerequisites, both reported by the kit. See [Migrating ESLint configs to TypeScript](https://github.com/williamthorsen/eslint-config/blob/main/docs/migrating-eslint-configs-to-typescript.md).
 
 ## What's included
 
@@ -566,6 +566,8 @@ export default defineRdyConfig({
 The `readyup >=0.33.0` peer names the version against which the kit is developed and tested. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
 
 The kit runs at the version resolved from the project's `node_modules` and reports whether the configuration matches that version. It never reports whether that version is current.
+
+Two checks judge each eslint config's language, at the repo root and in every workspace, and both skip below ESLint 10, which cannot load a TypeScript config. The kit reports a JavaScript config sharing a directory with a TypeScript one as an error, because the loader resolves the JavaScript basename first and the TypeScript config never runs. It warns on every JavaScript config, a shadowing one included, since a lone JavaScript config still loads.
 
 The check that the root config extends this package matches the package specifier as text, or a path into a workspace that provides the package: A config reaching it through a local re-export or a path alias is reported as not extending it.
 

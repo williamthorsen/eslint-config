@@ -6,6 +6,7 @@ import {
   isTypeScriptEslintConfig,
   listAncestorDirs,
   listEslintConfigCandidates,
+  listJavaScriptEslintConfigs,
   listShadowedEslintConfigDirs,
   resolveDirPath,
 } from '../eslint-config-paths.ts';
@@ -83,6 +84,33 @@ describe(listEslintConfigCandidates, () => {
 
   it('returns nothing when there are no directories to search', () => {
     expect(listEslintConfigCandidates([])).toStrictEqual([]);
+  });
+});
+
+describe(listJavaScriptEslintConfigs, () => {
+  it('lists every JavaScript config at the root and in a workspace, in input order', () => {
+    const paths = [
+      'eslint.config.js',
+      'eslint.config.ts',
+      'packages/react/eslint.config.mjs',
+      'packages/react/eslint.config.mts',
+      'packages/node/eslint.config.cjs',
+      'packages/node/eslint.config.cts',
+    ];
+
+    expect(listJavaScriptEslintConfigs(paths)).toStrictEqual([
+      'eslint.config.js',
+      'packages/react/eslint.config.mjs',
+      'packages/node/eslint.config.cjs',
+    ]);
+  });
+
+  it('returns nothing when every config is TypeScript', () => {
+    expect(listJavaScriptEslintConfigs(['eslint.config.ts', 'packages/react/eslint.config.mts'])).toStrictEqual([]);
+  });
+
+  it('returns nothing when there are no configs', () => {
+    expect(listJavaScriptEslintConfigs([])).toStrictEqual([]);
   });
 });
 
