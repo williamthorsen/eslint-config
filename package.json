@@ -19,12 +19,12 @@
     "prepare": "lefthook check-install || lefthook install"
   },
   "devDependencies": {
-    "@types/node": "24.19.1",
+    "@types/node": "24.19.2",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "4.1.11",
     "@williamthorsen/eslint-config-typescript": "workspace:*",
-    "@williamthorsen/nmr": "0.47.0",
-    "@williamthorsen/release-kit": "14.2.1",
+    "@williamthorsen/nmr": "0.48.0",
+    "@williamthorsen/release-kit": "14.2.2",
     "@williamthorsen/strict-lint": "workspace:*",
     "@williamthorsen/toolbelt.vitest": "catalog:",
     "@williamthorsen/tsconfig": "workspace:*",
@@ -34,17 +34,17 @@
     "globals": "17.13.0",
     "jiti": "2.7.0",
     "lefthook": "2.2.1",
-    "prettier": "3.9.9",
+    "prettier": "3.9.10",
     "readyup": "catalog:",
     "rimraf": "6.1.3",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
-    "v11y-check": "0.19.2",
+    "v11y-check": "0.19.3",
     "vite": "8.3.4",
     "vitest": "catalog:",
     "zod": "4.6.5"
   },
-  "packageManager": "pnpm@12.11.1",
+  "packageManager": "pnpm@12.11.2",
   "engines": {
     "node": ">=24"
   }
