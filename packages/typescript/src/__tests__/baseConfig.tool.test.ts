@@ -53,6 +53,19 @@ describe('baseConfig', () => {
     expect(config).toHaveProperty(['rules', 'max-lines'], [1, { max, skipBlankLines: true, skipComments: true }]);
   });
 
+  it.each([
+    ['src/main.ts', 2],
+    ['src/main.js', 2],
+    ['src/__tests__/main.unit.test.ts', 0],
+    ['src/__tests__/main.test.js', 0],
+  ])('sets unicorn/no-unnecessary-parameters in %s to severity %i', async (filePath, severity) => {
+    const linter = new ESLint({ overrideConfig: baseConfig, overrideConfigFile: true });
+
+    const config: unknown = await linter.calculateConfigForFile(filePath);
+
+    expect(config).toHaveProperty(['rules', 'unicorn/no-unnecessary-parameters', 0], severity);
+  });
+
   it('keeps the ceiling when advisoryRuleSeverities sets the severity', async () => {
     const linter = new ESLint({
       overrideConfig: [...baseConfig, { rules: { ...advisoryRuleSeverities } }],

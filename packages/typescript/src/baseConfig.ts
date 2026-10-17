@@ -49,6 +49,7 @@ export const baseConfig: Config[] = [
       'sky-pilot/prefer-function-declaration': 'off',
       'unicorn/consistent-function-scoping': 'off',
       'unicorn/no-thenable': 'off',
+      'unicorn/no-unnecessary-parameters': 'off',
       'unicorn/no-useless-undefined': 'off',
     },
   },
