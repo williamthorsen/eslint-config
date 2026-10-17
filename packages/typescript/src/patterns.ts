@@ -5,6 +5,7 @@ export const codeExtensions = [...javaScriptExtensions, ...typeScriptExtensions]
 export const javaScriptFiles = javaScriptExtensions.map((ext) => `**/*.${ext}`);
 export const typeScriptFiles = typeScriptExtensions.map((ext) => `**/*.${ext}`);
 export const codeFiles = codeExtensions.map((ext) => `**/*.${ext}`);
+export const configFiles = codeExtensions.flatMap((ext) => [`**/*.config.${ext}`, `**/.*rc.${ext}`]);
 export const testFiles = codeExtensions.map((ext) => `**/*.{spec,test}.${ext}`);
 
 export const patterns = {

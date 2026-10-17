@@ -129,7 +129,7 @@ describe(strictLint, () => {
     });
 
     it('promotes a warning that no ceiling caps', async () => {
-      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       await captureError(ProcessExitError, () => strictLint());
 
@@ -138,7 +138,7 @@ describe(strictLint, () => {
 
     it('leaves a warning that a config ceiling caps below error', async () => {
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
-      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       await strictLint();
 
@@ -147,7 +147,7 @@ describe(strictLint, () => {
 
     it('lets programmatic ceilings outrank the config files', async () => {
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'error' } });
-      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       await strictLint({ maxSeverity: { 'some-rule': 'warn' } });
 
@@ -159,8 +159,8 @@ describe(strictLint, () => {
         Promise.resolve(cascadeOf(dir === '/capped' ? [{ maxSeverity: { 'some-rule': 'warn' } }] : [])),
       );
       mockLintFiles.mockResolvedValue([
-        buildResult({ filePath: '/capped/a.ts', messages: [buildMessage('some-rule', 1)] }),
-        buildResult({ filePath: '/open/a.ts', messages: [buildMessage('some-rule', 1)] }),
+        buildResult({ filePath: '/capped/a.ts', messages: [buildMessage(1)] }),
+        buildResult({ filePath: '/open/a.ts', messages: [buildMessage(1)] }),
       ]);
 
       await captureError(ProcessExitError, () => strictLint());
@@ -172,7 +172,7 @@ describe(strictLint, () => {
   describe('promotion ordering', () => {
     it('promotes before --quiet filters, so a promoted problem survives the filter', async () => {
       using _argv = pointArgvAt(['--quiet']);
-      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       const error = await captureError(ProcessExitError, () => strictLint());
 
@@ -183,7 +183,7 @@ describe(strictLint, () => {
 
     it('counts a promoted problem as an error rather than a warning for --max-warnings', async () => {
       using _argv = pointArgvAt(['--max-warnings', '0']);
-      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       await captureError(ProcessExitError, () => strictLint());
 
@@ -195,7 +195,7 @@ describe(strictLint, () => {
     it('counts a capped problem as a warning for --max-warnings', async () => {
       using _argv = pointArgvAt(['--max-warnings', '0']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
-      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       const error = await captureError(ProcessExitError, () => strictLint());
 
@@ -205,8 +205,8 @@ describe(strictLint, () => {
     it('promotes results served from cache identically, since it spans the whole returned array', async () => {
       // A cached run returns fully formed results, which nothing at this seam distinguishes from fresh ones.
       mockLintFiles.mockResolvedValue([
-        buildResult({ filePath: '/project/cached.ts', messages: [buildMessage('some-rule', 1)] }),
-        buildResult({ filePath: '/project/fresh.ts', messages: [buildMessage('some-rule', 1)] }),
+        buildResult({ filePath: '/project/cached.ts', messages: [buildMessage(1)] }),
+        buildResult({ filePath: '/project/fresh.ts', messages: [buildMessage(1)] }),
       ]);
 
       await captureError(ProcessExitError, () => strictLint());
@@ -358,7 +358,7 @@ describe(strictLint, () => {
 
     it('exits 0 when only capped warnings are reported', async () => {
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
-      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 1)] })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       await strictLint();
 
@@ -366,7 +366,7 @@ describe(strictLint, () => {
     });
 
     it('exits 1 when errors are reported', async () => {
-      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage('some-rule', 2)] })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(2)] })]);
 
       const error = await captureError(ProcessExitError, () => strictLint());
 
@@ -448,7 +448,7 @@ describe(strictLint, () => {
     it('exits 1 when warnings exceed --max-warnings threshold', async () => {
       using _argv = pointArgvAt(['--max-warnings', '2']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
-      mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: buildThreeWarnings() })]);
 
       const error = await captureError(ProcessExitError, () => strictLint());
 
@@ -458,7 +458,7 @@ describe(strictLint, () => {
     it('does not exit when warnings are within --max-warnings threshold', async () => {
       using _argv = pointArgvAt(['--max-warnings', '5']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
-      mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: buildThreeWarnings() })]);
 
       await strictLint();
 
@@ -519,7 +519,7 @@ describe(strictLint, () => {
     it('writes the --max-warnings message alone when the formatter produced no output', async () => {
       using _argv = pointArgvAt(['--quiet', '--max-warnings', '0']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
-      mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: buildThreeWarnings() })]);
       mockFormat.mockResolvedValue('');
 
       await captureError(ProcessExitError, () => strictLint());
@@ -530,7 +530,7 @@ describe(strictLint, () => {
     it('separates the --max-warnings message from the report that the formatter produced', async () => {
       using _argv = pointArgvAt(['--max-warnings', '0']);
       withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
-      mockLintFiles.mockResolvedValue([buildResult({ messages: warningsFor('some-rule', 3) })]);
+      mockLintFiles.mockResolvedValue([buildResult({ messages: buildThreeWarnings() })]);
       mockFormat.mockResolvedValue('report\n');
 
       await captureError(ProcessExitError, () => strictLint());
@@ -542,9 +542,9 @@ describe(strictLint, () => {
 
 // region | Helpers
 
-/** Builds a lint message with the fields that promotion reads, filling in the rest to satisfy ESLint's shape. */
-function buildMessage(ruleId: string | null, severity: Linter.LintMessage['severity']): Linter.LintMessage {
-  return { column: 1, line: 1, message: 'a problem', ruleId, severity };
+/** Builds a `some-rule` message with the fields that promotion reads, filling in the rest to satisfy ESLint's shape. */
+function buildMessage(severity: Linter.LintMessage['severity']): Linter.LintMessage {
+  return { column: 1, line: 1, message: 'a problem', ruleId: 'some-rule', severity };
 }
 
 /** Builds a lint result whose counts start at zero, since promotion restates them from the messages. */
@@ -606,9 +606,9 @@ function reportedSeverities(): number[] {
   return results.flatMap((result: ESLint.LintResult) => result.messages.map((message) => message.severity));
 }
 
-/** Builds a number of warnings for one rule, so that a threshold test states a count rather than a list. */
-function warningsFor(ruleId: string, count: number): Linter.LintMessage[] {
-  return Array.from({ length: count }, () => buildMessage(ruleId, 1));
+/** Builds three warnings for `some-rule`, so that a threshold test states a count rather than a list. */
+function buildThreeWarnings(): Linter.LintMessage[] {
+  return Array.from({ length: 3 }, () => buildMessage(1));
 }
 
 /** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */

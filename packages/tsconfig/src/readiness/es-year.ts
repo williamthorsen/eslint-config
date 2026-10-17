@@ -28,7 +28,7 @@ export function readDeclaredEsYear(compilerOptions: Record<string, unknown>): st
 
   const libYears = toStringArray(compilerOptions['lib']).flatMap((entry) => {
     const year = parseEsYear(entry);
-    return year === undefined ? [] : [year];
+    return year === undefined ? [] : year;
   });
   return libYears.toSorted().at(-1);
 }

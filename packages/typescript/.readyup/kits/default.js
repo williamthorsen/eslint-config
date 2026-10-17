@@ -393,7 +393,7 @@ function listInputJudgements() {
     if (tsconfigPath === void 0) return [];
     const chain = readChain(tsconfigPath);
     if (chain === void 0) return [];
-    return [{ configPath, coverage: judgeInputCoverage(chain.entries, configPath) }];
+    return { configPath, coverage: judgeInputCoverage(chain.entries, configPath) };
   });
 }
 function listProviderWorkspaceDirs() {
@@ -411,7 +411,7 @@ function nextRootDirsAbsolute() {
     const content = readFile(configPath);
     if (content === void 0) return [];
     const relative2 = listRelativeNextRootDirs(content);
-    return relative2.length === 0 ? [] : [`${configPath} (${relative2.join(", ")})`];
+    return relative2.length === 0 ? [] : `${configPath} (${relative2.join(", ")})`;
   });
   if (offenders.length === 0) return true;
   return { ok: false, detail: `settings.next.rootDir is relative in ${offenders.join(", ")}` };
@@ -450,7 +450,7 @@ function readInstalledVersion(name) {
   const versions = listRepoSearchDirs().flatMap((dir) => {
     const manifest = readJsonFile(resolveDirPath(dir, `node_modules/${name}/package.json`));
     const version = manifest === void 0 ? void 0 : getJsonValue(manifest, "version");
-    return typeof version === "string" ? [version] : [];
+    return typeof version === "string" ? version : [];
   });
   const lowest = pickLowestVersion(versions);
   installedVersions.set(name, lowest);

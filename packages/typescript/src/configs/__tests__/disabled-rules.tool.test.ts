@@ -6,6 +6,7 @@ import { baseConfig } from '#src/baseConfig.ts';
 import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
 
 const disabledRuleIds = [
+  'unicorn/no-asterisk-prefix-in-documentation-comments',
   'unicorn/no-for-each',
   'unicorn/no-nested-ternary',
   'unicorn/prefer-combined-guards',

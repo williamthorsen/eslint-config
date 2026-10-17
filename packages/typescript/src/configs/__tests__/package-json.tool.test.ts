@@ -32,13 +32,13 @@ const universalTierFields = ['author', 'engines'];
 
 describe('rules binding only publishable packages', () => {
   it('report nothing against a private manifest omitting every field that they require', async () => {
-    const reported = await lintManifest({ ...omitFields(compliantManifest, publishableTierFields), private: true });
+    const reported = await lintManifest({ ...omitCompliantFields(publishableTierFields), private: true });
 
     expect(reported.filter((ruleId) => publishableTierRules.includes(ruleId))).toStrictEqual([]);
   });
 
   it('report against a publishable manifest omitting the same fields', async () => {
-    const reported = await lintManifest(omitFields(compliantManifest, publishableTierFields));
+    const reported = await lintManifest(omitCompliantFields(publishableTierFields));
 
     expect(reported.filter((ruleId) => publishableTierRules.includes(ruleId)).toSorted()).toStrictEqual(
       publishableTierRules,
@@ -48,7 +48,7 @@ describe('rules binding only publishable packages', () => {
 
 describe('rules binding every package', () => {
   it('report against a private manifest omitting author and engines', async () => {
-    const reported = await lintManifest({ ...omitFields(compliantManifest, universalTierFields), private: true });
+    const reported = await lintManifest({ ...omitCompliantFields(universalTierFields), private: true });
 
     expect(reported.filter((ruleId) => universalTierRules.includes(ruleId)).toSorted()).toStrictEqual(
       universalTierRules,
@@ -94,13 +94,13 @@ describe('rules that the preset supplies and this config no longer suppresses', 
   });
 
   it('require a repository of a publishable manifest', async () => {
-    const reported = await lintManifest(omitFields(compliantManifest, ['repository']));
+    const reported = await lintManifest(omitCompliantFields(['repository']));
 
     expect(reported).toContain('package-json/require-repository');
   });
 
   it('require sideEffects of a publishable manifest', async () => {
-    const reported = await lintManifest(omitFields(compliantManifest, ['sideEffects']));
+    const reported = await lintManifest(omitCompliantFields(['sideEffects']));
 
     expect(reported).toContain('package-json/require-sideEffects');
   });
@@ -108,9 +108,9 @@ describe('rules that the preset supplies and this config no longer suppresses', 
 
 // region | Helpers
 
-/** Returns the manifest without the named top-level fields. */
-function omitFields(manifest: Record<string, unknown>, fields: readonly string[]): Record<string, unknown> {
-  return Object.fromEntries(Object.entries(manifest).filter(([field]) => !fields.includes(field)));
+/** Returns the compliant manifest without the named top-level fields. */
+function omitCompliantFields(fields: readonly string[]): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(compliantManifest).filter(([field]) => !fields.includes(field)));
 }
 
 // endregion | Helpers

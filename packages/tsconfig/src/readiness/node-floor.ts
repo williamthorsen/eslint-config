@@ -31,7 +31,7 @@ export function classifyNodeEsYear(
 export function findLowestNodeMajor(floors: readonly string[]): number | undefined {
   const majors = floors.flatMap((floor) => {
     const major = readNodeMajor(floor);
-    return major === undefined ? [] : [major];
+    return major === undefined ? [] : major;
   });
   return majors.length === 0 ? undefined : Math.min(...majors);
 }
