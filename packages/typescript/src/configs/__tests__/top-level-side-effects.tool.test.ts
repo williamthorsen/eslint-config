@@ -11,6 +11,7 @@ describe('unicorn/no-top-level-side-effects', () => {
     { fixture: 'side-effects/module.ts', isReported: true },
     { fixture: 'side-effects/tool.config.ts', isReported: false },
     { fixture: 'side-effects/.toolrc.ts', isReported: false },
+    { fixture: 'side-effects/sanity.cli.ts', isReported: false },
     { fixture: 'side-effects/kit.ts', isReported: false },
     { fixture: 'side-effects/.readyup/kits/default.ts', isReported: false },
     { fixture: 'side-effects/.readyup/kits/checks/build-checks.ts', isReported: true },
