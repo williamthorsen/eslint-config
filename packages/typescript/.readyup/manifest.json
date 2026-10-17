@@ -16,6 +16,7 @@
             "A root eslint config exists",
             "The root eslint config extends @williamthorsen/eslint-config-typescript",
             "No JavaScript eslint config shadows a TypeScript one",
+            "Every eslint config is TypeScript",
             "An eslint config anchors the project service with tsconfigRootDir",
             "An eslint config sets settings.next.rootDir",
             "Every settings.next.rootDir is absolute"
@@ -46,7 +47,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "aa3b8fe0",
+          "hash": "80457803",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -64,9 +65,14 @@
           "path": "../src/readiness/eslint-config-contents.ts"
         },
         {
-          "hash": "1f4f88db",
+          "hash": "0101a322",
           "kind": "module",
           "path": "../src/readiness/eslint-config-paths.ts"
+        },
+        {
+          "hash": "5f2eaa63",
+          "kind": "module",
+          "path": "../src/readiness/judgeOffenders.ts"
         },
         {
           "hash": "d53de60d",
@@ -103,8 +109,8 @@
       "path": "kits/default.js",
       "readyupVersion": "0.41.1",
       "source": "kits/default.ts",
-      "sourceHash": "aa3b8fe0",
-      "targetHash": "e15b9d35"
+      "sourceHash": "80457803",
+      "targetHash": "72c30b7f"
     }
   ]
 }
