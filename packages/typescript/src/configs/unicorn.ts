@@ -2,7 +2,7 @@ import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
 import unicornPlugin from 'eslint-plugin-unicorn';
 
-import { configFiles } from '#src/patterns.ts';
+import { configFiles, readyupKitEntryFiles } from '#src/patterns.ts';
 
 // see https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/readme.md
 const rules: Linter.RulesRecord = {
@@ -79,9 +79,10 @@ const config = defineConfig(
     extends: [unicornPlugin.configs.recommended],
     rules,
   },
-  // A tool loads a config file; nothing imports it, so its top-level calls are not side effects of an import.
+  // A tool loads a config file or a readyup kit's entry file; nothing imports it, so its top-level calls are not
+  // side effects of an import.
   {
-    files: configFiles,
+    files: [...configFiles, ...readyupKitEntryFiles],
     rules: {
       'unicorn/no-top-level-side-effects': 'off',
     },
