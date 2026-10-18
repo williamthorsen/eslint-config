@@ -33,7 +33,8 @@
     "rewriteRelativeImportExtensions": true,
     // Without this, `lib` follows `target` into the `.full` variant, admitting DOM globals.
     // `ESNext.Disposable` contains the explicit-resource-management declarations; no numbered lib has them.
-    "lib": ["ES2025", "ESNext.Disposable"],
+    // `ESNext.Array` contains `Array.fromAsync`, which Node 24 implements; no numbered lib has it.
+    "lib": ["ES2025", "ESNext.Disposable", "ESNext.Array"],
     // Default is `ES2022` with `Bundler` resolution: wrong for published Node packages.
     "module": "NodeNext",
     // Files with no import or export would otherwise be scripts sharing global scope.

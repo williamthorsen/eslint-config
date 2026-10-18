@@ -46,17 +46,17 @@ A package that extends a framework base such as `astro/tsconfigs/base` or `@tsco
 
 Everything `@tsconfig/strictest` sets, plus the Node and build options it omits:
 
-| Option                       | Value                             |
-| ---------------------------- | --------------------------------- |
-| `allowImportingTsExtensions` | `true`                            |
-| `lib`                        | `["ES2025", "ESNext.Disposable"]` |
-| `module`                     | `"NodeNext"`                      |
-| `moduleDetection`            | `"force"`                         |
-| `noEmit`                     | `true`                            |
-| `removeComments`             | `true`                            |
-| `target`                     | `"ES2025"`                        |
+| Option                       | Value                                             |
+| ---------------------------- | ------------------------------------------------- |
+| `allowImportingTsExtensions` | `true`                                            |
+| `lib`                        | `["ES2025", "ESNext.Disposable", "ESNext.Array"]` |
+| `module`                     | `"NodeNext"`                                      |
+| `moduleDetection`            | `"force"`                                         |
+| `noEmit`                     | `true`                                            |
+| `removeComments`             | `true`                                            |
+| `target`                     | `"ES2025"`                                        |
 
-`target` and `lib` are pinned to a Node 24 floor. `ESNext.Disposable` supplies the explicit-resource-management declarations (`using`, `Disposable`, `DisposableStack`), which Node 24 implements but the numbered libs do not yet include.
+`target` and `lib` are pinned to a Node 24 floor. `ESNext.Disposable` supplies the explicit-resource-management declarations (`using`, `Disposable`, `DisposableStack`), and `ESNext.Array` supplies `Array.fromAsync`; Node 24 implements both, but the numbered libs do not yet include them.
 
 ## What the consumer owns
 
