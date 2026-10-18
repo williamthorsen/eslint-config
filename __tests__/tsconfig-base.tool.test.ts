@@ -47,12 +47,22 @@ describe('@williamthorsen/tsconfig base config', () => {
     // A `--lib` name is an alias: TypeScript resolves a superseded one to its numbered successor with no
     // diagnostic, so this array names the file actually loaded. A numbered successor appearing here is the
     // signal to swap the declared entry for it.
-    expect(options.lib).toStrictEqual([lib('ES2025'), lib('ESNext.Disposable')]);
+    expect(options.lib).toStrictEqual([lib('ES2025'), lib('ESNext.Disposable'), lib('ESNext.Array')]);
     expect(options.module).toBe(ts.ModuleKind.NodeNext);
     expect(options.moduleDetection).toBe(ts.ModuleDetectionKind.Force);
     expect(options.noEmit).toBe(true);
     expect(options.removeComments).toBe(true);
     expect(options.target).toBe(ts.ScriptTarget.ES2025);
+  });
+
+  it('declares Array.fromAsync', () => {
+    expect(listDiagnosticMessages('await Array.fromAsync([1]);')).toStrictEqual([]);
+  });
+
+  it('declares no DOM globals', () => {
+    expect(listDiagnosticMessages('document.title;')).toStrictEqual([
+      expect.stringContaining("Cannot find name 'document'"),
+    ]);
   });
 
   it('resolves the consumer-owned keys that the root declares', () => {
@@ -101,6 +111,27 @@ describe('@williamthorsen/tsconfig base config', () => {
     expect(beyondUpstream.toSorted()).toStrictEqual(nodeLayerKeys.toSorted());
   });
 });
+
+/**
+ * Typechecks a module against the base's resolved options and lists its diagnostic messages. `types` is
+ * cleared so that ambient package declarations cannot stand in for the libs.
+ */
+function listDiagnosticMessages(source: string): string[] {
+  const fileName = path.join(repoRoot, 'snippet.ts');
+  const programOptions: ts.CompilerOptions = { ...options, types: [] };
+  const host = ts.createCompilerHost(programOptions);
+  const getSourceFile = host.getSourceFile.bind(host);
+  host.getSourceFile = (name, languageVersion, ...rest) =>
+    name === fileName
+      ? ts.createSourceFile(name, `${source}\nexport {};\n`, languageVersion)
+      : getSourceFile(name, languageVersion, ...rest);
+
+  const program = ts.createProgram([fileName], programOptions, host);
+
+  return ts
+    .getPreEmitDiagnostics(program)
+    .map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
+}
 
 /** Parses a tsconfig with its `extends` chain resolved, throwing on any error diagnostic. */
 function parseConfig(configPath: string): ts.CompilerOptions {
