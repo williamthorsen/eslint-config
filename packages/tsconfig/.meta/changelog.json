@@ -1,5 +1,22 @@
 [
   {
+    "version": "0.12.0",
+    "date": "2026-10-18",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Adds `ESNext.Array` to the `lib` in `tsconfig.base.json`, so that a call to `Array.fromAsync`, which `unicorn/prefer-array-from-async` recommends, typechecks without a local `lib` override. (#284)",
+            "hash": "2d85c299036a8dbd6b385a976398d477ee6c5b83",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.11.1",
     "date": "2026-10-17",
     "sections": [

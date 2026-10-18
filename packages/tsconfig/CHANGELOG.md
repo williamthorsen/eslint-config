@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.12.0 — 2026-10-18
+
+### 🎉 Features
+
+- Adds `ESNext.Array` to the `lib` in `tsconfig.base.json`, so that a call to `Array.fromAsync`, which `unicorn/prefer-array-from-async` recommends, typechecks without a local `lib` override. (#284)
+
 ## 0.11.1 — 2026-10-17
 
 ### ♻️ Refactoring
