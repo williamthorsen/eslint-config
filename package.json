@@ -23,7 +23,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "4.1.12",
     "@williamthorsen/eslint-config-typescript": "workspace:*",
-    "@williamthorsen/nmr": "0.48.0",
+    "@williamthorsen/nmr": "0.50.1",
     "@williamthorsen/release-kit": "14.2.4",
     "@williamthorsen/strict-lint": "workspace:*",
     "@williamthorsen/toolbelt.vitest": "catalog:",
