@@ -1,5 +1,27 @@
 [
   {
+    "version": "20.1.3",
+    "date": "2026-10-23",
+    "sections": [
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrades `readyup` to 0.43.0 and recompiles the readyup kits of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, whose bundles change only in the stamped readyup version. (#286)",
+            "hash": "528f7b2318615a24080b88db43bbe43345cca7f8",
+            "entry": 3
+          },
+          {
+            "description": "Upgrades `@williamthorsen/nmr` to 0.50.1, `codeassembly` to 0.18.0, `typescript-eslint` to 8.71.2, and the remaining dependencies to their latest patch or minor releases, and keeps `lefthook` at 2.2.1 because its 2.2.2 release was published without provenance. (#286)",
+            "hash": "528f7b2318615a24080b88db43bbe43345cca7f8",
+            "entry": 4
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "20.1.2",
     "date": "2026-10-17",
     "sections": [
@@ -329,6 +351,11 @@
             "description": "Revises the comments in `packages/typescript` outside `src/plugins/` to follow the comment-discipline rules, adding descriptions to the undocumented config factories and helpers and removing comments that restate rule documentation, record the code's history, or hold commented-out rules. (#234)",
             "hash": "e9989e0c500c55ee9dd42fcc0100effeee688c64",
             "entry": 1
+          },
+          {
+            "description": "Revise comments in the tsconfig package (#236)",
+            "body": "Revises the comments in the `tsconfig` package, including its readyup kit and `tsconfig.base.json`, to follow the comment-discipline rules.",
+            "hash": "0b6d6e9ba21954de6bca3c153cdf50c0531bd8ac"
           },
           {
             "description": "Revises the comments and test titles of the custom rules and their typed rule tester to follow the plain-speech and writing conventions. (#245)",

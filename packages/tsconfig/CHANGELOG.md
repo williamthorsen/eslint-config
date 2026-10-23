@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.12.1 — 2026-10-23
+
+### 📦 Dependencies
+
+- Upgrades `readyup` to 0.43.0 and recompiles the readyup kits of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, whose bundles change only in the stamped readyup version. (#286)
+
 ## 0.12.0 — 2026-10-18
 
 ### 🎉 Features
@@ -35,6 +41,10 @@ All notable changes to this project will be documented in this file.
 - Rewords the messages that the package's ReadyUp kit reports: The redundant-option check is now named "No tsconfig re-declares an option that the base already supplies", and the fix hints for the redundant-option, ES-year, Node-floor, and escaping-path checks are reworded. (#250)
 
 ### 📚 Documentation
+
+- Revise comments in the typescript configs and readiness checks (#234)
+
+  Revises the comments in the `typescript` package outside its custom rules, covering its configs, utilities, test helpers, and readiness checks, to follow the comment-discipline rules.
 
 - Revises the comments under `packages/tsconfig/` to follow the comment-discipline rules, adding the missing comment on `target` in `tsconfig.base.json` and removing test comments that restate the description of the function under test. (#236)
 - Revises the `@williamthorsen/tsconfig` README, code comments, and test titles to follow the plain-speech and writing conventions. (#250)

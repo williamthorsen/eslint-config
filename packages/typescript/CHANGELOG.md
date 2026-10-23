@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 20.1.3 — 2026-10-23
+
+### 📦 Dependencies
+
+- Upgrades `readyup` to 0.43.0 and recompiles the readyup kits of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, whose bundles change only in the stamped readyup version. (#286)
+- Upgrades `@williamthorsen/nmr` to 0.50.1, `codeassembly` to 0.18.0, `typescript-eslint` to 8.71.2, and the remaining dependencies to their latest patch or minor releases, and keeps `lefthook` at 2.2.1 because its 2.2.2 release was published without provenance. (#286)
+
 ## 20.1.2 — 2026-10-17
 
 ### 🐛 Bug fixes
@@ -103,6 +110,10 @@ All notable changes to this project will be documented in this file.
 - Replaces the four `../../docs/` migration-guide links in `packages/typescript/README.md` with absolute GitHub URLs on `main`, because the published tarball contains no `docs/` directory and the relative links broke wherever the README was read outside the repo. (#226)
 - Revises the comments under `packages/typescript/src/plugins/` to follow the comment-discipline rules, adding a description to each rule's `create` and its helpers and removing comments that restate the code or record its history. (#233)
 - Revises the comments in `packages/typescript` outside `src/plugins/` to follow the comment-discipline rules, adding descriptions to the undocumented config factories and helpers and removing comments that restate rule documentation, record the code's history, or hold commented-out rules. (#234)
+- Revise comments in the tsconfig package (#236)
+
+  Revises the comments in the `tsconfig` package, including its readyup kit and `tsconfig.base.json`, to follow the comment-discipline rules.
+
 - Revises the comments and test titles of the custom rules and their typed rule tester to follow the plain-speech and writing conventions. (#245)
 - Revises the prose in `packages/typescript/README.md` to follow the plain-speech and writing conventions. (#246)
 - Revises the comments and test titles under `packages/typescript/src` and in the kit source to follow the plain-speech and writing conventions. (#248)

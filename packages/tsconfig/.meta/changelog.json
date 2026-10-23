@@ -1,5 +1,22 @@
 [
   {
+    "version": "0.12.1",
+    "date": "2026-10-23",
+    "sections": [
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrades `readyup` to 0.43.0 and recompiles the readyup kits of `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript`, whose bundles change only in the stamped readyup version. (#286)",
+            "hash": "528f7b2318615a24080b88db43bbe43345cca7f8",
+            "entry": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.12.0",
     "date": "2026-10-18",
     "sections": [
@@ -91,6 +108,11 @@
         "title": "📚 Documentation",
         "audience": "dev",
         "items": [
+          {
+            "description": "Revise comments in the typescript configs and readiness checks (#234)",
+            "body": "Revises the comments in the `typescript` package outside its custom rules, covering its configs, utilities, test helpers, and readiness checks, to follow the comment-discipline rules.",
+            "hash": "e9989e0c500c55ee9dd42fcc0100effeee688c64"
+          },
           {
             "description": "Revises the comments under `packages/tsconfig/` to follow the comment-discipline rules, adding the missing comment on `target` in `tsconfig.base.json` and removing test comments that restate the description of the function under test. (#236)",
             "hash": "0b6d6e9ba21954de6bca3c153cdf50c0531bd8ac",
