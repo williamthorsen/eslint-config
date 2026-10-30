@@ -48,11 +48,11 @@
     "prepublishOnly": "nmr build"
   },
   "dependencies": {
-    "@williamthorsen/toolbelt.filesystem": "0.9.4",
-    "@williamthorsen/toolbelt.packaging": "0.6.4"
+    "@williamthorsen/toolbelt.filesystem": "0.10.0",
+    "@williamthorsen/toolbelt.packaging": "0.7.0"
   },
   "devDependencies": {
-    "@williamthorsen/toolbelt.testing": "0.7.0",
+    "@williamthorsen/toolbelt.testing": "0.8.0",
     "@williamthorsen/toolbelt.vitest": "catalog:",
     "eslint": "catalog:",
     "vitest": "catalog:"
