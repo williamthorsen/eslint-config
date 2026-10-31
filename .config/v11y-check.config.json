@@ -2,10 +2,33 @@
   "$schema": "https://github.com/williamthorsen/node-monorepo-tools/raw/audit-deps-v0.6.0/packages/audit-deps/schemas/config.json",
   "dev": {
     "severityThreshold": "moderate",
-    "allowlist": []
+    "allowlist": [
+      {
+        "addedAt": "2026-10-31T03:35:13.892Z",
+        "id": "1244012",
+        "path": ".>rimraf>glob>minimatch",
+        "reason": "Added by v11y sync at 2026-10-31 03:35:13 UTC",
+        "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249"
+      },
+      {
+        "addedAt": "2026-10-31T03:35:13.892Z",
+        "id": "1244013",
+        "path": ".>rimraf>glob",
+        "reason": "Added by v11y sync at 2026-10-31 03:35:13 UTC",
+        "url": "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4"
+      }
+    ]
   },
   "prod": {
     "severityThreshold": "low",
-    "allowlist": []
+    "allowlist": [
+      {
+        "addedAt": "2026-10-31T03:35:14.200Z",
+        "id": "1244012",
+        "path": "packages__typescript>eslint-plugin-yml>eslint>minimatch",
+        "reason": "Added by v11y sync at 2026-10-31 03:35:14 UTC",
+        "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249"
+      }
+    ]
   }
 }
