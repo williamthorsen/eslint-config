@@ -34,12 +34,10 @@ const rules: Linter.RulesRecord = {
   'unicorn/number-literal-case': ['warn', { hexadecimalValue: 'lowercase' }], // to align with Prettier
   'unicorn/numeric-separators-style': [
     'warn',
+    // ESLint merges these into the rule's defaults, so only the values that differ from them are listed.
     {
-      onlyIfContainsSeparator: false,
-      hexadecimal: { minimumDigits: 0, groupLength: 4 },
-      binary: { minimumDigits: 0, groupLength: 4 },
-      octal: { minimumDigits: 0, groupLength: 4 },
-      number: { minimumDigits: 5, groupLength: 3, fractionGroupLength: 3 },
+      hexadecimal: { groupLength: 4 },
+      number: { fractionGroupLength: 3 },
     },
   ], // 🔴🟠
   'unicorn/prefer-global-this': 'warn', // 🔴🟠
