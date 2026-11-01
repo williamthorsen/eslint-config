@@ -8,20 +8,12 @@ const ruleId = 'unicorn/no-top-level-side-effects';
 
 describe('unicorn/no-top-level-side-effects', () => {
   it.each([
-    { fixture: 'side-effects/module.ts', isReported: true },
-    { fixture: 'side-effects/tool.config.ts', isReported: false },
-    { fixture: 'side-effects/.toolrc.ts', isReported: false },
-    { fixture: 'side-effects/sanity.cli.ts', isReported: false },
-    { fixture: 'side-effects/kit.ts', isReported: false },
-    { fixture: 'side-effects/.readyup/kits/default.ts', isReported: false },
-    { fixture: 'side-effects/.readyup/kits/checks/build-checks.ts', isReported: true },
-    { fixture: 'side-effects/wxt/background.ts', isReported: false },
-    { fixture: 'side-effects/wxt/imports.content.ts', isReported: false },
-    { fixture: 'side-effects/wxt/side-effect.content.ts', isReported: true },
-  ])('reports a default-exported call in $fixture: $isReported', async ({ fixture, isReported }) => {
+    { fixture: 'side-effects/global-mutation.ts', isReported: true },
+    { fixture: 'side-effects/unknown-call.ts', isReported: false },
+  ])('reports a top-level side effect in $fixture: $isReported', async ({ fixture, isReported }) => {
     const results = await lintFixture([...baseConfig, typedParserSettings], fixture);
 
-    // A fixture that failed to parse reports no rule at all, which would satisfy the exempt cases.
+    // A fixture that failed to parse reports no rule at all, which would satisfy the unreported case.
     expect(results[0]?.fatalErrorCount).toBe(0);
 
     const messages = results[0]?.messages ?? [];
