@@ -9,7 +9,7 @@ const ruleId = 'unicorn/no-top-level-side-effects';
 describe('unicorn/no-top-level-side-effects', () => {
   it.each([
     { fixture: 'side-effects/global-mutation.ts', isReported: true },
-    { fixture: 'side-effects/module.ts', isReported: false },
+    { fixture: 'side-effects/unknown-call.ts', isReported: false },
   ])('reports a top-level side effect in $fixture: $isReported', async ({ fixture, isReported }) => {
     const results = await lintFixture([...baseConfig, typedParserSettings], fixture);
 
