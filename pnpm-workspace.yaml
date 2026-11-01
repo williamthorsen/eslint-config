@@ -1,6 +1,3 @@
-packages:
-  - packages/*
-
 allowBuilds:
   esbuild: true
   lefthook: true
@@ -17,12 +14,6 @@ catalog:
   typescript-eslint: '8.72.1'
   vitest: '5.0.5'
 
-peerDependencyRules:
-  allowedVersions:
-    'eslint-plugin-jest-dom>eslint': '>=10'
-    'eslint-plugin-jsx-a11y>eslint': '>=10'
-    'eslint-plugin-react>eslint': '>=10'
-
 # Pin pnpm 11's default 24-hour release-age soak against supply-chain attacks, and exempt first-party
 # packages so that a fresh release is usable downstream at once.
 minimumReleaseAge: 1440
@@ -33,4 +24,21 @@ minimumReleaseAgeExclude:
   - readyup
   - v11y-check
 
+packages:
+  - packages/*
+
+peerDependencyRules:
+  allowedVersions:
+    'eslint-plugin-jest-dom>eslint': '>=10'
+    'eslint-plugin-jsx-a11y>eslint': '>=10'
+    'eslint-plugin-react>eslint': '>=10'
+
 savePrefix: ''
+
+# Refuse a release whose provenance is weaker than that of an earlier release of the same package,
+# which can signal a compromised publisher.
+trustPolicy: no-downgrade
+# semver@6.3.1 lacks provenance and was published after provenance-bearing 7.x releases, but its line
+# never had provenance, and @babel/core and eslint-plugin-react still require semver 6.
+trustPolicyExclude:
+  - semver@6.3.1
