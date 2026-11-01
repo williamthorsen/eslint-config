@@ -110,7 +110,7 @@ Every `package.json` must declare `author` and `engines`, and may not contain an
 
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely.
 
-Config files (`*.config.*`, `.*rc.*`, and `sanity.cli.*` code files) and [readyup](https://www.npmjs.com/package/readyup) kit entry files (code files directly under a `.readyup/kits/` directory) have `unicorn/no-top-level-side-effects` turned off, because a tool loads them rather than a module importing them, so `export default defineConfig(…)` does not report whichever helper it calls, and a kit's `checks` can hold an array that a call builds. The rule stays on for the modules in a `.readyup/kits/` subdirectory, which a kit imports. Elsewhere, the rule treats a readyup kit's `export default defineRdyKit(…)` as pure, and likewise [WXT](https://wxt.dev)'s `defineAppConfig`, `defineBackground`, `defineContentScript`, `defineUnlistedScript`, and `defineWxtPlugin`, each when imported from its `wxt/utils/define-*` module or from `#imports`. The rule recognizes a call only through its import, so it still reports a define function that WXT auto-imports.
+`unicorn/no-top-level-side-effects` reports a module that has runtime exports and mutates global state at its top level. It keeps the plugin's default and does not report calls whose effects it cannot determine; the rule's [`checkUnknownCalls`](https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/no-top-level-side-effects.md#checkunknowncalls) option enables that check.
 
 ## File length
 
