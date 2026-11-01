@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 20.2.0 — 2026-11-01
+
+### 🎉 Features
+
+- Upgrades `eslint-plugin-unicorn` to 79.0.0 and adopts its default for `unicorn/no-top-level-side-effects`, which reports a module with runtime exports that mutates a global at its top level and no longer reports a top-level call whose effects the rule cannot determine. (#288)
+- Removes the exemptions from `unicorn/no-top-level-side-effects` for config files, readyup kit entry files, and the readyup and WXT `define*` functions, so the rule now checks those files for global mutations as it checks any other module. (#288)
+- Changes `unicorn/numeric-separators-style` to require a separator only in a decimal number of 5 or more digits, so that the rule accepts a 4-digit number such as `2026` and reports `2_026`, which `--fix` rewrites to `2026`. (#293)
+
 ## 20.1.3 — 2026-10-23
 
 ### 📦 Dependencies
