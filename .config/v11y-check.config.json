@@ -4,18 +4,11 @@
     "severityThreshold": "moderate",
     "allowlist": [
       {
-        "addedAt": "2026-10-31T03:35:13.892Z",
-        "id": "1244012",
-        "path": ".>rimraf>glob>minimatch",
-        "reason": "Added by v11y sync at 2026-10-31 03:35:13 UTC",
+        "addedAt": "2026-11-05T07:15:49.088Z",
+        "id": "1244623",
+        "path": ".>typescript-eslint>@typescript-eslint/parser>@typescript-eslint/typescript-estree>minimatch",
+        "reason": "Added by v11y sync at 2026-11-05 07:15:49 UTC",
         "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249"
-      },
-      {
-        "addedAt": "2026-10-31T03:35:13.892Z",
-        "id": "1244013",
-        "path": ".>rimraf>glob",
-        "reason": "Added by v11y sync at 2026-10-31 03:35:13 UTC",
-        "url": "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4"
       }
     ]
   },
@@ -23,10 +16,10 @@
     "severityThreshold": "low",
     "allowlist": [
       {
-        "addedAt": "2026-10-31T03:35:14.200Z",
-        "id": "1244012",
-        "path": "packages__typescript>eslint-plugin-yml>eslint>minimatch",
-        "reason": "Added by v11y sync at 2026-10-31 03:35:14 UTC",
+        "addedAt": "2026-11-05T07:15:49.090Z",
+        "id": "1244623",
+        "path": "packages__typescript>eslint-plugin-import-x>minimatch",
+        "reason": "Added by v11y sync at 2026-11-05 07:15:49 UTC",
         "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249"
       }
     ]
