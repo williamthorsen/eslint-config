@@ -192,16 +192,16 @@ Because ESLint merges `settings` deeply, this adds `tsconfig` to the resolver wi
 
 This config's own plugin contains eight rules. The TypeScript config enables six of them, so they apply to `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. Two are in neither preset: The base config enables [`no-real-time-sleep`](#sky-pilotno-real-time-sleep) in test files, and [`no-type-cycle`](#sky-pilotno-type-cycle) is enabled per project.
 
-| Rule                                    | `recommended` | `strict`   | Enforces                                                                                |
-| --------------------------------------- | ------------- | ---------- | --------------------------------------------------------------------------------------- |
-| `sky-pilot/no-floating-disposable`      | `warn`        | `error`    | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
-| `sky-pilot/no-real-time-sleep`          | test files    | test files | A test does not wait on a real timer; it advances fake timers.                          |
-| `sky-pilot/no-split-imports`            | `warn`        | `error`    | A module is imported in one statement, with `type` on the specifiers that import types. |
-| `sky-pilot/no-type-cycle`               | opt-in        | opt-in     | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
-| `sky-pilot/no-undefined-with-number`    | `error`       | `error`    | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
-| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`    | A barrel exists only at a module published by the package.                              |
-| `sky-pilot/no-unused-map`               | `warn`        | `error`    | The result of `Array#map` is used, or the call is written as `forEach`.                 |
-| `sky-pilot/prefer-function-declaration` | `warn`        | `error`    | An untyped function-valued variable is written as a function declaration.               |
+| Rule                                    | `recommended` | `strict` | Enforces                                                                                |
+| --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
+| `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
+| `sky-pilot/no-real-time-sleep`          | opt-in        | opt-in   | A test does not wait on a real timer; it advances fake timers.                          |
+| `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
+| `sky-pilot/no-type-cycle`               | opt-in        | opt-in   | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
+| `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
+| `sky-pilot/no-unpublished-barrel`       | `warn`        | `error`  | A barrel exists only at a module published by the package.                              |
+| `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used, or the call is written as `forEach`.                 |
+| `sky-pilot/prefer-function-declaration` | `warn`        | `error`  | An untyped function-valued variable is written as a function declaration.               |
 
 `no-real-time-sleep` takes no preset severity: The base config sets it to `warn` in test files. `advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: They report defects rather than style advice.
 
