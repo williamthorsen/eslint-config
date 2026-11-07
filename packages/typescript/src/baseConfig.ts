@@ -4,6 +4,7 @@ import globals from 'globals';
 import { configs } from './configs/configs.ts';
 import { buildGitIgnores } from './ignores/git.ts';
 import { codeFiles, javaScriptFiles, testFiles, typeScriptFiles } from './patterns.ts';
+import skyPilotPlugin from './plugins/eslint-plugin-sky-pilot.ts';
 
 export const baseConfig: Config[] = [
   ...buildGitIgnores(process.cwd()),
@@ -38,6 +39,9 @@ export const baseConfig: Config[] = [
   },
   {
     files: testFiles,
+    // Reuse the preset's registration, which the TypeScript block also applies: ESLint rejects a second object
+    // registered under the same plugin name.
+    plugins: skyPilotPlugin.configs.recommended.plugins,
     rules: {
       '@typescript-eslint/no-confusing-void-expression': 'off',
       '@typescript-eslint/no-empty-function': 'off',
@@ -46,6 +50,7 @@ export const baseConfig: Config[] = [
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/unbound-method': 'off',
       'max-lines': ['warn', { max: 500, skipBlankLines: true, skipComments: true }],
+      'sky-pilot/no-real-time-sleep': 'warn',
       'sky-pilot/prefer-function-declaration': 'off',
       'unicorn/consistent-function-scoping': 'off',
       'unicorn/no-thenable': 'off',

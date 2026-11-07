@@ -66,6 +66,39 @@ describe('baseConfig', () => {
     expect(config).toHaveProperty(['rules', 'unicorn/no-unnecessary-parameters', 0], severity);
   });
 
+  it.each(['src/__tests__/main.unit.test.ts', 'src/__tests__/main.test.js'])(
+    'warns on sky-pilot/no-real-time-sleep in %s and keeps no-restricted-syntax',
+    async (filePath) => {
+      const linter = new ESLint({ overrideConfig: baseConfig, overrideConfigFile: true });
+
+      const config: unknown = await linter.calculateConfigForFile(filePath);
+
+      expect(config).toHaveProperty(['rules', 'sky-pilot/no-real-time-sleep', 0], 1);
+      expect(config).toHaveProperty(
+        ['rules', 'no-restricted-syntax'],
+        [2, 'DebuggerStatement', 'LabeledStatement', 'WithStatement'],
+      );
+    },
+  );
+
+  it.each(['src/main.ts', 'src/main.js'])('leaves sky-pilot/no-real-time-sleep unset in %s', async (filePath) => {
+    const linter = new ESLint({ overrideConfig: baseConfig, overrideConfigFile: true });
+
+    const config: unknown = await linter.calculateConfigForFile(filePath);
+
+    expect(config).not.toHaveProperty(['rules', 'sky-pilot/no-real-time-sleep']);
+  });
+
+  it('reports a real-time sleep in a JavaScript test file', async () => {
+    const linter = new ESLint({ overrideConfig: baseConfig, overrideConfigFile: true });
+
+    const [result] = await linter.lintText('await new Promise((resolve) => setTimeout(resolve, 100));\n', {
+      filePath: 'src/__tests__/main.test.js',
+    });
+
+    expect(result?.messages.map((message) => message.ruleId)).toContain('sky-pilot/no-real-time-sleep');
+  });
+
   it('keeps the ceiling when advisoryRuleSeverities sets the severity', async () => {
     const linter = new ESLint({
       overrideConfig: [...baseConfig, { rules: { ...advisoryRuleSeverities } }],
