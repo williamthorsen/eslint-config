@@ -58,7 +58,7 @@ Releases run through the **Release** workflow, which analyzes commits since each
 gh workflow run release.yaml
 ```
 
-It accepts three optional inputs: `only` (comma-separated workspaces), `bump` (override the derived level), and `force` (release when no bump-worthy commits exist). Pushing a `<workspace>-v<semver>` tag triggers the **Publish** and **Create GitHub Release** workflows, so tags must be pushed by this workflow rather than by hand.
+It accepts three optional inputs: `only` (comma-separated workspaces), `bump` (override the derived level), and `force` (release when no bump-worthy commits exist). Pushing a `<workspace>-v<semver>` tag triggers the **Publish** and **Create GitHub release** workflows, so tags must be pushed by this workflow rather than by hand.
 
 ### Dry run
 

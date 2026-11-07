@@ -50,7 +50,7 @@ nmr test:coverage # vitest with coverage, the unit and tool tiers
 Releases are triggered by the **Release** GitHub Actions workflow (manual `workflow_dispatch`):
 
 1. The workflow runs [`@williamthorsen/release-kit`](https://github.com/williamthorsen/node-monorepo-tools/tree/main/packages/release-kit) to analyze commits, bump versions, regenerate CHANGELOGs, and push tags of the form `<workspace>-v<semver>`.
-2. Tag pushes trigger the **Publish** and **Create GitHub Release** workflows.
+2. Tag pushes trigger the **Publish** and **Create GitHub release** workflows.
 
 Don't push release tags by hand; manual tags can desync `package.json` versions, CHANGELOGs, and the commit history that release-kit reads.
 
