@@ -10,7 +10,7 @@ interface Preset {
 
 // `optInRules` names the rules that a plugin registers but no preset enables; a project turns them on for itself.
 const pluginModules: { name: string; configs: Record<string, Preset>; optInRules: string[] }[] = [
-  { name: 'sky-pilot', configs: skyPilot.configs, optInRules: ['no-type-cycle'] },
+  { name: 'sky-pilot', configs: skyPilot.configs, optInRules: ['no-real-time-sleep', 'no-type-cycle'] },
   { name: 'sky-pilot-react', configs: skyPilotReact.configs, optInRules: [] },
 ];
 

@@ -4,6 +4,7 @@ import type { Config } from 'eslint/config';
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
 import noFloatingDisposableRule from './rules/no-floating-disposable.ts';
+import noRealTimeSleepRule from './rules/no-real-time-sleep.ts';
 import noSplitImportsRule from './rules/no-split-imports.ts';
 import noTypeCycleRule from './rules/no-type-cycle.ts';
 import noUndefinedWithNumberRule from './rules/no-undefined-with-number.ts';
@@ -17,6 +18,7 @@ const skyPilotPlugin: ESLint.Plugin = {
   },
   rules: ensurePluginRules({
     'no-floating-disposable': noFloatingDisposableRule,
+    'no-real-time-sleep': noRealTimeSleepRule,
     'no-split-imports': noSplitImportsRule,
     'no-type-cycle': noTypeCycleRule,
     'no-undefined-with-number': noUndefinedWithNumberRule,
@@ -26,8 +28,11 @@ const skyPilotPlugin: ESLint.Plugin = {
   }),
 };
 
+/** A preset, which always registers the plugin, so that another block can reuse the registration. */
+type Preset = Config & { plugins: NonNullable<Config['plugins']> };
+
 // Annotate explicitly: declaration emit cannot name `@eslint/core`'s `Plugin`, which an inferred type would reference.
-const configs: { recommended: Config; strict: Config } = {
+const configs: { recommended: Preset; strict: Preset } = {
   recommended: {
     plugins: {
       'sky-pilot': skyPilotPlugin,

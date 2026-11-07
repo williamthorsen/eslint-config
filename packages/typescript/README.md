@@ -104,11 +104,11 @@ The default export bundles configs for the following surfaces:
 | JSON / JSON5   | `**/*.{json,json5}`            | `jsonc`                                                             |
 | YAML           | `**/*.{yaml,yml}`              | `yml`                                                               |
 | `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)     |
-| Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed                                     |
+| Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed, `sky-pilot/no-real-time-sleep`     |
 
 Every `package.json` must declare `author` and `engines`, and may not contain an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not declare a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency declared by a package must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
 
-Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely.
+Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely. They also get [`sky-pilot/no-real-time-sleep`](#sky-pilotno-real-time-sleep), which reports a wait on a real timer.
 
 `unicorn/no-top-level-side-effects` reports a module that has runtime exports and mutates global state at its top level. It keeps the plugin's default and does not report calls whose effects it cannot determine; the rule's [`checkUnknownCalls`](https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/no-top-level-side-effects.md#checkunknowncalls) option enables that check.
 
@@ -190,11 +190,12 @@ Because ESLint merges `settings` deeply, this adds `tsconfig` to the resolver wi
 
 ## Custom rules (`sky-pilot`)
 
-This config's own plugin contains seven rules. The TypeScript config enables six of them, so they apply to `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. The seventh, [`no-type-cycle`](#sky-pilotno-type-cycle), is in neither preset and is enabled per project.
+This config's own plugin contains eight rules. The TypeScript config enables six of them, so they apply to `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. Two are in neither preset: The base config enables [`no-real-time-sleep`](#sky-pilotno-real-time-sleep) in test files, and [`no-type-cycle`](#sky-pilotno-type-cycle) is enabled per project.
 
 | Rule                                    | `recommended` | `strict` | Enforces                                                                                |
 | --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
 | `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
+| `sky-pilot/no-real-time-sleep`          | opt-in        | opt-in   | A test does not wait on a real timer; it advances fake timers.                          |
 | `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
 | `sky-pilot/no-type-cycle`               | opt-in        | opt-in   | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
 | `sky-pilot/no-undefined-with-number`    | `error`       | `error`  | `Number()` is never passed a possibly-`undefined` value, which yields `NaN`.            |
@@ -202,7 +203,7 @@ This config's own plugin contains seven rules. The TypeScript config enables six
 | `sky-pilot/no-unused-map`               | `warn`        | `error`  | The result of `Array#map` is used, or the call is written as `forEach`.                 |
 | `sky-pilot/prefer-function-declaration` | `warn`        | `error`  | An untyped function-valued variable is written as a function declaration.               |
 
-`advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: They report defects rather than style advice.
+`no-real-time-sleep` takes no preset severity: The base config sets it to `warn` in test files. `advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: They report defects rather than style advice.
 
 `createConfig.react()` adds a rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function returned by a hook be memoized.
 
@@ -277,6 +278,45 @@ acquireHandle();
 ```
 
 typescript-eslint's `no-misused-disposable` covers these cases and more, but it is [still in draft](https://github.com/typescript-eslint/typescript-eslint/pull/12659).
+
+### `sky-pilot/no-real-time-sleep`
+
+Reports a promise that waits on a real timer in a test file, where it passes on an idle machine and fails intermittently under load. The base config enables it at `warn` for the files that [`patterns.testFiles`](#file-patterns) matches, JavaScript and TypeScript alike, and neither preset includes it, since a delay in production code is not a defect.
+
+It reports where the sleep is created, so a `sleep()` helper is reported at its definition:
+
+- a `new Promise` whose executor resolves from the global `setTimeout` (or `globalThis.setTimeout`), by passing `resolve` as the handler or by calling it anywhere inside the handler;
+- a call to `setTimeout` from `node:timers/promises` or `timers/promises`, through a named import, renamed or not, or a namespace or default import.
+
+A delay that is omitted or a literal `0` is left alone, because it yields one turn of the event loop rather than waiting on a duration. A `setTimeout` that a local declaration shadows is also left alone.
+
+Run the test on fake timers and advance them explicitly:
+
+```ts
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+it('stops polling after the job finishes', async () => {
+  startPolling();
+  await vi.advanceTimersByTimeAsync(1000);
+
+  expect(fetchStatus).toHaveBeenCalledTimes(2);
+});
+```
+
+A test whose timer runs in another process cannot fake the clock, and polls on a condition with a deadline instead. That poll, and a timer promise that a test creates under fake timers and then advances, take an inline disable comment naming the reason:
+
+```ts
+// eslint-disable-next-line sky-pilot/no-real-time-sleep -- polls a server running in a child process
+await new Promise((resolve) => setTimeout(resolve, 50));
+```
+
+The rule takes no options.
 
 ### `sky-pilot/no-type-cycle`
 
