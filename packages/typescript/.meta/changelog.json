@@ -1,5 +1,22 @@
 [
   {
+    "version": "20.3.0",
+    "date": "2026-11-07",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Adds the `sky-pilot/no-real-time-sleep` rule, which reports a `Promise` resolved from `setTimeout` and a non-zero-delay `setTimeout` from `timers/promises`, and enables it at `warn` in the test files matched by the base config. (#295)",
+            "hash": "3564177d3fbbe6afb0e99b879ee993649b776157",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "20.2.0",
     "date": "2026-11-01",
     "sections": [

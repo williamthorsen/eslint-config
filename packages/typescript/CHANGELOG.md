@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 20.3.0 — 2026-11-07
+
+### 🎉 Features
+
+- Adds the `sky-pilot/no-real-time-sleep` rule, which reports a `Promise` resolved from `setTimeout` and a non-zero-delay `setTimeout` from `timers/promises`, and enables it at `warn` in the test files matched by the base config. (#295)
+
 ## 20.2.0 — 2026-11-01
 
 ### 🎉 Features
