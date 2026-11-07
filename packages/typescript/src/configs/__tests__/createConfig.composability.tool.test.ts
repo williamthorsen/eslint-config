@@ -62,8 +62,8 @@ describe('plugins subpath composability with defineConfig', () => {
   });
 
   it('composes the exported plugin under a plugins key and applies its rules', async () => {
-    // `Config['plugins']` is optional, so narrow rather than assert; the repo forbids assertions.
-    const skyPilotPlugin = skyPilot.default.configs.recommended.plugins?.['sky-pilot'];
+    // An index into `plugins` may miss, so narrow rather than assert; the repo forbids assertions.
+    const skyPilotPlugin = skyPilot.default.configs.recommended.plugins['sky-pilot'];
     assert.exists(skyPilotPlugin, 'the recommended config must register the sky-pilot plugin');
 
     const composed = defineConfig(fixtureWiring, {

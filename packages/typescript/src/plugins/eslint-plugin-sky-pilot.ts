@@ -28,8 +28,11 @@ const skyPilotPlugin: ESLint.Plugin = {
   }),
 };
 
+/** A preset, which always registers the plugin, so that another block can reuse the registration. */
+type Preset = Config & { plugins: NonNullable<Config['plugins']> };
+
 // Annotate explicitly: declaration emit cannot name `@eslint/core`'s `Plugin`, which an inferred type would reference.
-const configs: { recommended: Config; strict: Config } = {
+const configs: { recommended: Preset; strict: Preset } = {
   recommended: {
     plugins: {
       'sky-pilot': skyPilotPlugin,
