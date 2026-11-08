@@ -18,6 +18,9 @@ const modifiedStrictRules: Linter.RulesRecord = {
 };
 // Rules whose defaults report on valid Vitest code rather than on defects.
 const correctedRules: Linter.RulesRecord = {
+  // The default wants `test` at the top level, so it reports a top-level `const it = baseIt.extend(...)` fixture
+  // declaration as a test written with `it`. Requiring `it` everywhere admits the declaration.
+  'vitest/consistent-test-it': ['warn', { fn: 'it' }],
   // 🟠⚫ Demands `vi.fn<T>()` even when an implementation already types the mock, with no option to exempt that.
   'vitest/require-mock-type-parameters': 'off',
   // Vitest's `expect(actual, message)` is documented API, but the rule accepts a second argument only when it is a
