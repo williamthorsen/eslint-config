@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 21.0.0 — 2026-11-08
+
+### 🐛 Bug fixes
+
+- 🚨 **Breaking:** Fixes the issue that the `vitest` config reported a top-level `const it = baseIt.extend(...)` fixture declaration under `vitest/consistent-test-it`, by setting the rule to require `it` for every test call. (#298)
+
 ## 20.3.0 — 2026-11-07
 
 ### 🎉 Features

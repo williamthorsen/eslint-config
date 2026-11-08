@@ -1,5 +1,24 @@
 [
   {
+    "version": "21.0.0",
+    "date": "2026-11-08",
+    "sections": [
+      {
+        "title": "🐛 Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Fixes the issue that the `vitest` config reported a top-level `const it = baseIt.extend(...)` fixture declaration under `vitest/consistent-test-it`, by setting the rule to require `it` for every test call. (#298)",
+            "breaking": true,
+            "migration": "Rename each top-level `test(...)` call to `it(...)`, or set `'vitest/consistent-test-it': 'warn'` in the consumer's own config to restore the plugin's default, which reports a top-level `extend` fixture declaration again.",
+            "hash": "7f616ea0ad1cf2b8b9a76577c002907313353529",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "20.3.0",
     "date": "2026-11-07",
     "sections": [
