@@ -10,10 +10,10 @@ import { fixtureWiring, lintFixture } from '../test-utils/lintFixture.ts';
 // No parser override, so the fixture is parsed by espree and has no parser services.
 const untypedWiring: Config = { files: ['**/*.mjs'] };
 
-// The config silences two rules that report on valid Vitest code. Assert the lint outcome rather than the config's
+// The config corrects three rules that report on valid Vitest code. Assert the lint outcome rather than the config's
 // shape: a shape assertion restates the source and passes forever, while this fails when a plugin upgrade renames an
 // option or changes a default. Each fixture also contains one expected report to distinguish the absence of the
-// silenced rules from a config that stopped matching the fixture, which would report nothing either way.
+// corrected rules' reports from a config that stopped matching the fixture, which would report nothing either way.
 describe('createConfig.vitest rule corrections', () => {
   it('reports only the untouched rule on the patterns that the corrections permit', async () => {
     const composed = [fixtureWiring, ...(await createConfig.vitest())];
