@@ -5,16 +5,17 @@
 import { existsSync } from 'node:fs';
 
 // Thin wrapper so that pnpm can symlink the bin at install time, before `dist/` exists.
-// This wrapper loads the real entry point at runtime from the build output.
-const entryPoint = new URL('../dist/esm/bin/strict-lint.js', import.meta.url);
+// It loads the TypeScript source when `src/` is present, which only a source checkout has,
+// because `files` leaves `src/` out of the published package. Otherwise it loads the build output.
+const sourceEntryPoint = new URL('../src/bin/strict-lint.ts', import.meta.url);
+const buildEntryPoint = new URL('../dist/esm/bin/strict-lint.js', import.meta.url);
+const entryPoint = [sourceEntryPoint, buildEntryPoint].find((url) => existsSync(url));
 
 // Gate on the entry file itself. Because Node raises ERR_MODULE_NOT_FOUND for any
 // unresolved module in the graph, keying the build-first message off the error code would
 // also fire when the build is present and one of its imports is missing.
-if (!existsSync(entryPoint)) {
-  process.stderr.write(
-    'strict-lint: build output not found. In a source checkout, run `nmr build`; otherwise reinstall the package.\n',
-  );
+if (entryPoint === undefined) {
+  process.stderr.write('strict-lint: build output not found. Reinstall the package.\n');
   process.exit(1);
 }
 
