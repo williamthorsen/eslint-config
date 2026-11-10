@@ -7,12 +7,13 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 
 const WRAPPER_PATH = fileURLToPath(new URL('../../bin/strict-lint.js', import.meta.url));
-const ENTRY_RELATIVE_PATH = path.join('dist', 'esm', 'bin', 'strict-lint.js');
+const BUILD_ENTRY_RELATIVE_PATH = path.join('dist', 'esm', 'bin', 'strict-lint.js');
+const SOURCE_ENTRY_RELATIVE_PATH = path.join('src', 'bin', 'strict-lint.ts');
 
 const createdDirs: string[] = [];
 
-// The wrapper resolves its entry point relative to its own location, so a copy in a temp tree decides for itself
-// whether the build output is there. That keeps these cases independent of whether this checkout has been built.
+// The wrapper resolves its entry points relative to its own location, so a copy in a temp tree decides for itself
+// which of them is there. That keeps these cases independent of whether this checkout has been built.
 describe('bin wrapper', () => {
   afterAll(() => {
     for (const dir of createdDirs) {
@@ -20,27 +21,49 @@ describe('bin wrapper', () => {
     }
   });
 
-  it('reports the missing build output and names the command that produces it', () => {
-    const wrapper = installWrapper();
+  it('reports the missing build output when neither entry point is there', () => {
+    const wrapper = installWrapper({});
 
     const { status, stderr } = runWrapper(wrapper);
 
     expect(status).toBe(1);
     expect(stderr).toContain('build output not found');
-    expect(stderr).toContain('nmr build');
+    expect(stderr).toContain('Reinstall the package');
   });
 
-  it('runs the entry point when the build output is there', () => {
-    const wrapper = installWrapper('process.stdout.write("entry reached\\n");\n');
+  it('runs the build output when the source is absent', () => {
+    const wrapper = installWrapper({ build: 'process.stdout.write("build reached\\n");\n' });
 
     const { status, stdout } = runWrapper(wrapper);
 
     expect(status).toBe(0);
-    expect(stdout).toContain('entry reached');
+    expect(stdout).toContain('build reached');
+  });
+
+  it('runs the source when the build output is absent', () => {
+    const wrapper = installWrapper({ source: 'process.stdout.write("source reached\\n");\n' });
+
+    const { status, stdout } = runWrapper(wrapper);
+
+    expect(status).toBe(0);
+    expect(stdout).toContain('source reached');
+  });
+
+  it('prefers the source to the build output', () => {
+    const wrapper = installWrapper({
+      build: 'process.stdout.write("build reached\\n");\n',
+      source: 'process.stdout.write("source reached\\n");\n',
+    });
+
+    const { status, stdout } = runWrapper(wrapper);
+
+    expect(status).toBe(0);
+    expect(stdout).toContain('source reached');
+    expect(stdout).not.toContain('build reached');
   });
 
   it('reports an entry point that fails to load', () => {
-    const wrapper = installWrapper('throw new Error("boom");\n');
+    const wrapper = installWrapper({ build: 'throw new Error("boom");\n' });
 
     const { status, stderr } = runWrapper(wrapper);
 
@@ -51,8 +74,8 @@ describe('bin wrapper', () => {
 
 // region | Helpers
 
-/** Copies the wrapper into a temp tree, optionally alongside an entry point with the given body, and returns its path. */
-function installWrapper(entryPointBody?: string): string {
+/** Copies the wrapper into a temp tree, alongside an entry point for each body given, and returns its path. */
+function installWrapper(entryPointBodies: { build?: string; source?: string }): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-bin-'));
   createdDirs.push(dir);
 
@@ -64,11 +87,8 @@ function installWrapper(entryPointBody?: string): string {
   fs.mkdirSync(path.dirname(wrapper), { recursive: true });
   fs.copyFileSync(WRAPPER_PATH, wrapper);
 
-  if (entryPointBody !== undefined) {
-    const entryPoint = path.join(dir, ENTRY_RELATIVE_PATH);
-    fs.mkdirSync(path.dirname(entryPoint), { recursive: true });
-    fs.writeFileSync(entryPoint, entryPointBody);
-  }
+  writeEntryPoint(path.join(dir, BUILD_ENTRY_RELATIVE_PATH), entryPointBodies.build);
+  writeEntryPoint(path.join(dir, SOURCE_ENTRY_RELATIVE_PATH), entryPointBodies.source);
 
   return wrapper;
 }
@@ -77,6 +97,14 @@ function installWrapper(entryPointBody?: string): string {
 function runWrapper(wrapper: string): { status: number | null; stderr: string; stdout: string } {
   const result = spawnSync(process.execPath, [wrapper], { encoding: 'utf8' });
   return { status: result.status, stderr: result.stderr, stdout: result.stdout };
+}
+
+/** Writes an entry point with the given body, or nothing when the body is absent. */
+function writeEntryPoint(entryPoint: string, body: string | undefined): void {
+  if (body === undefined) return;
+
+  fs.mkdirSync(path.dirname(entryPoint), { recursive: true });
+  fs.writeFileSync(entryPoint, body);
 }
 
 // endregion | Helpers

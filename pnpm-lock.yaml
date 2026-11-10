@@ -203,8 +203,8 @@ importers:
         specifier: workspace:*
         version: link:packages/typescript
       '@williamthorsen/nmr':
-        specifier: 1.0.0
-        version: 1.0.0(typescript@6.0.3)(vite@8.3.7(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.1.0)
+        specifier: 2.0.0
+        version: 2.0.0(typescript@6.0.3)(vite@8.3.7(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.1.0)
       '@williamthorsen/release-kit':
         specifier: 18.0.0
         version: 18.0.0
@@ -1214,8 +1214,8 @@ packages:
     resolution: {integrity: sha512-pOh6W+vibevPAPVWNLiAJPHD9chDmJe8yskEbn0b0i/Gtiy4WNAaTNTMYABuGC7VTI2S1dV5r3opbBvgzLLaJQ==}
     engines: {node: '>=24.16.0'}
 
-  '@williamthorsen/nmr@1.0.0':
-    resolution: {integrity: sha512-g+kvQcQqbxP7Kpr4mFq4rbWiLSQOYQ6gUo2TRZd9K02OTMh2M1QjqK1JFEthoLppmp5wKEQeJULbjJ/bMCyz5A==}
+  '@williamthorsen/nmr@2.0.0':
+    resolution: {integrity: sha512-yrXGGWNA/IfDND1lrOisajbzVJblXYlwPDBXGVgLvPy3DmgnWT2X/K8J3IkzK6HjXNBm4nedbfLbD4Xcbm+IbA==}
     engines: {node: '>=24.16.0', pnpm: '>=11'}
     hasBin: true
     peerDependencies:
@@ -3944,9 +3944,9 @@ snapshots:
       diff: 9.0.0
       yaml: 2.9.1
 
-  '@williamthorsen/nmr@1.0.0(typescript@6.0.3)(vite@8.3.7(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.1.0)':
+  '@williamthorsen/nmr@2.0.0(typescript@6.0.3)(vite@8.3.7(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.1.0)':
     dependencies:
-      '@williamthorsen/nmr-core': 0.16.0
+      '@williamthorsen/nmr-core': 0.16.1
       '@williamthorsen/toolbelt.errors': 0.9.0
       '@williamthorsen/toolbelt.filesystem': 0.10.0
       glob: 14.0.4
