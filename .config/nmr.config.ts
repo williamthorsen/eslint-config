@@ -2,10 +2,6 @@ import { defineConfig } from '@williamthorsen/nmr/config';
 
 /** Repo-level nmr overrides. */
 export default defineConfig({
-  devBin: {
-    // Run strict-lint from its workspace source, so that the repo lints with the version under development.
-    'strict-lint': 'node packages/strict-lint/src/bin/strict-lint.ts',
-  },
   rootScripts: {
     // Restates nmr's default list to append `verify:kits`.
     'check:strict': ['typecheck', 'fmt:check', 'lint:strict', 'test:coverage', 'verify:kits'],
