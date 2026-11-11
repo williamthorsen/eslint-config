@@ -48,6 +48,8 @@ A specifier naming a JavaScript file is unchanged. The resolver alias is scoped 
 
 `import-x/extensions` reports each specifier but cannot repair one. Because its fixer is gated behind a rule option that the config does not set, `eslint --fix` changes nothing, and the repair that it offers as an editor suggestion appends the resolved extension rather than replacing the written one, turning `./m.js` into `./m.js.ts`. Do not apply the suggestion or enable the rule's `fix` option: Rewrite the specifiers by hand or with a codemod.
 
+From v22, `sky-pilot/no-js-extension-for-ts` reports the `.js` spelling in place of `import-x/extensions`, and `eslint --fix` rewrites each specifier to its source's extension. A codebase migrating to v22 or later can skip the manual rewrite. See the [rule's section](../packages/typescript/README.md#sky-pilotno-js-extension-for-ts) in the README.
+
 ## Step 3: Nothing to change when an override sets the resolver
 
 ESLint merges `settings` deeply, so an override adding a resolver key of its own keeps the shipped `extensionAlias`. An existing override needs no change:
