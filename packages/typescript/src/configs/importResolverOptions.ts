@@ -1,10 +1,10 @@
 // The bundled resolver defaults `extensions` to `['.mjs', '.cjs', '.js', '.json', '.node']` and sets no
-// `extensionAlias`, so a specifier ending in `.js` that names a `.ts` file resolves to nothing: The module
-// graph loses the edge, and `import-x/no-cycle` cannot follow it. `sky-pilot/no-js-extension-for-ts` reports the
-// `.js` spelling itself. Each alias list ends with the JavaScript extension itself, which keeps a genuine JavaScript sibling
-// resolvable; the alias replaces the search extension rather than adding to it. Both lists are ordered by
-// resolution priority rather than alphabetically: When a `.js` and a `.ts` sibling both exist, an
-// extensionless specifier in a TypeScript source names the TypeScript one.
+// `extensionAlias`, so a specifier ending in `.js` that names a `.ts` file resolves to nothing: The module graph loses
+// the edge, and `import-x/no-cycle` cannot follow it. `sky-pilot/no-js-extension-for-ts` reports the `.js` spelling
+// itself. Each alias list ends with the JavaScript extension itself, which keeps a genuine JavaScript sibling
+// resolvable; the alias replaces the search extension rather than adding to it. Both lists are ordered by resolution
+// priority rather than alphabetically: When a `.js` and a `.ts` sibling both exist, an extensionless specifier in a
+// TypeScript source names the TypeScript one.
 export const importResolverOptions = {
   extensionAlias: {
     '.cjs': ['.cts', '.cjs'],

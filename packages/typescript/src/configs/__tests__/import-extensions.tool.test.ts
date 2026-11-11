@@ -22,9 +22,8 @@ describe('the extension rules that the shipped config sets', () => {
     ]);
   });
 
-  // `js-target.ts` is next to `js-target.js`, so the specifier resolves to whichever the alias tries
-  // first: the TypeScript sibling wherever the alias applies, the JavaScript one where it does not. Without
-  // that sibling the case passes whether or not the alias is scoped, guarding nothing.
+  // `js-target.ts` is next to `js-target.js`, and TypeScript resolves the specifier to the TypeScript sibling, so the
+  // case fails if `sky-pilot/no-js-extension-for-ts` reaches a JavaScript file with type information.
   it('reports nothing for a `.js` specifier that names a JavaScript file', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'js-importer.js');
 
@@ -98,19 +97,6 @@ describe('the extension rules that the shipped config sets', () => {
     expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([
       'sky-pilot/no-js-extension-for-ts: Expected file extension "ts" for "#src/target.js"',
-    ]);
-  });
-
-  // ESLint merges `settings` deeply, which lets a consumer add a resolver key without displacing the
-  // config's own `extensionAlias`. The README documents the override on that basis.
-  it('keeps the alias when a later config adds a resolver key of its own', async () => {
-    const override = { settings: { 'import-x/resolver': { node: { conditionNames: ['import'] } } } };
-
-    const results = await lintFixture([...baseConfig, typedParserSettings, override], 'cycle-jsvalue-a.ts');
-
-    expect(results[0]?.fatalErrorCount).toBe(0);
-    expect(listExtensionMessages(results)).toStrictEqual([
-      'sky-pilot/no-js-extension-for-ts: Expected file extension "ts" for "./cycle-jsvalue-b.js"',
     ]);
   });
 });

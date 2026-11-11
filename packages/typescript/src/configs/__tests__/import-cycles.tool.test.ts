@@ -19,6 +19,17 @@ describe('the cycle rule that the import config sets', () => {
     expect(listCycleMessages(results)).toStrictEqual(['Dependency cycle detected']);
   });
 
+  // ESLint merges `settings` deeply, which lets a consumer add a resolver key without displacing the config's own
+  // `extensionAlias`. The README documents the override on that basis.
+  it('follows a `.js` specifier to its TypeScript source when a later config adds a resolver key', async () => {
+    const override = { settings: { 'import-x/resolver': { node: { conditionNames: ['import'] } } } };
+
+    const results = await lintFixture([...baseConfig, typedParserSettings, override], 'cycle-jsvalue-a.ts');
+
+    expect(results[0]?.fatalErrorCount).toBe(0);
+    expect(listCycleMessages(results)).toStrictEqual(['Dependency cycle detected']);
+  });
+
   // `import-x/no-cycle` skips a statement whose specifiers are all types, through one code path for the
   // top-level spelling and another for the inline one, so a cycle reachable only through them goes
   // unreported. These cases pin the gap that `sky-pilot/no-type-cycle` covers when a consumer enables it; they
