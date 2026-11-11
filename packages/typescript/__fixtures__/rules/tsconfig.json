@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
+    // A case may import a TypeScript source by its own extension, and a target may be a `.tsx` file.
+    "allowImportingTsExtensions": true,
+    "jsx": "preserve",
     "lib": ["ES2024", "ESNext.Disposable"],
+    "noEmit": true,
     "types": [],
   },
   "include": ["anchor.ts"],

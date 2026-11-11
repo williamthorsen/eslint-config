@@ -46,9 +46,9 @@ The TypeScript rules are type-aware, and the preset enables typescript-eslint's 
 
 ## Import specifiers
 
-A relative specifier names the TypeScript source that it reaches: `./m.ts`, never `./m.js`. `import-x/extensions` reports the `.js` spelling, and the config supplies an `import-x` resolver default that sets `extensionAlias` so that the rule reads the file to which the specifier resolves. The alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source keeps naming the JavaScript file that it loads.
+A relative specifier names the TypeScript source that it reaches: `./m.ts`, never `./m.js`. [`sky-pilot/no-js-extension-for-ts`](#sky-pilotno-js-extension-for-ts) reports and fixes the `.js` spelling, and `import-x/extensions` reports a specifier that omits its extension. The config also supplies an `import-x` resolver default that sets `extensionAlias`, so that `import-x/no-cycle` follows `./m.js` to `m.ts`. The alias is scoped to `**/*.{ts,cts,mts,tsx}`, so a JavaScript source keeps naming the JavaScript file that it loads.
 
-The rule enforces relative specifiers and multi-segment `#` subpath imports, such as `#src/utils/assert.ts`. Every other bare specifier holding a slash is exempt, which lets a package import its own subpath export. A non-relative alias such as `src/foo/bar` is indistinguishable from one and goes unchecked too. A one-segment `#` specifier such as `#config` is exempt as well, because it usually names an exact mapping to a file and cannot take an extension.
+`import-x/extensions` enforces relative specifiers and multi-segment `#` subpath imports, such as `#src/utils/assert.ts`. Every other bare specifier holding a slash is exempt, which lets a package import its own subpath export. A non-relative alias such as `src/foo/bar` is indistinguishable from one and goes unchecked too. A one-segment `#` specifier such as `#config` is exempt as well, because it usually names an exact mapping to a file and cannot take an extension.
 
 A pattern mapping whose target contains the extension, such as `"#src/*": "./src/*.ts"`, makes the extensionless specifier the correct one. A project using one restores the exemption by restating the rule's options:
 
@@ -186,15 +186,16 @@ export default [
 ];
 ```
 
-Because ESLint merges `settings` deeply, this adds `tsconfig` to the resolver without displacing the `extensionAlias` that the config supplies. A TypeScript file keeps both; a JavaScript file gets the `tsconfig` resolver alone, its specifiers naming the files that they load.
+Because ESLint merges `settings` deeply, this adds `tsconfig` to the resolver without displacing the `extensionAlias` that the config supplies, through which the rule follows a `.js` specifier to its TypeScript source. A TypeScript file keeps both; a JavaScript file gets the `tsconfig` resolver alone, its specifiers naming the files that they load.
 
 ## Custom rules (`sky-pilot`)
 
-This config's own plugin contains eight rules. The TypeScript config enables six of them, so they apply to `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. Two are in neither preset: The base config enables [`no-real-time-sleep`](#sky-pilotno-real-time-sleep) in test files, and [`no-type-cycle`](#sky-pilotno-type-cycle) is enabled per project.
+This config's own plugin contains nine rules. The TypeScript config enables seven of them, so they apply to `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. Two are in neither preset: The base config enables [`no-real-time-sleep`](#sky-pilotno-real-time-sleep) in test files, and [`no-type-cycle`](#sky-pilotno-type-cycle) is enabled per project.
 
 | Rule                                    | `recommended` | `strict` | Enforces                                                                                |
 | --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
 | `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
+| `sky-pilot/no-js-extension-for-ts`      | `error`       | `error`  | A specifier names a TypeScript source by its own extension, not by a JavaScript one.    |
 | `sky-pilot/no-real-time-sleep`          | opt-in        | opt-in   | A test does not wait on a real timer; it advances fake timers.                          |
 | `sky-pilot/no-split-imports`            | `warn`        | `error`  | A module is imported in one statement, with `type` on the specifiers that import types. |
 | `sky-pilot/no-type-cycle`               | opt-in        | opt-in   | No module cycle passes through a type-only import, which `import-x/no-cycle` excludes.  |
@@ -278,6 +279,26 @@ acquireHandle();
 ```
 
 typescript-eslint's `no-misused-disposable` covers these cases and more, but it is [still in draft](https://github.com/typescript-eslint/typescript-eslint/pull/12659).
+
+### `sky-pilot/no-js-extension-for-ts`
+
+Reports a relative or `#` specifier written with a JavaScript extension (`.js`, `.jsx`, `.mjs`, or `.cjs`) that resolves to a TypeScript source of the same base name, and fixes it to that source's extension:
+
+```ts
+import { a } from './a.js'; // fixed to './a.ts'
+import { B } from './b.js'; // fixed to './b.tsx' when the source is `b.tsx`
+export * from '#src/c.js'; // fixed to '#src/c.ts'
+```
+
+The specifier resolves as `tsc` resolves it, through the TypeScript program built by the project service, so a `#` subpath import resolves through the package's `imports` map. Because the rule reads the program, it reports nothing when the parser supplies none.
+
+Every form that names a module is checked: an import, type-only or not, a side-effect import, a re-export, an `import()` expression or type, and `import x = require()`. Three kinds of specifier are passed over:
+
+- **A specifier that resolves to a declaration file**, such as `./m.js` beside `m.d.ts`: The declaration describes JavaScript that exists at the written path.
+- **A bare specifier**, which names a path that a package publishes, including a tsconfig `paths` alias such as `@/m.js`.
+- **A specifier that resolves to nothing**, which `tsc` reports itself.
+
+A specifier that omits its extension is reported by `import-x/extensions`. The rule takes no options.
 
 ### `sky-pilot/no-real-time-sleep`
 

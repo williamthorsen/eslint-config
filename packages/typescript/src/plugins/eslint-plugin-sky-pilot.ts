@@ -4,6 +4,7 @@ import type { Config } from 'eslint/config';
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
 import noFloatingDisposableRule from './rules/no-floating-disposable.ts';
+import noJsExtensionForTsRule from './rules/no-js-extension-for-ts.ts';
 import noRealTimeSleepRule from './rules/no-real-time-sleep.ts';
 import noSplitImportsRule from './rules/no-split-imports.ts';
 import noTypeCycleRule from './rules/no-type-cycle.ts';
@@ -18,6 +19,7 @@ const skyPilotPlugin: ESLint.Plugin = {
   },
   rules: ensurePluginRules({
     'no-floating-disposable': noFloatingDisposableRule,
+    'no-js-extension-for-ts': noJsExtensionForTsRule,
     'no-real-time-sleep': noRealTimeSleepRule,
     'no-split-imports': noSplitImportsRule,
     'no-type-cycle': noTypeCycleRule,
@@ -39,6 +41,7 @@ const configs: { recommended: Preset; strict: Preset } = {
     },
     rules: {
       'sky-pilot/no-floating-disposable': 'warn',
+      'sky-pilot/no-js-extension-for-ts': 'error',
       'sky-pilot/no-split-imports': 'warn',
       'sky-pilot/no-undefined-with-number': 'error',
       'sky-pilot/no-unpublished-barrel': 'warn',
@@ -52,6 +55,7 @@ const configs: { recommended: Preset; strict: Preset } = {
     },
     rules: {
       'sky-pilot/no-floating-disposable': 'error',
+      'sky-pilot/no-js-extension-for-ts': 'error',
       'sky-pilot/no-split-imports': 'error',
       'sky-pilot/no-undefined-with-number': 'error',
       'sky-pilot/no-unpublished-barrel': 'error',
