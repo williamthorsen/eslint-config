@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'node:url';
 
+import { describeError } from '@williamthorsen/toolbelt.errors';
 import { ESLint, type Linter } from 'eslint';
 
 import { isRecord } from '#src/common/isRecord.ts';
@@ -36,11 +37,6 @@ export async function loadEslintConfig(cwd: string, configPath?: string): Promis
 }
 
 // region | Helpers
-
-/** Renders a thrown value as a message. */
-function describeError(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
 
 /**
  * Checks whether a value is an array of config objects. It verifies only what the comparison depends on -- that each

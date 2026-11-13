@@ -22,6 +22,7 @@ if (entryPoint === undefined) {
 try {
   await import(entryPoint.href);
 } catch (error) {
+  // eslint-disable-next-line no-restricted-syntax -- this file imports only node builtins; see the top comment.
   const message = error instanceof Error ? error.message : String(error);
   process.stderr.write(`strict-lint: failed to load: ${message}\n`);
   process.exit(1);
