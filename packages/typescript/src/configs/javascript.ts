@@ -32,6 +32,14 @@ const rules: Linter.RulesRecord = {
     'DebuggerStatement',
     'LabeledStatement',
     'WithStatement',
+    {
+      selector:
+        "ConditionalExpression[test.operator='instanceof'][test.right.name='Error']" +
+        "[consequent.type='MemberExpression'][consequent.property.name='message']" +
+        "[alternate.callee.name='String']",
+      message:
+        'Describe a thrown value with a shared helper, such as `describeError` from `@williamthorsen/toolbelt.errors`, rather than an inline ternary.',
+    },
   ],
   'no-return-assign': 'error',
   'no-return-await': 'off',
