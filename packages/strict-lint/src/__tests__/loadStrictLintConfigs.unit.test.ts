@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { loadStrictLintConfigs, resolveSharedConfigs, STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
+import type { StrictLintConfig } from '../types.ts';
 
 interface CascadeOptions {
   fileNames: readonly string[];
-  shouldStopAscent?: ((config: unknown) => boolean) | undefined;
+  parseConfig: (value: unknown, filePath: string) => StrictLintConfig;
+  shouldStopAscent?: ((config: StrictLintConfig) => boolean) | undefined;
   startDir: string;
   stopAtDir: string;
 }
@@ -90,9 +92,6 @@ describe(loadStrictLintConfigs, () => {
       { name: 'the flag is true', config: { shouldIgnoreAncestors: true }, stops: true },
       { name: 'the flag is false', config: { shouldIgnoreAncestors: false }, stops: false },
       { name: 'the flag is absent', config: { maxSeverity: {} }, stops: false },
-      { name: 'the flag is a truthy non-boolean', config: { shouldIgnoreAncestors: 'yes' }, stops: false },
-      { name: 'the config is null', config: null, stops: false },
-      { name: 'the config is not an object', config: 'not-an-object', stops: false },
     ])('reports $stops when $name', async ({ config, stops }) => {
       withCascadeEntries([]);
       await loadStrictLintConfigs('/project');
@@ -273,19 +272,27 @@ describe(resolveSharedConfigs, () => {
 
 // region | Helpers
 
-/** Makes the mocked cascade resolve with an entry per directory, in the nearest-first order of the real one. */
+/**
+ * Makes the mocked cascade resolve with an entry per directory, in the nearest-first order of the real one, passing
+ * each raw config through the parser that strict-lint supplied, as the real cascade does.
+ */
 function withCascadeEntries(
   configsByDir: Array<[dir: string, config: unknown]>,
   stopReason: 'predicate' | 'stop-dir' = 'stop-dir',
 ): void {
-  mockedLoadConfigCascade.mockResolvedValue({
-    entries: configsByDir.map(([dir, config]) => ({ config, dir, filePath: configPathIn(dir) })),
-    stopReason,
-  });
+  mockedLoadConfigCascade.mockImplementation(({ parseConfig }) =>
+    Promise.try(() => ({
+      entries: configsByDir.map(([dir, config]) => {
+        const filePath = configPathIn(dir);
+        return { config: parseConfig(config, filePath), dir, filePath };
+      }),
+      stopReason,
+    })),
+  );
 }
 
 /** Returns the stop predicate that strict-lint passed to the cascade on its most recent call. */
-function stopAscentPredicate(): (config: unknown) => boolean {
+function stopAscentPredicate(): (config: StrictLintConfig) => boolean {
   const predicate = mockedLoadConfigCascade.mock.lastCall?.[0].shouldStopAscent;
   if (predicate === undefined) {
     throw new Error('loadConfigCascade was called without a stop predicate');

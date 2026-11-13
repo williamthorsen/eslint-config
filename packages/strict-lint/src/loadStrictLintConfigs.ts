@@ -22,16 +22,9 @@ export interface StrictLintCascade extends ConfigCascade<StrictLintConfig> {
  */
 export async function loadStrictLintConfigs(startDir: string): Promise<StrictLintCascade> {
   const projectRoot = findProjectRoot(startDir);
-  const cascade = await loadCascade(startDir, projectRoot.rootDir);
+  const { entries, stopReason } = await loadCascade(startDir, projectRoot.rootDir);
 
-  return {
-    entries: cascade.entries.map(({ config, dir, filePath }) => {
-      assertIsStrictLintConfig(config, filePath);
-      return { config, dir, filePath };
-    }),
-    projectRoot,
-    stopReason: cascade.stopReason,
-  };
+  return { entries, projectRoot, stopReason };
 }
 
 /**
@@ -47,10 +40,11 @@ export function resolveSharedConfigs(cascade: StrictLintCascade): Linter.Config[
 // region | Helpers
 
 /** Runs the cascade, mapping the native-TypeScript failure modes that its plain `import()` raises. */
-async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigCascade<unknown>> {
+async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigCascade<StrictLintConfig>> {
   try {
     return await loadConfigCascade({
       fileNames: [STRICT_LINT_CONFIG_NAME],
+      parseConfig: parseStrictLintConfig,
       shouldStopAscent: isIgnoringAncestors,
       startDir,
       stopAtDir,
@@ -60,12 +54,15 @@ async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigC
   }
 }
 
-/**
- * Checks whether a config bounds the walk at its own level. The cascade calls this as it loads each config, before
- * strict-lint validates any of them, so it must tolerate every value; validation later rejects an ill-typed flag.
- */
-function isIgnoringAncestors(config: unknown): boolean {
-  return isRecord(config) && config['shouldIgnoreAncestors'] === true;
+/** Checks whether a config bounds the walk at its own level. */
+function isIgnoringAncestors(config: StrictLintConfig): boolean {
+  return config.shouldIgnoreAncestors === true;
+}
+
+/** Validates the default export of a config file as a strict-lint config, throwing a `TypeError` naming the file. */
+function parseStrictLintConfig(value: unknown, filePath: string): StrictLintConfig {
+  assertIsStrictLintConfig(value, filePath);
+  return value;
 }
 
 /** Asserts that the default export of a config file is a valid strict-lint config. */
