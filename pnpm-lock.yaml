@@ -203,11 +203,11 @@ importers:
         specifier: workspace:*
         version: link:packages/typescript
       '@williamthorsen/nmr':
-        specifier: 2.2.0
-        version: 2.2.0(typescript@6.0.3)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.1.0)
+        specifier: 2.2.1
+        version: 2.2.1(typescript@6.0.3)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.1.0)
       '@williamthorsen/release-kit':
-        specifier: 18.1.1
-        version: 18.1.1
+        specifier: 18.2.0
+        version: 18.2.0
       '@williamthorsen/strict-lint':
         specifier: workspace:*
         version: link:packages/strict-lint
@@ -236,8 +236,8 @@ importers:
         specifier: 2.2.1
         version: 2.2.1
       prettier:
-        specifier: 3.10.0
-        version: 3.10.0
+        specifier: 3.10.1
+        version: 3.10.1
       readyup:
         specifier: 'catalog:'
         version: 0.46.2(esbuild@0.28.2)
@@ -269,8 +269,8 @@ importers:
         specifier: 0.10.3
         version: 0.10.3
       '@williamthorsen/toolbelt.packaging':
-        specifier: 0.7.3
-        version: 0.7.3
+        specifier: 0.8.0
+        version: 0.8.0
     devDependencies:
       '@williamthorsen/toolbelt.testing':
         specifier: 0.8.3
@@ -1238,8 +1238,8 @@ packages:
     resolution: {integrity: sha512-fh3bRAiePLh3J+IMFiASQbBWHdVkxGhSZg9JpSdREBlZP1htQCDvOlkr21cP+9XfNZ0V2bqQkTsFM+H+3R720A==}
     engines: {node: '>=24.16.0'}
 
-  '@williamthorsen/nmr@2.2.0':
-    resolution: {integrity: sha512-zou/C4BNgRHPL3F6gWsO2kQ7TqPZUmHTttbALi04jLWq6NtxIlcc5pGXAm5CuQ6eZ34nZpMacbOXNgMPKURO1g==}
+  '@williamthorsen/nmr@2.2.1':
+    resolution: {integrity: sha512-6P6avgd8doOurGbv3NUWyG+8q1QC++mySzvqSC5dj7owNSYROsaKD1E4kuu/DPLL0ccIlU/TuEKNt80y7Ueg+g==}
     engines: {node: '>=24.16.0', pnpm: '>=11'}
     hasBin: true
     peerDependencies:
@@ -1254,8 +1254,8 @@ packages:
       vitest:
         optional: true
 
-  '@williamthorsen/release-kit@18.1.1':
-    resolution: {integrity: sha512-lO7Vkcph0n9XU1Jm7MBRGCianRLhv9rHQ8+dGU0iptbba8gsRnukdYeQCeCqJaKC8LzktPqL9c4lYVpIBlv8xg==}
+  '@williamthorsen/release-kit@18.2.0':
+    resolution: {integrity: sha512-KpxIvAgQXMID5dHI3UsLQPh9ieUieNuwUzC71XIjvRuMY3XwpZ9LNo6mJSRmQKThenmSERofyK1+f+uKQR/wMQ==}
     engines: {node: '>=24.16.0'}
     hasBin: true
 
@@ -1319,6 +1319,10 @@ packages:
     resolution: {integrity: sha512-YZBCikZXUlcszM9QPH2RglggApbp6AD3RR+tz+twIiFx5fyWBKPtcQlkUkN7bk0nlzIwbwNWMGyGhL2pRWd/pw==}
     engines: {node: '>=24.0.0'}
 
+  '@williamthorsen/toolbelt.filesystem@0.11.0':
+    resolution: {integrity: sha512-qKY8fb0RjrcHnFYTxjpAupTIbnTKMi5QkRPMDv5ATsX7JsvgFxpZReeLF1nCElNeUo6S2wsdocRHKCx1wORvaA==}
+    engines: {node: '>=24.0.0'}
+
   '@williamthorsen/toolbelt.guards@4.2.0':
     resolution: {integrity: sha512-1+B/L2UpCGohBv7PluO5CAUm5OiSjr9qx9D8LCLfKR6cKNhE+cdecECxH1eTa37nXU1MkbzPUKzJLHumLZqSVw==}
     engines: {node: '>=24.0.0'}
@@ -1371,8 +1375,8 @@ packages:
     resolution: {integrity: sha512-D8Zgs6rRkhZYRldstq0+hpBPBnwcW0orhmXOiE9j5WmlB2DVjESq1Qw6Bo3sKxCCr2HxzRkObjT92eXXd1oHXA==}
     engines: {node: '>=24.0.0'}
 
-  '@williamthorsen/toolbelt.packaging@0.7.3':
-    resolution: {integrity: sha512-siofteH2HR2qWLbmQvWdOdtdF6/UJt27zPIUBTtHxWeqxkeHbFRAmCaORoJ/xPvR/wZoV72BtR3UltrgW4IaKQ==}
+  '@williamthorsen/toolbelt.packaging@0.8.0':
+    resolution: {integrity: sha512-21DMdQZn//uCV6BSuC+jWQblHYLyWGB0wo9uRvUBziro/VUtmS6RkkhnItOa5VcW+J5l4dqpxMIdTiOFcDBMCA==}
     engines: {node: '>=24.0.0'}
 
   '@williamthorsen/toolbelt.sets@3.1.0':
@@ -1712,8 +1716,8 @@ packages:
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
 
-  electron-to-chromium@1.5.482:
-    resolution: {integrity: sha512-CAj2EpyffocZkpJA1yUDSA/wgoo+JkSFkx5ywA00X5biWrmBGecoFyKlyZw2Tlt0mZFFfHqP9S4PMLwtXXeHXg==}
+  electron-to-chromium@1.5.483:
+    resolution: {integrity: sha512-zkGOvf625oaZgK+mhTF4hl3aTAfIOOnR7Jey0e7fUktdJWrB/wsLnzPKvWaqZkMCJ1yzUkAh6IqDJ9GMr3pR2Q==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -1721,8 +1725,8 @@ packages:
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
 
-  enhanced-resolve@5.26.1:
-    resolution: {integrity: sha512-PPnnSJq3azKOIewXR/uppBV/6h98dprBJ/WaQ9Qgj10xX1lJLNfg+XShpbsrSqcDSy2yYYyhfXM1wWhftqgyzw==}
+  enhanced-resolve@5.26.2:
+    resolution: {integrity: sha512-sQeK9D5kN5T+O0Hh+Cn8t39FZ0VJVARcoacJ7x1I0N+3/WqlckcS8D4NUKjMyTh4P5ly1SMgJQstou2aL3rmZQ==}
     engines: {node: '>=10.13.0'}
 
   entities@8.1.0:
@@ -2102,12 +2106,12 @@ packages:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
 
-  glob@14.0.4:
-    resolution: {integrity: sha512-mMiwNKoJZ4HAIRVJxotO6LsNRReA30gQwP9E2/p94tfLv+jygCNpKDjhhSL6OLY6LE371EZm5EAf7RpYuUqlsw==}
-    engines: {node: 18 || 20 || >=22}
-
   glob@14.0.5:
     resolution: {integrity: sha512-nbKW5Sl53DEM5PkmZ5Jwfeyss1ohuqcgOBjOarSjz1fp8W4ss4EOOvKADQRbApD6JmVBX+HkpZYfBez4wXbeQQ==}
+    engines: {node: 18 || 20 || >=22}
+
+  glob@14.0.6:
+    resolution: {integrity: sha512-OwXjVP2svY5EyLY75Vek96C8qK43gqrt4xsZ+qSILdnaEiJPXkd62mcfUSNx/TQErQRdu5uM5kF67sfONragKw==}
     engines: {node: 18 || 20 || >=22}
 
   globals@15.15.0:
@@ -2129,8 +2133,8 @@ packages:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
 
-  graceful-fs@4.2.11:
-    resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+  graceful-fs@4.2.12:
+    resolution: {integrity: sha512-iuyGF2E4oafQfPsRrG2wtY2ILupMhvtdrhzrxB+0VcjsPpSPttpfYdjnGFGsTi5MaJFjI1jOKHPQ6UTbTj9TAw==}
 
   has-bigints@1.1.0:
     resolution: {integrity: sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg==}
@@ -2811,6 +2815,11 @@ packages:
 
   prettier@3.10.0:
     resolution: {integrity: sha512-mBi4765LgjO1PFjlEs7pUeK0nb1bw71c+N4/ItfeUWNdY5cV2pRKaFpbbFRYmDJMO+5ZwzGxHRqHxFZna7iv5w==}
+    engines: {node: '>=14'}
+    hasBin: true
+
+  prettier@3.10.1:
+    resolution: {integrity: sha512-70vp3ZUYoPlFbF9uiTdXHUUCGEIp7d4+6p+8DYbkm2jP7x/3i/paXVF6dopSI3zd/CEitrZN1rc4i85xWmmXlg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4090,12 +4099,12 @@ snapshots:
       diff: 9.0.0
       yaml: 2.9.1
 
-  '@williamthorsen/nmr@2.2.0(typescript@6.0.3)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.1.0)':
+  '@williamthorsen/nmr@2.2.1(typescript@6.0.3)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))(vitest@5.1.0)':
     dependencies:
       '@williamthorsen/nmr-core': 0.16.2
-      '@williamthorsen/toolbelt.errors': 0.10.0
-      '@williamthorsen/toolbelt.filesystem': 0.10.2
-      glob: 14.0.4
+      '@williamthorsen/toolbelt.errors': 0.10.1
+      '@williamthorsen/toolbelt.filesystem': 0.10.3
+      glob: 14.0.5
       prettier: 3.10.0
       prettier-plugin-sh: 0.20.2(prettier@3.10.0)
       taze: 21.3.0
@@ -4105,11 +4114,11 @@ snapshots:
       vite: 8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)
       vitest: 5.1.0(@types/node@24.19.2)(@vitest/coverage-v8@5.1.0)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
-  '@williamthorsen/release-kit@18.1.1':
+  '@williamthorsen/release-kit@18.2.0':
     dependencies:
       '@williamthorsen/change-grammar': 0.4.1
       '@williamthorsen/nmr-core': 0.16.2
-      '@williamthorsen/toolbelt.errors': 0.9.1
+      '@williamthorsen/toolbelt.errors': 0.10.1
       json-stringify-pretty-compact: 4.0.0
       semver: 7.8.6
       yaml: 2.9.1
@@ -4172,6 +4181,10 @@ snapshots:
     dependencies:
       '@williamthorsen/toolbelt.errors': 0.10.1
 
+  '@williamthorsen/toolbelt.filesystem@0.11.0':
+    dependencies:
+      '@williamthorsen/toolbelt.errors': 0.10.1
+
   '@williamthorsen/toolbelt.guards@4.2.0': {}
 
   '@williamthorsen/toolbelt.guards@4.2.1': {}
@@ -4207,9 +4220,9 @@ snapshots:
       '@williamthorsen/toolbelt.filesystem': 0.10.2
       '@williamthorsen/toolbelt.objects': 4.4.2
 
-  '@williamthorsen/toolbelt.packaging@0.7.3':
+  '@williamthorsen/toolbelt.packaging@0.8.0':
     dependencies:
-      '@williamthorsen/toolbelt.filesystem': 0.10.3
+      '@williamthorsen/toolbelt.filesystem': 0.11.0
       '@williamthorsen/toolbelt.objects': 4.4.3
 
   '@williamthorsen/toolbelt.sets@3.1.0': {}
@@ -4398,7 +4411,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.11.36
       caniuse-lite: 1.0.30001826
-      electron-to-chromium: 1.5.482
+      electron-to-chromium: 1.5.483
       node-releases: 2.0.63
       update-browserslist-db: 1.3.4(browserslist@4.29.5)
 
@@ -4566,15 +4579,15 @@ snapshots:
 
   duplexer@0.1.2: {}
 
-  electron-to-chromium@1.5.482: {}
+  electron-to-chromium@1.5.483: {}
 
   emoji-regex@8.0.0: {}
 
   emoji-regex@9.2.2: {}
 
-  enhanced-resolve@5.26.1:
+  enhanced-resolve@5.26.2:
     dependencies:
-      graceful-fs: 4.2.11
+      graceful-fs: 4.2.12
       tapable: 2.3.3
 
   entities@8.1.0: {}
@@ -4823,7 +4836,7 @@ snapshots:
   eslint-plugin-n@18.5.0(eslint@10.14.0(jiti@2.7.0))(typescript@6.0.3):
     dependencies:
       '@eslint-community/eslint-utils': 4.10.1(eslint@10.14.0(jiti@2.7.0))
-      enhanced-resolve: 5.26.1
+      enhanced-resolve: 5.26.2
       eslint: 10.14.0(jiti@2.7.0)
       eslint-plugin-es-x: 7.8.0(eslint@10.14.0(jiti@2.7.0))
       get-tsconfig: 4.14.3
@@ -5143,13 +5156,13 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob@14.0.4:
+  glob@14.0.5:
     dependencies:
       minimatch: 11.0.8
       minipass: 7.1.3
       path-scurry: 3.0.0
 
-  glob@14.0.5:
+  glob@14.0.6:
     dependencies:
       minimatch: 11.0.8
       minipass: 7.1.3
@@ -5168,7 +5181,7 @@ snapshots:
 
   gopd@1.2.0: {}
 
-  graceful-fs@4.2.11: {}
+  graceful-fs@4.2.12: {}
 
   has-bigints@1.1.0: {}
 
@@ -5864,6 +5877,8 @@ snapshots:
 
   prettier@3.10.0: {}
 
+  prettier@3.10.1: {}
+
   proc-log@6.1.0: {}
 
   prop-types@15.8.1:
@@ -5959,7 +5974,7 @@ snapshots:
 
   rimraf@6.1.4:
     dependencies:
-      glob: 14.0.5
+      glob: 14.0.6
       package-json-from-dist: 1.0.1
 
   rolldown@1.2.19:

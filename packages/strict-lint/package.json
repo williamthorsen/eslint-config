@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@williamthorsen/toolbelt.filesystem": "0.10.3",
-    "@williamthorsen/toolbelt.packaging": "0.7.3"
+    "@williamthorsen/toolbelt.packaging": "0.8.0"
   },
   "devDependencies": {
     "@williamthorsen/toolbelt.testing": "0.8.3",
