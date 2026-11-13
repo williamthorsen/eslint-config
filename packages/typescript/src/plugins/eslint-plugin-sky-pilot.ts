@@ -3,6 +3,7 @@ import type { Config } from 'eslint/config';
 
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
+import helpersLastRule from './rules/helpers-last.ts';
 import noFloatingDisposableRule from './rules/no-floating-disposable.ts';
 import noJsExtensionForTsRule from './rules/no-js-extension-for-ts.ts';
 import noRealTimeSleepRule from './rules/no-real-time-sleep.ts';
@@ -18,6 +19,7 @@ const skyPilotPlugin: ESLint.Plugin = {
     name: 'eslint-plugin-sky-pilot',
   },
   rules: ensurePluginRules({
+    'helpers-last': helpersLastRule,
     'no-floating-disposable': noFloatingDisposableRule,
     'no-js-extension-for-ts': noJsExtensionForTsRule,
     'no-real-time-sleep': noRealTimeSleepRule,
