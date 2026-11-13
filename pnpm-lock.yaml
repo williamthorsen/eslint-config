@@ -265,6 +265,9 @@ importers:
 
   packages/strict-lint:
     dependencies:
+      '@williamthorsen/toolbelt.errors':
+        specifier: 0.10.1
+        version: 0.10.1
       '@williamthorsen/toolbelt.filesystem':
         specifier: 0.10.3
         version: 0.10.3

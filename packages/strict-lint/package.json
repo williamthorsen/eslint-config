@@ -48,6 +48,7 @@
     "prepublishOnly": "nmr build"
   },
   "dependencies": {
+    "@williamthorsen/toolbelt.errors": "0.10.1",
     "@williamthorsen/toolbelt.filesystem": "0.10.3",
     "@williamthorsen/toolbelt.packaging": "0.8.0"
   },

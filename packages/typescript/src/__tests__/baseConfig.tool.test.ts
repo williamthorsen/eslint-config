@@ -4,7 +4,9 @@ import path from 'node:path';
 import { createTempTree, pointCwdAt } from '@williamthorsen/toolbelt.testing/candidate';
 import { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, assert, describe, expect, it, vi } from 'vitest';
+
+import { fixText } from '#src/configs/test-utils/fixText.ts';
 
 import { advisoryRuleSeverities } from '../advisoryRuleSeverities.ts';
 import { baseConfig } from '../baseConfig.ts';
@@ -76,10 +78,31 @@ describe('baseConfig', () => {
       expect(config).toHaveProperty(['rules', 'sky-pilot/no-real-time-sleep', 0], 1);
       expect(config).toHaveProperty(
         ['rules', 'no-restricted-syntax'],
-        [2, 'DebuggerStatement', 'LabeledStatement', 'WithStatement'],
+        [
+          2,
+          'DebuggerStatement',
+          'LabeledStatement',
+          'WithStatement',
+          expect.objectContaining({ selector: expect.stringContaining('ConditionalExpression') }),
+        ],
       );
     },
   );
+
+  it.each([
+    ['main.ts', 'const message = error instanceof Error ? error.message : String(error);\n'],
+    ['main.js', 'const message = error instanceof Error ? error.message : String(error);\n'],
+    ['main.ts', 'const message =\n  error instanceof Error\n    ? error.message\n    : String(error);\n'],
+  ])('reports the inline error-message ternary in %s', async (fileName, code) => {
+    await expect(listRuleIds(fileName, code)).resolves.toContain('no-restricted-syntax');
+  });
+
+  it.each([
+    "const message = error instanceof Error ? error.message : 'Request failed';\n",
+    'const cause = error instanceof Error ? error : new Error(String(error));\n',
+  ])('allows an error ternary with another fallback: %s', async (code) => {
+    await expect(listRuleIds('main.ts', code)).resolves.not.toContain('no-restricted-syntax');
+  });
 
   it.each(['src/main.ts', 'src/main.js'])('leaves sky-pilot/no-real-time-sleep unset in %s', async (filePath) => {
     const linter = new ESLint({ overrideConfig: baseConfig, overrideConfigFile: true });
@@ -118,6 +141,17 @@ async function importBaseConfig(): Promise<Config[]> {
   vi.resetModules();
   const { baseConfig } = await import('../baseConfig.ts');
   return baseConfig;
+}
+
+/** Lints `code` under the base config as `fileName` in the fixtures directory and lists the rule ID of each message. */
+async function listRuleIds(fileName: string, code: string): Promise<Array<string | null>> {
+  const { messages } = await fixText(baseConfig, fileName, code);
+  // A parse failure reports nothing else, which would let a case that expects no report pass without linting.
+  assert.isFalse(
+    messages.some((message) => message.fatal),
+    `${fileName} failed to parse`,
+  );
+  return messages.map((message) => message.ruleId);
 }
 
 // endregion | Helpers
