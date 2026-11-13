@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## 15.0.0 — 2026-11-13
+
+### 🪦 Removed
+
+- 🚨 **Breaking:** Raises the `engines.node` floor of `@williamthorsen/eslint-config-typescript`, `@williamthorsen/strict-lint`, and `@williamthorsen/tsconfig` from `>=24` to `>=26`, and updates `strict-lint`'s error for a runtime without native TypeScript support to name Node 26. (#312)
+
+### ♻️ Refactoring
+
+- Replaces the private `describeError` helper in `strict-lint`'s config loader with `describeError` from `@williamthorsen/toolbelt.errors`, which `@williamthorsen/strict-lint` now declares as a dependency. (#309)
+
+### ⚙️ Tooling
+
+- Makes the committed `strict-lint` bin wrapper load `src/bin/strict-lint.ts` when `src/` is present, which only a checkout has, and the build output otherwise, so that the repo lints without a build. (#301)
+
+### 📦 Dependencies
+
+- Upgrades `@williamthorsen/toolbelt.filesystem` from 0.10.3 to 0.11.0 and passes strict-lint's config validator to `loadConfigCascade` as its new `parseConfig` option, which replaces the validation pass that ran after the cascade returned. (#310)
+
 ## 14.2.1 — 2026-10-17
 
 ### 🧪 Tests
@@ -12,7 +30,17 @@ All notable changes to this project will be documented in this file.
 
 ### 🎉 Features
 
+- 🚨 **Breaking:** Upgrade eslint-plugin-unicorn to 76.0.0 (#262)
+
+  Upgrades `eslint-plugin-unicorn` in `@williamthorsen/eslint-config-typescript` from 74.0.0 to 76.0.0, which adds error-level rules that can fail a consumer's lint. The change also turns off `unicorn/prefer-ternary`, because since unicorn 75 that rule asks for a guard clause to be rewritten as a ternary.
+
 - Ships `CHANGELOG.md` and the machine-readable `.meta/changelog.json` in the tarball of each published package, so that consumers receive the release history with the package. (#267)
+
+### 🐛 Bug fixes
+
+- Turn off unicorn/no-nested-ternary (#270)
+
+  Fixes the issue that `eslint --fix` and Prettier undid each other's edits to a nested ternary, by turning off `unicorn/no-nested-ternary` in `@williamthorsen/eslint-config-typescript` and removing it from `advisoryRuleSeverities`, because the rule's autofix adds parentheses that Prettier removes.
 
 ### ♻️ Refactoring
 

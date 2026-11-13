@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.13.0 — 2026-11-13
+
+### 🎉 Features
+
+- Widens the `lib` of `tsconfig.base.json` to `ES2025` plus each `ESNext` sublib whose APIs Node 26 implements, so that a consumer can typecheck `Temporal`, `Error.isError`, `Map.prototype.getOrInsert`, and `Uint8Array.fromBase64` without declaring them. (#312)
+
+### 🪦 Removed
+
+- 🚨 **Breaking:** Raises the `engines.node` floor of `@williamthorsen/eslint-config-typescript`, `@williamthorsen/strict-lint`, and `@williamthorsen/tsconfig` from `>=24` to `>=26`, and updates `strict-lint`'s error for a runtime without native TypeScript support to name Node 26. (#312)
+
 ## 0.12.1 — 2026-10-23
 
 ### 📦 Dependencies

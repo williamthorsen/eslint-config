@@ -1,5 +1,57 @@
 [
   {
+    "version": "15.0.0",
+    "date": "2026-11-13",
+    "sections": [
+      {
+        "title": "🪦 Removed",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Raises the `engines.node` floor of `@williamthorsen/eslint-config-typescript`, `@williamthorsen/strict-lint`, and `@williamthorsen/tsconfig` from `>=24` to `>=26`, and updates `strict-lint`'s error for a runtime without native TypeScript support to name Node 26. (#312)",
+            "breaking": true,
+            "migration": "Upgrade Node.js to 26 or later before upgrading any of these packages.",
+            "hash": "08da3ab440e5dcc3160c813effcb3e43fc2432bd",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Replaces the private `describeError` helper in `strict-lint`'s config loader with `describeError` from `@williamthorsen/toolbelt.errors`, which `@williamthorsen/strict-lint` now declares as a dependency. (#309)",
+            "hash": "9579c421c2fd6dc4ac56fed720953168610108ec",
+            "entry": 2
+          }
+        ]
+      },
+      {
+        "title": "⚙️ Tooling",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Makes the committed `strict-lint` bin wrapper load `src/bin/strict-lint.ts` when `src/` is present, which only a checkout has, and the build output otherwise, so that the repo lints without a build. (#301)",
+            "hash": "c17d6e487d2542d1407826c4464afdab74a647a5",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrades `@williamthorsen/toolbelt.filesystem` from 0.10.3 to 0.11.0 and passes strict-lint's config validator to `loadConfigCascade` as its new `parseConfig` option, which replaces the validation pass that ran after the cascade returned. (#310)",
+            "hash": "a89581e93848668f3e1f2f4d6140648312302d31",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "14.2.1",
     "date": "2026-10-17",
     "sections": [
@@ -25,9 +77,26 @@
         "audience": "all",
         "items": [
           {
+            "description": "Upgrade eslint-plugin-unicorn to 76.0.0 (#262)",
+            "body": "Upgrades `eslint-plugin-unicorn` in `@williamthorsen/eslint-config-typescript` from 74.0.0 to 76.0.0, which adds error-level rules that can fail a consumer's lint. The change also turns off `unicorn/prefer-ternary`, because since unicorn 75 that rule asks for a guard clause to be rewritten as a ternary.",
+            "breaking": true,
+            "hash": "d9234640a4ffd1f305d86c51b66ac1b1d9bc8e18"
+          },
+          {
             "description": "Ships `CHANGELOG.md` and the machine-readable `.meta/changelog.json` in the tarball of each published package, so that consumers receive the release history with the package. (#267)",
             "hash": "c762a7d1dc34ddefc1cb2e4db74ca46eb70b2b0f",
             "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "🐛 Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Turn off unicorn/no-nested-ternary (#270)",
+            "body": "Fixes the issue that `eslint --fix` and Prettier undid each other's edits to a nested ternary, by turning off `unicorn/no-nested-ternary` in `@williamthorsen/eslint-config-typescript` and removing it from `advisoryRuleSeverities`, because the rule's autofix adds parentheses that Prettier removes.",
+            "hash": "6c912e65c19473cb4015f323d0088e5eb789d26b"
           }
         ]
       },

@@ -1,5 +1,35 @@
 [
   {
+    "version": "0.13.0",
+    "date": "2026-11-13",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Widens the `lib` of `tsconfig.base.json` to `ES2025` plus each `ESNext` sublib whose APIs Node 26 implements, so that a consumer can typecheck `Temporal`, `Error.isError`, `Map.prototype.getOrInsert`, and `Uint8Array.fromBase64` without declaring them. (#312)",
+            "hash": "08da3ab440e5dcc3160c813effcb3e43fc2432bd",
+            "entry": 2
+          }
+        ]
+      },
+      {
+        "title": "🪦 Removed",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Raises the `engines.node` floor of `@williamthorsen/eslint-config-typescript`, `@williamthorsen/strict-lint`, and `@williamthorsen/tsconfig` from `>=24` to `>=26`, and updates `strict-lint`'s error for a runtime without native TypeScript support to name Node 26. (#312)",
+            "breaking": true,
+            "migration": "Upgrade Node.js to 26 or later before upgrading any of these packages.",
+            "hash": "08da3ab440e5dcc3160c813effcb3e43fc2432bd",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.12.1",
     "date": "2026-10-23",
     "sections": [

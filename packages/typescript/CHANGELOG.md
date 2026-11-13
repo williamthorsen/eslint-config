@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## 22.0.0 — 2026-11-13
+
+### 🎉 Features
+
+- 🚨 **Breaking:** Adds the type-aware rule `sky-pilot/no-js-extension-for-ts`, enabled as an error in both presets, which reports a relative or `#` subpath-import specifier that names a TypeScript source by a JavaScript extension and whose autofix rewrites the specifier to that source's extension. (#302)
+- Adds the opt-in rule `sky-pilot/helpers-last`, which reports an unexported top-level function that is outside a `// region | {Name}` fold or out of name order within its region, and an export or a `describe`, `it`, or `test` call that follows the first region containing such a function. (#308)
+- 🚨 **Breaking:** Adds a `no-restricted-syntax` entry to the base config that reports `error instanceof Error ? error.message : String(error)` in TypeScript and JavaScript files and directs the developer to a shared helper such as `describeError` from `@williamthorsen/toolbelt.errors`, while a ternary with any other fallback, such as a fixed string, still passes. (#309)
+
+### 🪦 Removed
+
+- 🚨 **Breaking:** Raises the `engines.node` floor of `@williamthorsen/eslint-config-typescript`, `@williamthorsen/strict-lint`, and `@williamthorsen/tsconfig` from `>=24` to `>=26`, and updates `strict-lint`'s error for a runtime without native TypeScript support to name Node 26. (#312)
+
+### 📦 Dependencies
+
+- Upgrades `eslint-plugin-import-x` from 4.17.1 to 4.18.1, in which `import-x/extensions` no longer reports a `.js` specifier that names a TypeScript source. (#302)
+
 ## 21.0.0 — 2026-11-08
 
 ### 🐛 Bug fixes

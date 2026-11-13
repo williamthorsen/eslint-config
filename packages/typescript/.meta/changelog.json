@@ -1,5 +1,60 @@
 [
   {
+    "version": "22.0.0",
+    "date": "2026-11-13",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Adds the type-aware rule `sky-pilot/no-js-extension-for-ts`, enabled as an error in both presets, which reports a relative or `#` subpath-import specifier that names a TypeScript source by a JavaScript extension and whose autofix rewrites the specifier to that source's extension. (#302)",
+            "breaking": true,
+            "migration": "Replace each `import-x/extensions` disable directive on a JavaScript-extension specifier that names a TypeScript source with one for `sky-pilot/no-js-extension-for-ts`, or run `eslint --fix` to rewrite the specifier.",
+            "hash": "0f5f32b6275688a7865e967c363aca06aa954f2d",
+            "entry": 1
+          },
+          {
+            "description": "Adds the opt-in rule `sky-pilot/helpers-last`, which reports an unexported top-level function that is outside a `// region | {Name}` fold or out of name order within its region, and an export or a `describe`, `it`, or `test` call that follows the first region containing such a function. (#308)",
+            "hash": "7b37e4f5627c8ea04c91ed22e4b9bf26f68ac742",
+            "entry": 1
+          },
+          {
+            "description": "Adds a `no-restricted-syntax` entry to the base config that reports `error instanceof Error ? error.message : String(error)` in TypeScript and JavaScript files and directs the developer to a shared helper such as `describeError` from `@williamthorsen/toolbelt.errors`, while a ternary with any other fallback, such as a fixed string, still passes. (#309)",
+            "breaking": true,
+            "migration": "Replace each `error instanceof Error ? error.message : String(error)` with a call to a shared helper, such as `describeError(error)` from `@williamthorsen/toolbelt.errors`, or disable `no-restricted-syntax` on that line when the file cannot take a dependency.",
+            "hash": "9579c421c2fd6dc4ac56fed720953168610108ec",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "🪦 Removed",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Raises the `engines.node` floor of `@williamthorsen/eslint-config-typescript`, `@williamthorsen/strict-lint`, and `@williamthorsen/tsconfig` from `>=24` to `>=26`, and updates `strict-lint`'s error for a runtime without native TypeScript support to name Node 26. (#312)",
+            "breaking": true,
+            "migration": "Upgrade Node.js to 26 or later before upgrading any of these packages.",
+            "hash": "08da3ab440e5dcc3160c813effcb3e43fc2432bd",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrades `eslint-plugin-import-x` from 4.17.1 to 4.18.1, in which `import-x/extensions` no longer reports a `.js` specifier that names a TypeScript source. (#302)",
+            "hash": "0f5f32b6275688a7865e967c363aca06aa954f2d",
+            "entry": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "21.0.0",
     "date": "2026-11-08",
     "sections": [
