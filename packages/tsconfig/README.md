@@ -46,17 +46,17 @@ A package that extends a framework base such as `astro/tsconfigs/base` or `@tsco
 
 Everything `@tsconfig/strictest` sets, plus the Node and build options it omits:
 
-| Option                       | Value                                             |
-| ---------------------------- | ------------------------------------------------- |
-| `allowImportingTsExtensions` | `true`                                            |
-| `lib`                        | `["ES2025", "ESNext.Disposable", "ESNext.Array"]` |
-| `module`                     | `"NodeNext"`                                      |
-| `moduleDetection`            | `"force"`                                         |
-| `noEmit`                     | `true`                                            |
-| `removeComments`             | `true`                                            |
-| `target`                     | `"ES2025"`                                        |
+| Option                       | Value                                            |
+| ---------------------------- | ------------------------------------------------ |
+| `allowImportingTsExtensions` | `true`                                           |
+| `lib`                        | `"ES2025"` plus the `ESNext` sublibs named below |
+| `module`                     | `"NodeNext"`                                     |
+| `moduleDetection`            | `"force"`                                        |
+| `noEmit`                     | `true`                                           |
+| `removeComments`             | `true`                                           |
+| `target`                     | `"ES2025"`                                       |
 
-`target` and `lib` are pinned to a Node 24 floor. `ESNext.Disposable` supplies the explicit-resource-management declarations (`using`, `Disposable`, `DisposableStack`), and `ESNext.Array` supplies `Array.fromAsync`; Node 24 implements both, but the numbered libs do not yet include them.
+`target` and `lib` are pinned to a Node 26 floor. TypeScript has no numbered lib past `ES2025`, so `lib` adds each `ESNext` sublib whose APIs Node 26 implements: `Array`, `Collection`, `Date`, `Disposable`, `Error`, `Intl`, `SharedMemory`, `Temporal`, and `TypedArrays`. `ESNext.Decorators` is omitted, because Node 26 does not implement `Symbol.metadata`.
 
 ## What the consumer owns
 
