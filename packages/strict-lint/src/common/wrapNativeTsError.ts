@@ -23,7 +23,7 @@ function hasErrorCode(error: unknown, code: string): boolean {
 
 /** Builds the message for a TypeScript config on a runtime without native type stripping. */
 function unsupportedRuntimeMessage(filePath: string): string {
-  return `Cannot load the TypeScript config "${filePath}": this Node runtime has no native TypeScript support. Upgrade to Node >=24.`;
+  return `Cannot load the TypeScript config "${filePath}": this Node runtime has no native TypeScript support. Upgrade to Node >=26.`;
 }
 
 /** Builds the message for a TypeScript config whose syntax native type stripping cannot erase. */

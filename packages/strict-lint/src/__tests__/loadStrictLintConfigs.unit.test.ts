@@ -212,13 +212,13 @@ describe(loadStrictLintConfigs, () => {
       await expect(loadStrictLintConfigs('/project')).rejects.toThrow(/erasable TypeScript syntax/);
     });
 
-    it('maps an unloadable TypeScript extension to the Node >=24 message when type stripping is off', async () => {
+    it('maps an unloadable TypeScript extension to the Node >=26 message when type stripping is off', async () => {
       Object.defineProperty(process.features, 'typescript', { value: false, configurable: true, enumerable: true });
       mockedLoadConfigCascade.mockRejectedValue(
         Object.assign(new Error('Unknown file extension ".ts"'), { code: 'ERR_UNKNOWN_FILE_EXTENSION' }),
       );
 
-      await expect(loadStrictLintConfigs('/project')).rejects.toThrow(/Node >=24/);
+      await expect(loadStrictLintConfigs('/project')).rejects.toThrow(/Node >=26/);
     });
 
     it('rethrows an unrelated cascade failure unchanged', async () => {
