@@ -68,6 +68,10 @@ ruleTester.run('helpers-last', rule, {
       'function PARSE2() {}',
       '// endregion | Helpers',
     ].join('\n'),
+    // Non-firing: a function exported by reference is not a helper
+    'function build() {}\nfunction parse() {}\nexport { build, parse as read };',
+    'function main() {}\nexport default main;',
+    'function main() {}\nexport = main;',
     // Non-firing: a marker inside a function body does not open a region
     'export function main() {\n  // region | Helpers\n}\nexport const z = 1;',
   ],
@@ -84,9 +88,12 @@ ruleTester.run('helpers-last', rule, {
     },
     {
       // Firing: an export after the helper region closes
-      code: ['// region | Helpers', 'function helper() {}', '// endregion | Helpers', 'export default helper;'].join(
-        '\n',
-      ),
+      code: [
+        '// region | Helpers',
+        'function helper() {}',
+        '// endregion | Helpers',
+        'export const x = helper();',
+      ].join('\n'),
       errors: [{ messageId: 'exportAfterHelpers', data: { helper: 'helper', region: 'Helpers' } }],
     },
     {
@@ -118,6 +125,16 @@ ruleTester.run('helpers-last', rule, {
         'function setUp() {}',
         '// endregion | Helpers',
         "describe.each([1, 2])('case %i', () => { setUp(); });",
+      ].join('\n'),
+      errors: [{ messageId: 'testAfterHelpers' }],
+    },
+    {
+      // Firing: a tagged-template `describe.each` after the helper region
+      code: [
+        '// region | Helpers',
+        'function setUp() {}',
+        '// endregion | Helpers',
+        "describe.each`a\n${1}`('case $a', () => { setUp(); });",
       ].join('\n'),
       errors: [{ messageId: 'testAfterHelpers' }],
     },

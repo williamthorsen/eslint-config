@@ -211,7 +211,7 @@ This config's own plugin contains ten rules. The TypeScript config enables seven
 
 ### `sky-pilot/helpers-last`
 
-Enforces the helper half of the "Declaration order" convention in the [code-layout rulebook](https://github.com/williamthorsen/codeassembly-guidance/blob/main/packages/guidance/content/guidance/rulebooks/williamthorsen-code-layout-preferences.md#declaration-order). A helper is an unexported top-level function declaration; overload signatures and their implementation count as one helper, and an ambient `declare function` is not one. The rule reports four things, without a fix:
+Enforces the helper half of the "Declaration order" convention in the [code-layout rulebook](https://github.com/williamthorsen/codeassembly-guidance/blob/main/packages/guidance/content/guidance/rulebooks/williamthorsen-code-layout-preferences.md#declaration-order). A helper is an unexported top-level function declaration; a function named in `export { name }`, `export default name`, or `export = name` is exported. Overload signatures and their implementation count as one helper, and an ambient `declare function` is not one. The rule reports four things, without a fix:
 
 - **A helper outside a region fold.** A region runs from a top-level `// region | {Name}` line comment to its matching `// endregion | {Name}`, or to the end of the file when it is unclosed. Regions may nest, and a helper belongs to its innermost region.
 - **An export after the helpers.** Once the outermost region that contains the file's first helper begins, every later export statement, re-exports included, is reported.

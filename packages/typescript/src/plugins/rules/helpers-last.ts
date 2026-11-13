@@ -92,14 +92,39 @@ export default ruleDefinition;
 
 // region | Helpers
 
+/** Collects the names that the program exports by reference, as in `export { name }` or `export default name`. */
+function collectExportedNames(program: TSESTree.Program): Set<string> {
+  const names = new Set<string>();
+
+  for (const statement of program.body) {
+    if (statement.type === AST_NODE_TYPES.ExportNamedDeclaration && statement.source === null) {
+      for (const specifier of statement.specifiers) {
+        names.add(specifier.local.name);
+      }
+    } else if (
+      statement.type === AST_NODE_TYPES.ExportDefaultDeclaration &&
+      statement.declaration.type === AST_NODE_TYPES.Identifier
+    ) {
+      names.add(statement.declaration.name);
+    } else if (
+      statement.type === AST_NODE_TYPES.TSExportAssignment &&
+      statement.expression.type === AST_NODE_TYPES.Identifier
+    ) {
+      names.add(statement.expression.name);
+    }
+  }
+  return names;
+}
+
 /** Collects the program's helpers in source order, each with the innermost region that contains it. */
 function collectHelpers(program: TSESTree.Program, regions: Region[]): Helper[] {
+  const exportedNames = collectExportedNames(program);
   const helpers: Helper[] = [];
   let previousName: string | undefined;
 
   for (const statement of program.body) {
     const id = findHelperId(statement);
-    if (id === undefined) {
+    if (id === undefined || exportedNames.has(id.name)) {
       previousName = undefined;
       continue;
     }
