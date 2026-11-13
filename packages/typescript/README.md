@@ -190,10 +190,11 @@ Because ESLint merges `settings` deeply, this adds `tsconfig` to the resolver wi
 
 ## Custom rules (`sky-pilot`)
 
-This config's own plugin contains nine rules. The TypeScript config enables seven of them, so they apply to `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. Two are in neither preset: The base config enables [`no-real-time-sleep`](#sky-pilotno-real-time-sleep) in test files, and [`no-type-cycle`](#sky-pilotno-type-cycle) is enabled per project.
+This config's own plugin contains ten rules. The TypeScript config enables seven of them, so they apply to `**/*.{ts,cts,mts,tsx}` only; a JavaScript file is unaffected unless a project enables them itself. Three are in neither preset: The base config enables [`no-real-time-sleep`](#sky-pilotno-real-time-sleep) in test files, and [`helpers-last`](#sky-pilothelpers-last) and [`no-type-cycle`](#sky-pilotno-type-cycle) are enabled per project.
 
 | Rule                                    | `recommended` | `strict` | Enforces                                                                                |
 | --------------------------------------- | ------------- | -------- | --------------------------------------------------------------------------------------- |
+| `sky-pilot/helpers-last`                | opt-in        | opt-in   | Unexported functions come last, in region folds, sorted by name.                        |
 | `sky-pilot/no-floating-disposable`      | `warn`        | `error`  | A disposable resource is bound with `using`, not discarded or left to a plain `const`.  |
 | `sky-pilot/no-js-extension-for-ts`      | `error`       | `error`  | A specifier names a TypeScript source by its own extension, not by a JavaScript one.    |
 | `sky-pilot/no-real-time-sleep`          | opt-in        | opt-in   | A test does not wait on a real timer; it advances fake timers.                          |
@@ -207,6 +208,46 @@ This config's own plugin contains nine rules. The TypeScript config enables seve
 `no-real-time-sleep` takes no preset severity: The base config sets it to `warn` in test files. `advisoryRuleSeverities` exempts `no-split-imports`, which reports arrangement (see [Type imports](#type-imports)), and none of the others, so [`@williamthorsen/strict-lint`](https://www.npmjs.com/package/@williamthorsen/strict-lint) promotes each of their warnings to an error: They report defects rather than style advice.
 
 `createConfig.react()` adds a rule from a companion plugin, `sky-pilot-react/memoized-functions-returned-by-hook`, which requires that a function returned by a hook be memoized.
+
+### `sky-pilot/helpers-last`
+
+Enforces the helper half of the "Declaration order" convention in the [code-layout rulebook](https://github.com/williamthorsen/codeassembly-guidance/blob/main/packages/guidance/content/guidance/rulebooks/williamthorsen-code-layout-preferences.md#declaration-order). A helper is an unexported top-level function declaration; a function named in `export { name }`, `export default name`, or `export = name` is exported. Overload signatures and their implementation count as one helper, and an ambient `declare function` is not one. The rule reports four things, without a fix:
+
+- **A helper outside a region fold.** A region runs from a top-level `// region | {Name}` line comment to its matching `// endregion | {Name}`, or to the end of the file when it is unclosed. Regions may nest, and a helper belongs to its innermost region.
+- **An export after the helpers.** Once the outermost region that contains the file's first helper begins, every later export statement, re-exports included, is reported.
+- **A test call after the helpers.** In the same position, every top-level call rooted at `describe`, `it`, or `test` is reported, such as `describe.each(table)(name, fn)`.
+- **Unsorted helpers.** Within each region, helpers are sorted case-insensitively by name. The rule reports the first helper out of order in each region.
+
+The helpers may sit in one `Helpers` region or in several named ones, and a region that contains no helper, such as `// region | Types`, may precede the exports:
+
+```ts
+export function build() {
+  assertEmitSucceeded(emitPackage());
+}
+
+// region | Emit
+function assertEmitSucceeded(succeeded: boolean) {
+  /* ... */
+}
+
+function emitPackage() {
+  /* ... */
+}
+// endregion | Emit
+```
+
+The rule is in neither preset, so that a project enables it once its code complies:
+
+```ts
+export default [
+  ...baseConfig,
+  {
+    rules: { 'sky-pilot/helpers-last': 'error' },
+  },
+];
+```
+
+Other declarations, such as classes and function-valued constants, are not helpers: `sky-pilot/prefer-function-declaration` reports an untyped function-valued constant. The rule takes no options.
 
 ### `sky-pilot/no-floating-disposable`
 
