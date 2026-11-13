@@ -50,7 +50,7 @@
     }
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=26"
   },
   "publishConfig": {
     "access": "public",
