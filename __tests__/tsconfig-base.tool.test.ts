@@ -47,7 +47,18 @@ describe('@williamthorsen/tsconfig base config', () => {
     // A `--lib` name is an alias: TypeScript resolves a superseded one to its numbered successor with no
     // diagnostic, so this array names the file actually loaded. A numbered successor appearing here is the
     // signal to swap the declared entry for it.
-    expect(options.lib).toStrictEqual([lib('ES2025'), lib('ESNext.Disposable'), lib('ESNext.Array')]);
+    expect(options.lib).toStrictEqual([
+      lib('ES2025'),
+      lib('ESNext.Array'),
+      lib('ESNext.Collection'),
+      lib('ESNext.Date'),
+      lib('ESNext.Disposable'),
+      lib('ESNext.Error'),
+      lib('ESNext.Intl'),
+      lib('ESNext.SharedMemory'),
+      lib('ESNext.Temporal'),
+      lib('ESNext.TypedArrays'),
+    ]);
     expect(options.module).toBe(ts.ModuleKind.NodeNext);
     expect(options.moduleDetection).toBe(ts.ModuleDetectionKind.Force);
     expect(options.noEmit).toBe(true);
@@ -55,8 +66,18 @@ describe('@williamthorsen/tsconfig base config', () => {
     expect(options.target).toBe(ts.ScriptTarget.ES2025);
   });
 
-  it('declares Array.fromAsync', () => {
-    expect(listDiagnosticMessages('await Array.fromAsync([1]);')).toStrictEqual([]);
+  it.each([
+    ['ESNext.Array', 'await Array.fromAsync([1]);'],
+    ['ESNext.Collection', 'new Map<string, number>().getOrInsert("a", 1);'],
+    ['ESNext.Date', 'new Date().toTemporalInstant();'],
+    ['ESNext.Disposable', 'new DisposableStack().dispose();'],
+    ['ESNext.Error', 'Error.isError(new Error());'],
+    ['ESNext.Intl', 'new Intl.Locale("en").getWeekInfo();'],
+    ['ESNext.SharedMemory', 'Atomics.pause();'],
+    ['ESNext.Temporal', 'Temporal.Now.instant();'],
+    ['ESNext.TypedArrays', 'Uint8Array.fromBase64("AA==");'],
+  ])('declares the %s API used by `%s`', (_lib, source) => {
+    expect(listDiagnosticMessages(source)).toStrictEqual([]);
   });
 
   it('declares no DOM globals', () => {

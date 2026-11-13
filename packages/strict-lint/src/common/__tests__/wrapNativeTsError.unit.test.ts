@@ -20,14 +20,14 @@ describe(wrapNativeTsError, () => {
     expect(wrapped?.cause).toBe(native);
   });
 
-  it('wraps ERR_UNKNOWN_FILE_EXTENSION with the Node >=24 message when type stripping is off', () => {
+  it('wraps ERR_UNKNOWN_FILE_EXTENSION with the Node >=26 message when type stripping is off', () => {
     disableNativeTypeScript();
     const native = Object.assign(new Error('Unknown file extension ".ts"'), { code: 'ERR_UNKNOWN_FILE_EXTENSION' });
 
     const wrapped = wrapNativeTsError(native, '/proj/.config/strict-lint.config.ts');
 
     expect(wrapped?.message).toContain('/proj/.config/strict-lint.config.ts');
-    expect(wrapped?.message).toMatch(/Node >=24/);
+    expect(wrapped?.message).toMatch(/Node >=26/);
     expect(wrapped?.cause).toBe(native);
   });
 

@@ -10,7 +10,7 @@ Run ESLint with all warnings promoted to errors, except for the rules that a str
 pnpm add -D @williamthorsen/strict-lint eslint
 ```
 
-Requires ESLint 10+ (flat config) and Node 24+. If the ESLint config is TypeScript, install [`jiti`](https://www.npmjs.com/package/jiti) alongside it: ESLint loads TypeScript configs through jiti, exactly as a plain `eslint` run does.
+Requires ESLint 10+ (flat config) and Node 26+. If the ESLint config is TypeScript, install [`jiti`](https://www.npmjs.com/package/jiti) alongside it: ESLint loads TypeScript configs through jiti, exactly as a plain `eslint` run does.
 
 ## Quick start
 
@@ -52,7 +52,7 @@ export default defineConfig({
 });
 ```
 
-The strict-lint config file is loaded through Node's native TypeScript support (Node 24+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not. This restriction applies to `.config/strict-lint.config.ts` alone; the ESLint config is loaded by ESLint through jiti, which transpiles rather than strips, and accepts any TypeScript.
+The strict-lint config file is loaded through Node's native TypeScript support (Node 26+), enabling TypeScript code to be run without a build step. Only erasable syntax is supported; constructs that emit runtime code (enums, runtime namespaces, parameter properties) are not. This restriction applies to `.config/strict-lint.config.ts` alone; the ESLint config is loaded by ESLint through jiti, which transpiles rather than strips, and accepts any TypeScript.
 
 ### Scaffolding a config
 
