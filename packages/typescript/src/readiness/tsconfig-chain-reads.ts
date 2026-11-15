@@ -79,7 +79,7 @@ export function sortChainReads(
 /** Names each `extends` reference that the chain could not follow and the config declaring it. */
 function describeUnresolvedExtends(chain: TsconfigChain): string {
   return chain.unresolvedExtends
-    .map(({ from, specifier }) => `extends "${specifier}" in ${from} does not resolve`)
+    .map(({ from, specifier }) => `extends "${specifier}" in ${from} does not resolve or does not parse`)
     .join(', ');
 }
 

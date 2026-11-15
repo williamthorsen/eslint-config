@@ -33,11 +33,14 @@ describe(describeUnreadChains, () => {
   it('names each unread tsconfig with its reason', () => {
     const unread = [
       { path: 'tsconfig.json', reason: 'it does not parse' },
-      { path: 'packages/a/tsconfig.json', reason: 'extends "x" in packages/a/tsconfig.json does not resolve' },
+      {
+        path: 'packages/a/tsconfig.json',
+        reason: 'extends "x" in packages/a/tsconfig.json does not resolve or does not parse',
+      },
     ];
 
     expect(describeUnreadChains(unread)).toBe(
-      'Could not read the tsconfig chain of tsconfig.json (it does not parse); packages/a/tsconfig.json (extends "x" in packages/a/tsconfig.json does not resolve)',
+      'Could not read the tsconfig chain of tsconfig.json (it does not parse); packages/a/tsconfig.json (extends "x" in packages/a/tsconfig.json does not resolve or does not parse)',
     );
   });
 });
@@ -101,7 +104,7 @@ describe(sortChainReads, () => {
       unread: [
         {
           path: 'packages/a/tsconfig.json',
-          reason: 'extends "@acme/tsconfig" in packages/a/tsconfig.json does not resolve',
+          reason: 'extends "@acme/tsconfig" in packages/a/tsconfig.json does not resolve or does not parse',
         },
         { path: 'packages/b/tsconfig.json', reason: 'it does not parse' },
       ],
@@ -121,7 +124,7 @@ describe(sortChainReads, () => {
       {
         path: 'tsconfig.json',
         reason:
-          'extends "./missing.json" in tsconfig.json does not resolve, extends "@acme/tsconfig" in tsconfig.base.json does not resolve',
+          'extends "./missing.json" in tsconfig.json does not resolve or does not parse, extends "@acme/tsconfig" in tsconfig.base.json does not resolve or does not parse',
       },
     ]);
   });

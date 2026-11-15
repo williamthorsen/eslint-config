@@ -100,7 +100,7 @@
           "path": "../src/readiness/skipBelowTypeScriptConfigSupport.ts"
         },
         {
-          "hash": "93c7db7f",
+          "hash": "428035c1",
           "kind": "module",
           "path": "../src/readiness/tsconfig-chain-reads.ts"
         },
@@ -115,7 +115,7 @@
       "readyupVersion": "0.46.2",
       "source": "kits/default.ts",
       "sourceHash": "bad5672d",
-      "targetHash": "8441beb4"
+      "targetHash": "702d8cef"
     }
   ]
 }

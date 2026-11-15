@@ -227,7 +227,7 @@ function sortChainReads(paths, readChain2) {
   return reads;
 }
 function describeUnresolvedExtends(chain) {
-  return chain.unresolvedExtends.map(({ from, specifier }) => `extends "${specifier}" in ${from} does not resolve`).join(", ");
+  return chain.unresolvedExtends.map(({ from, specifier }) => `extends "${specifier}" in ${from} does not resolve or does not parse`).join(", ");
 }
 
 // src/readiness/tsconfig-inputs.ts
