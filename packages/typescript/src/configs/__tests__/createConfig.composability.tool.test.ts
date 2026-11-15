@@ -17,9 +17,7 @@ describe('createConfig composability with defineConfig', () => {
     async ({ fixture, load }) => {
       const composed = defineConfig(fixtureWiring, ...(await load()));
 
-      const results = await lintFixture(composed, fixture);
-
-      expect(results[0]?.fatalErrorCount).toBe(0);
+      await expect(lintFixture(composed, fixture)).resolves.toHaveLength(1);
     },
   );
 
@@ -28,15 +26,13 @@ describe('createConfig composability with defineConfig', () => {
     async ({ fixture, load }) => {
       const composed = defineConfig(fixtureWiring, { extends: await load() });
 
-      const results = await lintFixture(composed, fixture);
-
-      expect(results[0]?.fatalErrorCount).toBe(0);
+      await expect(lintFixture(composed, fixture)).resolves.toHaveLength(1);
     },
   );
 });
 
-// Pin that the linter actually applies the plugin's rules under both composition forms: the
-// fatal-error check above passes even for a composition that dropped them.
+// Pin that the linter actually applies the plugin's rules under both composition forms: a composition that dropped
+// them still lints the fixture.
 describe('createConfig.next includes the plugin rules', () => {
   // `as const` keeps `form` a literal union, so a typo in the comparison below is a compile error rather than a
   // silent fall-through that runs the same composition form twice.
@@ -57,7 +53,6 @@ describe('plugins subpath composability with defineConfig', () => {
 
     const results = await lintFixture(composed, 'unused-map.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(results[0]?.messages.map((message) => message.ruleId)).toContain('sky-pilot/no-unused-map');
   });
 
@@ -73,7 +68,6 @@ describe('plugins subpath composability with defineConfig', () => {
 
     const results = await lintFixture(composed, 'unused-map.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(results[0]?.messages.map((message) => message.ruleId)).toContain('sky-pilot/no-unused-map');
   });
 });

@@ -1,8 +1,7 @@
-import type { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import { fixtureWiring, lintFixture } from '#src/configs/test-utils/lintFixture.ts';
+import { fixtureWiring, lintFixture, listRuleMessages } from '#src/configs/test-utils/lintFixture.ts';
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
 import { noTypeCycleRule } from '../no-type-cycle.ts';
@@ -36,8 +35,7 @@ describe('sky-pilot/no-type-cycle', () => {
   ])('reports a cycle through %s, naming its chain', async (_edge, fixture, chain) => {
     const results = await lintFixture([fixtureWiring, ruleConfig], fixture);
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
-    expect(listCycleMessages(results)).toStrictEqual([`Dependency cycle through a type-only import: ${chain}`]);
+    expect(listRuleMessages(results, ruleId)).toStrictEqual([`Dependency cycle through a type-only import: ${chain}`]);
   });
 
   it.each([
@@ -50,8 +48,7 @@ describe('sky-pilot/no-type-cycle', () => {
   ])('follows %s, resolving it as `tsc` does', async (_specifier, fixture, chain) => {
     const results = await lintFixture([fixtureWiring, ruleConfig], fixture);
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
-    expect(listCycleMessages(results)).toStrictEqual([`Dependency cycle through a type-only import: ${chain}`]);
+    expect(listRuleMessages(results, ruleId)).toStrictEqual([`Dependency cycle through a type-only import: ${chain}`]);
   });
 
   it.each([
@@ -73,19 +70,6 @@ describe('sky-pilot/no-type-cycle', () => {
   ])('reports nothing for %s', async (_subject, fixture) => {
     const results = await lintFixture([fixtureWiring, ruleConfig], fixture);
 
-    // A fixture that failed to parse reports no rule at all, which would satisfy the assertion below.
-    expect(results[0]?.fatalErrorCount).toBe(0);
-    expect(listCycleMessages(results)).toStrictEqual([]);
+    expect(listRuleMessages(results, ruleId)).toStrictEqual([]);
   });
 });
-
-// region | Helpers
-
-/** Collects the messages that the rule reported against the first linted file. */
-function listCycleMessages(results: readonly ESLint.LintResult[]): string[] {
-  const messages = results[0]?.messages ?? [];
-
-  return messages.filter((message) => message.ruleId === ruleId).map((message) => message.message);
-}
-
-// endregion | Helpers

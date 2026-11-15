@@ -13,9 +13,6 @@ describe('unicorn/no-top-level-side-effects', () => {
   ])('reports a top-level side effect in $fixture: $isReported', async ({ fixture, isReported }) => {
     const results = await lintFixture([...baseConfig, typedParserSettings], fixture);
 
-    // A fixture that failed to parse reports no rule at all, which would satisfy the unreported case.
-    expect(results[0]?.fatalErrorCount).toBe(0);
-
     const messages = results[0]?.messages ?? [];
 
     expect(messages.some((message) => message.ruleId === ruleId)).toBe(isReported);

@@ -1,10 +1,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { ESLint, type Linter } from 'eslint';
+import { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 import { assert } from 'vitest';
+
+import { toLinterConfigs } from './toLinterConfigs.ts';
+
+/** Fails when ESLint could not parse `name`, whose results would otherwise report no rule and pass vacuously. */
+export function assertParsed(results: readonly ESLint.LintResult[], name: string): void {
+  for (const result of results) {
+    const fatal = result.messages.find((message) => message.fatal === true);
+    assert.strictEqual(result.fatalErrorCount, 0, `${name} failed to parse: ${fatal?.message ?? 'unknown error'}`);
+  }
+}
 
 export const fixturesDir = path.join(import.meta.dirname, '../../../__fixtures__/configs');
 
@@ -35,7 +45,17 @@ export async function lintFixture(composed: readonly Config[], fixture: string):
   // any rule output. Results from a skipped file satisfy assertions without exercising the config.
   assert.isFalse(await eslint.isPathIgnored(filePath), `no composed config matches ${fixture}`);
 
-  return eslint.lintText(fs.readFileSync(filePath, 'utf8'), { filePath });
+  const results = await eslint.lintText(fs.readFileSync(filePath, 'utf8'), { filePath });
+  assertParsed(results, fixture);
+
+  return results;
+}
+
+/** Collects the messages that the rule reported against the linted files. */
+export function listRuleMessages(results: readonly ESLint.LintResult[], ruleId: string): string[] {
+  return results.flatMap((result) =>
+    result.messages.filter((message) => message.ruleId === ruleId).map((message) => message.message),
+  );
 }
 
 // The base config enables `projectService` but leaves `tsconfigRootDir` to the consumer. Pointing it at the
@@ -48,17 +68,3 @@ export const typedParserSettings: Config = {
     },
   },
 };
-
-// region | Helpers
-
-/**
- * Retypes configs as the `Linter.Config[]` that `new ESLint({ overrideConfig })` accepts, which models
- * `languageOptions` with a nominally-incompatible index signature. Only that constructor calls it, never
- * the factory results, whose assignability to `Config[]` the composability suite proves.
- */
-function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above
-  return configs as Linter.Config[];
-}
-
-// endregion | Helpers

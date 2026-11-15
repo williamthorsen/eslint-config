@@ -1,9 +1,8 @@
-import type { ESLint } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
 import { baseConfig } from '#src/baseConfig.ts';
 
-import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
+import { lintFixture, listRuleMessages, typedParserSettings } from '../test-utils/lintFixture.ts';
 
 // `settings['import-x/extensions']` lets the rule's module graph open a TypeScript file at all, and the
 // resolver alias lets a specifier written `./b.js` name one.
@@ -15,8 +14,7 @@ describe('the cycle rule that the import config sets', () => {
   ])('reports a cycle among value imports spelled with %s', async (_spelling, fixture) => {
     const results = await lintFixture([...baseConfig, typedParserSettings], fixture);
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
-    expect(listCycleMessages(results)).toStrictEqual(['Dependency cycle detected']);
+    expect(listRuleMessages(results, 'import-x/no-cycle')).toStrictEqual(['Dependency cycle detected']);
   });
 
   // ESLint merges `settings` deeply, which lets a consumer add a resolver key without displacing the config's own
@@ -26,8 +24,7 @@ describe('the cycle rule that the import config sets', () => {
 
     const results = await lintFixture([...baseConfig, typedParserSettings, override], 'cycle-jsvalue-a.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
-    expect(listCycleMessages(results)).toStrictEqual(['Dependency cycle detected']);
+    expect(listRuleMessages(results, 'import-x/no-cycle')).toStrictEqual(['Dependency cycle detected']);
   });
 
   // `import-x/no-cycle` skips a statement whose specifiers are all types, through one code path for the
@@ -42,19 +39,6 @@ describe('the cycle rule that the import config sets', () => {
   ])('reports nothing for a cycle among %s type-only imports', async (_spelling, fixture) => {
     const results = await lintFixture([...baseConfig, typedParserSettings], fixture);
 
-    // A fixture that failed to parse reports no rule at all, which would satisfy the assertion below.
-    expect(results[0]?.fatalErrorCount).toBe(0);
-    expect(listCycleMessages(results)).toStrictEqual([]);
+    expect(listRuleMessages(results, 'import-x/no-cycle')).toStrictEqual([]);
   });
 });
-
-// region | Helpers
-
-/** Collects the messages that `import-x/no-cycle` reported against the first linted file. */
-function listCycleMessages(results: readonly ESLint.LintResult[]): string[] {
-  const messages = results[0]?.messages ?? [];
-
-  return messages.filter((message) => message.ruleId === 'import-x/no-cycle').map((message) => message.message);
-}
-
-// endregion | Helpers
