@@ -7,7 +7,7 @@ allowBuilds:
 
 catalog:
   '@williamthorsen/toolbelt.vitest': '0.13.5'
-  eslint: '10.14.0'
+  eslint: '10.15.0'
   eslint-plugin-n: '18.5.0'
   readyup: '0.46.2'
   typescript: '6.0.3'

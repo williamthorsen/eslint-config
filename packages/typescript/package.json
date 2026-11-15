@@ -78,7 +78,7 @@
     "@williamthorsen/toolbelt.testing": "0.8.3",
     "esbuild": "0.28.2",
     "eslint": "catalog:",
-    "eslint-plugin-jest-dom": "5.10.1",
+    "eslint-plugin-jest-dom": "5.10.2",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.5",
     "eslint-plugin-react-hooks": "7.1.1",
