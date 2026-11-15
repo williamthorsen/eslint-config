@@ -17,7 +17,7 @@ const rules: Linter.RulesRecord = {
 };
 
 // Composed after the `json` config, whose rules it overrides on JSON5 files.
-const config = defineConfig({
+export const json5Config = defineConfig({
   files: ['**/*.json5'],
   languageOptions: {
     parser: jsonParser,
@@ -27,5 +27,3 @@ const config = defineConfig({
   },
   rules: rules,
 });
-
-export default config;

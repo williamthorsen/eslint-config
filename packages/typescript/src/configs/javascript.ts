@@ -98,9 +98,7 @@ const rules: Linter.RulesRecord = {
   ],
 };
 
-const config = defineConfig({
+export const javaScriptConfig = defineConfig({
   extends: [eslint.configs.recommended],
   rules,
 });
-
-export default config;

@@ -31,7 +31,7 @@ const rules: Linter.RulesRecord = {
   'quote-props': 'off',
 };
 
-const config = defineConfig({
+export const jsonConfig = defineConfig({
   files: ['**/*.{json,json5}'],
   ignores: ['**/package.json'],
   languageOptions: {
@@ -45,5 +45,3 @@ const config = defineConfig({
     ...rules,
   },
 });
-
-export default config;

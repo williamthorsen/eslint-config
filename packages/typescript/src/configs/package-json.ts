@@ -1,7 +1,7 @@
 import type { Config } from 'eslint/config';
 import packageJsonPlugin from 'eslint-plugin-package-json';
 
-const config: Config[] = [
+export const packageJsonConfig: Config[] = [
   packageJsonPlugin.configs.recommended,
   packageJsonPlugin.configs.stylistic,
   {
@@ -18,5 +18,3 @@ const config: Config[] = [
     },
   },
 ];
-
-export default config;

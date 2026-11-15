@@ -12,7 +12,7 @@ const skyPilotReactPlugin: ESLint.Plugin = {
 };
 
 // Annotate explicitly: declaration emit cannot name `@eslint/core`'s `Plugin`, which an inferred type would reference.
-const configs: { recommended: Config; strict: Config } = {
+export const skyPilotReactConfigs: { recommended: Config; strict: Config } = {
   recommended: {
     plugins: {
       'sky-pilot-react': skyPilotReactPlugin,
@@ -30,5 +30,3 @@ const configs: { recommended: Config; strict: Config } = {
     },
   },
 };
-
-export default { configs };

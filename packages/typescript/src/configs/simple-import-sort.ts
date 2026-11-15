@@ -32,11 +32,9 @@ const rules: Linter.RulesRecord = {
   ],
 };
 
-const config = defineConfig({
+export const simpleImportSortConfig = defineConfig({
   plugins: {
     'simple-import-sort': simpleImportSortPlugin,
   },
   rules,
 });
-
-export default config;

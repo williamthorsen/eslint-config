@@ -68,7 +68,7 @@ const rules: Linter.RulesRecord = {
   '@typescript-eslint/no-inferrable-types': 'warn', // ⚫🟠
 };
 
-const config = defineConfig({
+export const typeScriptConfig = defineConfig({
   extends: [
     ...tseslint.configs.strictTypeChecked, //
     promisePlugin.configs['flat/recommended'],
@@ -83,5 +83,3 @@ const config = defineConfig({
   },
   rules,
 });
-
-export default config;

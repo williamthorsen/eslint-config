@@ -13,9 +13,3 @@ export async function createReactTestingLibraryConfig(): Promise<Config[]> {
     ],
   });
 }
-
-const configs = {
-  react: createReactTestingLibraryConfig,
-};
-
-export default configs;

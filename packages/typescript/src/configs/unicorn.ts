@@ -68,9 +68,7 @@ const rules: Linter.RulesRecord = {
   'unicorn/text-encoding-identifier-case': 'warn', // 🔴🟠
 };
 
-const config = defineConfig({
+export const unicornConfig = defineConfig({
   extends: [unicornPlugin.configs.recommended],
   rules,
 });
-
-export default config;

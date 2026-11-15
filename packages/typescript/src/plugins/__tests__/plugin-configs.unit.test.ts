@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import skyPilot from '../eslint-plugin-sky-pilot.ts';
-import skyPilotReact from '../eslint-plugin-sky-pilot-react.ts';
+import { skyPilotReactConfigs } from '../eslint-plugin-sky-pilot-react.ts';
 
 interface Preset {
   plugins?: Record<string, { rules?: Record<string, unknown> | undefined }>;
@@ -11,7 +11,7 @@ interface Preset {
 // `optInRules` names the rules that a plugin registers but no preset enables; a project turns them on for itself.
 const pluginModules: { name: string; configs: Record<string, Preset>; optInRules: string[] }[] = [
   { name: 'sky-pilot', configs: skyPilot.configs, optInRules: ['helpers-last', 'no-real-time-sleep', 'no-type-cycle'] },
-  { name: 'sky-pilot-react', configs: skyPilotReact.configs, optInRules: [] },
+  { name: 'sky-pilot-react', configs: skyPilotReactConfigs, optInRules: [] },
 ];
 
 const presetCases = pluginModules.flatMap(({ name, configs, optInRules }) =>

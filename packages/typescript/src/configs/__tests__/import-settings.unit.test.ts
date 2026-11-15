@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { codeExtensions } from '#src/patterns.ts';
 
-import importConfig from '../import.ts';
+import { importConfig } from '../import.ts';
 
 // The setting spells the same list as `patterns.codeExtensions` in another form, and nothing reports a
 // divergence: an extension that the patterns lint but the setting omits leaves `import-x/no-cycle` walking a
