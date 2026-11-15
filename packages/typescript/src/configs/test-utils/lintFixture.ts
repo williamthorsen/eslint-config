@@ -8,6 +8,14 @@ import { assert } from 'vitest';
 
 import { toLinterConfigs } from './toLinterConfigs.ts';
 
+/** Fails when ESLint could not parse `name`, whose results would otherwise report no rule and pass vacuously. */
+export function assertParsed(results: readonly ESLint.LintResult[], name: string): void {
+  for (const result of results) {
+    const fatal = result.messages.find((message) => message.fatal === true);
+    assert.strictEqual(result.fatalErrorCount, 0, `${name} failed to parse: ${fatal?.message ?? 'unknown error'}`);
+  }
+}
+
 export const fixturesDir = path.join(import.meta.dirname, '../../../__fixtures__/configs');
 
 // Opts the fixture extensions into linting and wires the typescript-eslint parser with a project, so that a
@@ -37,7 +45,10 @@ export async function lintFixture(composed: readonly Config[], fixture: string):
   // any rule output. Results from a skipped file satisfy assertions without exercising the config.
   assert.isFalse(await eslint.isPathIgnored(filePath), `no composed config matches ${fixture}`);
 
-  return eslint.lintText(fs.readFileSync(filePath, 'utf8'), { filePath });
+  const results = await eslint.lintText(fs.readFileSync(filePath, 'utf8'), { filePath });
+  assertParsed(results, fixture);
+
+  return results;
 }
 
 // The base config enables `projectService` but leaves `tsconfigRootDir` to the consumer. Pointing it at the

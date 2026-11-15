@@ -3,7 +3,7 @@ import path from 'node:path';
 import { ESLint, type Linter } from 'eslint';
 import type { Config } from 'eslint/config';
 
-import { fixturesDir } from './lintFixture.ts';
+import { assertParsed, fixturesDir } from './lintFixture.ts';
 import { toLinterConfigs } from './toLinterConfigs.ts';
 
 export interface FixResult {
@@ -43,5 +43,6 @@ export async function fixText(composed: readonly Config[], fileName: string, tex
   if (result === undefined) {
     throw new Error(`ESLint returned no result for ${fileName}`);
   }
+  assertParsed([result], fileName);
   return { messages: result.messages, output: result.output ?? text };
 }
