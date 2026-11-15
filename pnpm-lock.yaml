@@ -347,15 +347,9 @@ importers:
       globals:
         specifier: 17.14.0
         version: 17.14.0
-      jsonc-eslint-parser:
-        specifier: 3.3.0
-        version: 3.3.0
       typescript-eslint:
         specifier: 'catalog:'
         version: 8.72.2(eslint@10.15.0(jiti@2.7.0))(typescript@6.0.3)
-      yaml-eslint-parser:
-        specifier: 2.1.0
-        version: 2.1.0
     devDependencies:
       '@eslint/config-helpers':
         specifier: 0.7.0

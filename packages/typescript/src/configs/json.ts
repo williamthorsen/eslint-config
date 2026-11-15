@@ -1,11 +1,6 @@
 import type { Linter } from 'eslint';
 import { defineConfig } from 'eslint/config';
-import rawJsoncPlugin from 'eslint-plugin-jsonc';
-import * as jsonParser from 'jsonc-eslint-parser';
-
-import { getSafeLinterPlugin } from '#src/utils/isLinterPlugin.ts';
-
-const jsoncPlugin = getSafeLinterPlugin(rawJsoncPlugin);
+import jsoncPlugin from 'eslint-plugin-jsonc';
 
 const rules: Linter.RulesRecord = {
   'jsonc/array-bracket-spacing': ['warn', 'never'],
@@ -34,14 +29,6 @@ const rules: Linter.RulesRecord = {
 export const jsonConfig = defineConfig({
   files: ['**/*.{json,json5}'],
   ignores: ['**/package.json'],
-  languageOptions: {
-    parser: jsonParser,
-  },
-  plugins: {
-    jsonc: jsoncPlugin,
-  },
-  rules: {
-    ...jsoncPlugin.configs['recommended-with-jsonc']?.rules,
-    ...rules,
-  },
+  extends: [jsoncPlugin.configs['recommended-with-jsonc']],
+  rules,
 });
