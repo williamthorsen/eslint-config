@@ -12,7 +12,6 @@ describe('the import-sort groups that the config sets', () => {
   it('sorts built-ins, packages, aliases, `#` imports, other absolute imports, relative imports, then side-effect imports', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'import-sort-groups.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listRuleMessages(results, 'simple-import-sort/imports')).toStrictEqual([]);
   });
 });

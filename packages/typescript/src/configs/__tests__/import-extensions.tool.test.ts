@@ -16,7 +16,6 @@ describe('the extension rules that the shipped config sets', () => {
   it('reports a `.js` specifier that names a TypeScript file', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'cycle-jsvalue-a.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([
       'sky-pilot/no-js-extension-for-ts: Expected file extension "ts" for "./cycle-jsvalue-b.js"',
     ]);
@@ -27,7 +26,6 @@ describe('the extension rules that the shipped config sets', () => {
   it('reports nothing for a `.js` specifier that names a JavaScript file', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'js-importer.js');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([]);
   });
 
@@ -37,7 +35,6 @@ describe('the extension rules that the shipped config sets', () => {
   it('resolves an extensionless specifier to the TypeScript sibling', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'extensionless-importer.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([
       'import-x/extensions: Missing file extension "ts" for "./js-target"',
     ]);
@@ -46,7 +43,6 @@ describe('the extension rules that the shipped config sets', () => {
   it('reports nothing for a package subpath imported from inside that package', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'self-reference/importer.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([
       'import-x/extensions: Missing file extension "ts" for "./sibling"',
     ]);
@@ -71,7 +67,6 @@ describe('the extension rules that the shipped config sets', () => {
       'self-reference/importer.ts',
     );
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([
       'import-x/extensions: Missing file extension "ts" for "fixtures-self-reference/target"',
       'import-x/extensions: Missing file extension "ts" for "./sibling"',
@@ -83,7 +78,6 @@ describe('the extension rules that the shipped config sets', () => {
   it('reports a multi-segment `#` import that omits its extension, and no other `#` import', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'subpath-imports/src/importer.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([
       'import-x/extensions: Missing file extension "ts" for "#src/target"',
     ]);
@@ -94,7 +88,6 @@ describe('the extension rules that the shipped config sets', () => {
   it('reports a multi-segment `#` import written with `.js` that names a TypeScript file', async () => {
     const results = await lintFixture([...baseConfig, typedParserSettings], 'subpath-imports/src/js-importer.ts');
 
-    expect(results[0]?.fatalErrorCount).toBe(0);
     expect(listExtensionMessages(results)).toStrictEqual([
       'sky-pilot/no-js-extension-for-ts: Expected file extension "ts" for "#src/target.js"',
     ]);

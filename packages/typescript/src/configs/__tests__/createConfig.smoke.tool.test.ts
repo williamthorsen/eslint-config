@@ -9,11 +9,11 @@ describe('createConfig preset load smoke tests', () => {
   it.each(factoryCases)(
     `$name: composes with the base config and lints without a rule-load error`,
     async ({ load, fixture }) => {
-      const results = await lintFixture([...baseConfig, ...(await load()), typedParserSettings], fixture);
-
-      // A rule that fails to instantiate (e.g. a removed ESLint 10 API) throws out of
-      // `lintText`; a parser failure produces a fatal message. Assert neither occurs.
-      expect(results[0]?.fatalErrorCount).toBe(0);
+      // A rule that fails to instantiate (e.g. a removed ESLint 10 API) throws out of `lintText`, and a parse
+      // failure fails the guard in `lintFixture`.
+      await expect(lintFixture([...baseConfig, ...(await load()), typedParserSettings], fixture)).resolves.toHaveLength(
+        1,
+      );
     },
   );
 });
