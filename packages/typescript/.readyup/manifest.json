@@ -47,7 +47,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "80457803",
+          "hash": "bad5672d",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -100,7 +100,12 @@
           "path": "../src/readiness/skipBelowTypeScriptConfigSupport.ts"
         },
         {
-          "hash": "05ca3400",
+          "hash": "428035c1",
+          "kind": "module",
+          "path": "../src/readiness/tsconfig-chain-reads.ts"
+        },
+        {
+          "hash": "22fb7960",
           "kind": "module",
           "path": "../src/readiness/tsconfig-inputs.ts"
         }
@@ -109,8 +114,8 @@
       "path": "kits/default.js",
       "readyupVersion": "0.46.2",
       "source": "kits/default.ts",
-      "sourceHash": "80457803",
-      "targetHash": "c6d79de5"
+      "sourceHash": "bad5672d",
+      "targetHash": "702d8cef"
     }
   ]
 }

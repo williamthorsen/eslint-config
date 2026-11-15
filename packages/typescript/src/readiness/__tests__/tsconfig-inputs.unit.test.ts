@@ -1,7 +1,8 @@
+import type { TsconfigChain } from 'readyup/check-utils';
 import { describe, expect, it } from 'vitest';
 
 import { buildChainEntry } from '../test-utils/buildChainEntry.ts';
-import { judgeInputCoverage } from '../tsconfig-inputs.ts';
+import { judgeInputCoverage, judgeOwnedInputs, skipUnlessEnumerated } from '../tsconfig-inputs.ts';
 
 const ESLINT_CONFIG = 'eslint.config.ts';
 
@@ -164,5 +165,67 @@ describe(judgeInputCoverage, () => {
 
   it('is not enumerated for an empty chain', () => {
     expect(judgeInputCoverage([], ESLINT_CONFIG)).toStrictEqual({ kind: 'not-enumerated' });
+  });
+});
+
+describe(judgeOwnedInputs, () => {
+  const enumerating: TsconfigChain = {
+    entries: [buildChainEntry({ config: { include: ['vitest.config.ts'] } })],
+    unresolvedExtends: [],
+  };
+
+  it('judges each eslint config against the chain of the tsconfig owning it', () => {
+    const owned = [{ configPath: ESLINT_CONFIG, tsconfigPath: 'tsconfig.json' }];
+
+    expect(judgeOwnedInputs(owned, () => enumerating)).toStrictEqual({
+      judgements: [
+        {
+          configPath: ESLINT_CONFIG,
+          coverage: { kind: 'enumerated-without', sites: [{ declaredIn: 'tsconfig.json', field: 'include' }] },
+        },
+      ],
+      unread: [],
+    });
+  });
+
+  it('leaves unjudged an eslint config whose owning chain was not read, naming the tsconfig once', () => {
+    const owned = [
+      { configPath: ESLINT_CONFIG, tsconfigPath: 'tsconfig.json' },
+      { configPath: 'scripts/eslint.config.ts', tsconfigPath: 'tsconfig.json' },
+    ];
+
+    expect(judgeOwnedInputs(owned, () => undefined)).toStrictEqual({
+      judgements: [],
+      unread: [{ path: 'tsconfig.json', reason: 'it does not parse' }],
+    });
+  });
+});
+
+describe(skipUnlessEnumerated, () => {
+  const notEnumerated = { configPath: ESLINT_CONFIG, coverage: { kind: 'not-enumerated' } } as const;
+  const unread = [{ path: 'b/tsconfig.json', reason: 'it does not parse' }];
+
+  it('runs when a judged tsconfig enumerates', () => {
+    const judgements = [{ configPath: ESLINT_CONFIG, coverage: { kind: 'covered' } } as const];
+
+    expect(skipUnlessEnumerated({ judgements, unread })).toBe(false);
+  });
+
+  it('skips when no judged tsconfig enumerates', () => {
+    expect(skipUnlessEnumerated({ judgements: [notEnumerated], unread: [] })).toBe(
+      'No tsconfig owning an eslint config enumerates a sibling TypeScript file by name',
+    );
+  });
+
+  it('names the unread chains when no judged tsconfig enumerates', () => {
+    expect(skipUnlessEnumerated({ judgements: [notEnumerated], unread })).toBe(
+      'No tsconfig owning an eslint config enumerates a sibling TypeScript file by name. Could not read the tsconfig chain of b/tsconfig.json (it does not parse)',
+    );
+  });
+
+  it('skips on the unread chains alone when nothing was judged', () => {
+    expect(skipUnlessEnumerated({ judgements: [], unread })).toBe(
+      'Could not read the tsconfig chain of b/tsconfig.json (it does not parse)',
+    );
   });
 });
