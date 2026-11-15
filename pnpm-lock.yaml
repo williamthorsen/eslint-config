@@ -281,8 +281,8 @@ importers:
         specifier: 0.11.1
         version: 0.11.1
       '@williamthorsen/toolbelt.packaging':
-        specifier: 0.8.0
-        version: 0.8.0
+        specifier: 0.9.0
+        version: 0.9.0
     devDependencies:
       '@williamthorsen/toolbelt.testing':
         specifier: 0.8.4
@@ -1371,6 +1371,10 @@ packages:
 
   '@williamthorsen/toolbelt.packaging@0.8.0':
     resolution: {integrity: sha512-21DMdQZn//uCV6BSuC+jWQblHYLyWGB0wo9uRvUBziro/VUtmS6RkkhnItOa5VcW+J5l4dqpxMIdTiOFcDBMCA==}
+    engines: {node: '>=24.0.0'}
+
+  '@williamthorsen/toolbelt.packaging@0.9.0':
+    resolution: {integrity: sha512-HSPRU9NbyKNyHeN9jo5MZuiYQw/KoKW/n01wiKFqsTqpBsP9ASCwyo+77ON1ByhV4Ixrx3+mr1uraAjWTdvHtA==}
     engines: {node: '>=24.0.0'}
 
   '@williamthorsen/toolbelt.sets@3.1.0':
@@ -4202,6 +4206,11 @@ snapshots:
   '@williamthorsen/toolbelt.packaging@0.8.0':
     dependencies:
       '@williamthorsen/toolbelt.filesystem': 0.11.0
+      '@williamthorsen/toolbelt.objects': 4.4.3
+
+  '@williamthorsen/toolbelt.packaging@0.9.0':
+    dependencies:
+      '@williamthorsen/toolbelt.filesystem': 0.11.1
       '@williamthorsen/toolbelt.objects': 4.4.3
 
   '@williamthorsen/toolbelt.sets@3.1.0': {}

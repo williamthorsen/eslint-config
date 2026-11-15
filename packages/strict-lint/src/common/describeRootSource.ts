@@ -1,9 +1,11 @@
 import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 
 /** Describes how the project root was chosen: by a marker file, or by one of the fallbacks. */
-export function describeRootSource({ marker, source }: ProjectRoot): string {
-  if (marker !== null) {
-    return `marker: ${marker}`;
+export function describeRootSource(projectRoot: ProjectRoot): string {
+  if (projectRoot.source === 'marker') {
+    return `marker: ${projectRoot.marker}`;
   }
-  return source === 'package-json' ? 'nearest package.json' : 'no project marker; using the start directory';
+  return projectRoot.source === 'package-json'
+    ? 'nearest package.json'
+    : 'no project marker; using the start directory';
 }
