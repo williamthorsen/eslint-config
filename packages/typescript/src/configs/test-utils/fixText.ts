@@ -4,6 +4,7 @@ import { ESLint, type Linter } from 'eslint';
 import type { Config } from 'eslint/config';
 
 import { fixturesDir } from './lintFixture.ts';
+import { toLinterConfigs } from './toLinterConfigs.ts';
 
 export interface FixResult {
   /** The messages left after every fix was applied. */
@@ -44,16 +45,3 @@ export async function fixText(composed: readonly Config[], fileName: string, tex
   }
   return { messages: result.messages, output: result.output ?? text };
 }
-
-// region | Helpers
-
-/**
- * Retypes configs as the `Linter.Config[]` that `new ESLint({ overrideConfig })` accepts, which models
- * `languageOptions` with a nominally-incompatible index signature. Only that constructor calls it.
- */
-function toLinterConfigs(configs: readonly Config[]): Linter.Config[] {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- see comment above
-  return configs as Linter.Config[];
-}
-
-// endregion | Helpers
