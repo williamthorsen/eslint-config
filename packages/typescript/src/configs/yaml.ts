@@ -13,7 +13,7 @@ const rules: Linter.RulesRecord = {
   'spaced-comment': 'off',
 };
 
-const config = defineConfig({
+export const yamlConfig = defineConfig({
   files: ['**/*.{yaml,yml}'],
   languageOptions: {
     parser: yamlParser,
@@ -26,5 +26,3 @@ const config = defineConfig({
     ...rules,
   },
 });
-
-export default config;

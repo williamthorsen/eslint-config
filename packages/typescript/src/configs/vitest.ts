@@ -42,7 +42,7 @@ const typeAwareRules: Linter.RulesRecord = {
 };
 
 /** Builds the Vitest config: every plugin rule, minus the corrections above. */
-async function createConfig(): Promise<Config[]> {
+export async function createVitestConfig(): Promise<Config[]> {
   const { default: vitestPlugin } = await import('@vitest/eslint-plugin');
 
   return defineConfig(
@@ -61,5 +61,3 @@ async function createConfig(): Promise<Config[]> {
     },
   );
 }
-
-export default createConfig;

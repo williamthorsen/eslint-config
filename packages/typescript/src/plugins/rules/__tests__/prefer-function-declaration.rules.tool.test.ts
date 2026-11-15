@@ -1,9 +1,9 @@
-import rule from '../prefer-function-declaration.ts';
+import { preferFunctionDeclarationRule } from '../prefer-function-declaration.ts';
 import { RuleTester } from '../test-utils/ruleTester.ts';
 
 const ruleTester = new RuleTester();
 
-ruleTester.run('prefer-function-declaration', rule, {
+ruleTester.run('prefer-function-declaration', preferFunctionDeclarationRule, {
   valid: [
     // Non-firing: a typed function expression is exempt
     'const add: (a: number, b: number) => number = (a, b) => a + b;',

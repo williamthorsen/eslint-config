@@ -40,7 +40,7 @@ const rules: Linter.RulesRecord = {
   'import-x/no-cycle': ['error', { ignoreExternal: true }],
 };
 
-const config = defineConfig(
+export const importConfig = defineConfig(
   {
     plugins: {
       'import-x': importXPlugin,
@@ -57,5 +57,3 @@ const config = defineConfig(
     },
   },
 );
-
-export default config;

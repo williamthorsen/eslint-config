@@ -96,7 +96,22 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
   };
 };
 
-// region | Helper functions
+export const noJsExtensionForTsRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Require a TypeScript extension on a specifier that names a TypeScript source',
+    },
+    fixable: 'code',
+    schema: [],
+    messages: {
+      tsExtension: 'Expected file extension "{{extension}}" for "{{importPath}}"',
+    },
+  },
+  create,
+} as const;
+
+// region | Helpers
 
 /** Returns the program's module-resolution cache, creating it on first request. */
 function getResolutionCache(program: ts.Program): ts.ModuleResolutionCache {
@@ -120,21 +135,4 @@ function isLocalSpecifier(specifier: string): boolean {
   return specifier.startsWith('./') || specifier.startsWith('../') || specifier.startsWith('#');
 }
 
-// endregion | Helper functions
-
-const ruleDefinition = {
-  meta: {
-    type: 'problem',
-    docs: {
-      description: 'Require a TypeScript extension on a specifier that names a TypeScript source',
-    },
-    fixable: 'code',
-    schema: [],
-    messages: {
-      tsExtension: 'Expected file extension "{{extension}}" for "{{importPath}}"',
-    },
-  },
-  create,
-} as const;
-
-export default ruleDefinition;
+// endregion | Helpers

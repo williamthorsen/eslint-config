@@ -51,7 +51,21 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
   };
 };
 
-// region | Helper functions
+export const noTypeCycleRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow a module cycle that passes through a type-only import',
+    },
+    schema: [],
+    messages: {
+      typeCycle: 'Dependency cycle through a type-only import: {{cycle}}',
+    },
+  },
+  create,
+} as const;
+
+// region | Helpers
 
 /** Collects the edges leaving a file, resolving each specifier the way `tsc` does. */
 function collectEdges(program: ts.Program, file: ts.SourceFile): readonly Edge[] {
@@ -241,20 +255,4 @@ function toModuleReference(node: ts.Node): ModuleReference | undefined {
   return undefined;
 }
 
-// endregion | Helper functions
-
-const ruleDefinition = {
-  meta: {
-    type: 'problem',
-    docs: {
-      description: 'Disallow a module cycle that passes through a type-only import',
-    },
-    schema: [],
-    messages: {
-      typeCycle: 'Dependency cycle through a type-only import: {{cycle}}',
-    },
-  },
-  create,
-} as const;
-
-export default ruleDefinition;
+// endregion | Helpers

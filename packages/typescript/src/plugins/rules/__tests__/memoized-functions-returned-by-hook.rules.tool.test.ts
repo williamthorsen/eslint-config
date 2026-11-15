@@ -1,9 +1,9 @@
-import rule from '../memoized-functions-returned-by-hook.ts';
+import { memoizedFunctionsReturnedByHookRule } from '../memoized-functions-returned-by-hook.ts';
 import { RuleTester } from '../test-utils/ruleTester.ts';
 
 const ruleTester = new RuleTester();
 
-ruleTester.run('memoized-functions-returned-by-hook', rule, {
+ruleTester.run('memoized-functions-returned-by-hook', memoizedFunctionsReturnedByHookRule, {
   valid: [
     // Non-firing: the returned function is memoized with useCallback
     `function useThing() {

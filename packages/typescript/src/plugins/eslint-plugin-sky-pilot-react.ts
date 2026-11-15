@@ -3,7 +3,7 @@ import type { Config } from 'eslint/config';
 
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
-import memoizedFunctionsReturnedByHookRule from './rules/memoized-functions-returned-by-hook.ts';
+import { memoizedFunctionsReturnedByHookRule } from './rules/memoized-functions-returned-by-hook.ts';
 
 const skyPilotReactPlugin: ESLint.Plugin = {
   rules: ensurePluginRules({
@@ -12,7 +12,7 @@ const skyPilotReactPlugin: ESLint.Plugin = {
 };
 
 // Annotate explicitly: declaration emit cannot name `@eslint/core`'s `Plugin`, which an inferred type would reference.
-const configs: { recommended: Config; strict: Config } = {
+export const skyPilotReactConfigs: { recommended: Config; strict: Config } = {
   recommended: {
     plugins: {
       'sky-pilot-react': skyPilotReactPlugin,
@@ -30,5 +30,3 @@ const configs: { recommended: Config; strict: Config } = {
     },
   },
 };
-
-export default { configs };

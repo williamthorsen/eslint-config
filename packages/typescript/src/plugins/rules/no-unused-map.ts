@@ -27,8 +27,34 @@ const create: TSESLint.RuleCreateFunction<'unusedMap'> = (context) => {
   };
 };
 
-// region | Helper functions
 type MapCall = TSESTree.CallExpression & { callee: TSESTree.MemberExpression };
+
+export const noUnusedMapRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow discarding the result of Array#map',
+    },
+    schema: [],
+    messages: {
+      unusedMap: 'Unused result of Array#map. Consider using Array#forEach instead.',
+    },
+  },
+  create,
+} as const;
+
+// region | Helpers
+
+/**
+ * Returns true if every non-nullable constituent of the type is array-like. Stripping `undefined` and `null` keeps an
+ * optional-chained receiver (typed `T[] | undefined`) array-like. `any` and TS's error type are assignable to
+ * `readonly any[]`, so the flag check rejects them; `unknown` already fails the checker's test.
+ */
+function isArrayLikeType(type: ts.Type, checker: ts.TypeChecker): boolean {
+  const nonNullable = checker.getNonNullableType(type);
+  const parts = nonNullable.isUnion() ? nonNullable.types : [nonNullable];
+  return parts.every((part) => (part.flags & ts.TypeFlags.Any) === 0 && checker.isArrayLikeType(part));
+}
 
 /** Returns true if the node is a non-computed call to a method named `map`. */
 function isMapCall(node: TSESTree.CallExpression): node is MapCall {
@@ -49,31 +75,4 @@ function isResultDiscarded(node: TSESTree.CallExpression): boolean {
   return parent.type === AST_NODE_TYPES.ExpressionStatement;
 }
 
-/**
- * Returns true if every non-nullable constituent of the type is array-like. Stripping `undefined` and `null` keeps an
- * optional-chained receiver (typed `T[] | undefined`) array-like. `any` and TS's error type are assignable to
- * `readonly any[]`, so the flag check rejects them; `unknown` already fails the checker's test.
- */
-function isArrayLikeType(type: ts.Type, checker: ts.TypeChecker): boolean {
-  const nonNullable = checker.getNonNullableType(type);
-  const parts = nonNullable.isUnion() ? nonNullable.types : [nonNullable];
-  return parts.every((part) => (part.flags & ts.TypeFlags.Any) === 0 && checker.isArrayLikeType(part));
-}
-
-// endregion | Helper functions
-
-const ruleDefinition = {
-  meta: {
-    type: 'problem',
-    docs: {
-      description: 'Disallow discarding the result of Array#map',
-    },
-    schema: [],
-    messages: {
-      unusedMap: 'Unused result of Array#map. Consider using Array#forEach instead.',
-    },
-  },
-  create,
-} as const;
-
-export default ruleDefinition;
+// endregion | Helpers

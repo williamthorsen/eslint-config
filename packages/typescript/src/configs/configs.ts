@@ -1,16 +1,16 @@
 import type { Config } from 'eslint/config';
 
-import eslintComments from './eslint-comments.ts';
-import importConfig from './import.ts';
-import javaScript from './javascript.ts';
-import json from './json.ts';
-import json5 from './json5.ts';
-import n from './n.ts';
-import packageJson from './package-json.ts';
-import simpleImportSort from './simple-import-sort.ts';
-import typeScript from './typescript.ts';
-import unicorn from './unicorn.ts';
-import yaml from './yaml.ts';
+import { eslintCommentsConfig } from './eslint-comments.ts';
+import { importConfig } from './import.ts';
+import { javaScriptConfig } from './javascript.ts';
+import { jsonConfig } from './json.ts';
+import { json5Config } from './json5.ts';
+import { nConfig } from './n.ts';
+import { packageJsonConfig } from './package-json.ts';
+import { simpleImportSortConfig } from './simple-import-sort.ts';
+import { typeScriptConfig } from './typescript.ts';
+import { unicornConfig } from './unicorn.ts';
+import { yamlConfig } from './yaml.ts';
 
 export type ConfigName =
   | 'eslintComments'
@@ -26,15 +26,15 @@ export type ConfigName =
   | 'yaml';
 
 export const configs: Record<ConfigName, Config[]> = {
-  eslintComments,
+  eslintComments: eslintCommentsConfig,
   import: importConfig,
-  javaScript,
-  json,
-  json5,
-  n,
-  packageJson,
-  simpleImportSort,
-  typeScript,
-  unicorn,
-  yaml,
+  javaScript: javaScriptConfig,
+  json: jsonConfig,
+  json5: json5Config,
+  n: nConfig,
+  packageJson: packageJsonConfig,
+  simpleImportSort: simpleImportSortConfig,
+  typeScript: typeScriptConfig,
+  unicorn: unicornConfig,
+  yaml: yamlConfig,
 };

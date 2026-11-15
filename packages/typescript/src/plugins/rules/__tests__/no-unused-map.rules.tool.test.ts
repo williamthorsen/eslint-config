@@ -1,4 +1,4 @@
-import rule from '../no-unused-map.ts';
+import { noUnusedMapRule } from '../no-unused-map.ts';
 import { createTypedRuleTester, RuleTester } from '../test-utils/ruleTester.ts';
 
 // This rule's receiver guard is type-aware, so it needs the tester backed by a TS program.
@@ -7,7 +7,7 @@ const typedRuleTester = createTypedRuleTester();
 // Because the fixture program declares no ambient `console`, a case reaching for one declares its own.
 const consoleDeclaration = 'declare const console: { log(value: unknown): void };';
 
-typedRuleTester.run('no-unused-map', rule, {
+typedRuleTester.run('no-unused-map', noUnusedMapRule, {
   valid: [
     // Non-firing: result assigned to a variable
     'const doubled = [1, 2, 3].map((n) => n * 2);',
@@ -64,7 +64,7 @@ typedRuleTester.run('no-unused-map', rule, {
 // The rule must still report statement-position calls, not crash or silently disable.
 const untypedRuleTester = new RuleTester();
 
-untypedRuleTester.run('no-unused-map (syntactic fallback)', rule, {
+untypedRuleTester.run('no-unused-map (syntactic fallback)', noUnusedMapRule, {
   valid: [
     // Non-firing: value-consuming position needs no type information
     'new Set([1, 2, 3].map((n) => n * 2));',

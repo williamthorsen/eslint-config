@@ -20,19 +20,21 @@ const create: TSESLint.RuleCreateFunction<'memoizedFunctionsReturnedByHook'> = (
   };
 };
 
-// region | Helper functions
-/** Returns the declarator's initializer when it is a function or arrow function expression. */
-function getFunctionFromVariableDeclarator(
-  node: TSESTree.VariableDeclarator,
-): TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression | undefined {
-  if (
-    node.init &&
-    (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression || node.init.type === AST_NODE_TYPES.FunctionExpression)
-  ) {
-    return node.init;
-  }
-  return undefined;
-}
+export const memoizedFunctionsReturnedByHookRule = {
+  create,
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Ensure functions returned by hooks are memoized with useCallback or useMemo.',
+    },
+    schema: [],
+    messages: {
+      memoizedFunctionsReturnedByHook: 'Functions returned by hooks must be memoized with useCallback or useMemo.',
+    },
+  },
+} as const;
+
+// region | Helpers
 
 /** Reports each function in the returned object that is not wrapped in `useCallback` or `useMemo`. */
 function checkReturnedFunctions(
@@ -63,46 +65,49 @@ function checkReturnedFunctions(
     }
   }
 }
-/** Returns true if the node calls `useCallback` or `useMemo`, bare or as a member. */
-function isUseCallbackOrUseMemo(node: TSESTree.Node | undefined): boolean {
-  if (!node || node.type !== AST_NODE_TYPES.CallExpression) return false;
 
-  if (
-    node.callee.type === AST_NODE_TYPES.Identifier &&
-    (node.callee.name === 'useCallback' || node.callee.name === 'useMemo')
-  ) {
-    return true;
+/** Returns the properties of an object literal that the arrow function returns implicitly. */
+function extractPropertiesFromArrowFunction(node: TSESTree.ArrowFunctionExpression): TSESTree.Property[] {
+  if (node.body.type === AST_NODE_TYPES.ObjectExpression) {
+    return extractPropertiesFromObject(node.body);
   }
-  return (
-    node.callee.type === AST_NODE_TYPES.MemberExpression &&
-    node.callee.property.type === AST_NODE_TYPES.Identifier &&
-    (node.callee.property.name === 'useCallback' || node.callee.property.name === 'useMemo')
-  );
+  return [];
 }
 
-/** Returns true if the node is a function expression or an arrow function. */
-function isFunction(
-  node: TSESTree.Node | undefined,
-): node is TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression {
-  return (
-    !!node && (node.type === AST_NODE_TYPES.FunctionExpression || node.type === AST_NODE_TYPES.ArrowFunctionExpression)
-  );
+/** Returns the properties of each object literal returned by a top-level `return` in the block. */
+function extractPropertiesFromBlockBody(body: TSESTree.BlockStatement): TSESTree.Property[] {
+  const properties: TSESTree.Property[] = [];
+
+  for (const stmt of body.body) {
+    if (stmt.type === AST_NODE_TYPES.ReturnStatement && stmt.argument?.type === AST_NODE_TYPES.ObjectExpression) {
+      properties.push(...extractPropertiesFromObject(stmt.argument));
+    }
+  }
+
+  return properties;
 }
 
-/** Returns true if the declared name starts with `use`. */
-function isCustomHook(node: TSESTree.FunctionDeclaration | TSESTree.VariableDeclarator): boolean {
-  if (
-    node.type === AST_NODE_TYPES.FunctionDeclaration &&
-    node.id?.type === AST_NODE_TYPES.Identifier &&
-    node.id.name.startsWith('use')
-  ) {
-    return true;
+/** Returns the object's properties, omitting spread elements. */
+function extractPropertiesFromObject(obj: TSESTree.ObjectExpression): TSESTree.Property[] {
+  const properties: TSESTree.Property[] = [];
+  for (const prop of obj.properties) {
+    if (prop.type === AST_NODE_TYPES.Property) {
+      properties.push(prop);
+    }
   }
-  return (
-    node.type === AST_NODE_TYPES.VariableDeclarator &&
-    node.id.type === AST_NODE_TYPES.Identifier &&
-    node.id.name.startsWith('use')
-  );
+  return properties;
+}
+
+/** Returns the function with the given name declared at the top level of the function's block body. */
+function findFunctionByName(
+  node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression,
+  functionName: string,
+): TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression | undefined {
+  if (node.body.type !== AST_NODE_TYPES.BlockStatement) {
+    return undefined;
+  }
+
+  return findFunctionDeclaration(node.body.body, functionName) || findFunctionExpression(node.body.body, functionName);
 }
 
 /** Returns the function declaration with the given name among the statements. */
@@ -141,48 +146,17 @@ function findFunctionExpression(
   return undefined;
 }
 
-/** Returns the function with the given name declared at the top level of the function's block body. */
-function findFunctionByName(
-  node: TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression,
-  functionName: string,
-): TSESTree.FunctionDeclaration | TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression | undefined {
-  if (node.body.type !== AST_NODE_TYPES.BlockStatement) {
-    return undefined;
+/** Returns the declarator's initializer when it is a function or arrow function expression. */
+function getFunctionFromVariableDeclarator(
+  node: TSESTree.VariableDeclarator,
+): TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression | undefined {
+  if (
+    node.init &&
+    (node.init.type === AST_NODE_TYPES.ArrowFunctionExpression || node.init.type === AST_NODE_TYPES.FunctionExpression)
+  ) {
+    return node.init;
   }
-
-  return findFunctionDeclaration(node.body.body, functionName) || findFunctionExpression(node.body.body, functionName);
-}
-
-/** Returns the object's properties, omitting spread elements. */
-function extractPropertiesFromObject(obj: TSESTree.ObjectExpression): TSESTree.Property[] {
-  const properties: TSESTree.Property[] = [];
-  for (const prop of obj.properties) {
-    if (prop.type === AST_NODE_TYPES.Property) {
-      properties.push(prop);
-    }
-  }
-  return properties;
-}
-
-/** Returns the properties of each object literal returned by a top-level `return` in the block. */
-function extractPropertiesFromBlockBody(body: TSESTree.BlockStatement): TSESTree.Property[] {
-  const properties: TSESTree.Property[] = [];
-
-  for (const stmt of body.body) {
-    if (stmt.type === AST_NODE_TYPES.ReturnStatement && stmt.argument?.type === AST_NODE_TYPES.ObjectExpression) {
-      properties.push(...extractPropertiesFromObject(stmt.argument));
-    }
-  }
-
-  return properties;
-}
-
-/** Returns the properties of an object literal that the arrow function returns implicitly. */
-function extractPropertiesFromArrowFunction(node: TSESTree.ArrowFunctionExpression): TSESTree.Property[] {
-  if (node.body.type === AST_NODE_TYPES.ObjectExpression) {
-    return extractPropertiesFromObject(node.body);
-  }
-  return [];
+  return undefined;
 }
 
 /** Returns the properties of each object literal that the function returns at the top level of its body. */
@@ -199,20 +173,47 @@ function getReturnedObjectProperties(
 
   return [];
 }
-// endregion | Helper functions
 
-const ruleDefinition = {
-  create,
-  meta: {
-    type: 'problem',
-    docs: {
-      description: 'Ensure functions returned by hooks are memoized with useCallback or useMemo.',
-    },
-    schema: [],
-    messages: {
-      memoizedFunctionsReturnedByHook: 'Functions returned by hooks must be memoized with useCallback or useMemo.',
-    },
-  },
-} as const;
+/** Returns true if the declared name starts with `use`. */
+function isCustomHook(node: TSESTree.FunctionDeclaration | TSESTree.VariableDeclarator): boolean {
+  if (
+    node.type === AST_NODE_TYPES.FunctionDeclaration &&
+    node.id?.type === AST_NODE_TYPES.Identifier &&
+    node.id.name.startsWith('use')
+  ) {
+    return true;
+  }
+  return (
+    node.type === AST_NODE_TYPES.VariableDeclarator &&
+    node.id.type === AST_NODE_TYPES.Identifier &&
+    node.id.name.startsWith('use')
+  );
+}
 
-export default ruleDefinition;
+/** Returns true if the node is a function expression or an arrow function. */
+function isFunction(
+  node: TSESTree.Node | undefined,
+): node is TSESTree.FunctionExpression | TSESTree.ArrowFunctionExpression {
+  return (
+    !!node && (node.type === AST_NODE_TYPES.FunctionExpression || node.type === AST_NODE_TYPES.ArrowFunctionExpression)
+  );
+}
+
+/** Returns true if the node calls `useCallback` or `useMemo`, bare or as a member. */
+function isUseCallbackOrUseMemo(node: TSESTree.Node | undefined): boolean {
+  if (!node || node.type !== AST_NODE_TYPES.CallExpression) return false;
+
+  if (
+    node.callee.type === AST_NODE_TYPES.Identifier &&
+    (node.callee.name === 'useCallback' || node.callee.name === 'useMemo')
+  ) {
+    return true;
+  }
+  return (
+    node.callee.type === AST_NODE_TYPES.MemberExpression &&
+    node.callee.property.type === AST_NODE_TYPES.Identifier &&
+    (node.callee.property.name === 'useCallback' || node.callee.property.name === 'useMemo')
+  );
+}
+
+// endregion | Helpers

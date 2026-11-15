@@ -21,7 +21,7 @@ const modifiedRules: Linter.RulesRecord = {
   'eslint-comments/disable-enable-pair': ['error', { allowWholeFile: true }],
 };
 
-const config = defineConfig({
+export const eslintCommentsConfig = defineConfig({
   plugins: {
     'eslint-comments': eslintCommentsPlugin,
   },
@@ -30,5 +30,3 @@ const config = defineConfig({
     ...modifiedRules,
   },
 });
-
-export default config;

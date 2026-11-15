@@ -51,6 +51,24 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
   };
 };
 
+// `import-x/no-duplicates` also merges the shapes that `toContribution` excludes, and loses a kind, a side-effect
+// import, or the parse.
+export const noSplitImportsRule = {
+  create,
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description: 'Disallow importing one module in several statements when one statement could import every binding',
+    },
+    fixable: 'code',
+    schema: [],
+    messages: {
+      splitImports:
+        "'{{source}}' is imported in {{count}} statements; one statement can import every binding, with `type` on the specifiers that import types.",
+    },
+  },
+} as const;
+
 // region | Helpers
 
 /**
@@ -111,6 +129,11 @@ function fixWouldLoseComment(
   });
 }
 
+/** Returns true if the two ranges share any characters. */
+function rangesOverlap(a: TSESTree.Range, b: TSESTree.Range): boolean {
+  return a[0] < b[1] && a[1] > b[0];
+}
+
 /**
  * Widens a statement's range so that its removal leaves no trace: the whole line when nothing else shares it, and
  * otherwise the spaces that separated it from what follows.
@@ -126,11 +149,6 @@ function rangeWithLine(sourceCode: TSESLint.SourceCode, node: TSESTree.Node): TS
     return [start, end + trailingSpaces];
   }
   return [lineStart, end + lineBreakLength];
-}
-
-/** Returns true if the two ranges share any characters. */
-function rangesOverlap(a: TSESTree.Range, b: TSESTree.Range): boolean {
-  return a[0] < b[1] && a[1] > b[0];
 }
 
 /**
@@ -207,23 +225,3 @@ function toNamedSpecifier(specifier: TSESTree.ImportSpecifier, inTypeStatement: 
 }
 
 // endregion | Helpers
-
-// `import-x/no-duplicates` also merges the shapes that `toContribution` excludes, and loses a kind, a side-effect
-// import, or the parse.
-const ruleDefinition = {
-  create,
-  meta: {
-    type: 'suggestion',
-    docs: {
-      description: 'Disallow importing one module in several statements when one statement could import every binding',
-    },
-    fixable: 'code',
-    schema: [],
-    messages: {
-      splitImports:
-        "'{{source}}' is imported in {{count}} statements; one statement can import every binding, with `type` on the specifiers that import types.",
-    },
-  },
-} as const;
-
-export default ruleDefinition;

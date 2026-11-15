@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
-import rule from '../no-unused-map.ts';
+import { noUnusedMapRule } from '../no-unused-map.ts';
 
 // The rule-tester conformance tables live in `no-unused-map.rules.tool.test.ts`. This file covers a case that the rule
 // tester cannot set up: `Linter` runs its default parser (espree), which supplies no parser services at all.
@@ -11,7 +11,7 @@ describe('no-unused-map under a non-TypeScript parser', () => {
   it('applies the syntactic check instead of crashing', () => {
     const linter = new Linter();
     const messages = linter.verify('[1, 2, 3].map((n) => console.log(n));', {
-      plugins: { 'sky-pilot': { rules: ensurePluginRules({ 'no-unused-map': rule }) } },
+      plugins: { 'sky-pilot': { rules: ensurePluginRules({ 'no-unused-map': noUnusedMapRule }) } },
       rules: { 'sky-pilot/no-unused-map': 'error' },
     });
 

@@ -92,7 +92,33 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
   };
 };
 
-// region | Helper functions
+export const noUnpublishedBarrelRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow a barrel file outside a published entry point',
+    },
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          outDir: { type: 'string' },
+          sourceDir: { type: 'string' },
+        },
+        additionalProperties: false,
+      },
+    ],
+    messages: {
+      unbuiltBarrel:
+        'Barrel outside a published entry point: this file is outside `{{sourceDir}}`, so the build emits no module for it, and the nearest package.json publishes no `{{sourcePath}}`. Import the defining modules directly, or publish this module.',
+      unpublishedBarrel:
+        'Barrel outside a published entry point: the nearest package.json publishes neither `{{target}}` nor `{{sourcePath}}`. Import the defining modules directly, or publish this module.',
+    },
+  },
+  create,
+} as const;
+
+// region | Helpers
 
 /** Collects the local names that every import declaration binds. */
 function collectImportedNames(program: TSESTree.Program): Set<string> {
@@ -334,32 +360,4 @@ function unwrapTypeExpressions(node: TSESTree.Node): TSESTree.Node {
   return current;
 }
 
-// endregion | Helper functions
-
-const ruleDefinition = {
-  meta: {
-    type: 'problem',
-    docs: {
-      description: 'Disallow a barrel file outside a published entry point',
-    },
-    schema: [
-      {
-        type: 'object',
-        properties: {
-          outDir: { type: 'string' },
-          sourceDir: { type: 'string' },
-        },
-        additionalProperties: false,
-      },
-    ],
-    messages: {
-      unbuiltBarrel:
-        'Barrel outside a published entry point: this file is outside `{{sourceDir}}`, so the build emits no module for it, and the nearest package.json publishes no `{{sourcePath}}`. Import the defining modules directly, or publish this module.',
-      unpublishedBarrel:
-        'Barrel outside a published entry point: the nearest package.json publishes neither `{{target}}` nor `{{sourcePath}}`. Import the defining modules directly, or publish this module.',
-    },
-  },
-  create,
-} as const;
-
-export default ruleDefinition;
+// endregion | Helpers

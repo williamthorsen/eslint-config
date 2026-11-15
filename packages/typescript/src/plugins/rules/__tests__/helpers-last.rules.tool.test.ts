@@ -1,9 +1,9 @@
-import rule from '../helpers-last.ts';
+import { helpersLastRule } from '../helpers-last.ts';
 import { RuleTester } from '../test-utils/ruleTester.ts';
 
 const ruleTester = new RuleTester();
 
-ruleTester.run('helpers-last', rule, {
+ruleTester.run('helpers-last', helpersLastRule, {
   valid: [
     // Non-firing: a file without helpers
     'export function a() {}\nexport const b = 1;',

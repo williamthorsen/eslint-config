@@ -1,11 +1,11 @@
-import rule from '../no-real-time-sleep.ts';
+import { noRealTimeSleepRule } from '../no-real-time-sleep.ts';
 import { RuleTester } from '../test-utils/ruleTester.ts';
 
 const ruleTester = new RuleTester();
 
 const error = [{ messageId: 'realTimeSleep' }] as const;
 
-ruleTester.run('no-real-time-sleep', rule, {
+ruleTester.run('no-real-time-sleep', noRealTimeSleepRule, {
   valid: [
     // Non-firing: a zero or omitted delay yields a turn rather than waiting
     'await new Promise((resolve) => setTimeout(resolve, 0));',

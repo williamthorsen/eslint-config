@@ -11,9 +11,7 @@ const modifiedRules: Linter.RulesRecord = {
   'n/no-unsupported-features/node-builtins': 'off',
 };
 
-const config = defineConfig({
+export const nConfig = defineConfig({
   extends: [nPlugin.configs['flat/recommended']],
   rules: modifiedRules,
 });
-
-export default config;
