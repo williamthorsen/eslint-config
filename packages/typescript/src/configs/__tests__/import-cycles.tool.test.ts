@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { baseConfig } from '#src/baseConfig.ts';
-
-import { lintFixture, listRuleMessages, typedParserSettings } from '../test-utils/lintFixture.ts';
+import { lintFixture, listRuleMessages, typedParserSettings } from '#src/test-utils/lintFixture.ts';
 
 // `settings['import-x/extensions']` lets the rule's module graph open a TypeScript file at all, and the
 // resolver alias lets a specifier written `./b.js` name one.

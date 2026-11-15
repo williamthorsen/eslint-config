@@ -1,7 +1,7 @@
 import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
-import { fixtureWiring, lintFixture, listRuleMessages } from '#src/configs/test-utils/lintFixture.ts';
+import { fixtureWiring, lintFixture, listRuleMessages } from '#src/test-utils/lintFixture.ts';
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
 import { noTypeCycleRule } from '../no-type-cycle.ts';

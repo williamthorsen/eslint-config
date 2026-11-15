@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { baseConfig } from '#src/baseConfig.ts';
-
-import { lintFixture, listRuleMessages, typedParserSettings } from '../test-utils/lintFixture.ts';
+import { lintFixture, listRuleMessages, typedParserSettings } from '#src/test-utils/lintFixture.ts';
 
 describe('the import-sort groups that the config sets', () => {
   // The fixture holds imports for every group, in the configured order and separated by the blank lines that the rule

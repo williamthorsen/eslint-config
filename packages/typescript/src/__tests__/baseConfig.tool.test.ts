@@ -6,11 +6,10 @@ import { ESLint } from 'eslint';
 import type { Config } from 'eslint/config';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fixText } from '#src/configs/test-utils/fixText.ts';
-
 import { advisoryRuleSeverities } from '../advisoryRuleSeverities.ts';
 import { baseConfig } from '../baseConfig.ts';
 import { gitIgnoresConfigName } from '../ignores/git.ts';
+import { fixText } from '../test-utils/fixText.ts';
 
 describe('baseConfig', () => {
   afterEach(() => {

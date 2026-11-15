@@ -2,8 +2,7 @@ import type { Config } from 'eslint/config';
 import { describe, expect, it } from 'vitest';
 
 import { baseConfig } from '#src/baseConfig.ts';
-
-import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
+import { lintFixture, typedParserSettings } from '#src/test-utils/lintFixture.ts';
 
 const disabledRuleIds = [
   'unicorn/no-asterisk-prefix-in-documentation-comments',
