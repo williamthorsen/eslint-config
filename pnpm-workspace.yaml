@@ -40,5 +40,8 @@ savePrefix: ''
 trustPolicy: no-downgrade
 # semver@6.3.1 lacks provenance and was published after provenance-bearing 7.x releases, but its line
 # never had provenance, and @babel/core and eslint-plugin-react still require semver 6.
+# lefthook@2.2.2 lacks provenance because its maintainer published it by hand after a CI failure
+# (evilmartians/lefthook#1600); its platform binary packages still have provenance.
 trustPolicyExclude:
+  - lefthook@2.2.2
   - semver@6.3.1
