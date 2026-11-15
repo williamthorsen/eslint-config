@@ -1,5 +1,35 @@
 [
   {
+    "version": "0.14.0",
+    "date": "2026-11-15",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Lowers the `engines.node` floor of `@williamthorsen/strict-lint`, `@williamthorsen/tsconfig`, and `@williamthorsen/eslint-config-typescript` from `>=26` to `>=24`, so that the packages support Node 24, an LTS line until April 2028. (#314)",
+            "hash": "cc1c6ccbb65195429b2199e3bebe53805d510edf",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "🪦 Removed",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Removes `ESNext.Collection`, `ESNext.Date`, `ESNext.Intl`, `ESNext.Temporal`, and `ESNext.TypedArrays` from the `lib` of `@williamthorsen/tsconfig`'s `tsconfig.base.json`, so that code using an API that Node 24 does not implement, such as `Temporal`, `Uint8Array.fromBase64`, or `Map.prototype.getOrInsert`, no longer typechecks. (#314)",
+            "breaking": true,
+            "migration": "Add each removed sublib that the code uses to `lib` in the consuming tsconfig, and restate the base's `ES2025`, `ESNext.Array`, `ESNext.Disposable`, `ESNext.Error`, and `ESNext.SharedMemory` beside it, because a `lib` set there replaces the base's list rather than adding to it; add `ESNext.Intl` only together with `ESNext.Temporal`, which it references.",
+            "hash": "cc1c6ccbb65195429b2199e3bebe53805d510edf",
+            "entry": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.13.0",
     "date": "2026-11-13",
     "sections": [

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 15.1.0 — 2026-11-15
+
+### 🎉 Features
+
+- Lowers the `engines.node` floor of `@williamthorsen/strict-lint`, `@williamthorsen/tsconfig`, and `@williamthorsen/eslint-config-typescript` from `>=26` to `>=24`, so that the packages support Node 24, an LTS line until April 2028. (#314)
+
 ## 15.0.0 — 2026-11-13
 
 ### 🪦 Removed

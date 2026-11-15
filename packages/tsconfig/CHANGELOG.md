@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.14.0 — 2026-11-15
+
+### 🎉 Features
+
+- Lowers the `engines.node` floor of `@williamthorsen/strict-lint`, `@williamthorsen/tsconfig`, and `@williamthorsen/eslint-config-typescript` from `>=26` to `>=24`, so that the packages support Node 24, an LTS line until April 2028. (#314)
+
+### 🪦 Removed
+
+- 🚨 **Breaking:** Removes `ESNext.Collection`, `ESNext.Date`, `ESNext.Intl`, `ESNext.Temporal`, and `ESNext.TypedArrays` from the `lib` of `@williamthorsen/tsconfig`'s `tsconfig.base.json`, so that code using an API that Node 24 does not implement, such as `Temporal`, `Uint8Array.fromBase64`, or `Map.prototype.getOrInsert`, no longer typechecks. (#314)
+
 ## 0.13.0 — 2026-11-13
 
 ### 🎉 Features
