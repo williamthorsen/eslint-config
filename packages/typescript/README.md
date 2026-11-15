@@ -101,8 +101,8 @@ The default export bundles configs for the following surfaces:
 | TypeScript     | `**/*.{ts,cts,mts,tsx}`        | `typescript-eslint` (type-aware), `sky-pilot`                       |
 | JavaScript     | `**/*.{js,cjs,mjs,jsx}`        | core rules, JS-specific conventions                                 |
 | Cross-cutting  | all code files                 | `eslint-comments`, `import-x`, `n`, `simple-import-sort`, `unicorn` |
-| JSON / JSON5   | `**/*.{json,json5}`            | `jsonc`                                                             |
-| YAML           | `**/*.{yaml,yml}`              | `yml`                                                               |
+| JSON / JSON5   | `**/*.{json,json5}`            | `jsonc` (`recommended-with-jsonc`)                                  |
+| YAML           | `**/*.{yaml,yml}`              | `yml` (`recommended`)                                               |
 | `package.json` | `**/package.json`              | `package-json` (recommended + stylistic, plus publish metadata)     |
 | Tests          | `**/*.{spec,test}.{js,ts,...}` | strict TypeScript rules relaxed, `sky-pilot/no-real-time-sleep`     |
 
