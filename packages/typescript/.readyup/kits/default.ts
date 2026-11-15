@@ -91,7 +91,7 @@ export default defineRdyKit({
           checks: [
             {
               name: `The root eslint config extends ${PACKAGE_NAME}`,
-              check: rootEslintConfigExtendsThisPackage,
+              check: checkRootEslintConfigExtendsThisPackage,
               fix: `Import ${PACKAGE_NAME} in the root eslint config and spread it into the exported config`,
             },
           ],
@@ -100,29 +100,29 @@ export default defineRdyKit({
           name: 'No JavaScript eslint config shadows a TypeScript one',
           severity: 'error',
           skip: skipUnlessEslintLoadsTypeScript,
-          check: noShadowedEslintConfig,
+          check: checkNoShadowedEslintConfig,
           fix: `Delete the JavaScript eslint config sharing a directory with a TypeScript one: The loader resolves the JavaScript basename first, so the TypeScript config never runs. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
         },
         {
           name: 'Every eslint config is TypeScript',
           skip: skipUnlessEslintLoadsTypeScript,
-          check: noJavaScriptEslintConfig,
+          check: checkNoJavaScriptEslintConfig,
           fix: `Rename each JavaScript eslint config to eslint.config.ts, which brings it into the compiler and the project service. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
         },
         {
           name: 'An eslint config anchors the project service with tsconfigRootDir',
-          check: tsconfigRootDirAnchored,
+          check: checkTsconfigRootDirAnchored,
           fix: 'Set parserOptions.tsconfigRootDir (import.meta.dirname) in the root eslint config so that type-aware linting resolves from the repo root rather than the working directory',
         },
         {
           name: 'An eslint config sets settings.next.rootDir',
           skip: skipUnlessNextRootDirApplies,
-          check: nextRootDirSet,
+          check: checkNextRootDirSet,
           fix: 'Set settings.next.rootDir (import.meta.dirname) in the eslint config enabling the Next plugin: Unset, it falls back to the working directory, and no-html-link-for-pages stops running wherever that holds no pages directory',
           checks: [
             {
               name: 'Every settings.next.rootDir is absolute',
-              check: nextRootDirsAbsolute,
+              check: checkNextRootDirsAbsolute,
               fix: 'Replace each relative settings.next.rootDir with an absolute path (import.meta.dirname): The plugin globs the value against the working directory, so a relative one anchors to wherever eslint was launched',
             },
           ],
@@ -135,13 +135,13 @@ export default defineRdyKit({
         {
           name: "The repo's tsconfigs permit a TypeScript-extension import",
           skip: skipUnlessTsconfigChainRead,
-          check: tsExtensionImportsPermitted,
+          check: checkTsExtensionImportsPermitted,
           fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly when the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`,
         },
         {
           name: "A tsconfig enumerating an eslint config's siblings names the config itself",
           skip: () => skipUnlessEnumerated(listInputJudgements()),
-          check: eslintConfigEnumerated,
+          check: checkEslintConfigEnumerated,
           fix: `Replace the enumeration with a *.ts glob, which also covers any root-level config file added later; appending eslint.config.ts is the narrower fallback. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
         },
       ],
@@ -152,13 +152,13 @@ export default defineRdyKit({
         {
           name: 'No eslint config sets parserOptions.project',
           severity: 'error',
-          check: noLegacyParserProject,
+          check: checkNoLegacyParserProject,
           fix: `Remove parserOptions.project: This config enables projectService, and typescript-eslint throws when both are set. Migration: ${MIGRATION_URL}`,
         },
         {
           name: 'No tsconfig.eslint.json files remain',
           severity: 'recommend',
-          check: noTsconfigEslintJson,
+          check: checkNoTsconfigEslintJson,
           fix: `Fold any lint-only include entries into tsconfig.json and delete tsconfig.eslint.json. Migration: ${MIGRATION_URL}`,
         },
       ],
@@ -168,22 +168,11 @@ export default defineRdyKit({
 
 // region | Helpers
 
-/** Compares a peer dependency's installed version against the floor that this package's peer range sets. */
-function checkPeerFloor(name: string): boolean | CheckOutcome {
-  const comparison = comparePeerVersions(name);
-  return comparison.kind === 'unknown' ? { ok: false, detail: comparison.reason } : judgePeerFloor(comparison);
-}
-
-/** Pairs a peer's declared range with its installed version. */
-function comparePeerVersions(name: string): PeerComparison {
-  return comparePeer({ installed: readInstalledVersion(name), name, owner: PACKAGE_NAME, range: readPeerRange(name) });
-}
-
 /**
  * Fails when a tsconfig's enumerated inputs omit an eslint config located among the files that they
  * name, judging only the tsconfigs whose chains were read and naming the rest.
  */
-function eslintConfigEnumerated(): boolean | CheckOutcome {
+function checkEslintConfigEnumerated(): boolean | CheckOutcome {
   const { judgements, unread } = listInputJudgements();
   const offenders: string[] = [];
   for (const { configPath, coverage } of judgements) {
@@ -192,6 +181,96 @@ function eslintConfigEnumerated(): boolean | CheckOutcome {
     offenders.push(`${configPath} (${sites})`);
   }
   return judgeReadOffenders(offenders, 'an enumeration omits the eslint config:', unread, '; ');
+}
+
+/** Fails when an eslint config sets a relative settings.next.rootDir, naming the offenders and their values. */
+function checkNextRootDirsAbsolute(): boolean | CheckOutcome {
+  const offenders = findEslintConfigs().flatMap((configPath) => {
+    const content = readFile(configPath);
+    if (content === undefined) return [];
+    const relative = listRelativeNextRootDirs(content);
+    return relative.length === 0 ? [] : `${configPath} (${relative.join(', ')})`;
+  });
+  return judgeOffenders(offenders, 'settings.next.rootDir is relative in');
+}
+
+/** Fails when an eslint config enables the Next plugin and none sets settings.next.rootDir. */
+function checkNextRootDirSet(): boolean | CheckOutcome {
+  const setting = listEslintConfigsMatching(setsNextRootDir);
+  if (setting.length > 0) return { ok: true, detail: `settings.next.rootDir is set in ${setting.join(', ')}` };
+  const reaching = listEslintConfigsMatching(enablesNextPlugin);
+  return {
+    ok: false,
+    detail: `The Next plugin is enabled in ${reaching.join(', ')} and no eslint config sets settings.next.rootDir`,
+  };
+}
+
+/** Fails when an eslint config is JavaScript, naming the offenders. */
+function checkNoJavaScriptEslintConfig(): boolean | CheckOutcome {
+  return judgeOffenders(listJavaScriptEslintConfigs(findEslintConfigs()), 'JavaScript eslint config found:');
+}
+
+/** Fails when an eslint config still declares parserOptions.project, naming the offenders. */
+function checkNoLegacyParserProject(): boolean | CheckOutcome {
+  return judgeOffenders(listEslintConfigsMatching(declaresParserProject), 'parserOptions.project found in:');
+}
+
+/** Fails when a JavaScript eslint config shadows a TypeScript one, naming the directories. */
+function checkNoShadowedEslintConfig(): boolean | CheckOutcome {
+  const dirs = listShadowedEslintConfigDirs(findEslintConfigs());
+  return judgeOffenders(dirs, 'a JavaScript config shadows a TypeScript one in:');
+}
+
+/** Fails when a tsconfig.eslint.json remains, naming the offenders. */
+function checkNoTsconfigEslintJson(): boolean | CheckOutcome {
+  const offenders = listRepoSearchDirs()
+    .map((dir) => resolveDirPath(dir, 'tsconfig.eslint.json'))
+    .filter((configPath) => fileExists(configPath));
+  return judgeOffenders(offenders, 'tsconfig.eslint.json found:');
+}
+
+/** Compares a peer dependency's installed version against the floor that this package's peer range sets. */
+function checkPeerFloor(name: string): boolean | CheckOutcome {
+  const comparison = comparePeerVersions(name);
+  return comparison.kind === 'unknown' ? { ok: false, detail: comparison.reason } : judgePeerFloor(comparison);
+}
+
+/**
+ * Reports whether the root eslint config extends this package, by package specifier or by a path
+ * into a workspace providing it. The repo developing this package imports it by the second route,
+ * since importing the specifier there would resolve to a build artifact.
+ */
+function checkRootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
+  const basename = findRootEslintConfig();
+  if (basename === undefined) return false;
+
+  const content = readFile(basename);
+  if (content === undefined) return false;
+  if (content.includes(PACKAGE_NAME)) return true;
+
+  const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
+  return providerDir !== undefined && { ok: true, detail: `imported by source path from ${providerDir}` };
+}
+
+/** Passes when any eslint config anchors the project service with tsconfigRootDir. */
+function checkTsconfigRootDirAnchored(): boolean | CheckOutcome {
+  if (listEslintConfigsMatching(setsTsconfigRootDir).length > 0) return true;
+  return { ok: false, detail: 'no eslint config sets parserOptions.tsconfigRootDir' };
+}
+
+/**
+ * Fails when a tsconfig owning the repo's sources permits no import path ending in a TypeScript
+ * extension, judging only the tsconfigs whose chains were read and naming the rest.
+ */
+function checkTsExtensionImportsPermitted(): boolean | CheckOutcome {
+  const { read, unread } = sortChainReads(listRepoTsconfigs(), readChain);
+  const offenders = read.filter(({ chain }) => !permitsTsExtensionImports(chain.entries)).map(({ path }) => path);
+  return judgeReadOffenders(offenders, 'no compiler option permits the import under', unread);
+}
+
+/** Pairs a peer's declared range with its installed version. */
+function comparePeerVersions(name: string): PeerComparison {
+  return comparePeer({ installed: readInstalledVersion(name), name, owner: PACKAGE_NAME, range: readPeerRange(name) });
 }
 
 /** Lists every eslint config present across the repo's search directories. */
@@ -246,52 +325,6 @@ function listRepoTsconfigs(): string[] {
   return [...new Set(declared)];
 }
 
-/** Fails when an eslint config sets a relative settings.next.rootDir, naming the offenders and their values. */
-function nextRootDirsAbsolute(): boolean | CheckOutcome {
-  const offenders = findEslintConfigs().flatMap((configPath) => {
-    const content = readFile(configPath);
-    if (content === undefined) return [];
-    const relative = listRelativeNextRootDirs(content);
-    return relative.length === 0 ? [] : `${configPath} (${relative.join(', ')})`;
-  });
-  return judgeOffenders(offenders, 'settings.next.rootDir is relative in');
-}
-
-/** Fails when an eslint config enables the Next plugin and none sets settings.next.rootDir. */
-function nextRootDirSet(): boolean | CheckOutcome {
-  const setting = listEslintConfigsMatching(setsNextRootDir);
-  if (setting.length > 0) return { ok: true, detail: `settings.next.rootDir is set in ${setting.join(', ')}` };
-  const reaching = listEslintConfigsMatching(enablesNextPlugin);
-  return {
-    ok: false,
-    detail: `The Next plugin is enabled in ${reaching.join(', ')} and no eslint config sets settings.next.rootDir`,
-  };
-}
-
-/** Fails when an eslint config is JavaScript, naming the offenders. */
-function noJavaScriptEslintConfig(): boolean | CheckOutcome {
-  return judgeOffenders(listJavaScriptEslintConfigs(findEslintConfigs()), 'JavaScript eslint config found:');
-}
-
-/** Fails when an eslint config still declares parserOptions.project, naming the offenders. */
-function noLegacyParserProject(): boolean | CheckOutcome {
-  return judgeOffenders(listEslintConfigsMatching(declaresParserProject), 'parserOptions.project found in:');
-}
-
-/** Fails when a JavaScript eslint config shadows a TypeScript one, naming the directories. */
-function noShadowedEslintConfig(): boolean | CheckOutcome {
-  const dirs = listShadowedEslintConfigDirs(findEslintConfigs());
-  return judgeOffenders(dirs, 'a JavaScript config shadows a TypeScript one in:');
-}
-
-/** Fails when a tsconfig.eslint.json remains, naming the offenders. */
-function noTsconfigEslintJson(): boolean | CheckOutcome {
-  const offenders = listRepoSearchDirs()
-    .map((dir) => resolveDirPath(dir, 'tsconfig.eslint.json'))
-    .filter((configPath) => fileExists(configPath));
-  return judgeOffenders(offenders, 'tsconfig.eslint.json found:');
-}
-
 /** Reads a tsconfig's resolved extends chain, once per path for the life of the run. */
 function readChain(tsconfigPath: string): TsconfigChain | undefined {
   if (!tsconfigChains.has(tsconfigPath)) tsconfigChains.set(tsconfigPath, readTsconfigChain(tsconfigPath));
@@ -321,23 +354,6 @@ function readInstalledVersion(name: string): string | undefined {
 function readPeerRange(name: string): string | undefined {
   const range = getJsonValue(PEER_RANGES, 'peerDependencies', name);
   return typeof range === 'string' ? range : undefined;
-}
-
-/**
- * Reports whether the root eslint config extends this package, by package specifier or by a path
- * into a workspace providing it. The repo developing this package imports it by the second route,
- * since importing the specifier there would resolve to a build artifact.
- */
-function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
-  const basename = findRootEslintConfig();
-  if (basename === undefined) return false;
-
-  const content = readFile(basename);
-  if (content === undefined) return false;
-  if (content.includes(PACKAGE_NAME)) return true;
-
-  const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
-  return providerDir !== undefined && { ok: true, detail: `imported by source path from ${providerDir}` };
 }
 
 /** Skips a check on TypeScript eslint configs below eslint 10, which can load only a JavaScript config. */
@@ -374,22 +390,6 @@ function skipUnlessTsconfigChainRead(): false | string {
   const tsconfigs = listRepoTsconfigs();
   if (tsconfigs.length === 0) return 'The repo declares no tsconfig';
   return skipUnlessChainRead(sortChainReads(tsconfigs, readChain));
-}
-
-/** Passes when any eslint config anchors the project service with tsconfigRootDir. */
-function tsconfigRootDirAnchored(): boolean | CheckOutcome {
-  if (listEslintConfigsMatching(setsTsconfigRootDir).length > 0) return true;
-  return { ok: false, detail: 'no eslint config sets parserOptions.tsconfigRootDir' };
-}
-
-/**
- * Fails when a tsconfig owning the repo's sources permits no import path ending in a TypeScript
- * extension, judging only the tsconfigs whose chains were read and naming the rest.
- */
-function tsExtensionImportsPermitted(): boolean | CheckOutcome {
-  const { read, unread } = sortChainReads(listRepoTsconfigs(), readChain);
-  const offenders = read.filter(({ chain }) => !permitsTsExtensionImports(chain.entries)).map(({ path }) => path);
-  return judgeReadOffenders(offenders, 'no compiler option permits the import under', unread);
 }
 
 // endregion | Helpers

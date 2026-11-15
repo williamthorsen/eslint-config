@@ -189,13 +189,13 @@ var default_default = defineRdyKit({
         {
           name: `Every workspace tsconfig extends ${PACKAGE_NAME}`,
           skip: skipUnlessSomeTsconfigIsAccountable,
-          check: everyTsconfigAdoptsTheBase,
+          check: checkEveryTsconfigAdoptsTheBase,
           fix: `Extend ${BASE_SPECIFIER} from each tsconfig named above, and declare ${PACKAGE_NAME} as a devDependency of each package that names it but cannot resolve it. Adoption: ${ADOPTION_URL}`
         },
         {
           name: "No tsconfig re-declares an option that the base already supplies",
           severity: "recommend",
-          check: noRedundantOptions,
+          check: checkNoRedundantOptions,
           fix: "Delete each option named above: The base already supplies it with the same value"
         }
       ]
@@ -206,14 +206,14 @@ var default_default = defineRdyKit({
         {
           name: `No tsconfig declares an ES year other than the one ${PACKAGE_NAME} sets`,
           skip: skipUnlessBaseEsYearKnown,
-          check: everyEsYearMatchesTheBase,
+          check: checkEveryEsYearMatchesTheBase,
           fix: "Delete the target or lib declaration named above, so that the ES year set by the base applies"
         },
         {
           name: "The declared Node floor supports the base's ES year",
           severity: "error",
           skip: skipUnlessNodeFloorComparable,
-          check: nodeFloorSupportsBaseEsYear,
+          check: checkNodeFloorSupportsBaseEsYear,
           fix: "Raise engines.node to a major implementing the base's ES year: Below it, code that typechecks fails at runtime"
         }
       ]
@@ -224,31 +224,14 @@ var default_default = defineRdyKit({
         {
           name: "No tsconfig's include, exclude, or files names a path outside its own directory",
           skip: skipUnlessSomeTsconfigWasFound,
-          check: noEscapingPaths,
+          check: checkNoEscapingPaths,
           fix: "Declare the field named above in the config that owns the directory, listing every path that it needs, since a local declaration replaces the inherited one rather than merging and discards the default exclude of node_modules, bower_components, jspm_packages, and outDir; or prefix each path in the config being extended with ${configDir}, which resolves to the consuming config's directory"
         }
       ]
     }
   ]
 });
-function classifyAdoptions() {
-  cache.adoptions ??= findTsconfigs().map((path) => classifyTsconfig(path));
-  return cache.adoptions;
-}
-function classifyTsconfig(path) {
-  const chain = readChain(path);
-  if (chain === void 0) return { kind: "unadopted", path };
-  const classification = classifyChain(chain);
-  return classification.kind === "adopted" ? { baseIndex: classification.baseIndex, chain, kind: "adopted", path } : { kind: classification.kind, path };
-}
-function dedupe(values) {
-  return [...new Set(values)];
-}
-function describeEscape(configPath, escaping) {
-  const source = escaping.declaredIn === configPath ? "" : `, from ${escaping.declaredIn}`;
-  return `${escaping.field}: ${escaping.path}${source}`;
-}
-function everyEsYearMatchesTheBase() {
+function checkEveryEsYearMatchesTheBase() {
   const baseEsYear = readBaseEsYear();
   if (baseEsYear === void 0) return true;
   const offenders = [];
@@ -265,7 +248,7 @@ function everyEsYearMatchesTheBase() {
     detail: `the base sets ${baseEsYear}; declared otherwise in: ${dedupe(offenders).join(", ")}`
   };
 }
-function everyTsconfigAdoptsTheBase() {
+function checkEveryTsconfigAdoptsTheBase() {
   const accountable = classifyAdoptions().filter((adoption) => adoption.kind !== "external-base");
   const adopted = accountable.filter((adoption) => adoption.kind === "adopted");
   const progress = { type: "fraction", passedCount: adopted.length, count: accountable.length };
@@ -277,6 +260,53 @@ function everyTsconfigAdoptsTheBase() {
     unadopted.length > 0 ? `no extends chain reaches the base from: ${unadopted.join(", ")}` : void 0
   ].filter((detail) => detail !== void 0);
   return { ok: false, detail: details.join("; "), progress };
+}
+function checkNodeFloorSupportsBaseEsYear() {
+  const verdict = judgeNodeFloor();
+  return verdict.kind === "skip" || { ok: verdict.kind === "pass", detail: verdict.detail };
+}
+function checkNoEscapingPaths() {
+  const judged = findTsconfigs().flatMap((path) => {
+    const chain = readChain(path);
+    return chain === void 0 ? [] : { escapes: findEscapingPaths(chain.entries), path };
+  });
+  const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
+  const progress = {
+    type: "fraction",
+    passedCount: judged.length - offenders.length,
+    count: judged.length
+  };
+  if (offenders.length === 0) return { ok: true, progress };
+  const details = offenders.flatMap(
+    (offender) => offender.escapes.map((escaping) => `${offender.path} (${describeEscape(offender.path, escaping)})`)
+  );
+  return { ok: false, detail: details.join(", "), progress };
+}
+function checkNoRedundantOptions() {
+  const offenders = listAdoptedTsconfigs().flatMap(
+    (adoption) => findRedundantOptions(adoption.chain.entries, adoption.baseIndex).map(
+      (redundant) => `${redundant.path} (${redundant.key})`
+    )
+  );
+  if (offenders.length === 0) return true;
+  return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(", ")}` };
+}
+function classifyAdoptions() {
+  cache.adoptions ??= findTsconfigs().map((path) => classifyTsconfig(path));
+  return cache.adoptions;
+}
+function classifyTsconfig(path) {
+  const chain = readChain(path);
+  if (chain === void 0) return { kind: "unadopted", path };
+  const classification = classifyChain(chain);
+  return classification.kind === "adopted" ? { baseIndex: classification.baseIndex, chain, kind: "adopted", path } : { kind: classification.kind, path };
+}
+function dedupe(values) {
+  return [...new Set(values)];
+}
+function describeEscape(configPath, escaping) {
+  const source = escaping.declaredIn === configPath ? "" : `, from ${escaping.declaredIn}`;
+  return `${escaping.field}: ${escaping.path}${source}`;
 }
 function findTsconfigs() {
   return listTsconfigSearchDirs().map((dir) => resolveDirPath(dir, "tsconfig.json")).filter((path) => fileExists(path));
@@ -317,36 +347,6 @@ function listPathsOfKind(classified, kind) {
 }
 function listTsconfigSearchDirs() {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
-}
-function nodeFloorSupportsBaseEsYear() {
-  const verdict = judgeNodeFloor();
-  return verdict.kind === "skip" || { ok: verdict.kind === "pass", detail: verdict.detail };
-}
-function noEscapingPaths() {
-  const judged = findTsconfigs().flatMap((path) => {
-    const chain = readChain(path);
-    return chain === void 0 ? [] : { escapes: findEscapingPaths(chain.entries), path };
-  });
-  const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
-  const progress = {
-    type: "fraction",
-    passedCount: judged.length - offenders.length,
-    count: judged.length
-  };
-  if (offenders.length === 0) return { ok: true, progress };
-  const details = offenders.flatMap(
-    (offender) => offender.escapes.map((escaping) => `${offender.path} (${describeEscape(offender.path, escaping)})`)
-  );
-  return { ok: false, detail: details.join(", "), progress };
-}
-function noRedundantOptions() {
-  const offenders = listAdoptedTsconfigs().flatMap(
-    (adoption) => findRedundantOptions(adoption.chain.entries, adoption.baseIndex).map(
-      (redundant) => `${redundant.path} (${redundant.key})`
-    )
-  );
-  if (offenders.length === 0) return true;
-  return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(", ")}` };
 }
 function readBaseEsYear() {
   for (const adoption of listAdoptedTsconfigs()) {
