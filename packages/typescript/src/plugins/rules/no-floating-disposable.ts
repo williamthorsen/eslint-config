@@ -17,7 +17,9 @@ interface Options {
 }
 
 type ReferenceIdentifier = TSESTree.Identifier | TSESTree.JSXIdentifier;
+
 type ResourceExpression = TSESTree.CallExpression | TSESTree.NewExpression;
+
 type TypedServices = ParserServicesWithTypeInformation;
 
 // Callees whose disposable result is safe to discard. Node's timer globals return a `Timeout` implementing
@@ -122,7 +124,35 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
   };
 };
 
-// region | Helper functions
+export const noFloatingDisposableRule = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow leaving a disposable resource unbound by `using`',
+    },
+    hasSuggestions: true,
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          allow: { type: 'array', items: { type: 'string' } },
+          checkDeclarations: { type: 'boolean' },
+        },
+        additionalProperties: false,
+      },
+    ],
+    messages: {
+      bindWithKeyword: 'Bind with `{{keyword}}`.',
+      floatingDisposable:
+        'Discarded disposable resource. Bind the result with `{{keyword}}`, or mark the discard with `void`.',
+      unboundDisposable:
+        'Resource is acquired and never disposed. Bind it with `{{keyword}}` instead of `{{kind}}`, so that it is released when the scope ends.',
+    },
+  },
+  create,
+} as const;
+
+// region | Helpers
 
 /** Returns true if the identifier is the object of a member expression, which reads or drives the resource in place. */
 function isContainedUse(identifier: ReferenceIdentifier): boolean {
@@ -394,34 +424,4 @@ function returnsThisType(node: ResourceExpression, services: TypedServices, chec
   return returnType.isTypeParameter() && 'isThisType' in returnType && returnType.isThisType === true;
 }
 
-// endregion | Helper functions
-
-const ruleDefinition = {
-  meta: {
-    type: 'problem',
-    docs: {
-      description: 'Disallow leaving a disposable resource unbound by `using`',
-    },
-    hasSuggestions: true,
-    schema: [
-      {
-        type: 'object',
-        properties: {
-          allow: { type: 'array', items: { type: 'string' } },
-          checkDeclarations: { type: 'boolean' },
-        },
-        additionalProperties: false,
-      },
-    ],
-    messages: {
-      bindWithKeyword: 'Bind with `{{keyword}}`.',
-      floatingDisposable:
-        'Discarded disposable resource. Bind the result with `{{keyword}}`, or mark the discard with `void`.',
-      unboundDisposable:
-        'Resource is acquired and never disposed. Bind it with `{{keyword}}` instead of `{{kind}}`, so that it is released when the scope ends.',
-    },
-  },
-  create,
-} as const;
-
-export default ruleDefinition;
+// endregion | Helpers

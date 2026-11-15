@@ -3,16 +3,16 @@ import type { Config } from 'eslint/config';
 
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
-import helpersLastRule from './rules/helpers-last.ts';
-import noFloatingDisposableRule from './rules/no-floating-disposable.ts';
-import noJsExtensionForTsRule from './rules/no-js-extension-for-ts.ts';
-import noRealTimeSleepRule from './rules/no-real-time-sleep.ts';
-import noSplitImportsRule from './rules/no-split-imports.ts';
-import noTypeCycleRule from './rules/no-type-cycle.ts';
-import noUndefinedWithNumberRule from './rules/no-undefined-with-number.ts';
-import noUnpublishedBarrelRule from './rules/no-unpublished-barrel.ts';
-import noUnusedMapRule from './rules/no-unused-map.ts';
-import preferFunctionDeclarationRule from './rules/prefer-function-declaration.ts';
+import { helpersLastRule } from './rules/helpers-last.ts';
+import { noFloatingDisposableRule } from './rules/no-floating-disposable.ts';
+import { noJsExtensionForTsRule } from './rules/no-js-extension-for-ts.ts';
+import { noRealTimeSleepRule } from './rules/no-real-time-sleep.ts';
+import { noSplitImportsRule } from './rules/no-split-imports.ts';
+import { noTypeCycleRule } from './rules/no-type-cycle.ts';
+import { noUndefinedWithNumberRule } from './rules/no-undefined-with-number.ts';
+import { noUnpublishedBarrelRule } from './rules/no-unpublished-barrel.ts';
+import { noUnusedMapRule } from './rules/no-unused-map.ts';
+import { preferFunctionDeclarationRule } from './rules/prefer-function-declaration.ts';
 
 const skyPilotPlugin: ESLint.Plugin = {
   meta: {

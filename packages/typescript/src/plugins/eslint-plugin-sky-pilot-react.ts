@@ -3,7 +3,7 @@ import type { Config } from 'eslint/config';
 
 import { ensurePluginRules } from '#src/utils/ensurePluginRules.ts';
 
-import memoizedFunctionsReturnedByHookRule from './rules/memoized-functions-returned-by-hook.ts';
+import { memoizedFunctionsReturnedByHookRule } from './rules/memoized-functions-returned-by-hook.ts';
 
 const skyPilotReactPlugin: ESLint.Plugin = {
   rules: ensurePluginRules({

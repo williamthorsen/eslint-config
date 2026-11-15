@@ -1,4 +1,4 @@
-import rule from '../no-floating-disposable.ts';
+import { noFloatingDisposableRule } from '../no-floating-disposable.ts';
 import { createTypedRuleTester, RuleTester } from '../test-utils/ruleTester.ts';
 
 // Disposability is a type property, so every case here needs the tester backed by a TS program.
@@ -18,7 +18,7 @@ const digest = 'declare class Digest { [Symbol.asyncDispose](): Promise<void>; d
 // A stream that does own a descriptor, standing for `fs.createWriteStream`.
 const fileStream = 'declare class FileStream { [Symbol.asyncDispose](): Promise<void>; bytesWritten: number }';
 
-typedRuleTester.run('no-floating-disposable', rule, {
+typedRuleTester.run('no-floating-disposable', noFloatingDisposableRule, {
   valid: [
     // Non-firing: bound with `using`
     'declare function acquire(): Disposable; function run() { using resource = acquire(); }',
@@ -475,7 +475,7 @@ typedRuleTester.run('no-floating-disposable', rule, {
 // nothing about a bare call is syntactically disposable, so the rule reports nothing rather than guessing.
 const untypedRuleTester = new RuleTester();
 
-untypedRuleTester.run('no-floating-disposable (no program)', rule, {
+untypedRuleTester.run('no-floating-disposable (no program)', noFloatingDisposableRule, {
   valid: [
     'declare function acquire(): Disposable; acquire();',
     'declare class TempDir { [Symbol.dispose](): void } new TempDir();',

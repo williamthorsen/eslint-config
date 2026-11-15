@@ -71,7 +71,7 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
   };
 };
 
-const ruleDefinition = {
+export const helpersLastRule = {
   create,
   meta: {
     type: 'suggestion',
@@ -87,8 +87,6 @@ const ruleDefinition = {
     },
   },
 } as const;
-
-export default ruleDefinition;
 
 // region | Helpers
 

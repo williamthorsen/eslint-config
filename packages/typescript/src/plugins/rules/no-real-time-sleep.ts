@@ -44,7 +44,7 @@ const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
   };
 };
 
-const ruleDefinition = {
+export const noRealTimeSleepRule = {
   create,
   meta: {
     type: 'problem',
@@ -58,8 +58,6 @@ const ruleDefinition = {
     },
   },
 } as const;
-
-export default ruleDefinition;
 
 // region | Helpers
 
@@ -85,19 +83,6 @@ function hasNonZeroDelay(delay: TSESTree.CallExpressionArgument | undefined): bo
   return !(delay === undefined || (delay.type === AST_NODE_TYPES.Literal && delay.value === 0));
 }
 
-/** Returns true if the callee is the global `setTimeout`, named bare or as a member of `globalThis`. */
-function isGlobalSetTimeout(sourceCode: TSESLint.SourceCode, callee: TSESTree.Expression): boolean {
-  if (callee.type === AST_NODE_TYPES.MemberExpression) {
-    return (
-      !callee.computed &&
-      callee.property.type === AST_NODE_TYPES.Identifier &&
-      callee.property.name === 'setTimeout' &&
-      isGlobalIdentifier(sourceCode, callee.object, 'globalThis')
-    );
-  }
-  return isGlobalIdentifier(sourceCode, callee, 'setTimeout');
-}
-
 /**
  * Returns true if the node names the global of that name: a reference that nothing declares, or a global-scope
  * variable that only the environment defines, such as an ES builtin or a configured global.
@@ -114,6 +99,19 @@ function isGlobalIdentifier(sourceCode: TSESLint.SourceCode, node: TSESTree.Node
 
   const variable = reference.resolved;
   return variable === null || (variable.scope.type === TSESLint.Scope.ScopeType.global && variable.defs.length === 0);
+}
+
+/** Returns true if the callee is the global `setTimeout`, named bare or as a member of `globalThis`. */
+function isGlobalSetTimeout(sourceCode: TSESLint.SourceCode, callee: TSESTree.Expression): boolean {
+  if (callee.type === AST_NODE_TYPES.MemberExpression) {
+    return (
+      !callee.computed &&
+      callee.property.type === AST_NODE_TYPES.Identifier &&
+      callee.property.name === 'setTimeout' &&
+      isGlobalIdentifier(sourceCode, callee.object, 'globalThis')
+    );
+  }
+  return isGlobalIdentifier(sourceCode, callee, 'setTimeout');
 }
 
 /**
@@ -155,6 +153,13 @@ function isTimerCall(sourceCode: TSESLint.SourceCode, call: TSESTree.CallExpress
   return isGlobalSetTimeout(sourceCode, call.callee) && hasNonZeroDelay(call.arguments[1]);
 }
 
+/** Returns true if the import binding comes from `timers/promises`, with or without the `node:` prefix. */
+function isTimersPromisesImport(binding: TSESLint.Scope.Definition): boolean {
+  return (
+    binding.parent?.type === AST_NODE_TYPES.ImportDeclaration && timersPromisesSources.has(binding.parent.source.value)
+  );
+}
+
 /**
  * Returns true if the callee is the `setTimeout` export of `timers/promises`: a named import, renamed or not, or a
  * member of the module's namespace or default import.
@@ -185,13 +190,6 @@ function isTimersPromisesSetTimeout(sourceCode: TSESLint.SourceCode, callee: TSE
     (binding?.node.type === AST_NODE_TYPES.ImportDefaultSpecifier ||
       binding?.node.type === AST_NODE_TYPES.ImportNamespaceSpecifier) &&
     isTimersPromisesImport(binding)
-  );
-}
-
-/** Returns true if the import binding comes from `timers/promises`, with or without the `node:` prefix. */
-function isTimersPromisesImport(binding: TSESLint.Scope.Definition): boolean {
-  return (
-    binding.parent?.type === AST_NODE_TYPES.ImportDeclaration && timersPromisesSources.has(binding.parent.source.value)
   );
 }
 

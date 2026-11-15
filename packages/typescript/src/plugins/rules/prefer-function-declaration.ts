@@ -27,6 +27,23 @@ const create: TSESLint.RuleCreateFunction<'preferDeclaration'> = (context) => {
   };
 };
 
+export const preferFunctionDeclarationRule = {
+  create,
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Prefer function declarations over function expressions',
+      recommended: false,
+    },
+    schema: [],
+    messages: {
+      preferDeclaration: 'Prefer function declarations over function expressions.',
+    },
+  },
+} as const;
+
+// region | Helpers
+
 /** Returns true if a `ThisExpression` occurs anywhere beneath the root, nested functions included. */
 function containsThisExpression(root: TSESTree.Node): boolean {
   const stack: TSESTree.Node[] = [root];
@@ -67,19 +84,4 @@ function containsThisExpression(root: TSESTree.Node): boolean {
   return false;
 }
 
-const ruleDefinition = {
-  create,
-  meta: {
-    type: 'problem',
-    docs: {
-      description: 'Prefer function declarations over function expressions',
-      recommended: false,
-    },
-    schema: [],
-    messages: {
-      preferDeclaration: 'Prefer function declarations over function expressions.',
-    },
-  },
-} as const;
-
-export default ruleDefinition;
+// endregion | Helpers

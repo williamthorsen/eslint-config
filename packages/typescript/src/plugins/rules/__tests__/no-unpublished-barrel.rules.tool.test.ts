@@ -2,12 +2,12 @@ import path from 'node:path';
 
 import type { TestCaseError } from '@typescript-eslint/rule-tester';
 
-import rule from '../no-unpublished-barrel.ts';
+import { noUnpublishedBarrelRule } from '../no-unpublished-barrel.ts';
 import { RuleTester } from '../test-utils/ruleTester.ts';
 
 const ruleTester = new RuleTester();
 
-ruleTester.run('no-unpublished-barrel', rule, {
+ruleTester.run('no-unpublished-barrel', noUnpublishedBarrelRule, {
   valid: [
     {
       // Non-firing: the root entry point that a conditional `exports` names

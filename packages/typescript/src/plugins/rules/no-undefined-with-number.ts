@@ -26,7 +26,7 @@ const create: TSESLint.RuleCreateFunction<'undefinedWithNumber'> = (context) => 
   };
 };
 
-const ruleDefinition = {
+export const noUndefinedWithNumberRule = {
   create,
   meta: {
     type: 'problem',
@@ -39,5 +39,3 @@ const ruleDefinition = {
     },
   },
 } as const;
-
-export default ruleDefinition;

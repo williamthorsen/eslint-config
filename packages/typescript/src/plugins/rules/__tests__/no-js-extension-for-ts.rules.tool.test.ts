@@ -1,10 +1,10 @@
-import rule from '../no-js-extension-for-ts.ts';
+import { noJsExtensionForTsRule } from '../no-js-extension-for-ts.ts';
 import { createTypedRuleTester } from '../test-utils/ruleTester.ts';
 
 // The rule resolves each specifier through the program, so every target is a file under `__fixtures__/rules/`.
 const ruleTester = createTypedRuleTester();
 
-ruleTester.run('no-js-extension-for-ts', rule, {
+ruleTester.run('no-js-extension-for-ts', noJsExtensionForTsRule, {
   valid: [
     // Non-firing: the specifier already names the source
     "import { value } from './extension-target.ts';",

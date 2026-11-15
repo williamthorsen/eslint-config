@@ -1,13 +1,13 @@
 import type { InvalidTestCase } from '@typescript-eslint/rule-tester';
 
-import rule from '../no-split-imports.ts';
+import { noSplitImportsRule } from '../no-split-imports.ts';
 import { RuleTester } from '../test-utils/ruleTester.ts';
 
 type MessageId = 'splitImports';
 
 const ruleTester = new RuleTester();
 
-ruleTester.run('no-split-imports', rule, {
+ruleTester.run('no-split-imports', noSplitImportsRule, {
   valid: [
     // Non-firing: one statement per module, in every shape
     "import { v } from 'm';",
