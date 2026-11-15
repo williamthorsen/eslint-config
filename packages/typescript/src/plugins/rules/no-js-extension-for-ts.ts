@@ -1,7 +1,9 @@
 import path from 'node:path';
 
-import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import ts from 'typescript';
+
+import { findParserServices } from './utils/parser-services.ts';
 
 type MessageId = 'tsExtension';
 
@@ -20,9 +22,9 @@ const resolutionCaches = new WeakMap<ts.Program, ts.ModuleResolutionCache>();
 
 /** Reports a relative or `#` specifier written with a JavaScript extension that resolves to a TypeScript source. */
 const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
-  const services = getServicesOrNull(context);
+  const services = findParserServices(context);
   const program = services?.program ?? null;
-  if (services === null || program === null) {
+  if (services === undefined || program === null) {
     return {};
   }
 
@@ -111,18 +113,6 @@ function getResolutionCache(program: ts.Program): ts.ModuleResolutionCache {
     resolutionCaches.set(program, cache);
   }
   return cache;
-}
-
-/**
- * Returns the parser services, or null when the parser supplies none. `getParserServices` throws for a non-TypeScript
- * parser even with `allowWithoutFullTypeInformation`, making the throw the only available signal.
- */
-function getServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<MessageId>>[0]) {
-  try {
-    return ESLintUtils.getParserServices(context, true);
-  } catch {
-    return null;
-  }
 }
 
 /** Returns true if the specifier is relative or a subpath import; a bare specifier names a package's published path. */

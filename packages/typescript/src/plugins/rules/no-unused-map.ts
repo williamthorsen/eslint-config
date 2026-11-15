@@ -1,16 +1,18 @@
-import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import ts from 'typescript';
+
+import { findParserServices } from './utils/parser-services.ts';
 
 /** Reports a discarded `map` call, limited to array-like receivers when type information is available. */
 const create: TSESLint.RuleCreateFunction<'unusedMap'> = (context) => {
-  const services = getServicesOrNull(context);
+  const services = findParserServices(context);
 
   return {
     CallExpression(node: TSESTree.CallExpression) {
       if (!isMapCall(node) || !isResultDiscarded(node)) {
         return;
       }
-      if (services !== null && services.program !== null) {
+      if (services !== undefined && services.program !== null) {
         const checker = services.program.getTypeChecker();
         const receiverType = services.getTypeAtLocation(node.callee.object);
         if (!isArrayLikeType(receiverType, checker)) {
@@ -36,18 +38,6 @@ function isMapCall(node: TSESTree.CallExpression): node is MapCall {
     node.callee.property.type === AST_NODE_TYPES.Identifier &&
     node.callee.property.name === 'map'
   );
-}
-
-/**
- * Returns the parser services, or null when the parser supplies none. `getParserServices` throws for a non-TypeScript
- * parser even with `allowWithoutFullTypeInformation`, making the throw the only available signal.
- */
-function getServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<'unusedMap'>>[0]) {
-  try {
-    return ESLintUtils.getParserServices(context, true);
-  } catch {
-    return null;
-  }
 }
 
 /**

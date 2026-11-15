@@ -1,7 +1,9 @@
 import path from 'node:path';
 
-import { ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import ts from 'typescript';
+
+import { findParserServices } from './utils/parser-services.ts';
 
 type MessageId = 'typeCycle';
 
@@ -24,9 +26,9 @@ const graphs = new WeakMap<ts.Program, Map<ts.SourceFile, readonly Edge[]>>();
 
 /** Reports each edge leaving the file that starts a cycle back to it through a type-only edge. */
 const create: TSESLint.RuleCreateFunction<MessageId> = (context) => {
-  const services = getServicesOrNull(context);
+  const services = findParserServices(context);
   const program = services?.program ?? null;
-  if (services === null || program === null) {
+  if (services === undefined || program === null) {
     return {};
   }
 
@@ -122,18 +124,6 @@ function findCycle(program: ts.Program, origin: ts.SourceFile, edge: Edge): read
   }
 
   return walk(edge.target, edge.isTypeOnly) ? [...chain, origin] : undefined;
-}
-
-/**
- * Returns the parser services, or null when the parser supplies none. `getParserServices` throws for a
- * non-TypeScript parser even with `allowWithoutFullTypeInformation`, making the throw the only available signal.
- */
-function getServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<MessageId>>[0]) {
-  try {
-    return ESLintUtils.getParserServices(context, true);
-  } catch {
-    return null;
-  }
 }
 
 /** Returns true if an import clause has a top-level `type` modifier. */
