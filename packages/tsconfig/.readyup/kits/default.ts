@@ -59,13 +59,13 @@ export default defineRdyKit({
         {
           name: `Every workspace tsconfig extends ${PACKAGE_NAME}`,
           skip: skipUnlessSomeTsconfigIsAccountable,
-          check: everyTsconfigAdoptsTheBase,
+          check: checkEveryTsconfigAdoptsTheBase,
           fix: `Extend ${BASE_SPECIFIER} from each tsconfig named above, and declare ${PACKAGE_NAME} as a devDependency of each package that names it but cannot resolve it. Adoption: ${ADOPTION_URL}`,
         },
         {
           name: 'No tsconfig re-declares an option that the base already supplies',
           severity: 'recommend',
-          check: noRedundantOptions,
+          check: checkNoRedundantOptions,
           fix: 'Delete each option named above: The base already supplies it with the same value',
         },
       ],
@@ -76,14 +76,14 @@ export default defineRdyKit({
         {
           name: `No tsconfig declares an ES year other than the one ${PACKAGE_NAME} sets`,
           skip: skipUnlessBaseEsYearKnown,
-          check: everyEsYearMatchesTheBase,
+          check: checkEveryEsYearMatchesTheBase,
           fix: 'Delete the target or lib declaration named above, so that the ES year set by the base applies',
         },
         {
           name: "The declared Node floor supports the base's ES year",
           severity: 'error',
           skip: skipUnlessNodeFloorComparable,
-          check: nodeFloorSupportsBaseEsYear,
+          check: checkNodeFloorSupportsBaseEsYear,
           fix: "Raise engines.node to a major implementing the base's ES year: Below it, code that typechecks fails at runtime",
         },
       ],
@@ -94,7 +94,7 @@ export default defineRdyKit({
         {
           name: "No tsconfig's include, exclude, or files names a path outside its own directory",
           skip: skipUnlessSomeTsconfigWasFound,
-          check: noEscapingPaths,
+          check: checkNoEscapingPaths,
           fix: "Declare the field named above in the config that owns the directory, listing every path that it needs, since a local declaration replaces the inherited one rather than merging and discards the default exclude of node_modules, bower_components, jspm_packages, and outDir; or prefix each path in the config being extended with ${configDir}, which resolves to the consuming config's directory",
         },
       ],
@@ -103,6 +103,80 @@ export default defineRdyKit({
 });
 
 // region | Helpers
+
+/** Fails when a consumer's own tsconfig declares an ES year that departs from the base's. */
+function checkEveryEsYearMatchesTheBase(): boolean | CheckOutcome {
+  const baseEsYear = readBaseEsYear();
+  if (baseEsYear === undefined) return true;
+
+  const offenders: string[] = [];
+  for (const adoption of listAdoptedTsconfigs()) {
+    for (const entry of adoption.chain.entries.slice(0, adoption.baseIndex)) {
+      if (!isConsumerOwnedConfig(entry.path)) continue;
+      const declared = readDeclaredEsYear(entry.compilerOptions);
+      if (declared !== undefined && declared !== baseEsYear) offenders.push(`${entry.path} (${declared})`);
+    }
+  }
+  if (offenders.length === 0) return { ok: true, detail: `every tsconfig extending the base is at ${baseEsYear}` };
+  return {
+    ok: false,
+    detail: `the base sets ${baseEsYear}; declared otherwise in: ${dedupe(offenders).join(', ')}`,
+  };
+}
+
+/** Fails when a workspace tsconfig neither reaches the base nor legitimately opts out of it. */
+function checkEveryTsconfigAdoptsTheBase(): boolean | CheckOutcome {
+  const accountable = classifyAdoptions().filter((adoption) => adoption.kind !== 'external-base');
+  const adopted = accountable.filter((adoption) => adoption.kind === 'adopted');
+  const progress: Progress = { type: 'fraction', passedCount: adopted.length, count: accountable.length };
+
+  const uninstalled = listPathsOfKind(accountable, 'uninstalled');
+  const unadopted = listPathsOfKind(accountable, 'unadopted');
+  if (uninstalled.length === 0 && unadopted.length === 0) return { ok: true, progress };
+
+  const details = [
+    uninstalled.length > 0 ? `${PACKAGE_NAME} is named but not installed in: ${uninstalled.join(', ')}` : undefined,
+    unadopted.length > 0 ? `no extends chain reaches the base from: ${unadopted.join(', ')}` : undefined,
+  ].filter((detail) => detail !== undefined);
+  return { ok: false, detail: details.join('; '), progress };
+}
+
+/** Fails when the lowest declared Node floor predates the ES year set by the base. */
+function checkNodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
+  const verdict = judgeNodeFloor();
+  return verdict.kind === 'skip' || { ok: verdict.kind === 'pass', detail: verdict.detail };
+}
+
+/** Fails when a workspace tsconfig is governed by an include, exclude, or files path outside its own directory. */
+function checkNoEscapingPaths(): boolean | CheckOutcome {
+  const judged = findTsconfigs().flatMap((path) => {
+    const chain = readChain(path);
+    return chain === undefined ? [] : { escapes: findEscapingPaths(chain.entries), path };
+  });
+  const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
+  const progress: Progress = {
+    type: 'fraction',
+    passedCount: judged.length - offenders.length,
+    count: judged.length,
+  };
+  if (offenders.length === 0) return { ok: true, progress };
+
+  const details = offenders.flatMap((offender) =>
+    offender.escapes.map((escaping) => `${offender.path} (${describeEscape(offender.path, escaping)})`),
+  );
+  return { ok: false, detail: details.join(', '), progress };
+}
+
+/** Fails when a tsconfig re-declares an option that the base already supplies with the same value. */
+function checkNoRedundantOptions(): boolean | CheckOutcome {
+  const offenders = listAdoptedTsconfigs().flatMap((adoption) =>
+    findRedundantOptions(adoption.chain.entries, adoption.baseIndex).map(
+      (redundant) => `${redundant.path} (${redundant.key})`,
+    ),
+  );
+  if (offenders.length === 0) return true;
+  return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(', ')}` };
+}
 
 /** Classifies every workspace tsconfig by how it reaches, or fails to reach, this package's base. */
 function classifyAdoptions(): Adoption[] {
@@ -133,43 +207,6 @@ function dedupe(values: readonly string[]): string[] {
 function describeEscape(configPath: string, escaping: EscapingPath): string {
   const source = escaping.declaredIn === configPath ? '' : `, from ${escaping.declaredIn}`;
   return `${escaping.field}: ${escaping.path}${source}`;
-}
-
-/** Fails when a consumer's own tsconfig declares an ES year that departs from the base's. */
-function everyEsYearMatchesTheBase(): boolean | CheckOutcome {
-  const baseEsYear = readBaseEsYear();
-  if (baseEsYear === undefined) return true;
-
-  const offenders: string[] = [];
-  for (const adoption of listAdoptedTsconfigs()) {
-    for (const entry of adoption.chain.entries.slice(0, adoption.baseIndex)) {
-      if (!isConsumerOwnedConfig(entry.path)) continue;
-      const declared = readDeclaredEsYear(entry.compilerOptions);
-      if (declared !== undefined && declared !== baseEsYear) offenders.push(`${entry.path} (${declared})`);
-    }
-  }
-  if (offenders.length === 0) return { ok: true, detail: `every tsconfig extending the base is at ${baseEsYear}` };
-  return {
-    ok: false,
-    detail: `the base sets ${baseEsYear}; declared otherwise in: ${dedupe(offenders).join(', ')}`,
-  };
-}
-
-/** Fails when a workspace tsconfig neither reaches the base nor legitimately opts out of it. */
-function everyTsconfigAdoptsTheBase(): boolean | CheckOutcome {
-  const accountable = classifyAdoptions().filter((adoption) => adoption.kind !== 'external-base');
-  const adopted = accountable.filter((adoption) => adoption.kind === 'adopted');
-  const progress: Progress = { type: 'fraction', passedCount: adopted.length, count: accountable.length };
-
-  const uninstalled = listPathsOfKind(accountable, 'uninstalled');
-  const unadopted = listPathsOfKind(accountable, 'unadopted');
-  if (uninstalled.length === 0 && unadopted.length === 0) return { ok: true, progress };
-
-  const details = [
-    uninstalled.length > 0 ? `${PACKAGE_NAME} is named but not installed in: ${uninstalled.join(', ')}` : undefined,
-    unadopted.length > 0 ? `no extends chain reaches the base from: ${unadopted.join(', ')}` : undefined,
-  ].filter((detail) => detail !== undefined);
-  return { ok: false, detail: details.join('; '), progress };
 }
 
 /** Lists every workspace tsconfig present, the repo root included. */
@@ -238,43 +275,6 @@ function listPathsOfKind(classified: readonly Adoption[], kind: Adoption['kind']
 /** Lists the directories that may contain a tsconfig: the repo root and every workspace. */
 function listTsconfigSearchDirs(): string[] {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
-}
-
-/** Fails when the lowest declared Node floor predates the ES year set by the base. */
-function nodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
-  const verdict = judgeNodeFloor();
-  return verdict.kind === 'skip' || { ok: verdict.kind === 'pass', detail: verdict.detail };
-}
-
-/** Fails when a workspace tsconfig is governed by an include, exclude, or files path outside its own directory. */
-function noEscapingPaths(): boolean | CheckOutcome {
-  const judged = findTsconfigs().flatMap((path) => {
-    const chain = readChain(path);
-    return chain === undefined ? [] : { escapes: findEscapingPaths(chain.entries), path };
-  });
-  const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
-  const progress: Progress = {
-    type: 'fraction',
-    passedCount: judged.length - offenders.length,
-    count: judged.length,
-  };
-  if (offenders.length === 0) return { ok: true, progress };
-
-  const details = offenders.flatMap((offender) =>
-    offender.escapes.map((escaping) => `${offender.path} (${describeEscape(offender.path, escaping)})`),
-  );
-  return { ok: false, detail: details.join(', '), progress };
-}
-
-/** Fails when a tsconfig re-declares an option that the base already supplies with the same value. */
-function noRedundantOptions(): boolean | CheckOutcome {
-  const offenders = listAdoptedTsconfigs().flatMap((adoption) =>
-    findRedundantOptions(adoption.chain.entries, adoption.baseIndex).map(
-      (redundant) => `${redundant.path} (${redundant.key})`,
-    ),
-  );
-  if (offenders.length === 0) return true;
-  return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(', ')}` };
 }
 
 /**
