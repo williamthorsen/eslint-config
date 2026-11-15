@@ -50,14 +50,9 @@ describe('@williamthorsen/tsconfig base config', () => {
     expect(options.lib).toStrictEqual([
       lib('ES2025'),
       lib('ESNext.Array'),
-      lib('ESNext.Collection'),
-      lib('ESNext.Date'),
       lib('ESNext.Disposable'),
       lib('ESNext.Error'),
-      lib('ESNext.Intl'),
       lib('ESNext.SharedMemory'),
-      lib('ESNext.Temporal'),
-      lib('ESNext.TypedArrays'),
     ]);
     expect(options.module).toBe(ts.ModuleKind.NodeNext);
     expect(options.moduleDetection).toBe(ts.ModuleDetectionKind.Force);
@@ -68,16 +63,22 @@ describe('@williamthorsen/tsconfig base config', () => {
 
   it.each([
     ['ESNext.Array', 'await Array.fromAsync([1]);'],
-    ['ESNext.Collection', 'new Map<string, number>().getOrInsert("a", 1);'],
-    ['ESNext.Date', 'new Date().toTemporalInstant();'],
     ['ESNext.Disposable', 'new DisposableStack().dispose();'],
     ['ESNext.Error', 'Error.isError(new Error());'],
-    ['ESNext.Intl', 'new Intl.Locale("en").getWeekInfo();'],
     ['ESNext.SharedMemory', 'Atomics.pause();'],
-    ['ESNext.Temporal', 'Temporal.Now.instant();'],
-    ['ESNext.TypedArrays', 'Uint8Array.fromBase64("AA==");'],
   ])('declares the %s API used by `%s`', (_lib, source) => {
     expect(listDiagnosticMessages(source)).toStrictEqual([]);
+  });
+
+  // Each sublib declares an API that Node 24 does not implement, so the base must not admit it.
+  it.each([
+    ['ESNext.Collection', 'new Map<string, number>().getOrInsert("a", 1);', 'getOrInsert'],
+    ['ESNext.Date', 'new Date().toTemporalInstant();', 'toTemporalInstant'],
+    ['ESNext.Intl', 'new Intl.Locale("en").getWeekInfo();', 'getWeekInfo'],
+    ['ESNext.Temporal', 'Temporal.Now.instant();', 'Temporal'],
+    ['ESNext.TypedArrays', 'Uint8Array.fromBase64("AA==");', 'fromBase64'],
+  ])('omits the %s API used by `%s`', (_lib, source, name) => {
+    expect(listDiagnosticMessages(source)).toStrictEqual([expect.stringContaining(`'${name}'`)]);
   });
 
   it('declares no DOM globals', () => {

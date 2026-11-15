@@ -56,7 +56,7 @@ Everything `@tsconfig/strictest` sets, plus the Node and build options it omits:
 | `removeComments`             | `true`                                           |
 | `target`                     | `"ES2025"`                                       |
 
-`target` and `lib` are pinned to a Node 26 floor. TypeScript has no numbered lib past `ES2025`, so `lib` adds each `ESNext` sublib whose APIs Node 26 implements: `Array`, `Collection`, `Date`, `Disposable`, `Error`, `Intl`, `SharedMemory`, `Temporal`, and `TypedArrays`. `ESNext.Decorators` is omitted, because Node 26 does not implement `Symbol.metadata`.
+`target` and `lib` are pinned to a Node 24 floor. TypeScript has no numbered lib past `ES2025`, so `lib` adds each `ESNext` sublib whose APIs Node 24 implements: `Array`, `Disposable`, `Error`, and `SharedMemory`. `ESNext.Collection`, `ESNext.Date`, `ESNext.Temporal`, and `ESNext.TypedArrays` are omitted, because Node 24 does not implement their APIs; `ESNext.Intl` is omitted because it references `ESNext.Temporal`; and `ESNext.Decorators` is omitted because Node 24 does not implement `Symbol.metadata`.
 
 ## What the consumer owns
 

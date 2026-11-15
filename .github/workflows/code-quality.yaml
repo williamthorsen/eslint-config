@@ -31,3 +31,14 @@ jobs:
           { "name": "static", "command": "pnpm exec nmr typecheck && pnpm exec nmr fmt:check && pnpm exec nmr verify:kits" },
           { "name": "test", "command": "pnpm exec nmr test:coverage" }
         ]
+
+  # The published packages declare `engines.node: >=24` while `.tool-versions` pins development to a later
+  # major, so the tests also run on the floor.
+  code-quality-node-24:
+    uses: williamthorsen/.github/.github/workflows/code-quality-pnpm-workflow.yaml@v8
+    with:
+      node-version: '24'
+      check-commands: >-
+        [
+          { "name": "test", "command": "pnpm exec nmr test:coverage" }
+        ]
