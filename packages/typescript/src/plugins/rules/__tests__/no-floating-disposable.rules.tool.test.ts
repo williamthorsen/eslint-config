@@ -1,5 +1,9 @@
+import type { InvalidTestCase } from '@typescript-eslint/rule-tester';
+
 import { noFloatingDisposableRule } from '../no-floating-disposable.ts';
 import { createTypedRuleTester, RuleTester } from '../test-utils/ruleTester.ts';
+
+type MessageId = 'bindWithKeyword' | 'floatingDisposable' | 'unboundDisposable';
 
 // Disposability is a type property, so every case here needs the tester backed by a TS program.
 const typedRuleTester = createTypedRuleTester();
@@ -190,144 +194,38 @@ typedRuleTester.run('no-floating-disposable', noFloatingDisposableRule, {
 
     // -- Declarations --
 
-    {
-      // Firing: the resource is read in place and never released
-      code: `${capture} function run() { const captured = acquire(); captured.lines; }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} function run() { using captured = acquire(); captured.lines; }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a resource that nothing reads still leaks
-      code: `${capture} function run() { const captured = acquire(); }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} function run() { using captured = acquire(); }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a `let` binding, rebound to the same keyword that the type calls for
-      code: `${capture} function run() { let captured = acquire(); captured.lines; }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'let' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} function run() { using captured = acquire(); captured.lines; }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a `var` whose references are all inside the block at which a `using` would be released
-      code: `${capture} function run() { { var captured = acquire(); captured.lines; } }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'var' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} function run() { { using captured = acquire(); captured.lines; } }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a nested block is a scope of its own
-      code: `${capture} function run() { if (true) { const captured = acquire(); captured.lines; } }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} function run() { if (true) { using captured = acquire(); captured.lines; } }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a constructed resource bound to a declaration
-      code: 'class TempDir { [Symbol.dispose](): void {} path = ""; } function run() { const dir = new TempDir(); dir.path; }',
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output:
-                'class TempDir { [Symbol.dispose](): void {} path = ""; } function run() { using dir = new TempDir(); dir.path; }',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: an async resource inside an `async` function, where `await using` compiles
-      code: `${asyncCapture} async function run() { const captured = acquireAsync(); captured.lines; }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'await using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'await using' },
-              output: `${asyncCapture} async function run() { await using captured = acquireAsync(); captured.lines; }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: an awaited promise yields the resource that the declaration then binds
-      code: 'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function open(): Promise<AsyncCapture>; async function run() { const captured = await open(); captured.lines; }',
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'await using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'await using' },
-              output:
-                'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function open(): Promise<AsyncCapture>; async function run() { await using captured = await open(); captured.lines; }',
-            },
-          ],
-        },
-      ],
-    },
+    // Firing: the resource is read in place and never released
+    buildRebindCase(`${capture} function run() { const captured = acquire(); captured.lines; }`, 'using', 'const'),
+    // Firing: a resource that nothing reads still leaks
+    buildRebindCase(`${capture} function run() { const captured = acquire(); }`, 'using', 'const'),
+    // Firing: a `let` binding, rebound to the same keyword that the type calls for
+    buildRebindCase(`${capture} function run() { let captured = acquire(); captured.lines; }`, 'using', 'let'),
+    // Firing: a `var` whose references are all inside the block at which a `using` would be released
+    buildRebindCase(`${capture} function run() { { var captured = acquire(); captured.lines; } }`, 'using', 'var'),
+    // Firing: a nested block is a scope of its own
+    buildRebindCase(
+      `${capture} function run() { if (true) { const captured = acquire(); captured.lines; } }`,
+      'using',
+      'const',
+    ),
+    // Firing: a constructed resource bound to a declaration
+    buildRebindCase(
+      'class TempDir { [Symbol.dispose](): void {} path = ""; } function run() { const dir = new TempDir(); dir.path; }',
+      'using',
+      'const',
+    ),
+    // Firing: an async resource inside an `async` function, where `await using` compiles
+    buildRebindCase(
+      `${asyncCapture} async function run() { const captured = acquireAsync(); captured.lines; }`,
+      'await using',
+      'const',
+    ),
+    // Firing: an awaited promise yields the resource that the declaration then binds
+    buildRebindCase(
+      'interface AsyncCapture extends AsyncDisposable { lines: string[] } declare function open(): Promise<AsyncCapture>; async function run() { const captured = await open(); captured.lines; }',
+      'await using',
+      'const',
+    ),
     {
       // Firing with no suggestion: `await using` needs an enclosing `async` function, which this one is not
       code: `${asyncCapture} function run() { const captured = acquireAsync(); captured.lines; }`,
@@ -343,125 +241,40 @@ typedRuleTester.run('no-floating-disposable', noFloatingDisposableRule, {
       code: `${capture} function run() { const captured = acquire(), count = 1; captured.lines; count; }`,
       errors: [{ messageId: 'unboundDisposable', data: { keyword: 'using', kind: 'const' }, suggestions: [] }],
     },
-    {
-      // Firing: a block at module level is a scope of its own, and the walk to an enclosing function finds none
-      code: `${capture} declare const flag: boolean; if (flag) { const captured = acquire(); captured.lines; }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} declare const flag: boolean; if (flag) { using captured = acquire(); captured.lines; }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a bare block at module level
-      code: `${capture} { const captured = acquire(); captured.lines; }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} { using captured = acquire(); captured.lines; }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a loop body at module level
-      code: `${capture} for (const size of [1]) { const captured = acquire(); captured.lines; }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} for (const size of [1]) { using captured = acquire(); captured.lines; }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a `try` block at module level
-      code: `${capture} try { const captured = acquire(); captured.lines; } finally {}`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} try { using captured = acquire(); captured.lines; } finally {}`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a class static block, which exits like any other block
-      code: `${capture} class Runner { static { const captured = acquire(); captured.lines; } }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} class Runner { static { using captured = acquire(); captured.lines; } }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: the resource is in argument position, so the call taking a function is not one that it receives
-      code: `${capture} declare function expectLines(lines: string[], assert: () => void): void; function run() { const captured = acquire(); expectLines(captured.lines, () => {}); }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} declare function expectLines(lines: string[], assert: () => void): void; function run() { using captured = acquire(); expectLines(captured.lines, () => {}); }`,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      // Firing: a call on the resource that takes no function argument
-      code: `${capture} function run() { const captured = acquire(); captured.lines.join(','); }`,
-      errors: [
-        {
-          messageId: 'unboundDisposable',
-          data: { keyword: 'using', kind: 'const' },
-          suggestions: [
-            {
-              messageId: 'bindWithKeyword',
-              data: { keyword: 'using' },
-              output: `${capture} function run() { using captured = acquire(); captured.lines.join(','); }`,
-            },
-          ],
-        },
-      ],
-    },
+    // Firing: a block at module level is a scope of its own, and the walk to an enclosing function finds none
+    buildRebindCase(
+      `${capture} declare const flag: boolean; if (flag) { const captured = acquire(); captured.lines; }`,
+      'using',
+      'const',
+    ),
+    // Firing: a bare block at module level
+    buildRebindCase(`${capture} { const captured = acquire(); captured.lines; }`, 'using', 'const'),
+    // Firing: a loop body at module level
+    buildRebindCase(
+      `${capture} for (const size of [1]) { const captured = acquire(); captured.lines; }`,
+      'using',
+      'const',
+    ),
+    // Firing: a `try` block at module level
+    buildRebindCase(`${capture} try { const captured = acquire(); captured.lines; } finally {}`, 'using', 'const'),
+    // Firing: a class static block, which exits like any other block
+    buildRebindCase(
+      `${capture} class Runner { static { const captured = acquire(); captured.lines; } }`,
+      'using',
+      'const',
+    ),
+    // Firing: the resource is in argument position, so the call taking a function is not one that it receives
+    buildRebindCase(
+      `${capture} declare function expectLines(lines: string[], assert: () => void): void; function run() { const captured = acquire(); expectLines(captured.lines, () => {}); }`,
+      'using',
+      'const',
+    ),
+    // Firing: a call on the resource that takes no function argument
+    buildRebindCase(
+      `${capture} function run() { const captured = acquire(); captured.lines.join(','); }`,
+      'using',
+      'const',
+    ),
     {
       // Firing: `checkDeclarations` applies only to the declaration half; the discarded half still reports
       code: 'declare function acquire(): Disposable; acquire();',
@@ -483,3 +296,36 @@ untypedRuleTester.run('no-floating-disposable (no program)', noFloatingDisposabl
   ],
   invalid: [],
 });
+
+// region | Helpers
+
+/** Builds a declaration case whose one suggestion rebinds the code's single `kind` declaration with `keyword`. */
+function buildRebindCase(
+  code: string,
+  keyword: 'await using' | 'using',
+  kind: 'const' | 'let' | 'var',
+): InvalidTestCase<MessageId, []> {
+  const matches = code.matchAll(new RegExp(String.raw`\b${kind} \w+ =`, 'g')).toArray();
+  const [match] = matches;
+  if (match === undefined || matches.length > 1) {
+    throw new Error(`Expected one \`${kind}\` declaration in the case's code, found ${matches.length}: ${code}`);
+  }
+  return {
+    code,
+    errors: [
+      {
+        messageId: 'unboundDisposable',
+        data: { keyword, kind },
+        suggestions: [
+          {
+            messageId: 'bindWithKeyword',
+            data: { keyword },
+            output: `${code.slice(0, match.index)}${keyword}${code.slice(match.index + kind.length)}`,
+          },
+        ],
+      },
+    ],
+  };
+}
+
+// endregion | Helpers
