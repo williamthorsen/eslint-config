@@ -1,7 +1,13 @@
-import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import {
+  AST_NODE_TYPES,
+  type ParserServicesWithTypeInformation,
+  type TSESLint,
+  type TSESTree,
+} from '@typescript-eslint/utils';
 import ts from 'typescript';
 
 import { findEnclosingBlock, findEnclosingFunction, isWithin } from './utils/ast-ancestry.ts';
+import { findParserServices } from './utils/parser-services.ts';
 
 type MessageId = 'bindWithKeyword' | 'floatingDisposable' | 'unboundDisposable';
 
@@ -12,7 +18,7 @@ interface Options {
 
 type ReferenceIdentifier = TSESTree.Identifier | TSESTree.JSXIdentifier;
 type ResourceExpression = TSESTree.CallExpression | TSESTree.NewExpression;
-type TypedServices = NonNullable<ReturnType<typeof getTypedServicesOrNull>>;
+type TypedServices = ParserServicesWithTypeInformation;
 
 // Callees whose disposable result is safe to discard. Node's timer globals return a `Timeout` implementing
 // `Symbol.dispose`, and discarding it is the point of `setTimeout(fn, ms);`. `node:crypto`'s factories return a
@@ -32,11 +38,11 @@ const defaultAllow: readonly string[] = [
 
 /** Reports a disposable resource that is discarded, or declared without `using` in a scope that could release it. */
 const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (context) => {
-  const services = getTypedServicesOrNull(context);
+  const services = findParserServices(context);
 
   // Nothing about `foo();` identifies a disposable without types, so the rule reports nothing at all on an untyped
   // parse.
-  if (services === null) {
+  if (services === undefined || services.program === null) {
     return {};
   }
 
@@ -117,20 +123,6 @@ const create: TSESLint.RuleCreateFunction<MessageId, [Partial<Options>?]> = (con
 };
 
 // region | Helper functions
-
-/**
- * Returns type-aware parser services, or null when the parser supplies none or the configuration provides no program.
- * `getParserServices` throws for a non-TypeScript parser even with `allowWithoutFullTypeInformation`, making the throw
- * the only available signal.
- */
-function getTypedServicesOrNull(context: Parameters<TSESLint.RuleCreateFunction<MessageId>>[0]) {
-  try {
-    const services = ESLintUtils.getParserServices(context, true);
-    return services.program === null ? null : services;
-  } catch {
-    return null;
-  }
-}
 
 /** Returns true if the identifier is the object of a member expression, which reads or drives the resource in place. */
 function isContainedUse(identifier: ReferenceIdentifier): boolean {
