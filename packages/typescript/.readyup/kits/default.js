@@ -195,6 +195,41 @@ function skipBelowTypeScriptConfigSupport(installed) {
   return compareVersions2(installed, ESLINT_TYPESCRIPT_FLOOR) < 0 && "eslint is below 10, which cannot load a TypeScript eslint config";
 }
 
+// src/readiness/tsconfig-chain-reads.ts
+function appendUnreadNote(sentence, unread) {
+  return unread.length === 0 ? sentence : `${sentence}. ${describeUnreadChains(unread)}`;
+}
+function describeUnreadChains(unread) {
+  return `Could not read the tsconfig chain of ${unread.map(({ path, reason }) => `${path} (${reason})`).join("; ")}`;
+}
+function judgeReadOffenders(offenders, label, unread, separator = ", ") {
+  const judgement = judgeOffenders(offenders, label, separator);
+  if (unread.length === 0) return judgement;
+  if (judgement === true) return { ok: true, detail: describeUnreadChains(unread) };
+  return { ok: false, detail: appendUnreadNote(judgement.detail, unread) };
+}
+function skipUnlessChainRead(reads) {
+  return reads.read.length === 0 && reads.unread.length > 0 && describeUnreadChains(reads.unread);
+}
+function sortChainReads(paths, readChain2) {
+  const reads = { read: [], unread: [] };
+  const distinctPaths = new Set(paths);
+  for (const path of distinctPaths) {
+    const chain = readChain2(path);
+    if (chain === void 0) {
+      reads.unread.push({ path, reason: "it does not parse" });
+    } else if (chain.unresolvedExtends.length > 0) {
+      reads.unread.push({ path, reason: describeUnresolvedExtends(chain) });
+    } else {
+      reads.read.push({ path, chain });
+    }
+  }
+  return reads;
+}
+function describeUnresolvedExtends(chain) {
+  return chain.unresolvedExtends.map(({ from, specifier }) => `extends "${specifier}" in ${from} does not resolve`).join(", ");
+}
+
 // src/readiness/tsconfig-inputs.ts
 import { dirname, join, relative } from "node:path/posix";
 var CONFIG_DIR_TEMPLATE = "${configDir}";
@@ -215,6 +250,23 @@ function judgeInputCoverage(entries, filePath) {
   if (covered) return { kind: "covered" };
   const sites = [files, include].filter((declared) => declared !== void 0).filter((declared) => declared.paths.some((path) => isSiblingTypeScriptFile(path, targetDir))).map((declared) => ({ declaredIn: declared.declaredIn, field: declared.field }));
   return sites.length > 0 ? { kind: "enumerated-without", sites } : { kind: "not-enumerated" };
+}
+function judgeOwnedInputs(owned, readChain2) {
+  const { read, unread } = sortChainReads(
+    owned.map(({ tsconfigPath }) => tsconfigPath),
+    readChain2
+  );
+  const chains = new Map(read.map(({ chain, path }) => [path, chain]));
+  const judgements = owned.flatMap(({ configPath, tsconfigPath }) => {
+    const chain = chains.get(tsconfigPath);
+    return chain === void 0 ? [] : { configPath, coverage: judgeInputCoverage(chain.entries, configPath) };
+  });
+  return { judgements, unread };
+}
+function skipUnlessEnumerated({ judgements, unread }) {
+  if (judgements.some((judgement) => judgement.coverage.kind !== "not-enumerated")) return false;
+  if (judgements.length === 0 && unread.length > 0) return describeUnreadChains(unread);
+  return appendUnreadNote("No tsconfig owning an eslint config enumerates a sibling TypeScript file by name", unread);
 }
 function escapeSegment(segment) {
   return segment.replaceAll(/[$()*+.?[\\\]^{|}]/g, (char) => {
@@ -342,13 +394,13 @@ var default_default = defineRdyKit({
       checks: [
         {
           name: "The repo's tsconfigs permit a TypeScript-extension import",
-          skip: skipUnlessTsconfigPresent,
+          skip: skipUnlessTsconfigChainRead,
           check: tsExtensionImportsPermitted,
           fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly when the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`
         },
         {
           name: "A tsconfig enumerating an eslint config's siblings names the config itself",
-          skip: skipUnlessEnumerated,
+          skip: () => skipUnlessEnumerated(listInputJudgements()),
           check: eslintConfigEnumerated,
           fix: `Replace the enumeration with a *.ts glob, which also covers any root-level config file added later; appending eslint.config.ts is the narrower fallback. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`
         }
@@ -381,13 +433,14 @@ function comparePeerVersions(name) {
   return comparePeer({ installed: readInstalledVersion(name), name, owner: PACKAGE_NAME, range: readPeerRange(name) });
 }
 function eslintConfigEnumerated() {
+  const { judgements, unread } = listInputJudgements();
   const offenders = [];
-  for (const { configPath, coverage } of listInputJudgements()) {
+  for (const { configPath, coverage } of judgements) {
     if (coverage.kind !== "enumerated-without") continue;
     const sites = coverage.sites.map((site) => `${site.field} in ${site.declaredIn}`).join(", ");
     offenders.push(`${configPath} (${sites})`);
   }
-  return judgeOffenders(offenders, "an enumeration omits the eslint config:", "; ");
+  return judgeReadOffenders(offenders, "an enumeration omits the eslint config:", unread, "; ");
 }
 function findEslintConfigs() {
   return listEslintConfigCandidates(listRepoSearchDirs()).filter((configPath) => fileExists(configPath));
@@ -402,13 +455,11 @@ function listEslintConfigsMatching(matches) {
   });
 }
 function listInputJudgements() {
-  return findEslintConfigs().flatMap((configPath) => {
+  const owned = findEslintConfigs().flatMap((configPath) => {
     const tsconfigPath = findOwningTsconfig(configPath, fileExists);
-    if (tsconfigPath === void 0) return [];
-    const chain = readChain(tsconfigPath);
-    if (chain === void 0) return [];
-    return { configPath, coverage: judgeInputCoverage(chain.entries, configPath) };
+    return tsconfigPath === void 0 ? [] : { configPath, tsconfigPath };
   });
+  return judgeOwnedInputs(owned, readChain);
 }
 function listProviderWorkspaceDirs() {
   return discoverWorkspaces().filter((workspace) => workspace.name === PACKAGE_NAME).map((workspace) => workspace.dir);
@@ -481,11 +532,6 @@ function rootEslintConfigExtendsThisPackage() {
   const providerDir = listProviderWorkspaceDirs().find((dir) => importsFromDir(content, dir));
   return providerDir !== void 0 && { ok: true, detail: `imported by source path from ${providerDir}` };
 }
-function skipUnlessEnumerated() {
-  const judged = listInputJudgements();
-  if (judged.some((judgement) => judgement.coverage.kind !== "not-enumerated")) return false;
-  return "No tsconfig owning an eslint config enumerates a sibling TypeScript file by name";
-}
 function skipUnlessEslintLoadsTypeScript() {
   return skipBelowTypeScriptConfigSupport(readInstalledVersion("eslint"));
 }
@@ -499,19 +545,19 @@ function skipUnlessPeerComparable(name) {
   const comparison = comparePeerVersions(name);
   return comparison.kind !== "comparable" && comparison.reason;
 }
-function skipUnlessTsconfigPresent() {
-  return listRepoTsconfigs().length === 0 && "The repo declares no tsconfig";
+function skipUnlessTsconfigChainRead() {
+  const tsconfigs = listRepoTsconfigs();
+  if (tsconfigs.length === 0) return "The repo declares no tsconfig";
+  return skipUnlessChainRead(sortChainReads(tsconfigs, readChain));
 }
 function tsconfigRootDirAnchored() {
   if (listEslintConfigsMatching(setsTsconfigRootDir).length > 0) return true;
   return { ok: false, detail: "no eslint config sets parserOptions.tsconfigRootDir" };
 }
 function tsExtensionImportsPermitted() {
-  const offenders = listRepoTsconfigs().filter((tsconfigPath) => {
-    const chain = readChain(tsconfigPath);
-    return chain !== void 0 && !permitsTsExtensionImports(chain.entries);
-  });
-  return judgeOffenders(offenders, "no compiler option permits the import under");
+  const { read, unread } = sortChainReads(listRepoTsconfigs(), readChain);
+  const offenders = read.filter(({ chain }) => !permitsTsExtensionImports(chain.entries)).map(({ path }) => path);
+  return judgeReadOffenders(offenders, "no compiler option permits the import under", unread);
 }
 export {
   default_default as default

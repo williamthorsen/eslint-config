@@ -1,6 +1,8 @@
 import { dirname, join, relative } from 'node:path/posix';
 
-import type { TsconfigChainEntry } from 'readyup/check-utils';
+import type { TsconfigChain, TsconfigChainEntry } from 'readyup/check-utils';
+
+import { appendUnreadNote, describeUnreadChains, sortChainReads, type UnreadChain } from './tsconfig-chain-reads.ts';
 
 const CONFIG_DIR_TEMPLATE = '${configDir}';
 
@@ -16,6 +18,17 @@ const TYPESCRIPT_FILE = /\.[cm]?ts$/;
 export interface EnumerationSite {
   declaredIn: string;
   field: 'files' | 'include';
+}
+
+/** How one eslint config is treated by the inputs of the tsconfig owning it. */
+export interface InputJudgement {
+  configPath: string;
+  coverage: InputCoverage;
+}
+
+export interface InputJudgements {
+  judgements: InputJudgement[];
+  unread: UnreadChain[];
 }
 
 export type InputCoverage =
@@ -59,6 +72,37 @@ export function judgeInputCoverage(entries: readonly TsconfigChainEntry[], fileP
     .filter((declared) => declared.paths.some((path) => isSiblingTypeScriptFile(path, targetDir)))
     .map((declared) => ({ declaredIn: declared.declaredIn, field: declared.field }));
   return sites.length > 0 ? { kind: 'enumerated-without', sites } : { kind: 'not-enumerated' };
+}
+
+/**
+ * Judges how each eslint config is treated by the inputs of the tsconfig owning it, and lists the
+ * owning tsconfigs whose chains could not be read, whose configs go unjudged.
+ */
+export function judgeOwnedInputs(
+  owned: ReadonlyArray<{ configPath: string; tsconfigPath: string }>,
+  readChain: (path: string) => TsconfigChain | undefined,
+): InputJudgements {
+  const { read, unread } = sortChainReads(
+    owned.map(({ tsconfigPath }) => tsconfigPath),
+    readChain,
+  );
+  const chains = new Map(read.map(({ chain, path }) => [path, chain]));
+  const judgements = owned.flatMap(({ configPath, tsconfigPath }) => {
+    const chain = chains.get(tsconfigPath);
+    return chain === undefined ? [] : { configPath, coverage: judgeInputCoverage(chain.entries, configPath) };
+  });
+  return { judgements, unread };
+}
+
+/**
+ * Skips the enumeration check when no judged tsconfig covers its eslint config or names a TypeScript
+ * file beside it. The reason names any chain that could not be read, and is that alone when no chain
+ * was read.
+ */
+export function skipUnlessEnumerated({ judgements, unread }: InputJudgements): false | string {
+  if (judgements.some((judgement) => judgement.coverage.kind !== 'not-enumerated')) return false;
+  if (judgements.length === 0 && unread.length > 0) return describeUnreadChains(unread);
+  return appendUnreadNote('No tsconfig owning an eslint config enumerates a sibling TypeScript file by name', unread);
 }
 
 // region | Helpers

@@ -679,6 +679,8 @@ The extension-import check reports a `tsconfig.json` whose effective compiler op
 
 The enumeration check judges each eslint config against the nearest `tsconfig.json` at or above its directory, which is the config that the project service resolves; a sibling under another basename, such as `tsconfig.build.json`, goes unread. It reports a `files` or `include` that names the eslint config's siblings one by one without naming the config itself. When nothing enumerates, it stays silent rather than reporting every project whose inputs omit the file: A root declaring `files: []` alongside `references`, or a project reached through `allowDefaultProject`, covers the config by a route that its own inputs do not show.
 
+Both tsconfig checks judge only the `tsconfig.json` files whose `extends` chain they read in full. A file that does not parse, or one that extends a config that does not resolve, such as a published base before `install`, is named in the check's result rather than judged. A check that could read none of the chains that it needs skips.
+
 ## License
 
 ISC.

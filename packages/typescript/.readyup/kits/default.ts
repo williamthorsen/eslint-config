@@ -41,7 +41,8 @@ import { listSearchDirs } from '../../src/readiness/listSearchDirs.ts';
 import { comparePeer, judgePeerFloor, type PeerComparison, pickLowestVersion } from '../../src/readiness/peer-floor.ts';
 import { permitsTsExtensionImports } from '../../src/readiness/permitsTsExtensionImports.ts';
 import { skipBelowTypeScriptConfigSupport } from '../../src/readiness/skipBelowTypeScriptConfigSupport.ts';
-import { type InputCoverage, judgeInputCoverage } from '../../src/readiness/tsconfig-inputs.ts';
+import { judgeReadOffenders, skipUnlessChainRead, sortChainReads } from '../../src/readiness/tsconfig-chain-reads.ts';
+import { type InputJudgements, judgeOwnedInputs, skipUnlessEnumerated } from '../../src/readiness/tsconfig-inputs.ts';
 
 const PACKAGE_NAME = '@williamthorsen/eslint-config-typescript';
 const MIGRATION_URL = `https://github.com/williamthorsen/eslint-config/tree/main/packages/typescript#migrating-from-parseroptionsproject`;
@@ -50,11 +51,6 @@ const IMPORT_SPECIFIER_URL = `https://github.com/williamthorsen/eslint-config/tr
 
 // Inlined at compile time, so the floors track the package's own peer ranges instead of a copy.
 const PEER_RANGES = pickJson('../../package.json', ['peerDependencies']);
-
-interface InputJudgement {
-  configPath: string;
-  coverage: InputCoverage;
-}
 
 const installedVersions = new Map<string, string | undefined>();
 
@@ -138,13 +134,13 @@ export default defineRdyKit({
       checks: [
         {
           name: "The repo's tsconfigs permit a TypeScript-extension import",
-          skip: skipUnlessTsconfigPresent,
+          skip: skipUnlessTsconfigChainRead,
           check: tsExtensionImportsPermitted,
           fix: `Set rewriteRelativeImportExtensions in each tsconfig named, or allowImportingTsExtensions alongside noEmit or emitDeclarationOnly when the config emits nothing. The config requires a relative specifier to name its TypeScript source, which TypeScript rejects without one of them. Migration: ${IMPORT_SPECIFIER_URL}`,
         },
         {
           name: "A tsconfig enumerating an eslint config's siblings names the config itself",
-          skip: skipUnlessEnumerated,
+          skip: () => skipUnlessEnumerated(listInputJudgements()),
           check: eslintConfigEnumerated,
           fix: `Replace the enumeration with a *.ts glob, which also covers any root-level config file added later; appending eslint.config.ts is the narrower fallback. Migration: ${TS_ESLINT_CONFIG_MIGRATION_URL}`,
         },
@@ -183,15 +179,19 @@ function comparePeerVersions(name: string): PeerComparison {
   return comparePeer({ installed: readInstalledVersion(name), name, owner: PACKAGE_NAME, range: readPeerRange(name) });
 }
 
-/** Fails when a tsconfig's enumerated inputs omit an eslint config located among the files that they name. */
+/**
+ * Fails when a tsconfig's enumerated inputs omit an eslint config located among the files that they
+ * name, judging only the tsconfigs whose chains were read and naming the rest.
+ */
 function eslintConfigEnumerated(): boolean | CheckOutcome {
+  const { judgements, unread } = listInputJudgements();
   const offenders: string[] = [];
-  for (const { configPath, coverage } of listInputJudgements()) {
+  for (const { configPath, coverage } of judgements) {
     if (coverage.kind !== 'enumerated-without') continue;
     const sites = coverage.sites.map((site) => `${site.field} in ${site.declaredIn}`).join(', ');
     offenders.push(`${configPath} (${sites})`);
   }
-  return judgeOffenders(offenders, 'an enumeration omits the eslint config:', '; ');
+  return judgeReadOffenders(offenders, 'an enumeration omits the eslint config:', unread, '; ');
 }
 
 /** Lists every eslint config present across the repo's search directories. */
@@ -213,14 +213,12 @@ function listEslintConfigsMatching(matches: (content: string) => boolean): strin
 }
 
 /** Judges how each eslint config is treated by the inputs of the tsconfig owning it. */
-function listInputJudgements(): InputJudgement[] {
-  return findEslintConfigs().flatMap((configPath) => {
+function listInputJudgements(): InputJudgements {
+  const owned = findEslintConfigs().flatMap((configPath) => {
     const tsconfigPath = findOwningTsconfig(configPath, fileExists);
-    if (tsconfigPath === undefined) return [];
-    const chain = readChain(tsconfigPath);
-    if (chain === undefined) return [];
-    return { configPath, coverage: judgeInputCoverage(chain.entries, configPath) };
+    return tsconfigPath === undefined ? [] : { configPath, tsconfigPath };
   });
+  return judgeOwnedInputs(owned, readChain);
 }
 
 /** Lists the workspace directories providing this package, which the repo developing it imports by path. */
@@ -342,13 +340,6 @@ function rootEslintConfigExtendsThisPackage(): boolean | CheckOutcome {
   return providerDir !== undefined && { ok: true, detail: `imported by source path from ${providerDir}` };
 }
 
-/** Skips the enumeration check when no eslint config's nearest tsconfig covers it or names a TypeScript file beside it. */
-function skipUnlessEnumerated(): false | string {
-  const judged = listInputJudgements();
-  if (judged.some((judgement) => judgement.coverage.kind !== 'not-enumerated')) return false;
-  return 'No tsconfig owning an eslint config enumerates a sibling TypeScript file by name';
-}
-
 /** Skips a check on TypeScript eslint configs below eslint 10, which can load only a JavaScript config. */
 function skipUnlessEslintLoadsTypeScript(): false | string {
   return skipBelowTypeScriptConfigSupport(readInstalledVersion('eslint'));
@@ -377,10 +368,12 @@ function skipUnlessPeerComparable(name: string): false | string {
 
 /**
  * Skips the extension-import check when the repo declares no tsconfig, which the kit takes to mean
- * no TypeScript source.
+ * no TypeScript source, or when none of their chains could be read.
  */
-function skipUnlessTsconfigPresent(): false | string {
-  return listRepoTsconfigs().length === 0 && 'The repo declares no tsconfig';
+function skipUnlessTsconfigChainRead(): false | string {
+  const tsconfigs = listRepoTsconfigs();
+  if (tsconfigs.length === 0) return 'The repo declares no tsconfig';
+  return skipUnlessChainRead(sortChainReads(tsconfigs, readChain));
 }
 
 /** Passes when any eslint config anchors the project service with tsconfigRootDir. */
@@ -389,13 +382,14 @@ function tsconfigRootDirAnchored(): boolean | CheckOutcome {
   return { ok: false, detail: 'no eslint config sets parserOptions.tsconfigRootDir' };
 }
 
-/** Fails when a tsconfig owning the repo's sources permits no import path ending in a TypeScript extension. */
+/**
+ * Fails when a tsconfig owning the repo's sources permits no import path ending in a TypeScript
+ * extension, judging only the tsconfigs whose chains were read and naming the rest.
+ */
 function tsExtensionImportsPermitted(): boolean | CheckOutcome {
-  const offenders = listRepoTsconfigs().filter((tsconfigPath) => {
-    const chain = readChain(tsconfigPath);
-    return chain !== undefined && !permitsTsExtensionImports(chain.entries);
-  });
-  return judgeOffenders(offenders, 'no compiler option permits the import under');
+  const { read, unread } = sortChainReads(listRepoTsconfigs(), readChain);
+  const offenders = read.filter(({ chain }) => !permitsTsExtensionImports(chain.entries)).map(({ path }) => path);
+  return judgeReadOffenders(offenders, 'no compiler option permits the import under', unread);
 }
 
 // endregion | Helpers
