@@ -16,7 +16,7 @@ export function assertParsed(results: readonly ESLint.LintResult[], name: string
   }
 }
 
-export const fixturesDir = path.join(import.meta.dirname, '../../../__fixtures__/configs');
+export const fixturesDir = path.join(import.meta.dirname, '../../__fixtures__/configs');
 
 // Opts the fixture extensions into linting and wires the typescript-eslint parser with a project, so that a
 // composed config runs against the fixture instead of skipping it as matched by no `files` glob.

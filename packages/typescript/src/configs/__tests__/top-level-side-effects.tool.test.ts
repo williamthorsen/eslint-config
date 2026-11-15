@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { baseConfig } from '#src/baseConfig.ts';
-
-import { lintFixture, typedParserSettings } from '../test-utils/lintFixture.ts';
+import { lintFixture, typedParserSettings } from '#src/test-utils/lintFixture.ts';
 
 const ruleId = 'unicorn/no-top-level-side-effects';
 
