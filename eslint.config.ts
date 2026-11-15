@@ -58,6 +58,24 @@ const config = defineConfig([
     extends: [await createConfig.vitest()],
   }),
   {
+    files: ['packages/*/src/**/*.{cjs,cts,js,jsx,mjs,mts,ts,tsx}'],
+    // The defaults of these modules are published API.
+    ignores: [
+      'packages/typescript/src/configs/index.ts',
+      'packages/typescript/src/index.ts',
+      'packages/typescript/src/plugins/eslint-plugin-sky-pilot.ts',
+    ],
+    rules: {
+      'import-x/no-default-export': 'error',
+    },
+  },
+  {
+    files: ['packages/typescript/src/plugins/rules/*.ts'],
+    rules: {
+      'sky-pilot/helpers-last': 'error',
+    },
+  },
+  {
     files: ['**/scripts/**/*'],
     rules: {
       'no-console': 'off',
