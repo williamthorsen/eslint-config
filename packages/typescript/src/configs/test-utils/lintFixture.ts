@@ -51,6 +51,13 @@ export async function lintFixture(composed: readonly Config[], fixture: string):
   return results;
 }
 
+/** Collects the messages that the rule reported against the linted files. */
+export function listRuleMessages(results: readonly ESLint.LintResult[], ruleId: string): string[] {
+  return results.flatMap((result) =>
+    result.messages.filter((message) => message.ruleId === ruleId).map((message) => message.message),
+  );
+}
+
 // The base config enables `projectService` but leaves `tsconfigRootDir` to the consumer. Pointing it at the
 // fixtures dir lets a composition with the base resolve the fixture tsconfig, so every type-aware rule runs
 // for real.
