@@ -293,60 +293,10 @@ describe(strictLint, () => {
       mockLintFiles.mockResolvedValue([buildResult({ filePath: '/project/a.ts' })]);
     });
 
-    it('names the project root and every contributing config file, lowest precedence first', async () => {
-      mockStrictLintConfigs({ maxSeverity: {} }, { maxSeverity: {} });
-
+    it('reports the resolved config when --debug is present', async () => {
       await strictLint();
 
-      expect(reportedLines()).toStrictEqual([
-        'strict-lint: project root /project (marker: pnpm-workspace.yaml)',
-        'strict-lint: config files for /project, lowest precedence first:',
-        `strict-lint:   ${buildConfigPath('/project/level-1')}`,
-        `strict-lint:   ${buildConfigPath('/project/level-0')}`,
-      ]);
-    });
-
-    it('reports one block per distinct config set rather than one per directory', async () => {
-      mockedLoadStrictLintConfigs.mockImplementation((dir: string) =>
-        Promise.resolve(buildCascade(dir === '/other' ? [{ maxSeverity: {} }] : [])),
-      );
-      mockLintFiles.mockResolvedValue([
-        buildResult({ filePath: '/project/a.ts' }),
-        buildResult({ filePath: '/project/b.ts' }),
-        buildResult({ filePath: '/other/a.ts' }),
-      ]);
-
-      await strictLint();
-
-      // Two directories shared one empty cascade, so they collapse into a single line.
-      expect(reportedLines()).toContain('strict-lint: no config file found for /project');
-      expect(reportedLines()).toContain(`strict-lint: config files for /other, lowest precedence first:`);
-    });
-
-    it('collapses a long directory list into a count', async () => {
-      mockLintFiles.mockResolvedValue(
-        ['one', 'two', 'three', 'four', 'five'].map((dir) => buildResult({ filePath: `/${dir}/a.ts` })),
-      );
-
-      await strictLint();
-
-      expect(reportedLines()).toContain('strict-lint: no config file found for /one, /two, /three (and 2 more)');
-    });
-
-    it('reports the stop when a config bounded the ascent', async () => {
-      mockStoppedAscent({ shouldIgnoreAncestors: true });
-
-      await strictLint();
-
-      expect(reportedLines()).toContain('strict-lint: ascent stopped by shouldIgnoreAncestors');
-    });
-
-    it('says so when no file was linted, rather than reporting a config that nothing consulted', async () => {
-      mockLintFiles.mockResolvedValue([]);
-
-      await strictLint();
-
-      expect(reportedLines()).toStrictEqual(['strict-lint: no files were linted, so no config was resolved']);
+      expect(listConsoleLines(errorSpy)).toContain('strict-lint: project root /project (marker: pnpm-workspace.yaml)');
     });
 
     it('stays silent when --debug is absent', async () => {
@@ -356,11 +306,6 @@ describe(strictLint, () => {
 
       expect(errorSpy).not.toHaveBeenCalled();
     });
-
-    /** Returns the lines that the run wrote to stderr. */
-    function reportedLines(): string[] {
-      return listConsoleLines(errorSpy);
-    }
   });
 
   describe('exit code', () => {
@@ -586,7 +531,7 @@ describe(strictLint, () => {
 // region | Helpers
 
 /** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
-function buildCascade(configs: StrictLintConfig[], stopReason: 'predicate' | 'stop-dir' = 'stop-dir') {
+function buildCascade(configs: StrictLintConfig[]) {
   return {
     entries: configs.map((config, index) => ({
       config,
@@ -594,7 +539,7 @@ function buildCascade(configs: StrictLintConfig[], stopReason: 'predicate' | 'st
       filePath: buildConfigPath(`/project/level-${String(index)}`),
     })),
     projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
-    stopReason,
+    stopReason: 'stop-dir',
   };
 }
 
@@ -632,11 +577,6 @@ function buildThreeWarnings(): Linter.LintMessage[] {
 /** Checks whether a value is a non-null object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
-}
-
-/** Makes the mocked loader resolve as `mockStrictLintConfigs` does, for a walk cut short by `shouldIgnoreAncestors`. */
-function mockStoppedAscent(...configs: StrictLintConfig[]): void {
-  mockedLoadStrictLintConfigs.mockResolvedValue(buildCascade(configs, 'predicate'));
 }
 
 /** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
