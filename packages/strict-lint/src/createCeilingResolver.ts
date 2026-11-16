@@ -11,12 +11,21 @@ export interface CeilingResolver {
   resolveFor: (filePath: string) => Promise<MaxSeverityMap>;
 }
 
+/** Options for `createCeilingResolver`; `loadConfigs` defaults to the real cascade walk. */
+export interface CeilingResolverOptions {
+  loadConfigs?: typeof loadStrictLintConfigs;
+  overrides?: MaxSeverityMap | undefined;
+}
+
 /**
  * Builds a resolver that anchors the ceiling walk at each linted file, as ESLint anchors its own config lookup. One
  * walk runs per directory: Files sharing a directory share a cascade, and the memo stores the in-flight promise, so
  * concurrent lookups never start a second walk.
  */
-export function createCeilingResolver(overrides: MaxSeverityMap = {}): CeilingResolver {
+export function createCeilingResolver({
+  loadConfigs = loadStrictLintConfigs,
+  overrides = {},
+}: CeilingResolverOptions = {}): CeilingResolver {
   const cascadesByDir = new Map<string, StrictLintCascade>();
   const ceilingsByDir = new Map<string, Promise<MaxSeverityMap>>();
 
@@ -39,7 +48,7 @@ export function createCeilingResolver(overrides: MaxSeverityMap = {}): CeilingRe
 
   /** Walks the cascade from `dir`, records it, and returns its ceilings with the programmatic overrides on top. */
   async function loadCeilings(dir: string): Promise<MaxSeverityMap> {
-    const cascade = await loadStrictLintConfigs(dir);
+    const cascade = await loadConfigs(dir);
     cascadesByDir.set(dir, cascade);
     return { ...mergeMaxSeverity(cascade.entries), ...overrides };
   }

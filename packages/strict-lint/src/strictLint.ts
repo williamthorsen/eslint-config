@@ -143,7 +143,7 @@ async function doLint(
     return { text: '', errorCount: 0 };
   }
 
-  const ceilings = createCeilingResolver(options?.maxSeverity);
+  const ceilings = createCeilingResolver({ overrides: options?.maxSeverity });
 
   const eslint = new ESLint(buildEslintOptions(options, parsed));
 
