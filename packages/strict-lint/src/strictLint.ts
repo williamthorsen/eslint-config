@@ -35,12 +35,6 @@ export async function strictLint(options?: StrictLintOptions): Promise<string> {
 /** How many directories a provenance line names before it collapses the rest into a count. */
 const MAX_REPORTED_DIRS = 3;
 
-const SEVERITY_MAP: Record<string, Linter.RuleSeverity> = {
-  off: 'off',
-  warn: 'warn',
-  error: 'error',
-};
-
 /** The directories sharing one resolved set of ceiling config files. */
 interface CascadeGroup {
   dirs: string[];
@@ -83,7 +77,7 @@ function buildEslintOptions(options: StrictLintOptions | undefined, parsed: Pars
 function buildOverrideConfig(
   baseConfig: Linter.Config[] | undefined,
   programmaticOverrides: Record<string, Linter.RuleSeverity> | undefined,
-  cliOverrides: Record<string, string>,
+  cliOverrides: Record<string, Linter.RuleSeverity>,
 ): Linter.Config[] {
   const configs: Linter.Config[] = baseConfig ? [...baseConfig] : [];
 
@@ -92,11 +86,7 @@ function buildOverrideConfig(
   }
 
   if (Object.keys(cliOverrides).length > 0) {
-    configs.push({
-      rules: Object.fromEntries(
-        Object.entries(cliOverrides).map(([name, severity]) => [name, parseRuleSeverity(severity)]),
-      ),
-    });
+    configs.push({ rules: { ...cliOverrides } });
   }
 
   return configs;
@@ -228,15 +218,6 @@ function listDistinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascad
     roots.set(cascade.projectRoot.rootDir, cascade.projectRoot);
   }
   return roots.values().toArray();
-}
-
-/** Converts a CLI severity string to a typed `Linter.RuleSeverity`. */
-function parseRuleSeverity(value: string): Linter.RuleSeverity {
-  const severity = SEVERITY_MAP[value];
-  if (severity === undefined) {
-    throw new Error(`Invalid rule severity "${value}". Expected "off", "warn", or "error".`);
-  }
-  return severity;
 }
 
 /** Reports where the ceilings came from, on stderr, so that the report stays clear of the formatter output. */

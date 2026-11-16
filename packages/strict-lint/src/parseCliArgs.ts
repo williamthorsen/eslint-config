@@ -1,12 +1,14 @@
 import { parseArgs } from 'node:util';
 
-import type { ESLint } from 'eslint';
+import type { ESLint, Linter } from 'eslint';
+
+import { formatRuleSeverities, isRuleSeverity } from './common/severity.ts';
 
 /** Result of parsing ESLint CLI arguments into structured fields. */
 export interface ParsedCliArgs {
   patterns: string[];
   eslintOptions: Partial<ESLint.Options>;
-  ruleOverrides: Record<string, string>;
+  ruleOverrides: Record<string, Linter.RuleSeverity>;
   fixDryRun: boolean;
   format: string;
   quiet: boolean;
@@ -113,7 +115,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     eslintOptions.concurrency = parseConcurrency(values.concurrency);
   }
 
-  const ruleOverrides: Record<string, string> = {};
+  const ruleOverrides: Record<string, Linter.RuleSeverity> = {};
   if (values.rule) {
     for (const entry of values.rule) {
       const colonIndex = entry.indexOf(':');
@@ -125,7 +127,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
       if (severity === '') {
         throw new Error(`Invalid --rule value "${entry}". Missing severity after colon.`);
       }
-      ruleOverrides[ruleName] = severity;
+      ruleOverrides[ruleName] = parseRuleSeverity(entry, severity);
     }
   }
 
@@ -196,6 +198,16 @@ function parseMaxWarnings(value: string): number {
     throw new Error(`Invalid --max-warnings value "${value}". Expected an integer.`);
   }
   return parsed;
+}
+
+/** Validates a `--rule` severity, reading a canonical numeral as the number that it names. */
+function parseRuleSeverity(entry: string, text: string): Linter.RuleSeverity {
+  const numeric = Number(text);
+  const severity = String(numeric) === text ? numeric : text;
+  if (!isRuleSeverity(severity)) {
+    throw new Error(`Invalid --rule value "${entry}". Expected a severity of ${formatRuleSeverities()}.`);
+  }
+  return severity;
 }
 
 // endregion | Helpers
