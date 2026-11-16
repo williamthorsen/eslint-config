@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { StrictLintError } from '../common/cliErrors.ts';
 import { loadStrictLintConfigs, resolveSharedConfigs, STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
+import { buildConfigPath } from '../test-utils/strictLintCascades.ts';
 import type { StrictLintConfig } from '../types.ts';
 
 interface CascadeOptions {
@@ -273,11 +274,6 @@ describe(resolveSharedConfigs, () => {
 });
 
 // region | Helpers
-
-/** Returns the strict-lint config path within a directory. */
-function buildConfigPath(dir: string): string {
-  return `${dir}/${STRICT_LINT_CONFIG_NAME}`;
-}
 
 /**
  * Makes the mocked cascade resolve with an entry per directory, in the nearest-first order of the real one, passing

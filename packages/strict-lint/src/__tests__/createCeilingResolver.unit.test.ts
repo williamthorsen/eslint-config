@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createCeilingResolver } from '../createCeilingResolver.ts';
+import { buildCascade } from '../test-utils/strictLintCascades.ts';
 import type { StrictLintConfig } from '../types.ts';
 
 const { mockedLoadStrictLintConfigs } = vi.hoisted(() => ({
@@ -112,19 +113,6 @@ describe(createCeilingResolver, () => {
 });
 
 // region | Helpers
-
-/** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
-function buildCascade(configs: StrictLintConfig[]) {
-  return {
-    entries: configs.map((config, index) => ({
-      config,
-      dir: `/project/level-${String(index)}`,
-      filePath: `/project/level-${String(index)}/.config/strict-lint.config.ts`,
-    })),
-    projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
-    stopReason: 'stop-dir',
-  };
-}
 
 /** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
 function mockCascade(...configs: StrictLintConfig[]): void {

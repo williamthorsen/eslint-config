@@ -12,7 +12,10 @@ import {
 import type { ESLint, Linter } from 'eslint';
 import { beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
+import { isRecord } from '../common/isRecord.ts';
 import { strictLint } from '../strictLint.ts';
+import { buildResult } from '../test-utils/lintResults.ts';
+import { buildCascade } from '../test-utils/strictLintCascades.ts';
 import type { StrictLintConfig } from '../types.ts';
 
 const {
@@ -530,53 +533,14 @@ describe(strictLint, () => {
 
 // region | Helpers
 
-/** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
-function buildCascade(configs: StrictLintConfig[]) {
-  return {
-    entries: configs.map((config, index) => ({
-      config,
-      dir: `/project/level-${String(index)}`,
-      filePath: buildConfigPath(`/project/level-${String(index)}`),
-    })),
-    projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
-    stopReason: 'stop-dir',
-  };
-}
-
-/** Returns the strict-lint config path within a directory. */
-function buildConfigPath(dir: string): string {
-  return `${dir}/.config/strict-lint.config.ts`;
-}
-
 /** Builds a `some-rule` message with the fields that promotion reads, filling in the rest to satisfy ESLint's shape. */
 function buildMessage(severity: Linter.LintMessage['severity']): Linter.LintMessage {
   return { column: 1, line: 1, message: 'a problem', ruleId: 'some-rule', severity };
 }
 
-/** Builds a lint result whose counts start at zero, since promotion restates them from the messages. */
-function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintResult {
-  return {
-    errorCount: 0,
-    fatalErrorCount: 0,
-    filePath: '/project/a.ts',
-    fixableErrorCount: 0,
-    fixableWarningCount: 0,
-    messages: [],
-    suppressedMessages: [],
-    usedDeprecatedRules: [],
-    warningCount: 0,
-    ...overrides,
-  };
-}
-
 /** Builds three warnings for `some-rule`, so that a threshold test states a count rather than a list. */
 function buildThreeWarnings(): Linter.LintMessage[] {
   return Array.from({ length: 3 }, () => buildMessage(1));
-}
-
-/** Checks whether a value is a non-null object. */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
 }
 
 /** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */

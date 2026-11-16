@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { StrictLintCascade } from '../loadStrictLintConfigs.ts';
 import { reportConfigProvenance } from '../reportConfigProvenance.ts';
+import { buildConfigPath } from '../test-utils/strictLintCascades.ts';
 
 describe(reportConfigProvenance, () => {
   it('names the project root and every contributing config file, lowest precedence first', () => {
@@ -61,11 +62,6 @@ function buildCascade(configDirs: string[], stopReason: 'predicate' | 'stop-dir'
     projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
     stopReason,
   };
-}
-
-/** Returns the strict-lint config path within a directory. */
-function buildConfigPath(dir: string): string {
-  return `${dir}/.config/strict-lint.config.ts`;
 }
 
 /** Returns the lines that the report writes to stderr for the given cascades. */
