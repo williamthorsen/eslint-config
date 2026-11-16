@@ -16,6 +16,11 @@ describe(parseCliArgs, () => {
     expect(result.outputFile).toBeUndefined();
     expect(result.configPath).toBeUndefined();
     expect(result.debug).toBe(false);
+    expect(result.shouldShowVersion).toBe(false);
+  });
+
+  it.each([['--version'], ['-V']])('sets shouldShowVersion for %s', (flag) => {
+    expect(parseCliArgs([flag]).shouldShowVersion).toBe(true);
   });
 
   it('sets debug when --debug is provided', () => {

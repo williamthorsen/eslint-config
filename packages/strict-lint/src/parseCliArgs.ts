@@ -15,6 +15,7 @@ export interface ParsedCliArgs {
   configPath: string | undefined;
   debug: boolean;
   shouldShowHelp: boolean;
+  shouldShowVersion: boolean;
 }
 
 /** Parses process.argv-style arguments into ESLint constructor options and metadata. */
@@ -47,6 +48,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
       'max-warnings': { type: 'string', default: '-1' },
       format: { type: 'string', short: 'f', default: 'stylish' },
       'output-file': { type: 'string', short: 'o' },
+      version: { type: 'boolean', short: 'V', default: false },
     },
   });
 
@@ -139,6 +141,7 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     configPath: values.config,
     debug: values.debug,
     shouldShowHelp: values.help,
+    shouldShowVersion: values.version,
   };
 }
 

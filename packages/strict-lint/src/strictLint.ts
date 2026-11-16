@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 
 import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging';
+import { resolveSelfVersion } from '@williamthorsen/toolbelt.packaging/candidate';
 import { ESLint, type Linter } from 'eslint';
 
 import { describeRootSource } from './common/describeRootSource.ts';
@@ -54,6 +55,11 @@ async function doLint(
 
   if (parsed.shouldShowHelp) {
     showUsage();
+    return { text: '', errorCount: 0 };
+  }
+
+  if (parsed.shouldShowVersion) {
+    console.info(resolveSelfVersion(import.meta.url));
     return { text: '', errorCount: 0 };
   }
 
