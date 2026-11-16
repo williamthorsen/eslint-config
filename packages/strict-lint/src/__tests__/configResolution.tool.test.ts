@@ -18,14 +18,14 @@ describe('config resolution (subprocess)', () => {
     const [reported, reference] = [collectStrictLintRuleIds(tree.dir), await collectEslintRuleIds(tree.dir)];
 
     expect(reported).toStrictEqual(reference);
-  }, 30_000);
+  });
 
   it('applies the package config rather than the root config, run from the repo root', () => {
     using tree = makeMonorepoFixture();
 
     // The package turns `no-unused-vars` off and `no-console` on; the root config does neither.
     expect(collectStrictLintRuleIds(tree.dir)).toStrictEqual(['no-console']);
-  }, 30_000);
+  });
 
   it('promotes the package config warning to an error', () => {
     using tree = makeMonorepoFixture();
@@ -33,7 +33,7 @@ describe('config resolution (subprocess)', () => {
     const [result] = collectStrictLintReport(tree.dir);
 
     expect(result?.messages[0]?.severity).toBe(2);
-  }, 30_000);
+  });
 
   it('falls back to the root config for a file governed by no nearer config', () => {
     using tree = makeMonorepoFixture({ 'a.js': "const unused = 1;\nconsole.log('hi');\n" });
@@ -42,7 +42,7 @@ describe('config resolution (subprocess)', () => {
 
     // No config is beside this file, so the root's `no-unused-vars` governs and `no-console` stays unset.
     expect(results[0]?.messages.map((message) => message.ruleId)).toStrictEqual(['no-unused-vars']);
-  }, 30_000);
+  });
 });
 
 // region | Helpers

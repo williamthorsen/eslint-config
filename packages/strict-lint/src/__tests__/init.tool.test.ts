@@ -43,7 +43,7 @@ describe('strict-lint init (subprocess)', () => {
 
     expect(report).toHaveLength(1);
     expect(tree.exists(STRICT_LINT_CONFIG_NAME)).toBe(false);
-  }, 30_000);
+  });
 
   // The cascade imports the config through Node's native type stripping, which accepts only erasable syntax.
   it('writes a config that loads under native type stripping', () => {

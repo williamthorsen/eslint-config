@@ -24,7 +24,7 @@ describe('native config loading (subprocess)', () => {
     expect(status).toBe(1);
     expect(stdout).toContain('no-unused-vars');
     expect(stdout).toContain('error');
-  }, 30_000);
+  });
 
   it('prefers eslint.config.js over eslint.config.ts in the same directory', () => {
     using tree = makeFixture({
@@ -37,7 +37,7 @@ describe('native config loading (subprocess)', () => {
 
     // `.js` wins and turns the rule off, so there is nothing to promote.
     expect(status).toBe(0);
-  }, 30_000);
+  });
 
   it('applies an ancestor strict-lint config when none is beside the ESLint config', () => {
     using tree = makeFixture({
@@ -52,7 +52,7 @@ describe('native config loading (subprocess)', () => {
     // The root config caps the rule below error, so the violation stays a warning instead of being promoted.
     expect(stdout).toMatch(/warning\s+.*no-unused-vars/);
     expect(stdout).toContain('0 errors, 1 warning');
-  }, 30_000);
+  });
 
   it('applies a package-level strict-lint config when the ESLint config lives at the root', () => {
     using tree = makePackageCeilingFixture();
@@ -61,7 +61,7 @@ describe('native config loading (subprocess)', () => {
 
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
-  }, 30_000);
+  });
 
   it('applies a strict-lint config below the directory in which the run starts', () => {
     using tree = makePackageCeilingFixture();
@@ -71,7 +71,7 @@ describe('native config loading (subprocess)', () => {
     // Because ceilings follow the linted file, a package's own ceiling governs its files from any working directory.
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
-  }, 30_000);
+  });
 
   it('merges a package config over the root config, dropping only the entry that it overrides', () => {
     using tree = makeFixture({
@@ -87,7 +87,7 @@ describe('native config loading (subprocess)', () => {
     // The package drops the inherited `no-unused-vars` entry by promoting it; the root's `no-console` entry survives.
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 1 warning');
-  }, 30_000);
+  });
 
   it('ignores a strict-lint config above the project root', () => {
     using tree = makeFixture({
@@ -101,7 +101,7 @@ describe('native config loading (subprocess)', () => {
 
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 0 warnings');
-  }, 30_000);
+  });
 
   it('stops the ascent at a config declaring shouldIgnoreAncestors', () => {
     using tree = makeFixture({
@@ -117,7 +117,7 @@ describe('native config loading (subprocess)', () => {
     // Only the package's entry applies, so `no-console` is promoted while `no-unused-vars` stays a warning.
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 1 warning');
-  }, 30_000);
+  });
 
   it('leaves a config above shouldIgnoreAncestors unimported', () => {
     using tree = makeFixture({
@@ -133,7 +133,7 @@ describe('native config loading (subprocess)', () => {
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 0 warnings');
     expect(stderr).not.toContain('ancestor config was imported');
-  }, 30_000);
+  });
 
   it('applies ceilings from a config authored with defineConfig', () => {
     // The fixture tree has no `node_modules`, so the config imports the helper by URL instead of by package name.
@@ -149,7 +149,7 @@ describe('native config loading (subprocess)', () => {
 
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
-  }, 30_000);
+  });
 
   it('leaves the ignored-file notice a warning, so naming an ignored path does not fail the run', () => {
     using tree = makeFixture({
@@ -162,7 +162,7 @@ describe('native config loading (subprocess)', () => {
     // The notice reports no rule and no problem, and `maxSeverity` has no key that could cap it.
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
-  }, 30_000);
+  });
 
   it('leaves the unused-directive report a warning, which maxSeverity cannot cap', () => {
     using tree = makeFixture({
@@ -176,7 +176,7 @@ describe('native config loading (subprocess)', () => {
     // Only ESLint raises this one, through `linterOptions.reportUnusedDisableDirectives`.
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
-  }, 30_000);
+  });
 
   it('promotes a cached result exactly as it promotes a freshly linted one', () => {
     using tree = makeFixture({
@@ -193,7 +193,7 @@ describe('native config loading (subprocess)', () => {
     expect(tree.exists('.eslintcache')).toBe(true);
     expect(cached.stdout).toBe(fresh.stdout);
     expect(cached.status).toBe(1);
-  }, 30_000);
+  });
 
   it('loads an ESLint config containing non-erasable syntax, which ESLint transpiles', () => {
     using tree = makeFixture({
@@ -207,7 +207,7 @@ describe('native config loading (subprocess)', () => {
     // ESLint loads its own config and transpiles it rather than stripping types, so an enum resolves.
     expect(status).toBe(1);
     expect(stdout).toContain('no-unused-vars');
-  }, 30_000);
+  });
 
   it('fails a strict-lint config with non-erasable syntax with an actionable message', () => {
     using tree = makeFixture({
@@ -224,7 +224,7 @@ describe('native config loading (subprocess)', () => {
     expect(stderr).toMatch(/^strict-lint: Cannot load the TypeScript config ".*strict-lint\.config\.ts"/);
     expect(stderr).toContain('native type stripping');
     expect(stderr).not.toMatch(/^\s+at /m);
-  }, 30_000);
+  });
 });
 
 // region | Helpers
