@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { StrictLintError } from '../common/cliErrors.ts';
 import { loadStrictLintConfigs, resolveSharedConfigs, STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
 import type { StrictLintConfig } from '../types.ts';
 
@@ -161,6 +162,7 @@ describe(loadStrictLintConfigs, () => {
       mockCascadeEntries([['/project', config]]);
 
       await expect(loadStrictLintConfigs('/project')).rejects.toThrow(message);
+      await expect(loadStrictLintConfigs('/project')).rejects.toThrow(StrictLintError);
     });
 
     it('accepts a config with no maxSeverity key', async () => {
