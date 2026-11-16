@@ -2,6 +2,7 @@ import { type ConfigCascade, loadConfigCascade } from '@williamthorsen/toolbelt.
 import { findProjectRoot, type ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 import type { Linter } from 'eslint';
 
+import { StrictLintError } from './common/cliErrors.ts';
 import { isRecord } from './common/isRecord.ts';
 import { formatRuleSeverities, isRuleSeverity } from './common/severity.ts';
 import { wrapNativeTsError } from './common/wrapNativeTsError.ts';
@@ -42,14 +43,14 @@ export function resolveSharedConfigs(cascade: StrictLintCascade): Linter.Config[
 /** Asserts that `value` is a list whose entries are each a config object or an array of them, as `flat()` expects. */
 function assertIsSharedConfigs(value: unknown, filePath: string): void {
   if (!Array.isArray(value)) {
-    throw new TypeError(`Expected sharedConfigs in "${filePath}" to be an array`);
+    throw new StrictLintError(`Expected sharedConfigs in "${filePath}" to be an array`);
   }
   for (const [index, entry] of value.entries()) {
     const elements: unknown[] = Array.isArray(entry) ? entry : [entry];
     for (const element of elements) {
       if (!isRecord(element)) {
         const expectation = 'to be a config object or an array of them';
-        throw new TypeError(
+        throw new StrictLintError(
           `Expected sharedConfigs[${String(index)}] in "${filePath}" ${expectation}, got "${describeValue(element)}"`,
         );
       }
@@ -60,20 +61,20 @@ function assertIsSharedConfigs(value: unknown, filePath: string): void {
 /** Asserts that the default export of a config file is a valid strict-lint config. */
 function assertIsStrictLintConfig(config: unknown, filePath: string): asserts config is StrictLintConfig {
   if (!isRecord(config)) {
-    throw new TypeError(`Expected the default export of "${filePath}" to be an object`);
+    throw new StrictLintError(`Expected the default export of "${filePath}" to be an object`);
   }
 
   const { maxSeverity, sharedConfigs, shouldIgnoreAncestors } = config;
 
   if (maxSeverity !== undefined) {
     if (!isRecord(maxSeverity)) {
-      throw new TypeError(`Expected maxSeverity in "${filePath}" to be an object`);
+      throw new StrictLintError(`Expected maxSeverity in "${filePath}" to be an object`);
     }
     for (const [rule, severity] of Object.entries(maxSeverity)) {
       // Skip an explicit `undefined`, which means "no ceiling", as an absent key does.
       if (severity !== undefined && !isRuleSeverity(severity)) {
         const expectation = `to be a rule severity (${formatRuleSeverities()})`;
-        throw new TypeError(
+        throw new StrictLintError(
           `Expected maxSeverity["${rule}"] in "${filePath}" ${expectation}, got "${describeValue(severity)}"`,
         );
       }
@@ -85,7 +86,7 @@ function assertIsStrictLintConfig(config: unknown, filePath: string): asserts co
   }
 
   if (shouldIgnoreAncestors !== undefined && typeof shouldIgnoreAncestors !== 'boolean') {
-    throw new TypeError(`Expected shouldIgnoreAncestors in "${filePath}" to be a boolean`);
+    throw new StrictLintError(`Expected shouldIgnoreAncestors in "${filePath}" to be a boolean`);
   }
 }
 
@@ -117,7 +118,7 @@ async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigC
   }
 }
 
-/** Validates the default export of a config file as a strict-lint config, throwing a `TypeError` naming the file. */
+/** Validates the default export of a config file as a strict-lint config, throwing an error that names the file. */
 function parseStrictLintConfig(value: unknown, filePath: string): StrictLintConfig {
   assertIsStrictLintConfig(value, filePath);
   return value;

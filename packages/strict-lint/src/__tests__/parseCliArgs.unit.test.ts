@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { UsageError } from '../common/cliErrors.ts';
 import { parseCliArgs } from '../parseCliArgs.ts';
 
 describe(parseCliArgs, () => {
@@ -141,10 +142,12 @@ describe(parseCliArgs, () => {
 
   it('throws on invalid --concurrency value', () => {
     expect(() => parseCliArgs(['--concurrency', 'banana'])).toThrow('Invalid --concurrency value');
+    expect(() => parseCliArgs(['--concurrency', 'banana'])).toThrow(UsageError);
   });
 
   it('throws on non-integer --concurrency value', () => {
     expect(() => parseCliArgs(['--concurrency', '4.5'])).toThrow('Invalid --concurrency value');
+    expect(() => parseCliArgs(['--concurrency', '4.5'])).toThrow(UsageError);
   });
 
   it('parses --rule into ruleOverrides using colon-split', () => {
@@ -178,14 +181,17 @@ describe(parseCliArgs, () => {
     expect(() => parseCliArgs(['--rule', 'no-console: typo'])).toThrow(
       'Invalid --rule value "no-console: typo". Expected a severity of "off", "warn", "error", 0, 1, or 2.',
     );
+    expect(() => parseCliArgs(['--rule', 'no-console: typo'])).toThrow(UsageError);
   });
 
   it('throws on a non-canonical numeric --rule severity', () => {
     expect(() => parseCliArgs(['--rule', 'no-console: 2.0'])).toThrow('Invalid --rule value');
+    expect(() => parseCliArgs(['--rule', 'no-console: 2.0'])).toThrow(UsageError);
   });
 
   it('throws on --rule without colon separator', () => {
     expect(() => parseCliArgs(['--rule', 'no-console'])).toThrow('Invalid --rule value');
+    expect(() => parseCliArgs(['--rule', 'no-console'])).toThrow(UsageError);
   });
 
   it('returns --quiet flag', () => {
@@ -214,14 +220,17 @@ describe(parseCliArgs, () => {
 
   it('throws on non-numeric --max-warnings value', () => {
     expect(() => parseCliArgs(['--max-warnings', 'banana'])).toThrow('Invalid --max-warnings value');
+    expect(() => parseCliArgs(['--max-warnings', 'banana'])).toThrow(UsageError);
   });
 
   it('throws on non-integer --max-warnings value', () => {
     expect(() => parseCliArgs(['--max-warnings', '4.5'])).toThrow('Invalid --max-warnings value');
+    expect(() => parseCliArgs(['--max-warnings', '4.5'])).toThrow(UsageError);
   });
 
   it('throws on --rule with empty severity after colon', () => {
     expect(() => parseCliArgs(['--rule', 'no-console: '])).toThrow('Missing severity after colon');
+    expect(() => parseCliArgs(['--rule', 'no-console: '])).toThrow(UsageError);
   });
 
   it('returns --output-file value', () => {

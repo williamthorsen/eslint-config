@@ -27,7 +27,7 @@ Every warning emitted by the ESLint config becomes an error and fails the run, e
 1. Runs ESLint via the Node API, letting it resolve a config for each linted file just as a plain `eslint` run does, or pinning one config for the whole run via `--config <path>`.
 2. Rewrites every reported warning to an error, except those whose `maxSeverity` ceiling is below `error`.
 3. Reports any rule that the ESLint config merely repeats from the shared configs that `sharedConfigs` names, if it names any.
-4. Exits non-zero on any errors.
+4. Exits 1 when any error remains; see [Exit codes](#exit-codes).
 
 `maxSeverity` is the resolved set of ceilings, computed by merging, in increasing precedence, every `.config/strict-lint.config.ts` from the project root down to the directory of the file being linted, then any `maxSeverity` passed programmatically. No rule is exempt from promotion unless one of those sources says so.
 
@@ -250,6 +250,16 @@ strict-lint --rule 'no-console: warn' --rule 'no-debugger: error' src/
 ```
 
 CLI rule overrides take the highest precedence; they apply after errorization and after any programmatic overrides.
+
+### Exit codes
+
+| Code | Meaning                                                                                                                                                                             |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `0`  | No errors remain, or `--help` or `--version` ran                                                                                                                                    |
+| `1`  | An error remains after promotion, warnings exceed `--max-warnings`, the run failed (an invalid config, `init` failing to write), or strict-lint crashed                             |
+| `2`  | A usage error: an unknown option, an invalid value, a `--config` path that names nothing, `--concurrency` alongside a programmatic `baseConfig`, or a positional argument to `init` |
+
+A failure prints one `strict-lint:` line on stderr (`strict-lint init:` for `init`). A crash prints `strict-lint: internal error:` followed by its stack, which is the place to start a bug report.
 
 ## Programmatic API
 

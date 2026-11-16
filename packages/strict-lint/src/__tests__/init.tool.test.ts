@@ -81,13 +81,22 @@ describe('strict-lint init (subprocess)', () => {
     expect(tree.exists(STRICT_LINT_CONFIG_NAME)).toBe(false);
   });
 
-  it('reports an unknown init flag on stderr and exits non-zero', () => {
+  it('reports an unknown init flag as a usage error, exiting 2', () => {
     using tree = makeTree();
 
     const { status, stderr } = runCli(tree.dir, ['init', '--overwrite']);
 
-    expect(status).toBe(1);
-    expect(stderr).toContain('Unknown option');
+    expect(status).toBe(2);
+    expect(stderr).toMatch(/^strict-lint init: Unknown option '--overwrite'/);
+  });
+
+  it('reports a positional argument to init as a usage error, exiting 2', () => {
+    using tree = makeTree();
+
+    const { status, stderr } = runCli(tree.dir, ['init', 'extra']);
+
+    expect(status).toBe(2);
+    expect(stderr.trim()).toBe('strict-lint init: takes no positional arguments, got "extra"');
   });
 });
 

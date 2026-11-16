@@ -75,7 +75,7 @@ function reportReconciliation(reconciliation: FileReconciliation, isDryRun: bool
       break;
     }
     case 'failed':
-      console.error(`Failed to write ${filePath}: ${reconciliation.error}`);
+      console.error(`strict-lint init: failed to write ${filePath}: ${reconciliation.error}`);
       break;
   }
 }
