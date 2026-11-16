@@ -1,4 +1,29 @@
+import type { TsconfigChainEntry } from 'readyup/check-utils';
+
+import { isConsumerOwnedConfig } from './base-chain.ts';
+
 const ES_YEAR = /^es\d{4}$/;
+
+export interface EsYearMismatch {
+  esYear: string;
+  path: string;
+}
+
+/**
+ * Lists the configs nearer the entry than the base that declare an ES year other than the base's.
+ * Only a config owned by the consumer is reported, since only that one can be edited.
+ */
+export function findEsYearMismatches(
+  entries: readonly TsconfigChainEntry[],
+  baseIndex: number,
+  baseEsYear: string,
+): EsYearMismatch[] {
+  return entries.slice(0, baseIndex).flatMap((entry) => {
+    if (!isConsumerOwnedConfig(entry.path)) return [];
+    const esYear = readDeclaredEsYear(entry.compilerOptions);
+    return esYear === undefined || esYear === baseEsYear ? [] : { esYear, path: entry.path };
+  });
+}
 
 /**
  * Reports whether one ES year is at least another. Every year is `es` followed by four digits, so
