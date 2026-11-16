@@ -1,4 +1,4 @@
-import { parseArgs } from 'node:util';
+import { parseArgs, type ParseArgsConfig } from 'node:util';
 
 import type { ESLint, Linter } from 'eslint';
 
@@ -130,6 +130,37 @@ const CACHE_STRATEGIES: Record<string, ESLint.CacheStrategy> = {
   metadata: 'metadata',
 };
 
+const PARSE_CONFIG = {
+  allowPositionals: true,
+  allowNegative: true,
+  options: {
+    fix: { type: 'boolean', default: false },
+    'fix-dry-run': { type: 'boolean', default: false },
+    'fix-type': { type: 'string', multiple: true },
+    'ignore-pattern': { type: 'string', multiple: true },
+    ignore: { type: 'boolean' },
+    'error-on-unmatched-pattern': { type: 'boolean' },
+    'pass-on-no-patterns': { type: 'boolean', default: false },
+    'inline-config': { type: 'boolean' },
+    cache: { type: 'boolean', default: false },
+    'cache-location': { type: 'string' },
+    'cache-strategy': { type: 'string' },
+    'warn-ignored': { type: 'boolean' },
+    config: { type: 'string', short: 'c' },
+    debug: { type: 'boolean', default: false },
+    help: { type: 'boolean', short: 'h', default: false },
+    stats: { type: 'boolean', default: false },
+    flag: { type: 'string', multiple: true },
+    concurrency: { type: 'string' },
+    rule: { type: 'string', multiple: true },
+    quiet: { type: 'boolean', default: false },
+    'max-warnings': { type: 'string', default: '-1' },
+    format: { type: 'string', short: 'f', default: 'stylish' },
+    'output-file': { type: 'string', short: 'o' },
+    version: { type: 'boolean', short: 'V', default: false },
+  },
+} as const satisfies ParseArgsConfig;
+
 // region | Helpers
 
 /** Validates a `--cache-strategy` value against the strategies that ESLint accepts. */
@@ -176,39 +207,9 @@ function parseMaxWarnings(value: string): number {
 /** Runs `parseArgs` over the lint command's options, reporting a rejected argument as a usage error. */
 function parseOptions(argv: string[]) {
   try {
-    return parseArgs({
-      args: argv,
-      allowPositionals: true,
-      allowNegative: true,
-      options: {
-        fix: { type: 'boolean', default: false },
-        'fix-dry-run': { type: 'boolean', default: false },
-        'fix-type': { type: 'string', multiple: true },
-        'ignore-pattern': { type: 'string', multiple: true },
-        ignore: { type: 'boolean' },
-        'error-on-unmatched-pattern': { type: 'boolean' },
-        'pass-on-no-patterns': { type: 'boolean', default: false },
-        'inline-config': { type: 'boolean' },
-        cache: { type: 'boolean', default: false },
-        'cache-location': { type: 'string' },
-        'cache-strategy': { type: 'string' },
-        'warn-ignored': { type: 'boolean' },
-        config: { type: 'string', short: 'c' },
-        debug: { type: 'boolean', default: false },
-        help: { type: 'boolean', short: 'h', default: false },
-        stats: { type: 'boolean', default: false },
-        flag: { type: 'string', multiple: true },
-        concurrency: { type: 'string' },
-        rule: { type: 'string', multiple: true },
-        quiet: { type: 'boolean', default: false },
-        'max-warnings': { type: 'string', default: '-1' },
-        format: { type: 'string', short: 'f', default: 'stylish' },
-        'output-file': { type: 'string', short: 'o' },
-        version: { type: 'boolean', short: 'V', default: false },
-      },
-    });
+    return parseArgs({ ...PARSE_CONFIG, args: argv });
   } catch (error: unknown) {
-    throw toUsageError(error);
+    throw toUsageError(error, PARSE_CONFIG);
   }
 }
 

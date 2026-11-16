@@ -1,4 +1,4 @@
-import { parseArgs } from 'node:util';
+import { parseArgs, type ParseArgsConfig } from 'node:util';
 
 import { toUsageError, UsageError } from '#src/common/cliErrors.ts';
 
@@ -24,22 +24,23 @@ export function parseInitArgs(argv: string[]): ParsedInitArgs {
   };
 }
 
+const PARSE_CONFIG = {
+  allowPositionals: true,
+  options: {
+    'dry-run': { type: 'boolean', default: false },
+    force: { type: 'boolean', default: false },
+    help: { type: 'boolean', short: 'h', default: false },
+  },
+} as const satisfies ParseArgsConfig;
+
 // region | Helpers
 
 /** Runs `parseArgs` over the init command's options, reporting a rejected argument as a usage error. */
 function parseOptions(argv: string[]) {
   try {
-    return parseArgs({
-      args: argv,
-      allowPositionals: true,
-      options: {
-        'dry-run': { type: 'boolean', default: false },
-        force: { type: 'boolean', default: false },
-        help: { type: 'boolean', short: 'h', default: false },
-      },
-    });
+    return parseArgs({ ...PARSE_CONFIG, args: argv });
   } catch (error: unknown) {
-    throw toUsageError(error);
+    throw toUsageError(error, PARSE_CONFIG);
   }
 }
 

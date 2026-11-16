@@ -265,4 +265,17 @@ describe(parseCliArgs, () => {
     expect(result.quiet).toBe(true);
     expect(result.ruleOverrides).toStrictEqual({ 'no-console': 'error' });
   });
+
+  it('suggests the nearest option for a mistyped one', () => {
+    expect(() => parseCliArgs(['--fxi'])).toThrow("Unknown option '--fxi'. Did you mean '--fix'?");
+  });
+
+  it('suggests the nearest negated option for a mistyped one', () => {
+    expect(() => parseCliArgs(['--no-cahce'])).toThrow("Unknown option '--no-cahce'. Did you mean '--no-cache'?");
+  });
+
+  it('reports an unknown option without a suggestion when none is close', () => {
+    expect(() => parseCliArgs(['--bogus'])).toThrow("Unknown option '--bogus'");
+    expect(() => parseCliArgs(['--bogus'])).not.toThrow('Did you mean');
+  });
 });
