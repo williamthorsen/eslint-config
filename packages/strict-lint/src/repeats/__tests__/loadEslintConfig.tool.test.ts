@@ -1,8 +1,8 @@
-import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { createTempTree } from '@williamthorsen/toolbelt.testing/candidate';
 import { describe, expect, it } from 'vitest';
 
 import { loadEslintConfig } from '../loadEslintConfig.ts';
@@ -66,13 +66,9 @@ describe(loadEslintConfig, () => {
   }, 90_000);
 
   it('reports no config when the search finds none', async () => {
-    const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'strict-lint-'));
+    using tree = createTempTree({}, { prefix: 'strict-lint-' });
 
-    try {
-      await expect(loadEslintConfig(dir)).resolves.toStrictEqual({ status: 'missing' });
-    } finally {
-      fs.rmSync(dir, { recursive: true, force: true });
-    }
+    await expect(loadEslintConfig(tree.dir)).resolves.toStrictEqual({ status: 'missing' });
   }, 90_000);
 });
 
@@ -91,14 +87,8 @@ function assertLoaded(
  * Runs the body against a config module written outside the repository, so that no fixture config is authored in it.
  */
 async function withTempConfig(source: string, body: (filePath: string) => Promise<void>): Promise<void> {
-  const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'strict-lint-'));
-  const filePath = path.join(dir, 'eslint.config.mjs');
-  fs.writeFileSync(filePath, source, 'utf8');
-  try {
-    await body(filePath);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
+  using tree = createTempTree({ 'eslint.config.mjs': source }, { prefix: 'strict-lint-' });
+  await body(tree.resolve('eslint.config.mjs'));
 }
 
 // endregion | Helpers

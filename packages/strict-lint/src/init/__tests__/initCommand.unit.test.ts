@@ -1,9 +1,6 @@
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-
+import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
 import { disposeOnTestFinished, listConsoleLines, silenceConsole } from '@williamthorsen/toolbelt.vitest/candidate';
-import { afterAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { STRICT_LINT_CONFIG_NAME } from '#src/loadStrictLintConfigs.ts';
 
@@ -12,138 +9,130 @@ import { runInit } from '../initCommand.ts';
 
 const ROOT_MARKER = 'pnpm-lock.yaml';
 
-const createdDirs: string[] = [];
-
 describe(runInit, () => {
-  afterAll(() => {
-    for (const dir of createdDirs) {
-      fs.rmSync(dir, { force: true, recursive: true });
-    }
-  });
-
   it('writes the template into the target directory', () => {
-    const dir = makeTree();
+    using tree = makeTree();
     const reported = captureConsole();
 
-    expect(runInit([], dir)).toBe(0);
-    expect(readConfig(dir)).toBe(CONFIG_TEMPLATE);
-    expect(reported.info()).toContain(`Created ${path.join(dir, STRICT_LINT_CONFIG_NAME)}`);
+    expect(runInit([], tree.dir)).toBe(0);
+    expect(tree.read(STRICT_LINT_CONFIG_NAME)).toBe(CONFIG_TEMPLATE);
+    expect(reported.info()).toContain(`Created ${tree.resolve(STRICT_LINT_CONFIG_NAME)}`);
   });
 
   it('reports the project root and the marker that identified it', () => {
-    const dir = makeTree();
+    using tree = makeTree();
     const reported = captureConsole();
 
-    runInit([], dir);
+    runInit([], tree.dir);
 
-    expect(reported.info()).toContain(`project root at ${dir} (marker: ${ROOT_MARKER})`);
+    expect(reported.info()).toContain(`project root at ${tree.dir} (marker: ${ROOT_MARKER})`);
   });
 
   // A fallback root is the case that a reader most needs qualified: The cascade may not be the one that they expect.
   it('qualifies a project root reached by fallback', () => {
-    const dir = makeTree({ 'package.json': '{}' }, { hasRootMarker: false });
+    using tree = makeTree({ 'package.json': '{}' }, { hasRootMarker: false });
     const reported = captureConsole();
 
-    runInit([], dir);
+    runInit([], tree.dir);
 
     expect(reported.info()).toContain('(nearest package.json)');
   });
 
   it('prints an install step when the package cannot be imported from the target', () => {
-    const dir = makeTree();
+    using tree = makeTree();
     const reported = captureConsole();
 
-    expect(runInit([], dir)).toBe(0);
+    expect(runInit([], tree.dir)).toBe(0);
     expect(reported.info()).toContain('pnpm add -D @williamthorsen/strict-lint eslint');
   });
 
   it('prints no install step when the package is installed', () => {
-    const dir = makeTree();
-    writeFile(path.join(dir, 'node_modules/@williamthorsen/strict-lint/package.json'), '{}');
+    using tree = makeTree();
+    tree.write('node_modules/@williamthorsen/strict-lint/package.json', '{}');
     const reported = captureConsole();
 
-    runInit([], dir);
+    runInit([], tree.dir);
 
     expect(reported.info()).not.toContain('pnpm add -D');
   });
 
   it('writes nothing under --dry-run', () => {
-    const dir = makeTree();
+    using tree = makeTree();
     const reported = captureConsole();
 
-    expect(runInit(['--dry-run'], dir)).toBe(0);
-    expect(fs.existsSync(path.join(dir, STRICT_LINT_CONFIG_NAME))).toBe(false);
+    expect(runInit(['--dry-run'], tree.dir)).toBe(0);
+    expect(tree.exists(STRICT_LINT_CONFIG_NAME)).toBe(false);
     expect(reported.info()).toContain('Would create');
   });
 
   it('keeps a diverged config and names the flag that would replace it', () => {
-    const dir = makeTree();
-    writeConfig(dir, 'export default {};\n');
+    using tree = makeTree();
+    tree.write(STRICT_LINT_CONFIG_NAME, 'export default {};\n');
     const reported = captureConsole();
 
-    expect(runInit([], dir)).toBe(0);
-    expect(readConfig(dir)).toBe('export default {};\n');
+    expect(runInit([], tree.dir)).toBe(0);
+    expect(tree.read(STRICT_LINT_CONFIG_NAME)).toBe('export default {};\n');
     expect(reported.info()).toContain('Pass --force to overwrite it.');
   });
 
   it('replaces a diverged config under --force', () => {
-    const dir = makeTree();
-    writeConfig(dir, 'export default {};\n');
+    using tree = makeTree();
+    tree.write(STRICT_LINT_CONFIG_NAME, 'export default {};\n');
     const reported = captureConsole();
 
-    runInit(['--force'], dir);
+    runInit(['--force'], tree.dir);
 
-    expect(readConfig(dir)).toBe(CONFIG_TEMPLATE);
+    expect(tree.read(STRICT_LINT_CONFIG_NAME)).toBe(CONFIG_TEMPLATE);
     expect(reported.info()).toContain('Overwrote');
   });
 
   it('reports the overwrite that it would make under --dry-run --force', () => {
-    const dir = makeTree();
-    writeConfig(dir, 'export default {};\n');
+    using tree = makeTree();
+    tree.write(STRICT_LINT_CONFIG_NAME, 'export default {};\n');
     const reported = captureConsole();
 
-    expect(runInit(['--dry-run', '--force'], dir)).toBe(0);
-    expect(readConfig(dir)).toBe('export default {};\n');
+    expect(runInit(['--dry-run', '--force'], tree.dir)).toBe(0);
+    expect(tree.read(STRICT_LINT_CONFIG_NAME)).toBe('export default {};\n');
     expect(reported.info()).toContain('Would overwrite');
   });
 
   // A directory where the config belongs exists for `existsSync` and throws for `readFileSync`.
   it('names the reason when the existing config cannot be read', () => {
-    const dir = makeTree();
-    fs.mkdirSync(path.join(dir, STRICT_LINT_CONFIG_NAME), { recursive: true });
+    using tree = makeTree();
+    tree.mkdir(STRICT_LINT_CONFIG_NAME);
     const reported = captureConsole();
 
-    expect(runInit([], dir)).toBe(0);
+    expect(runInit([], tree.dir)).toBe(0);
     expect(reported.info()).toContain('could not be read');
   });
 
   // `reconcileFile` compares before it consults the conflict policy, so `--force` makes no write here.
   it.each([[[]], [['--force']]])('reports an unchanged config as up to date, given %j', (argv) => {
-    const dir = makeTree();
-    writeConfig(dir, CONFIG_TEMPLATE);
+    using tree = makeTree();
+    tree.write(STRICT_LINT_CONFIG_NAME, CONFIG_TEMPLATE);
     const reported = captureConsole();
 
-    runInit(argv, dir);
+    runInit(argv, tree.dir);
 
     expect(reported.info()).toContain('is already up to date');
   });
 
   // A file where the `.config` directory belongs makes the write fail at `mkdir`.
   it('reports a failed write on stderr and returns a non-zero code', () => {
-    const dir = makeTree({ '.config': '' });
+    using tree = makeTree({ '.config': '' });
     const reported = captureConsole();
 
-    expect(runInit([], dir)).toBe(1);
+    expect(runInit([], tree.dir)).toBe(1);
     expect(reported.error()).toContain('Failed to write');
     expect(reported.info()).not.toContain('project root at');
   });
 
   it.each([[['--help']], [['-h']]])('writes nothing and returns 0 for %j', (argv) => {
-    const dir = makeTree();
+    using tree = makeTree();
     captureConsole();
 
-    expect(runInit(argv, dir)).toBe(0);
-    expect(fs.existsSync(path.join(dir, STRICT_LINT_CONFIG_NAME))).toBe(false);
+    expect(runInit(argv, tree.dir)).toBe(0);
+    expect(tree.exists(STRICT_LINT_CONFIG_NAME)).toBe(false);
   });
 });
 
@@ -158,31 +147,9 @@ function captureConsole(): { error: () => string; info: () => string } {
   };
 }
 
-/** Creates a throwaway tree with a project-root marker, unless `hasRootMarker` is false, and returns its path. */
-function makeTree(files: Record<string, string> = {}, { hasRootMarker = true } = {}): string {
-  const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-init-unit-')));
-  createdDirs.push(dir);
-  const entries = Object.entries(hasRootMarker ? { [ROOT_MARKER]: '', ...files } : files);
-  for (const [name, content] of entries) {
-    writeFile(path.join(dir, name), content);
-  }
-  return dir;
-}
-
-/** Reads the config that `runInit` writes into `dir`. */
-function readConfig(dir: string): string {
-  return fs.readFileSync(path.join(dir, STRICT_LINT_CONFIG_NAME), 'utf8');
-}
-
-/** Writes an existing config into `dir`. */
-function writeConfig(dir: string, content: string): void {
-  writeFile(path.join(dir, STRICT_LINT_CONFIG_NAME), content);
-}
-
-/** Writes a file, creating its parent directories. */
-function writeFile(filePath: string, content: string): void {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, content);
+/** Creates a throwaway tree with a project-root marker, unless `hasRootMarker` is false. */
+function makeTree(files: Record<string, string> = {}, { hasRootMarker = true } = {}): TempTree {
+  return createTempTree(hasRootMarker ? { [ROOT_MARKER]: '', ...files } : files, { prefix: 'strict-lint-init-unit-' });
 }
 
 // endregion | Helpers
