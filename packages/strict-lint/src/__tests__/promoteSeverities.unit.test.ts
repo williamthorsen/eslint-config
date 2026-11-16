@@ -9,7 +9,7 @@ describe(promoteSeverities, () => {
   it('promotes a warning capped by no ceiling', async () => {
     const results = [buildResult({ messages: [buildMessage({ ruleId: 'some-rule', severity: 1 })] })];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({}));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({}));
 
     expect(promoted?.messages[0]?.severity).toBe(2);
   });
@@ -17,7 +17,7 @@ describe(promoteSeverities, () => {
   it('leaves a warning whose ceiling is below error', async () => {
     const results = [buildResult({ messages: [buildMessage({ ruleId: 'some-rule', severity: 1 })] })];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({ 'some-rule': 'warn' }));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({ 'some-rule': 'warn' }));
 
     expect(promoted?.messages[0]?.severity).toBe(1);
   });
@@ -25,7 +25,7 @@ describe(promoteSeverities, () => {
   it('leaves a severity that the config already set to error', async () => {
     const results = [buildResult({ messages: [buildMessage({ ruleId: 'some-rule', severity: 2 })] })];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({ 'some-rule': 'warn' }));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({ 'some-rule': 'warn' }));
 
     expect(promoted?.messages[0]?.severity).toBe(2);
   });
@@ -34,7 +34,7 @@ describe(promoteSeverities, () => {
     // ESLint reports the ignored-file notice and the unused-directive report with `ruleId: null`.
     const results = [buildResult({ messages: [buildMessage({ ruleId: null, severity: 1 })] })];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({}));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({}));
 
     expect(promoted?.messages[0]?.severity).toBe(1);
   });
@@ -42,7 +42,7 @@ describe(promoteSeverities, () => {
   it('counts a rule-less warning as a warning', async () => {
     const results = [buildResult({ messages: [buildMessage({ ruleId: null, severity: 1 })] })];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({}));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({}));
 
     expect(promoted).toMatchObject({ errorCount: 0, warningCount: 1 });
   });
@@ -59,7 +59,7 @@ describe(promoteSeverities, () => {
       }),
     ];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({ 'capped-rule': 'warn' }));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({ 'capped-rule': 'warn' }));
 
     expect(promoted).toMatchObject({ errorCount: 1, warningCount: 1 });
   });
@@ -74,7 +74,7 @@ describe(promoteSeverities, () => {
       }),
     ];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({}));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({}));
 
     expect(promoted).toMatchObject({ fixableErrorCount: 1, fixableWarningCount: 0 });
   });
@@ -84,7 +84,7 @@ describe(promoteSeverities, () => {
       buildResult({ fatalErrorCount: 1, messages: [buildMessage({ ruleId: null, severity: 2, fatal: true })] }),
     ];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({}));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({}));
 
     expect(promoted?.fatalErrorCount).toBe(1);
   });
@@ -101,7 +101,7 @@ describe(promoteSeverities, () => {
       }),
     ];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({}));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({}));
 
     expect(promoted?.suppressedMessages[0]?.severity).toBe(2);
   });
@@ -109,7 +109,7 @@ describe(promoteSeverities, () => {
   it('leaves the fix output untouched, which ESLint.outputFixes writes to disk', async () => {
     const results = [buildResult({ output: 'fixed source' })];
 
-    const [promoted] = await promoteSeverities(results, resolverOf({}));
+    const [promoted] = await promoteSeverities(results, buildUniformResolver({}));
 
     expect(promoted?.output).toBe('fixed source');
   });
@@ -160,7 +160,7 @@ function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintRes
 }
 
 /** Builds a resolver that returns one set of ceilings for every file. */
-function resolverOf(ceilings: MaxSeverityMap): CeilingResolver {
+function buildUniformResolver(ceilings: MaxSeverityMap): CeilingResolver {
   return buildResolver(() => ceilings);
 }
 

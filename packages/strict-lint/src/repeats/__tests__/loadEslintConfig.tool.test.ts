@@ -50,7 +50,7 @@ describe(loadEslintConfig, () => {
   });
 
   it('reads a lone config object, which ESLint takes as a one-element array', async () => {
-    await withTempConfig("export default { rules: { 'no-eval': 'error' } };", async (filePath) => {
+    await runWithTempConfig("export default { rules: { 'no-eval': 'error' } };", async (filePath) => {
       const load = await loadEslintConfig(REPO_ROOT, filePath);
 
       expect(load).toStrictEqual({ elements: [{ rules: { 'no-eval': 'error' } }], filePath, status: 'loaded' });
@@ -58,7 +58,7 @@ describe(loadEslintConfig, () => {
   }, 90_000);
 
   it('reports a function default export, which ESLint rejects before any lint runs', async () => {
-    await withTempConfig('export default () => [{ rules: {} }];', async (filePath) => {
+    await runWithTempConfig('export default () => [{ rules: {} }];', async (filePath) => {
       const load = await loadEslintConfig(REPO_ROOT, filePath);
 
       expect(load.status).toBe('unreadable');
@@ -86,7 +86,7 @@ function assertLoaded(
 /**
  * Runs the body against a config module written outside the repository, so that no fixture config is authored in it.
  */
-async function withTempConfig(source: string, body: (filePath: string) => Promise<void>): Promise<void> {
+async function runWithTempConfig(source: string, body: (filePath: string) => Promise<void>): Promise<void> {
   using tree = createTempTree({ 'eslint.config.mjs': source }, { prefix: 'strict-lint-' });
   await body(tree.resolve('eslint.config.mjs'));
 }

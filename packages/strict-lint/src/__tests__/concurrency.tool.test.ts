@@ -15,19 +15,19 @@ describe('concurrency (subprocess)', () => {
   it('reports what a single-threaded run reports', () => {
     using tree = makeFixture();
 
-    expect(reportOf(tree.dir, '2')).toStrictEqual(reportOf(tree.dir, 'off'));
+    expect(collectComparableReport(tree.dir, '2')).toStrictEqual(collectComparableReport(tree.dir, 'off'));
   }, 30_000);
 
   it('accepts an automatic worker count', () => {
     using tree = makeFixture();
 
-    expect(reportOf(tree.dir, 'auto')).toStrictEqual(reportOf(tree.dir, 'off'));
+    expect(collectComparableReport(tree.dir, 'auto')).toStrictEqual(collectComparableReport(tree.dir, 'off'));
   }, 30_000);
 
   it('promotes warnings in a worker exactly as it does in the main thread', () => {
     using tree = makeFixture();
 
-    const severities = reportOf(tree.dir, '2').flatMap((result) => result.severities);
+    const severities = collectComparableReport(tree.dir, '2').flatMap((result) => result.severities);
 
     expect(severities).toStrictEqual(Array.from({ length: FILE_COUNT }, () => 2));
   }, 30_000);
@@ -37,7 +37,7 @@ describe('concurrency (subprocess)', () => {
       '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
     });
 
-    const severities = reportOf(tree.dir, '2').flatMap((result) => result.severities);
+    const severities = collectComparableReport(tree.dir, '2').flatMap((result) => result.severities);
 
     expect(severities).toStrictEqual(Array.from({ length: FILE_COUNT }, () => 1));
   }, 30_000);
@@ -58,6 +58,18 @@ describe('concurrency (subprocess)', () => {
 
 // region | Helpers
 
+/** Runs the CLI and returns its report, reduced to what a worker could get wrong and sorted for comparison. */
+function collectComparableReport(cwd: string, concurrency: string): ComparableResult[] {
+  return readJsonReport(runCli(cwd, ['--concurrency', concurrency, '--format', 'json', '.']))
+    .map((result) => ({
+      file: path.basename(result.filePath),
+      ruleIds: result.messages.map((message) => message.ruleId),
+      severities: result.messages.map((message) => message.severity),
+    }))
+    .filter((result) => result.ruleIds.length > 0)
+    .toSorted((a, b) => a.file.localeCompare(b.file));
+}
+
 /** Writes a flat project with enough files that a worker count above one engages. */
 function makeFixture(extraFiles: Record<string, string> = {}): TempTree {
   const sources = Object.fromEntries(
@@ -68,18 +80,6 @@ function makeFixture(extraFiles: Record<string, string> = {}): TempTree {
     ...sources,
     ...extraFiles,
   });
-}
-
-/** Runs the CLI and returns its report, reduced to what a worker could get wrong and sorted for comparison. */
-function reportOf(cwd: string, concurrency: string): ComparableResult[] {
-  return readJsonReport(runCli(cwd, ['--concurrency', concurrency, '--format', 'json', '.']))
-    .map((result) => ({
-      file: path.basename(result.filePath),
-      ruleIds: result.messages.map((message) => message.ruleId),
-      severities: result.messages.map((message) => message.severity),
-    }))
-    .filter((result) => result.ruleIds.length > 0)
-    .toSorted((a, b) => a.file.localeCompare(b.file));
 }
 
 /** Writes the given files into a fresh temp tree with a project-root marker. */

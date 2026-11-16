@@ -71,7 +71,7 @@ describe(strictLint, () => {
     exitMock = disposeOnTestFinished(throwOnProcessExit());
     // Without a pointed argv the parser reads Vitest's own, whose arguments it takes for lint patterns.
     disposeOnTestFinished(pointArgvAt([]));
-    withStrictLintConfigs();
+    mockStrictLintConfigs();
     mockFormat.mockResolvedValue('');
     mockLintFiles.mockResolvedValue([]);
     // Mirror ESLint's own filter closely enough that `--quiet` ordering is testable: errors survive, warnings do not.
@@ -87,7 +87,7 @@ describe(strictLint, () => {
     it('leaves config discovery to ESLint, so each linted file resolves its own', async () => {
       await strictLint();
 
-      expect(constructedWith()).not.toHaveProperty('overrideConfigFile');
+      expect(readConstructorOptions()).not.toHaveProperty('overrideConfigFile');
     });
 
     it('pins ESLint to the config named by --config', async () => {
@@ -95,19 +95,19 @@ describe(strictLint, () => {
 
       await strictLint();
 
-      expect(constructedWith()).toMatchObject({ overrideConfigFile: '/project/custom.config.ts' });
+      expect(readConstructorOptions()).toMatchObject({ overrideConfigFile: '/project/custom.config.ts' });
     });
 
     it('pins ESLint to a programmatic baseConfig, which has no file to resolve from', async () => {
       await strictLint({ baseConfig: [{ rules: {} }] });
 
-      expect(constructedWith()).toMatchObject({ overrideConfig: [{ rules: {} }], overrideConfigFile: true });
+      expect(readConstructorOptions()).toMatchObject({ overrideConfig: [{ rules: {} }], overrideConfigFile: true });
     });
 
     it('includes no plugin-bearing config when none was passed, keeping the options cloneable', async () => {
       await strictLint();
 
-      expect(constructedWith()).toMatchObject({ overrideConfig: [] });
+      expect(readConstructorOptions()).toMatchObject({ overrideConfig: [] });
     });
 
     it('layers programmatic rule overrides below CLI ones', async () => {
@@ -115,7 +115,7 @@ describe(strictLint, () => {
 
       await strictLint({ ruleOverrides: { 'programmatic-rule': 'warn' } });
 
-      expect(constructedWith()).toMatchObject({
+      expect(readConstructorOptions()).toMatchObject({
         overrideConfig: [{ rules: { 'programmatic-rule': 'warn' } }, { rules: { 'cli-rule': 'error' } }],
       });
     });
@@ -135,30 +135,30 @@ describe(strictLint, () => {
 
       await captureError(ProcessExitError, () => strictLint());
 
-      expect(reportedSeverities()).toStrictEqual([2]);
+      expect(readReportedSeverities()).toStrictEqual([2]);
     });
 
     it('leaves a warning that a config ceiling caps below error', async () => {
-      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
+      mockStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       await strictLint();
 
-      expect(reportedSeverities()).toStrictEqual([1]);
+      expect(readReportedSeverities()).toStrictEqual([1]);
     });
 
     it('lets programmatic ceilings outrank the config files', async () => {
-      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'error' } });
+      mockStrictLintConfigs({ maxSeverity: { 'some-rule': 'error' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       await strictLint({ maxSeverity: { 'some-rule': 'warn' } });
 
-      expect(reportedSeverities()).toStrictEqual([1]);
+      expect(readReportedSeverities()).toStrictEqual([1]);
     });
 
     it('applies the ceilings of each file when two files resolve different configs', async () => {
       mockedLoadStrictLintConfigs.mockImplementation((dir: string) =>
-        Promise.resolve(cascadeOf(dir === '/capped' ? [{ maxSeverity: { 'some-rule': 'warn' } }] : [])),
+        Promise.resolve(buildCascade(dir === '/capped' ? [{ maxSeverity: { 'some-rule': 'warn' } }] : [])),
       );
       mockLintFiles.mockResolvedValue([
         buildResult({ filePath: '/capped/a.ts', messages: [buildMessage(1)] }),
@@ -167,7 +167,7 @@ describe(strictLint, () => {
 
       await captureError(ProcessExitError, () => strictLint());
 
-      expect(reportedSeverities()).toStrictEqual([1, 2]);
+      expect(readReportedSeverities()).toStrictEqual([1, 2]);
     });
   });
 
@@ -179,7 +179,7 @@ describe(strictLint, () => {
       const error = await captureError(ProcessExitError, () => strictLint());
 
       // Filtering first would drop the warning before it was ever promoted, and report nothing.
-      expect(reportedSeverities()).toStrictEqual([2]);
+      expect(readReportedSeverities()).toStrictEqual([2]);
       expect(error.code).toBe(1);
     });
 
@@ -191,12 +191,12 @@ describe(strictLint, () => {
 
       // Because strict-lint promoted the rule, no warning remains to exceed the threshold; the error alone fails the
       // run.
-      expect(formattedText()).not.toContain('too many warnings');
+      expect(readFormattedText()).not.toContain('too many warnings');
     });
 
     it('counts a capped problem as a warning for --max-warnings', async () => {
       using _argv = pointArgvAt(['--max-warnings', '0']);
-      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
+      mockStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       const error = await captureError(ProcessExitError, () => strictLint());
@@ -213,7 +213,7 @@ describe(strictLint, () => {
 
       await captureError(ProcessExitError, () => strictLint());
 
-      expect(reportedSeverities()).toStrictEqual([2, 2]);
+      expect(readReportedSeverities()).toStrictEqual([2, 2]);
     });
   });
 
@@ -221,7 +221,7 @@ describe(strictLint, () => {
     it('leaves concurrency unset without the flag, so ESLint applies its own default of off', async () => {
       await strictLint();
 
-      expect(constructedWith()).not.toHaveProperty('concurrency');
+      expect(readConstructorOptions()).not.toHaveProperty('concurrency');
     });
 
     it('accepts --concurrency when ESLint resolves the config itself', async () => {
@@ -229,7 +229,7 @@ describe(strictLint, () => {
 
       await strictLint();
 
-      expect(constructedWith()).toMatchObject({ concurrency: 'auto' });
+      expect(readConstructorOptions()).toMatchObject({ concurrency: 'auto' });
       expect(exitMock.spy).not.toHaveBeenCalled();
     });
 
@@ -254,7 +254,7 @@ describe(strictLint, () => {
 
   describe('repeated-rule check', () => {
     it('does no work when no strict-lint config names a shared config', async () => {
-      withStrictLintConfigs({ maxSeverity: {} });
+      mockStrictLintConfigs({ maxSeverity: {} });
 
       await strictLint();
 
@@ -262,7 +262,7 @@ describe(strictLint, () => {
     });
 
     it('reads the ESLint config once a strict-lint config names a shared config', async () => {
-      withStrictLintConfigs({ sharedConfigs: [[{ rules: { 'some-rule': 'error' } }]] });
+      mockStrictLintConfigs({ sharedConfigs: [[{ rules: { 'some-rule': 'error' } }]] });
 
       await strictLint();
 
@@ -280,21 +280,21 @@ describe(strictLint, () => {
     });
 
     it('names the project root and every contributing config file, lowest precedence first', async () => {
-      withStrictLintConfigs({ maxSeverity: {} }, { maxSeverity: {} });
+      mockStrictLintConfigs({ maxSeverity: {} }, { maxSeverity: {} });
 
       await strictLint();
 
       expect(reportedLines()).toStrictEqual([
         'strict-lint: project root /project (marker: pnpm-workspace.yaml)',
         'strict-lint: config files for /project, lowest precedence first:',
-        `strict-lint:   ${configPathIn('/project/level-1')}`,
-        `strict-lint:   ${configPathIn('/project/level-0')}`,
+        `strict-lint:   ${buildConfigPath('/project/level-1')}`,
+        `strict-lint:   ${buildConfigPath('/project/level-0')}`,
       ]);
     });
 
     it('reports one block per distinct config set rather than one per directory', async () => {
       mockedLoadStrictLintConfigs.mockImplementation((dir: string) =>
-        Promise.resolve(cascadeOf(dir === '/other' ? [{ maxSeverity: {} }] : [])),
+        Promise.resolve(buildCascade(dir === '/other' ? [{ maxSeverity: {} }] : [])),
       );
       mockLintFiles.mockResolvedValue([
         buildResult({ filePath: '/project/a.ts' }),
@@ -320,7 +320,7 @@ describe(strictLint, () => {
     });
 
     it('reports the stop when a config bounded the ascent', async () => {
-      withStoppedAscent({ shouldIgnoreAncestors: true });
+      mockStoppedAscent({ shouldIgnoreAncestors: true });
 
       await strictLint();
 
@@ -359,7 +359,7 @@ describe(strictLint, () => {
     });
 
     it('exits 0 when only capped warnings are reported', async () => {
-      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
+      mockStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: [buildMessage(1)] })]);
 
       await strictLint();
@@ -471,7 +471,7 @@ describe(strictLint, () => {
 
     it('exits 1 when warnings exceed --max-warnings threshold', async () => {
       using _argv = pointArgvAt(['--max-warnings', '2']);
-      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
+      mockStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: buildThreeWarnings() })]);
 
       const error = await captureError(ProcessExitError, () => strictLint());
@@ -481,7 +481,7 @@ describe(strictLint, () => {
 
     it('does not exit when warnings are within --max-warnings threshold', async () => {
       using _argv = pointArgvAt(['--max-warnings', '5']);
-      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
+      mockStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: buildThreeWarnings() })]);
 
       await strictLint();
@@ -542,7 +542,7 @@ describe(strictLint, () => {
 
     it('writes the --max-warnings message alone when the formatter produced no output', async () => {
       using _argv = pointArgvAt(['--quiet', '--max-warnings', '0']);
-      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
+      mockStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: buildThreeWarnings() })]);
       mockFormat.mockResolvedValue('');
 
@@ -553,7 +553,7 @@ describe(strictLint, () => {
 
     it('separates the --max-warnings message from the report that the formatter produced', async () => {
       using _argv = pointArgvAt(['--max-warnings', '0']);
-      withStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
+      mockStrictLintConfigs({ maxSeverity: { 'some-rule': 'warn' } });
       mockLintFiles.mockResolvedValue([buildResult({ messages: buildThreeWarnings() })]);
       mockFormat.mockResolvedValue('report\n');
 
@@ -565,6 +565,24 @@ describe(strictLint, () => {
 });
 
 // region | Helpers
+
+/** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
+function buildCascade(configs: StrictLintConfig[], stopReason: 'predicate' | 'stop-dir' = 'stop-dir') {
+  return {
+    entries: configs.map((config, index) => ({
+      config,
+      dir: `/project/level-${String(index)}`,
+      filePath: buildConfigPath(`/project/level-${String(index)}`),
+    })),
+    projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
+    stopReason,
+  };
+}
+
+/** Returns the strict-lint config path within a directory. */
+function buildConfigPath(dir: string): string {
+  return `${dir}/.config/strict-lint.config.ts`;
+}
 
 /** Builds a `some-rule` message with the fields that promotion reads, filling in the rest to satisfy ESLint's shape. */
 function buildMessage(severity: Linter.LintMessage['severity']): Linter.LintMessage {
@@ -592,38 +610,30 @@ function buildThreeWarnings(): Linter.LintMessage[] {
   return Array.from({ length: 3 }, () => buildMessage(1));
 }
 
-/** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
-function cascadeOf(configs: StrictLintConfig[], stopReason: 'predicate' | 'stop-dir' = 'stop-dir') {
-  return {
-    entries: configs.map((config, index) => ({
-      config,
-      dir: `/project/level-${String(index)}`,
-      filePath: configPathIn(`/project/level-${String(index)}`),
-    })),
-    projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
-    stopReason,
-  };
+/** Checks whether a value is a non-null object. */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
 }
 
-/** Returns the strict-lint config path within a directory. */
-function configPathIn(dir: string): string {
-  return `${dir}/.config/strict-lint.config.ts`;
+/** Makes the mocked loader resolve as `mockStrictLintConfigs` does, for a walk cut short by `shouldIgnoreAncestors`. */
+function mockStoppedAscent(...configs: StrictLintConfig[]): void {
+  mockedLoadStrictLintConfigs.mockResolvedValue(buildCascade(configs, 'predicate'));
+}
+
+/** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
+function mockStrictLintConfigs(...configs: StrictLintConfig[]): void {
+  mockedLoadStrictLintConfigs.mockResolvedValue(buildCascade(configs));
 }
 
 /** Returns the options that the run passed to the ESLint constructor. */
-function constructedWith(): Record<string, unknown> {
+function readConstructorOptions(): Record<string, unknown> {
   const [options] = mockEslintConstructor.mock.calls[0] ?? [];
   return isRecord(options) ? options : {};
 }
 
 /** Returns the text that the formatter produced during the run. */
-function formattedText(): string {
+function readFormattedText(): string {
   return mockFormat.mock.results.map((result) => String(result.value)).join('');
-}
-
-/** Checks whether a value is a non-null object. */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
 }
 
 /** Returns the version that strict-lint's own manifest declares. */
@@ -637,22 +647,12 @@ function readManifestVersion(): string {
 }
 
 /** Returns the severities that the run passed to the formatter, which are the ones that it reports. */
-function reportedSeverities(): number[] {
+function readReportedSeverities(): number[] {
   const [results] = mockFormat.mock.calls[0] ?? [];
   if (!Array.isArray(results)) {
     return [];
   }
   return results.flatMap((result: ESLint.LintResult) => result.messages.map((message) => message.severity));
-}
-
-/** Makes the mocked loader resolve as `withStrictLintConfigs` does, for a walk cut short by `shouldIgnoreAncestors`. */
-function withStoppedAscent(...configs: StrictLintConfig[]): void {
-  mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs, 'predicate'));
-}
-
-/** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
-function withStrictLintConfigs(...configs: StrictLintConfig[]): void {
-  mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs));
 }
 
 // endregion | Helpers
