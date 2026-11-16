@@ -13,13 +13,13 @@ import type { ESLint, Linter } from 'eslint';
 import { beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 
 import { isRecord } from '../common/isRecord.ts';
-import { strictLint } from '../strictLint.ts';
+import type { loadStrictLintConfigs } from '../loadStrictLintConfigs.ts';
+import { createStrictLint } from '../strictLint.ts';
 import { buildResult } from '../test-utils/lintResults.ts';
 import { buildCascade } from '../test-utils/strictLintCascades.ts';
 import type { StrictLintConfig } from '../types.ts';
 
 const {
-  mockedLoadStrictLintConfigs,
   mockedWriteFile,
   mockEslintConstructor,
   mockFindConfigFile,
@@ -29,7 +29,6 @@ const {
   mockLoadFormatter,
   mockOutputFixes,
 } = vi.hoisted(() => ({
-  mockedLoadStrictLintConfigs: vi.fn(),
   mockedWriteFile: vi.fn().mockResolvedValue(undefined),
   mockEslintConstructor: vi.fn(),
   mockFindConfigFile: vi.fn().mockResolvedValue(undefined),
@@ -38,11 +37,6 @@ const {
   mockLintFiles: vi.fn().mockResolvedValue([]),
   mockLoadFormatter: vi.fn(),
   mockOutputFixes: vi.fn().mockResolvedValue(undefined),
-}));
-
-vi.mock(import('../loadStrictLintConfigs.ts'), async (importOriginal) => ({
-  ...(await importOriginal()),
-  loadStrictLintConfigs: mockedLoadStrictLintConfigs,
 }));
 
 vi.mock('node:fs/promises', () => ({
@@ -65,6 +59,9 @@ vi.mock('eslint', () => {
     type: {},
   };
 });
+
+const mockedLoadStrictLintConfigs = vi.fn<typeof loadStrictLintConfigs>();
+const strictLint = createStrictLint({ loadConfigs: mockedLoadStrictLintConfigs });
 
 describe(strictLint, () => {
   let exitMock: MockedProcessExit;
