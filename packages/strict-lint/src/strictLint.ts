@@ -30,81 +30,6 @@ export async function strictLint(options?: StrictLintOptions): Promise<string> {
   return text;
 }
 
-/**
- * Runs the lint, reporting and exiting when it fails outright. The exit that ends a completed-but-failing run stays
- * with the caller, so it is not caught by the handler for the lint's own failures.
- */
-async function runLint(options: StrictLintOptions | undefined): Promise<{ text: string; errorCount: number }> {
-  try {
-    return await doLint(options, process.argv.slice(2));
-  } catch (error: unknown) {
-    console.error(error);
-    process.exit(1);
-  }
-}
-
-/**
- * Runs ESLint with strict-lint promotion applied. ESLint resolves a config for each linted file, exactly as a plain
- * `eslint` run does; strict-lint raises severities in the results afterwards.
- */
-async function doLint(
-  options: StrictLintOptions | undefined,
-  args: string[],
-): Promise<{ text: string; errorCount: number }> {
-  const parsed = parseCliArgs(args);
-
-  if (parsed.shouldShowHelp) {
-    showUsage();
-    return { text: '', errorCount: 0 };
-  }
-
-  if (parsed.shouldShowVersion) {
-    console.info(resolveSelfVersion(import.meta.url));
-    return { text: '', errorCount: 0 };
-  }
-
-  const ceilings = createCeilingResolver(options?.maxSeverity);
-
-  const eslint = new ESLint(buildEslintOptions(options, parsed));
-
-  const results = await eslint.lintFiles(resolvePatterns(options, parsed.patterns));
-
-  // Promote ahead of `--quiet`, whose severity filter would otherwise discard the warnings that strict-lint raises.
-  const promotedResults = await promoteSeverities(results, ceilings);
-
-  if (parsed.debug) {
-    reportConfigProvenance(ceilings.getCascades());
-  }
-
-  await checkForRepeatedRules(options, parsed, promotedResults);
-
-  if (!parsed.fixDryRun) {
-    await ESLint.outputFixes(promotedResults);
-  }
-
-  const filteredResults = parsed.quiet ? ESLint.getErrorResults(promotedResults) : promotedResults;
-
-  const errorCount = filteredResults.reduce((sum, r) => sum + r.errorCount, 0);
-  // Count warnings in the unfiltered results, so that --max-warnings works with --quiet.
-  const warningCount = promotedResults.reduce((sum, r) => sum + r.warningCount, 0);
-
-  const formatter = await eslint.loadFormatter(parsed.format);
-  let text = await formatter.format(filteredResults);
-
-  if (parsed.outputFile) {
-    await fs.writeFile(parsed.outputFile, text, 'utf8');
-  }
-
-  if (parsed.maxWarnings >= 0 && warningCount > parsed.maxWarnings) {
-    const message = `ESLint found too many warnings (maximum: ${String(parsed.maxWarnings)}).`;
-    // Separate the message from the report only when there is one; otherwise it would lead with a blank line.
-    text = text ? `${text}\n${message}` : message;
-    return { text, errorCount: Math.max(errorCount, 1) };
-  }
-
-  return { text, errorCount };
-}
-
 // region | Helpers
 
 /** How many directories a provenance line names before it collapses the rest into a count. */
@@ -115,6 +40,13 @@ const SEVERITY_MAP: Record<string, Linter.RuleSeverity> = {
   warn: 'warn',
   error: 'error',
 };
+
+/** The directories sharing one resolved set of ceiling config files. */
+interface CascadeGroup {
+  dirs: string[];
+  filePaths: string[];
+  stoppedByPredicate: boolean;
+}
 
 /**
  * Rejects concurrency alongside a programmatic `baseConfig`, whose plugin objects ESLint cannot clone to reach worker
@@ -208,6 +140,68 @@ function describeDirs(dirs: readonly string[]): string {
 }
 
 /**
+ * Runs ESLint with strict-lint promotion applied. ESLint resolves a config for each linted file, exactly as a plain
+ * `eslint` run does; strict-lint raises severities in the results afterwards.
+ */
+async function doLint(
+  options: StrictLintOptions | undefined,
+  args: string[],
+): Promise<{ text: string; errorCount: number }> {
+  const parsed = parseCliArgs(args);
+
+  if (parsed.shouldShowHelp) {
+    showUsage();
+    return { text: '', errorCount: 0 };
+  }
+
+  if (parsed.shouldShowVersion) {
+    console.info(resolveSelfVersion(import.meta.url));
+    return { text: '', errorCount: 0 };
+  }
+
+  const ceilings = createCeilingResolver(options?.maxSeverity);
+
+  const eslint = new ESLint(buildEslintOptions(options, parsed));
+
+  const results = await eslint.lintFiles(resolvePatterns(options, parsed.patterns));
+
+  // Promote ahead of `--quiet`, whose severity filter would otherwise discard the warnings that strict-lint raises.
+  const promotedResults = await promoteSeverities(results, ceilings);
+
+  if (parsed.debug) {
+    reportConfigProvenance(ceilings.getCascades());
+  }
+
+  await checkForRepeatedRules(options, parsed, promotedResults);
+
+  if (!parsed.fixDryRun) {
+    await ESLint.outputFixes(promotedResults);
+  }
+
+  const filteredResults = parsed.quiet ? ESLint.getErrorResults(promotedResults) : promotedResults;
+
+  const errorCount = filteredResults.reduce((sum, r) => sum + r.errorCount, 0);
+  // Count warnings in the unfiltered results, so that --max-warnings works with --quiet.
+  const warningCount = promotedResults.reduce((sum, r) => sum + r.warningCount, 0);
+
+  const formatter = await eslint.loadFormatter(parsed.format);
+  let text = await formatter.format(filteredResults);
+
+  if (parsed.outputFile) {
+    await fs.writeFile(parsed.outputFile, text, 'utf8');
+  }
+
+  if (parsed.maxWarnings >= 0 && warningCount > parsed.maxWarnings) {
+    const message = `ESLint found too many warnings (maximum: ${String(parsed.maxWarnings)}).`;
+    // Separate the message from the report only when there is one; otherwise it would lead with a blank line.
+    text = text ? `${text}\n${message}` : message;
+    return { text, errorCount: Math.max(errorCount, 1) };
+  }
+
+  return { text, errorCount };
+}
+
+/**
  * Collapses the per-directory walks into one entry per distinct outcome. A monorepo resolves one cascade per
  * directory containing linted files, but only a handful of distinct config sets, and the report names those.
  */
@@ -293,6 +287,19 @@ function resolvePatterns(options: StrictLintOptions | undefined, cliPatterns: st
   return ['.'];
 }
 
+/**
+ * Runs the lint, reporting and exiting when it fails outright. The exit that ends a completed-but-failing run stays
+ * with the caller, so it is not caught by the handler for the lint's own failures.
+ */
+async function runLint(options: StrictLintOptions | undefined): Promise<{ text: string; errorCount: number }> {
+  try {
+    return await doLint(options, process.argv.slice(2));
+  } catch (error: unknown) {
+    console.error(error);
+    process.exit(1);
+  }
+}
+
 /** Converts a CLI severity string to a typed `Linter.RuleSeverity`. */
 function toRuleSeverity(value: string): Linter.RuleSeverity {
   const severity = SEVERITY_MAP[value];
@@ -300,13 +307,6 @@ function toRuleSeverity(value: string): Linter.RuleSeverity {
     throw new Error(`Invalid rule severity "${value}". Expected "off", "warn", or "error".`);
   }
   return severity;
-}
-
-/** The directories sharing one resolved set of ceiling config files. */
-interface CascadeGroup {
-  dirs: string[];
-  filePaths: string[];
-  stoppedByPredicate: boolean;
 }
 
 // endregion | Helpers

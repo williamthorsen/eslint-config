@@ -134,6 +134,13 @@ describe('@williamthorsen/tsconfig base config', () => {
   });
 });
 
+// region | Helpers
+
+/** Converts a `lib` name to the `lib.*.d.ts` filename to which TypeScript normalizes it. */
+function lib(name: string): string {
+  return `lib.${name.toLowerCase()}.d.ts`;
+}
+
 /**
  * Typechecks a module against the base's resolved options and lists its diagnostic messages. `types` is
  * cleared so that ambient package declarations cannot stand in for the libs.
@@ -175,14 +182,23 @@ function parseConfig(configPath: string): ts.CompilerOptions {
   return parsed.options;
 }
 
+/** Reads the compiler options that the base declares. */
+function readBaseCompilerOptions(): Record<string, unknown> {
+  return readBaseConfig().compilerOptions ?? {};
+}
+
 /** Reads the `@williamthorsen/tsconfig` base as declared. */
 function readBaseConfig(): z.infer<typeof configSchema> {
   return readConfig(path.join(repoRoot, 'packages', 'tsconfig', 'tsconfig.base.json'));
 }
 
-/** Reads the compiler options that the base declares. */
-function readBaseCompilerOptions(): Record<string, unknown> {
-  return readBaseConfig().compilerOptions ?? {};
+/** Reads a tsconfig file's own JSON, without resolving `extends`. */
+function readConfig(configPath: string): z.infer<typeof configSchema> {
+  const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile.bind(ts.sys));
+
+  if (error) throw new Error(ts.flattenDiagnosticMessageText(error.messageText, '\n'));
+
+  return configSchema.parse(config);
 }
 
 /**
@@ -195,16 +211,4 @@ function readUpstreamCompilerOptions(): Record<string, unknown> {
   return readConfig(requireFromPackage.resolve('@tsconfig/strictest/tsconfig.json')).compilerOptions ?? {};
 }
 
-/** Reads a tsconfig file's own JSON, without resolving `extends`. */
-function readConfig(configPath: string): z.infer<typeof configSchema> {
-  const { config, error } = ts.readConfigFile(configPath, ts.sys.readFile.bind(ts.sys));
-
-  if (error) throw new Error(ts.flattenDiagnosticMessageText(error.messageText, '\n'));
-
-  return configSchema.parse(config);
-}
-
-/** Converts a `lib` name to the `lib.*.d.ts` filename to which TypeScript normalizes it. */
-function lib(name: string): string {
-  return `lib.${name.toLowerCase()}.d.ts`;
-}
+// endregion | Helpers

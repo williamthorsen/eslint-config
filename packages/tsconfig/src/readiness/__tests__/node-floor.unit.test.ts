@@ -5,10 +5,6 @@ import { classifyNodeEsYear, findLowestNodeMajor, readNodeMajor } from '../node-
 // Stands in for readyup's table, which covers the even-numbered LTS majors from 18 upward.
 const ES_YEAR_BY_MAJOR: Record<number, string | undefined> = { 18: 'es2022', 20: 'es2023', 22: 'es2024', 24: 'es2025' };
 
-function esYearForMajor(major: number): string | undefined {
-  return ES_YEAR_BY_MAJOR[major];
-}
-
 describe(classifyNodeEsYear, () => {
   it('reports the year for a major that the table covers', () => {
     expect(classifyNodeEsYear(24, esYearForMajor)).toStrictEqual({ esYear: 'es2025', kind: 'exact' });
@@ -63,3 +59,11 @@ describe(readNodeMajor, () => {
     expect(readNodeMajor('')).toBeUndefined();
   });
 });
+
+// region | Helpers
+
+function esYearForMajor(major: number): string | undefined {
+  return ES_YEAR_BY_MAJOR[major];
+}
+
+// endregion | Helpers

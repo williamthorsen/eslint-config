@@ -228,6 +228,14 @@ describe('native config loading (subprocess)', () => {
 
 // region | Helpers
 
+/**
+ * Writes the given files into a fresh temp tree. The tree gets a project-root marker, so that the fixture bounds
+ * config discovery, whatever is above the system temp directory on the machine running the suite.
+ */
+function makeFixture(files: Record<string, string>): TempTree {
+  return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-int-' });
+}
+
 /** Writes a monorepo tree whose only ESLint config is at the root and whose only ceiling is inside the package. */
 function makePackageCeilingFixture(): TempTree {
   return makeFixture({
@@ -235,14 +243,6 @@ function makePackageCeilingFixture(): TempTree {
     'packages/pkg/.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
     'packages/pkg/a.js': UNUSED_VAR_FILE,
   });
-}
-
-/**
- * Writes the given files into a fresh temp tree. The tree gets a project-root marker, so that the fixture bounds
- * config discovery, whatever is above the system temp directory on the machine running the suite.
- */
-function makeFixture(files: Record<string, string>): TempTree {
-  return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-int-' });
 }
 
 // endregion | Helpers

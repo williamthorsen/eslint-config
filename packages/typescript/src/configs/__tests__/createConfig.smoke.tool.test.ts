@@ -18,6 +18,16 @@ describe('createConfig preset load smoke tests', () => {
   );
 });
 
+describe('base config type-information wiring', () => {
+  it('enables projectService so that type-aware rules work without a consumer-supplied project', () => {
+    const enabled = baseConfig.some((entry) => enablesProjectService(entry.languageOptions?.['parserOptions']));
+
+    expect(enabled).toBe(true);
+  });
+});
+
+// region | Helpers
+
 /** Reports whether parser options enable `projectService`, reading them as `unknown` because `Config` types them as `{}`. */
 function enablesProjectService(parserOptions: unknown): boolean {
   return (
@@ -28,10 +38,4 @@ function enablesProjectService(parserOptions: unknown): boolean {
   );
 }
 
-describe('base config type-information wiring', () => {
-  it('enables projectService so that type-aware rules work without a consumer-supplied project', () => {
-    const enabled = baseConfig.some((entry) => enablesProjectService(entry.languageOptions?.['parserOptions']));
-
-    expect(enabled).toBe(true);
-  });
-});
+// endregion | Helpers

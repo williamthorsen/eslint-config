@@ -47,6 +47,11 @@ describe('config resolution (subprocess)', () => {
 
 // region | Helpers
 
+/** Writes the given files into a fresh temp tree with a project-root marker. */
+function makeFixture(files: Record<string, string>): TempTree {
+  return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-cfg-' });
+}
+
 /** Writes a monorepo whose package config contradicts the root config, so that a divergence is observable. */
 function makeMonorepoFixture(extraFiles: Record<string, string> = {}): TempTree {
   return makeFixture({
@@ -55,11 +60,6 @@ function makeMonorepoFixture(extraFiles: Record<string, string> = {}): TempTree 
     [TARGET]: "const unused = 1;\nconsole.log('hi');\n",
     ...extraFiles,
   });
-}
-
-/** Writes the given files into a fresh temp tree with a project-root marker. */
-function makeFixture(files: Record<string, string>): TempTree {
-  return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-cfg-' });
 }
 
 /** Runs strict-lint on a target and returns the results from its JSON formatter output. */

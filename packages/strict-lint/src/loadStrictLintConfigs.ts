@@ -39,30 +39,22 @@ export function resolveSharedConfigs(cascade: StrictLintCascade): Linter.Config[
 
 // region | Helpers
 
-/** Runs the cascade, mapping the native-TypeScript failure modes that its plain `import()` raises. */
-async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigCascade<StrictLintConfig>> {
-  try {
-    return await loadConfigCascade({
-      fileNames: [STRICT_LINT_CONFIG_NAME],
-      parseConfig: parseStrictLintConfig,
-      shouldStopAscent: isIgnoringAncestors,
-      startDir,
-      stopAtDir,
-    });
-  } catch (error: unknown) {
-    throw wrapNativeTsError(error, STRICT_LINT_CONFIG_NAME) ?? error;
+/** Asserts that `value` is a list whose entries are each a config object or an array of them, as `flat()` expects. */
+function assertIsSharedConfigs(value: unknown, filePath: string): void {
+  if (!Array.isArray(value)) {
+    throw new TypeError(`Expected sharedConfigs in "${filePath}" to be an array`);
   }
-}
-
-/** Checks whether a config bounds the walk at its own level. */
-function isIgnoringAncestors(config: StrictLintConfig): boolean {
-  return config.shouldIgnoreAncestors === true;
-}
-
-/** Validates the default export of a config file as a strict-lint config, throwing a `TypeError` naming the file. */
-function parseStrictLintConfig(value: unknown, filePath: string): StrictLintConfig {
-  assertIsStrictLintConfig(value, filePath);
-  return value;
+  for (const [index, entry] of value.entries()) {
+    const elements: unknown[] = Array.isArray(entry) ? entry : [entry];
+    for (const element of elements) {
+      if (!isRecord(element)) {
+        const expectation = 'to be a config object or an array of them';
+        throw new TypeError(
+          `Expected sharedConfigs[${String(index)}] in "${filePath}" ${expectation}, got "${describeValue(element)}"`,
+        );
+      }
+    }
+  }
 }
 
 /** Asserts that the default export of a config file is a valid strict-lint config. */
@@ -97,30 +89,38 @@ function assertIsStrictLintConfig(config: unknown, filePath: string): asserts co
   }
 }
 
-/** Asserts that `value` is a list whose entries are each a config object or an array of them, as `flat()` expects. */
-function assertIsSharedConfigs(value: unknown, filePath: string): void {
-  if (!Array.isArray(value)) {
-    throw new TypeError(`Expected sharedConfigs in "${filePath}" to be an array`);
-  }
-  for (const [index, entry] of value.entries()) {
-    const elements: unknown[] = Array.isArray(entry) ? entry : [entry];
-    for (const element of elements) {
-      if (!isRecord(element)) {
-        const expectation = 'to be a config object or an array of them';
-        throw new TypeError(
-          `Expected sharedConfigs[${String(index)}] in "${filePath}" ${expectation}, got "${describeValue(element)}"`,
-        );
-      }
-    }
-  }
-}
-
 /** Renders a rejected value for a diagnostic, so that it shows an object's shape rather than `[object Object]`. */
 function describeValue(value: unknown): string {
   if (typeof value === 'object' && value !== null) {
     return JSON.stringify(value);
   }
   return String(value);
+}
+
+/** Checks whether a config bounds the walk at its own level. */
+function isIgnoringAncestors(config: StrictLintConfig): boolean {
+  return config.shouldIgnoreAncestors === true;
+}
+
+/** Runs the cascade, mapping the native-TypeScript failure modes that its plain `import()` raises. */
+async function loadCascade(startDir: string, stopAtDir: string): Promise<ConfigCascade<StrictLintConfig>> {
+  try {
+    return await loadConfigCascade({
+      fileNames: [STRICT_LINT_CONFIG_NAME],
+      parseConfig: parseStrictLintConfig,
+      shouldStopAscent: isIgnoringAncestors,
+      startDir,
+      stopAtDir,
+    });
+  } catch (error: unknown) {
+    throw wrapNativeTsError(error, STRICT_LINT_CONFIG_NAME) ?? error;
+  }
+}
+
+/** Validates the default export of a config file as a strict-lint config, throwing a `TypeError` naming the file. */
+function parseStrictLintConfig(value: unknown, filePath: string): StrictLintConfig {
+  assertIsStrictLintConfig(value, filePath);
+  return value;
 }
 
 // endregion | Helpers

@@ -587,6 +587,11 @@ function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintRes
   };
 }
 
+/** Builds three warnings for `some-rule`, so that a threshold test states a count rather than a list. */
+function buildThreeWarnings(): Linter.LintMessage[] {
+  return Array.from({ length: 3 }, () => buildMessage(1));
+}
+
 /** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
 function cascadeOf(configs: StrictLintConfig[], stopReason: 'predicate' | 'stop-dir' = 'stop-dir') {
   return {
@@ -640,19 +645,14 @@ function reportedSeverities(): number[] {
   return results.flatMap((result: ESLint.LintResult) => result.messages.map((message) => message.severity));
 }
 
-/** Builds three warnings for `some-rule`, so that a threshold test states a count rather than a list. */
-function buildThreeWarnings(): Linter.LintMessage[] {
-  return Array.from({ length: 3 }, () => buildMessage(1));
+/** Makes the mocked loader resolve as `withStrictLintConfigs` does, for a walk cut short by `shouldIgnoreAncestors`. */
+function withStoppedAscent(...configs: StrictLintConfig[]): void {
+  mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs, 'predicate'));
 }
 
 /** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
 function withStrictLintConfigs(...configs: StrictLintConfig[]): void {
   mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs));
-}
-
-/** Makes the mocked loader resolve as `withStrictLintConfigs` does, for a walk cut short by `shouldIgnoreAncestors`. */
-function withStoppedAscent(...configs: StrictLintConfig[]): void {
-  mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs, 'predicate'));
 }
 
 // endregion | Helpers

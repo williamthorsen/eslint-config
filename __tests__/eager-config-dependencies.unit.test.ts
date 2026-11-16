@@ -105,11 +105,7 @@ describe('dependency check', () => {
   });
 });
 
-/** Reads and validates a package's `package.json`. */
-function readManifest(packageDir: string): Manifest {
-  const parsed: unknown = JSON.parse(readFileSync(path.join(packageDir, 'package.json'), 'utf8'));
-  return manifestSchema.parse(parsed);
-}
+// region | Helpers
 
 /** Lists each collected import that the manifest declares as neither a dependency nor a peer, sorted by name. */
 function findUndeclared(collected: Map<string, Set<string>>, manifest: Manifest): Violation[] {
@@ -145,3 +141,11 @@ function formatViolations(pkg: string, violations: Violation[]): string {
   });
   return `packages/${pkg}: eager configs import modules not declared as a dependency or peerDependency:\n${lines.join('\n')}`;
 }
+
+/** Reads and validates a package's `package.json`. */
+function readManifest(packageDir: string): Manifest {
+  const parsed: unknown = JSON.parse(readFileSync(path.join(packageDir, 'package.json'), 'utf8'));
+  return manifestSchema.parse(parsed);
+}
+
+// endregion | Helpers
