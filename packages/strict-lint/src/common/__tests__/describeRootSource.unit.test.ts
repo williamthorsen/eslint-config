@@ -13,6 +13,6 @@ describe(describeRootSource, () => {
     ['package-json', 'nearest package.json'],
     ['start-dir', 'no project marker; using the start directory'],
   ] as const)('names the %s fallback, which no marker chose', (source, expected) => {
-    expect(describeRootSource({ marker: null, rootDir: '/project', source })).toBe(expected);
+    expect(describeRootSource({ rootDir: '/project', source })).toBe(expected);
   });
 });
