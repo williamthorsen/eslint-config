@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { collectStaticExternalImports, parseExternalImports } from './support/collectStaticImports.ts';
+import { collectStaticExternalImports, parseExternalImports } from '../test-utils/collectStaticImports.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
