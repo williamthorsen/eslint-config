@@ -1,6 +1,68 @@
+import { makeTsconfigChainEntry } from 'readyup/testing';
 import { describe, expect, it } from 'vitest';
 
-import { isEsYearAtLeast, parseEsYear, readDeclaredEsYear } from '../es-year.ts';
+import { findEsYearMismatches, isEsYearAtLeast, parseEsYear, readDeclaredEsYear } from '../es-year.ts';
+
+const BASE_ENTRY = makeTsconfigChainEntry({
+  compilerOptions: { lib: ['ES2025', 'ESNext.Disposable'], target: 'ES2025' },
+  path: 'packages/tsconfig/tsconfig.base.json',
+  specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
+});
+
+describe(findEsYearMismatches, () => {
+  it('reports a config declaring another year, with its path and the year', () => {
+    const entries = [
+      makeTsconfigChainEntry({ compilerOptions: { target: 'ES2022' }, path: 'packages/api/tsconfig.json' }),
+      BASE_ENTRY,
+    ];
+
+    expect(findEsYearMismatches(entries, 1, 'es2025')).toStrictEqual([
+      { esYear: 'es2022', path: 'packages/api/tsconfig.json' },
+    ]);
+  });
+
+  it('leaves a config declaring the base year alone', () => {
+    const entries = [
+      makeTsconfigChainEntry({ compilerOptions: { target: 'ES2025' }, path: 'packages/api/tsconfig.json' }),
+      BASE_ENTRY,
+    ];
+
+    expect(findEsYearMismatches(entries, 1, 'es2025')).toStrictEqual([]);
+  });
+
+  it('leaves a config shipped by a dependency alone', () => {
+    const entries = [
+      makeTsconfigChainEntry({ path: 'packages/web/tsconfig.json' }),
+      makeTsconfigChainEntry({
+        compilerOptions: { target: 'ES2022' },
+        path: 'node_modules/astro/tsconfigs/base.json',
+        specifier: 'astro/tsconfigs/base',
+      }),
+      BASE_ENTRY,
+    ];
+
+    expect(findEsYearMismatches(entries, 2, 'es2025')).toStrictEqual([]);
+  });
+
+  it('leaves the base and every config beyond it alone', () => {
+    const entries = [
+      makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }),
+      makeTsconfigChainEntry({ ...BASE_ENTRY, compilerOptions: { target: 'ES2022' } }),
+      makeTsconfigChainEntry({ compilerOptions: { target: 'ES2020' }, path: 'tsconfig.json' }),
+    ];
+
+    expect(findEsYearMismatches(entries, 1, 'es2025')).toStrictEqual([]);
+  });
+
+  it('leaves a config declaring no year alone', () => {
+    const entries = [
+      makeTsconfigChainEntry({ compilerOptions: { lib: ['ESNext', 'DOM'] }, path: 'packages/api/tsconfig.json' }),
+      BASE_ENTRY,
+    ];
+
+    expect(findEsYearMismatches(entries, 1, 'es2025')).toStrictEqual([]);
+  });
+});
 
 describe(isEsYearAtLeast, () => {
   it('orders years by the year that they name', () => {

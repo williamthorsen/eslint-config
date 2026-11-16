@@ -21,9 +21,8 @@ import {
   type TsconfigChain,
 } from 'readyup/check-utils';
 
-import { isConsumerOwnedConfig } from '../../src/readiness/base-chain.ts';
 import { classifyChain } from '../../src/readiness/classifyChain.ts';
-import { readDeclaredEsYear } from '../../src/readiness/es-year.ts';
+import { findEsYearMismatches, readDeclaredEsYear } from '../../src/readiness/es-year.ts';
 import { type EscapingPath, findEscapingPaths } from '../../src/readiness/findEscapingPaths.ts';
 import { findRedundantOptions } from '../../src/readiness/findRedundantOptions.ts';
 import { listSearchDirs } from '../../src/readiness/listSearchDirs.ts';
@@ -110,14 +109,11 @@ function checkEveryEsYearMatchesTheBase(): boolean | CheckOutcome {
   const baseEsYear = readBaseEsYear();
   if (baseEsYear === undefined) return true;
 
-  const offenders: string[] = [];
-  for (const adoption of listAdoptedTsconfigs()) {
-    for (const entry of adoption.chain.entries.slice(0, adoption.baseIndex)) {
-      if (!isConsumerOwnedConfig(entry.path)) continue;
-      const declared = readDeclaredEsYear(entry.compilerOptions);
-      if (declared !== undefined && declared !== baseEsYear) offenders.push(`${entry.path} (${declared})`);
-    }
-  }
+  const offenders = listAdoptedTsconfigs().flatMap((adoption) =>
+    findEsYearMismatches(adoption.chain.entries, adoption.baseIndex, baseEsYear).map(
+      (mismatch) => `${mismatch.path} (${mismatch.esYear})`,
+    ),
+  );
   if (offenders.length === 0) return { ok: true, detail: `every tsconfig extending the base is at ${baseEsYear}` };
   return {
     ok: false,
