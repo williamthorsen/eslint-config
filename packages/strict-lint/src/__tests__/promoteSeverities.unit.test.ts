@@ -135,6 +135,14 @@ function buildMessage(overrides: Partial<Linter.LintMessage> = {}): Linter.LintM
   return { column: 1, line: 1, message: 'a problem', ruleId: null, severity: 1, ...overrides };
 }
 
+/** Builds a resolver that derives each file's ceilings from its path. */
+function buildResolver(ceilingsFor: (filePath: string) => MaxSeverityMap): CeilingResolver {
+  return {
+    getCascades: () => new Map(),
+    resolveFor: (filePath) => Promise.resolve(ceilingsFor(filePath)),
+  };
+}
+
 /** Builds a lint result whose counts default to zero, so that a test states only the fields that it asserts against. */
 function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintResult {
   return {
@@ -148,14 +156,6 @@ function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintRes
     usedDeprecatedRules: [],
     warningCount: 0,
     ...overrides,
-  };
-}
-
-/** Builds a resolver that derives each file's ceilings from its path. */
-function buildResolver(ceilingsFor: (filePath: string) => MaxSeverityMap): CeilingResolver {
-  return {
-    getCascades: () => new Map(),
-    resolveFor: (filePath) => Promise.resolve(ceilingsFor(filePath)),
   };
 }
 

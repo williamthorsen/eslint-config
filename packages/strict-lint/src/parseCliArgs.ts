@@ -145,15 +145,6 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
   };
 }
 
-/** Parses and validates the `--max-warnings` value as an integer. */
-function parseMaxWarnings(value: string): number {
-  const parsed = Number.parseInt(value, 10);
-  if (Number.isNaN(parsed) || String(parsed) !== value) {
-    throw new Error(`Invalid --max-warnings value "${value}". Expected an integer.`);
-  }
-  return parsed;
-}
-
 const FIX_TYPES: Record<string, ESLint.FixType> = {
   directive: 'directive',
   problem: 'problem',
@@ -161,28 +152,12 @@ const FIX_TYPES: Record<string, ESLint.FixType> = {
   layout: 'layout',
 };
 
-/** Validates a `--fix-type` value against the fix types that ESLint accepts. */
-function toFixType(value: string): ESLint.FixType {
-  const fixType = FIX_TYPES[value];
-  if (fixType === undefined) {
-    throw new Error(`Invalid --fix-type value "${value}". Expected "directive", "problem", "suggestion", or "layout".`);
-  }
-  return fixType;
-}
-
 const CACHE_STRATEGIES: Record<string, ESLint.CacheStrategy> = {
   content: 'content',
   metadata: 'metadata',
 };
 
-/** Validates a `--cache-strategy` value against the strategies that ESLint accepts. */
-function toCacheStrategy(value: string): ESLint.CacheStrategy {
-  const strategy = CACHE_STRATEGIES[value];
-  if (strategy === undefined) {
-    throw new Error(`Invalid --cache-strategy value "${value}". Expected "content" or "metadata".`);
-  }
-  return strategy;
-}
+// region | Helpers
 
 /** Parses a `--concurrency` value, accepting an integer, `auto`, or `off`. */
 function parseConcurrency(value: string): number | 'auto' | 'off' {
@@ -195,3 +170,32 @@ function parseConcurrency(value: string): number | 'auto' | 'off' {
   }
   return parsed;
 }
+
+/** Parses and validates the `--max-warnings` value as an integer. */
+function parseMaxWarnings(value: string): number {
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isNaN(parsed) || String(parsed) !== value) {
+    throw new Error(`Invalid --max-warnings value "${value}". Expected an integer.`);
+  }
+  return parsed;
+}
+
+/** Validates a `--cache-strategy` value against the strategies that ESLint accepts. */
+function toCacheStrategy(value: string): ESLint.CacheStrategy {
+  const strategy = CACHE_STRATEGIES[value];
+  if (strategy === undefined) {
+    throw new Error(`Invalid --cache-strategy value "${value}". Expected "content" or "metadata".`);
+  }
+  return strategy;
+}
+
+/** Validates a `--fix-type` value against the fix types that ESLint accepts. */
+function toFixType(value: string): ESLint.FixType {
+  const fixType = FIX_TYPES[value];
+  if (fixType === undefined) {
+    throw new Error(`Invalid --fix-type value "${value}". Expected "directive", "problem", "suggestion", or "layout".`);
+  }
+  return fixType;
+}
+
+// endregion | Helpers

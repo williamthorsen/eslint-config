@@ -70,7 +70,7 @@ const config = defineConfig([
     },
   },
   {
-    files: ['packages/typescript/src/plugins/rules/*.ts'],
+    files: typeScriptFiles,
     rules: {
       'sky-pilot/helpers-last': 'error',
     },

@@ -27,14 +27,6 @@ describe('rule ids configured by the opt-in factories', () => {
 
 // region | Helpers
 
-/** Collects every rule id that the blocks configure and that no registered plugin and no core rule defines. */
-function findUnresolvedRuleIds(blocks: readonly Config[]): string[] {
-  const plugins = collectPlugins(blocks);
-  const ruleIds = new Set(blocks.flatMap((block) => Object.keys(block.rules ?? {})));
-
-  return [...ruleIds].filter((ruleId) => !resolvesToRule(ruleId, plugins));
-}
-
 /** Merges the blocks' plugin registrations; a block's rules may name a plugin that a sibling block registers. */
 function collectPlugins(blocks: readonly Config[]): Map<string, ConfigPlugin> {
   const plugins = new Map<string, ConfigPlugin>();
@@ -48,6 +40,14 @@ function collectPlugins(blocks: readonly Config[]): Map<string, ConfigPlugin> {
   }
 
   return plugins;
+}
+
+/** Collects every rule id that the blocks configure and that no registered plugin and no core rule defines. */
+function findUnresolvedRuleIds(blocks: readonly Config[]): string[] {
+  const plugins = collectPlugins(blocks);
+  const ruleIds = new Set(blocks.flatMap((block) => Object.keys(block.rules ?? {})));
+
+  return [...ruleIds].filter((ruleId) => !resolvesToRule(ruleId, plugins));
 }
 
 /**

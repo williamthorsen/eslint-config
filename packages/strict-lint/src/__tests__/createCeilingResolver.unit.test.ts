@@ -113,11 +113,6 @@ describe(createCeilingResolver, () => {
 
 // region | Helpers
 
-/** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
-function withCascade(...configs: StrictLintConfig[]): void {
-  mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs));
-}
-
 /** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
 function cascadeOf(configs: StrictLintConfig[]) {
   return {
@@ -129,6 +124,11 @@ function cascadeOf(configs: StrictLintConfig[]) {
     projectRoot: { marker: 'pnpm-workspace.yaml', rootDir: '/project', source: 'marker' },
     stopReason: 'stop-dir',
   };
+}
+
+/** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
+function withCascade(...configs: StrictLintConfig[]): void {
+  mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs));
 }
 
 // endregion | Helpers

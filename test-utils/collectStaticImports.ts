@@ -64,10 +64,7 @@ export function parseExternalImports(sourceText: string, fileName = 'inline.ts')
   return [...new Set(collectEdges(sourceFile).external)].toSorted((a, b) => a.localeCompare(b));
 }
 
-/** Parses a file into a TypeScript source file. */
-function readSourceFile(file: string): ts.SourceFile {
-  return ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, scriptKindFor(file));
-}
+// region | Helpers
 
 /**
  * Splits a module's runtime import and export-from specifiers into relative paths, subpath imports, and external
@@ -95,25 +92,27 @@ function collectEdges(sourceFile: ts.SourceFile): ModuleEdges {
   return { relative, subpath, external };
 }
 
-/**
- * Returns the module specifier of a runtime import or export-from statement, or `undefined` for any other statement,
- * including a fully type-only one, which compilation erases.
- */
-function runtimeModuleSpecifier(statement: ts.Statement): string | undefined {
-  if (ts.isImportDeclaration(statement)) {
-    if (!isRuntimeImport(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) {
-      return undefined;
-    }
-    return statement.moduleSpecifier.text;
+/** Finds the `package.json` in `directory` or its nearest ancestor that contains one. */
+function findNearestManifest(directory: string): string | undefined {
+  const candidate = path.join(directory, 'package.json');
+  if (existsSync(candidate)) {
+    return candidate;
   }
-  if (ts.isExportDeclaration(statement)) {
-    const { moduleSpecifier } = statement;
-    if (moduleSpecifier === undefined || statement.isTypeOnly || !ts.isStringLiteral(moduleSpecifier)) {
-      return undefined;
-    }
-    return moduleSpecifier.text;
+  const parent = path.dirname(directory);
+  return parent === directory ? undefined : findNearestManifest(parent);
+}
+
+/** Reports whether a specifier names a Node builtin, with or without the `node:` prefix. */
+function isNodeBuiltin(specifier: string): boolean {
+  if (specifier.startsWith('node:')) {
+    return true;
   }
-  return undefined;
+  return nodeBuiltins.has(specifier);
+}
+
+/** Reports whether a value is a non-array object. */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /** Reports whether an import loads runtime code: It does unless it is type-only as a whole or in every element. */
@@ -135,21 +134,21 @@ function isRuntimeImport(node: ts.ImportDeclaration): boolean {
   return bindings.elements.some((element) => !element.isTypeOnly);
 }
 
-/** Reduces a bare specifier to its package name: `@scope/pkg/sub` -> `@scope/pkg`, `pkg/sub` -> `pkg`. */
-function toPackageName(specifier: string): string {
-  const segments = specifier.split('/');
-  if (specifier.startsWith('@')) {
-    return segments.slice(0, 2).join('/');
-  }
-  return segments[0] ?? specifier;
+/** Parses a file into a TypeScript source file. */
+function readSourceFile(file: string): ts.SourceFile {
+  return ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, scriptKindFor(file));
 }
 
-/** Reports whether a specifier names a Node builtin, with or without the `node:` prefix. */
-function isNodeBuiltin(specifier: string): boolean {
-  if (specifier.startsWith('node:')) {
-    return true;
-  }
-  return nodeBuiltins.has(specifier);
+/** Resolves an import path to a source file by trying the TypeScript extensions and directory indexes. */
+function resolveModuleFile(candidate: string): string | undefined {
+  const attempts = [
+    candidate,
+    `${candidate}.ts`,
+    `${candidate}.tsx`,
+    path.join(candidate, 'index.ts'),
+    path.join(candidate, 'index.tsx'),
+  ];
+  return attempts.find((attempt) => existsSync(attempt) && statSync(attempt).isFile());
 }
 
 /**
@@ -181,34 +180,39 @@ function resolveSubpathImport(specifier: string, importer: string): string {
   return specifier;
 }
 
-/** Finds the `package.json` in `directory` or its nearest ancestor that contains one. */
-function findNearestManifest(directory: string): string | undefined {
-  const candidate = path.join(directory, 'package.json');
-  if (existsSync(candidate)) {
-    return candidate;
+/**
+ * Returns the module specifier of a runtime import or export-from statement, or `undefined` for any other statement,
+ * including a fully type-only one, which compilation erases.
+ */
+function runtimeModuleSpecifier(statement: ts.Statement): string | undefined {
+  if (ts.isImportDeclaration(statement)) {
+    if (!isRuntimeImport(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) {
+      return undefined;
+    }
+    return statement.moduleSpecifier.text;
   }
-  const parent = path.dirname(directory);
-  return parent === directory ? undefined : findNearestManifest(parent);
-}
-
-/** Reports whether a value is a non-array object. */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-/** Resolves an import path to a source file by trying the TypeScript extensions and directory indexes. */
-function resolveModuleFile(candidate: string): string | undefined {
-  const attempts = [
-    candidate,
-    `${candidate}.ts`,
-    `${candidate}.tsx`,
-    path.join(candidate, 'index.ts'),
-    path.join(candidate, 'index.tsx'),
-  ];
-  return attempts.find((attempt) => existsSync(attempt) && statSync(attempt).isFile());
+  if (ts.isExportDeclaration(statement)) {
+    const { moduleSpecifier } = statement;
+    if (moduleSpecifier === undefined || statement.isTypeOnly || !ts.isStringLiteral(moduleSpecifier)) {
+      return undefined;
+    }
+    return moduleSpecifier.text;
+  }
+  return undefined;
 }
 
 /** Returns the script kind that matches a file's extension. */
 function scriptKindFor(file: string): ts.ScriptKind {
   return file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
 }
+
+/** Reduces a bare specifier to its package name: `@scope/pkg/sub` -> `@scope/pkg`, `pkg/sub` -> `pkg`. */
+function toPackageName(specifier: string): string {
+  const segments = specifier.split('/');
+  if (specifier.startsWith('@')) {
+    return segments.slice(0, 2).join('/');
+  }
+  return segments[0] ?? specifier;
+}
+
+// endregion | Helpers

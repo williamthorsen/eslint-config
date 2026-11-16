@@ -272,6 +272,20 @@ describe(resolveSharedConfigs, () => {
 
 // region | Helpers
 
+/** Returns the strict-lint config path within a directory. */
+function configPathIn(dir: string): string {
+  return `${dir}/${STRICT_LINT_CONFIG_NAME}`;
+}
+
+/** Returns the stop predicate that strict-lint passed to the cascade on its most recent call. */
+function stopAscentPredicate(): (config: StrictLintConfig) => boolean {
+  const predicate = mockedLoadConfigCascade.mock.lastCall?.[0].shouldStopAscent;
+  if (predicate === undefined) {
+    throw new Error('loadConfigCascade was called without a stop predicate');
+  }
+  return predicate;
+}
+
 /**
  * Makes the mocked cascade resolve with an entry per directory, in the nearest-first order of the real one, passing
  * each raw config through the parser that strict-lint supplied, as the real cascade does.
@@ -289,20 +303,6 @@ function withCascadeEntries(
       stopReason,
     })),
   );
-}
-
-/** Returns the stop predicate that strict-lint passed to the cascade on its most recent call. */
-function stopAscentPredicate(): (config: StrictLintConfig) => boolean {
-  const predicate = mockedLoadConfigCascade.mock.lastCall?.[0].shouldStopAscent;
-  if (predicate === undefined) {
-    throw new Error('loadConfigCascade was called without a stop predicate');
-  }
-  return predicate;
-}
-
-/** Returns the strict-lint config path within a directory. */
-function configPathIn(dir: string): string {
-  return `${dir}/${STRICT_LINT_CONFIG_NAME}`;
 }
 
 // endregion | Helpers
