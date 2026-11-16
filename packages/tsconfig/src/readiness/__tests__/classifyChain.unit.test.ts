@@ -1,41 +1,41 @@
 import type { TsconfigChain } from 'readyup/check-utils';
+import { makeTsconfigChainEntry } from 'readyup/testing';
 import { describe, expect, it } from 'vitest';
 
 import { classifyChain } from '../classifyChain.ts';
-import { buildChainEntry } from '../test-utils/buildChainEntry.ts';
 
-const BASE_ENTRY = buildChainEntry({
+const BASE_ENTRY = makeTsconfigChainEntry({
   path: 'packages/tsconfig/tsconfig.base.json',
   specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
 });
 
-const EXTERNAL_BASE_ENTRY = buildChainEntry({
+const EXTERNAL_BASE_ENTRY = makeTsconfigChainEntry({
   path: 'node_modules/astro/tsconfigs/base.json',
   specifier: 'astro/tsconfigs/base',
 });
 
 describe(classifyChain, () => {
   it('reports a chain reaching the base as adopted, with its position in the chain', () => {
-    const chain = buildChain([buildChainEntry({ path: 'packages/api/tsconfig.json' }), BASE_ENTRY]);
+    const chain = buildChain([makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }), BASE_ENTRY]);
 
     expect(classifyChain(chain)).toStrictEqual({ baseIndex: 1, kind: 'adopted' });
   });
 
   it('reports a chain containing only a base of another package as an opt-out', () => {
-    const chain = buildChain([buildChainEntry({ path: 'packages/web/tsconfig.json' }), EXTERNAL_BASE_ENTRY]);
+    const chain = buildChain([makeTsconfigChainEntry({ path: 'packages/web/tsconfig.json' }), EXTERNAL_BASE_ENTRY]);
 
     expect(classifyChain(chain)).toStrictEqual({ kind: 'external-base' });
   });
 
   it('reports a chain reaching no base at all as unadopted', () => {
-    const chain = buildChain([buildChainEntry({ path: 'packages/api/tsconfig.json' })]);
+    const chain = buildChain([makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' })]);
 
     expect(classifyChain(chain)).toStrictEqual({ kind: 'unadopted' });
   });
 
   it('reports a specifier naming the base but failing to resolve as uninstalled', () => {
     const chain = buildChain(
-      [buildChainEntry({ path: 'packages/api/tsconfig.json' })],
+      [makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' })],
       [{ from: 'packages/api/tsconfig.json', specifier: '@williamthorsen/tsconfig/tsconfig.base.json' }],
     );
 
@@ -44,7 +44,7 @@ describe(classifyChain, () => {
 
   it('reports uninstalled ahead of the opt-out carve-out', () => {
     const chain = buildChain(
-      [buildChainEntry({ path: 'packages/web/tsconfig.json' }), EXTERNAL_BASE_ENTRY],
+      [makeTsconfigChainEntry({ path: 'packages/web/tsconfig.json' }), EXTERNAL_BASE_ENTRY],
       [{ from: 'packages/web/tsconfig.json', specifier: '@williamthorsen/tsconfig/tsconfig.base.json' }],
     );
 
@@ -53,7 +53,7 @@ describe(classifyChain, () => {
 
   it('reports uninstalled ahead of a base that resolved elsewhere in the chain', () => {
     const chain = buildChain(
-      [buildChainEntry({ path: 'packages/api/tsconfig.json' }), BASE_ENTRY],
+      [makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }), BASE_ENTRY],
       [{ from: 'packages/api/tsconfig.json', specifier: '@williamthorsen/tsconfig/tsconfig.legacy.json' }],
     );
 

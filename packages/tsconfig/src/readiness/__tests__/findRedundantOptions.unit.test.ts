@@ -1,9 +1,9 @@
+import { makeTsconfigChainEntry } from 'readyup/testing';
 import { describe, expect, it } from 'vitest';
 
 import { findRedundantOptions } from '../findRedundantOptions.ts';
-import { buildChainEntry } from '../test-utils/buildChainEntry.ts';
 
-const BASE_ENTRY = buildChainEntry({
+const BASE_ENTRY = makeTsconfigChainEntry({
   compilerOptions: { lib: ['ES2025', 'ESNext.Disposable'], strict: true, target: 'ES2025' },
   path: 'packages/tsconfig/tsconfig.base.json',
   specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
@@ -12,7 +12,7 @@ const BASE_ENTRY = buildChainEntry({
 describe(findRedundantOptions, () => {
   it('reports a key restated with the base value, naming the config that restates it', () => {
     const entries = [
-      buildChainEntry({ compilerOptions: { strict: true }, path: 'packages/api/tsconfig.json' }),
+      makeTsconfigChainEntry({ compilerOptions: { strict: true }, path: 'packages/api/tsconfig.json' }),
       BASE_ENTRY,
     ];
 
@@ -22,7 +22,10 @@ describe(findRedundantOptions, () => {
   // A conflicting override is a deliberate departure from the base.
   it('leaves a key declared with a different value alone', () => {
     const entries = [
-      buildChainEntry({ compilerOptions: { strict: false, target: 'ES2022' }, path: 'packages/api/tsconfig.json' }),
+      makeTsconfigChainEntry({
+        compilerOptions: { strict: false, target: 'ES2022' },
+        path: 'packages/api/tsconfig.json',
+      }),
       BASE_ENTRY,
     ];
 
@@ -31,7 +34,7 @@ describe(findRedundantOptions, () => {
 
   it('compares structurally, so an array restated verbatim reads as redundant', () => {
     const entries = [
-      buildChainEntry({
+      makeTsconfigChainEntry({
         compilerOptions: { lib: ['ES2025', 'ESNext.Disposable'] },
         path: 'packages/api/tsconfig.json',
       }),
@@ -43,8 +46,12 @@ describe(findRedundantOptions, () => {
 
   it('reports a restatement made by an intermediate config, not only by the entry config', () => {
     const entries = [
-      buildChainEntry({ path: 'packages/api/tsconfig.json' }),
-      buildChainEntry({ compilerOptions: { strict: true }, path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
+      makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }),
+      makeTsconfigChainEntry({
+        compilerOptions: { strict: true },
+        path: 'tsconfig.json',
+        specifier: '../../tsconfig.json',
+      }),
       BASE_ENTRY,
     ];
 
@@ -53,9 +60,12 @@ describe(findRedundantOptions, () => {
 
   it('exempts a key that a config shipped by a dependency also declares', () => {
     const entries = [
-      buildChainEntry({ compilerOptions: { strict: true, target: 'ES2025' }, path: 'packages/web/tsconfig.json' }),
+      makeTsconfigChainEntry({
+        compilerOptions: { strict: true, target: 'ES2025' },
+        path: 'packages/web/tsconfig.json',
+      }),
       BASE_ENTRY,
-      buildChainEntry({
+      makeTsconfigChainEntry({
         compilerOptions: { target: 'ES2022' },
         path: 'node_modules/astro/tsconfigs/base.json',
         specifier: 'astro/tsconfigs/base',
@@ -68,8 +78,8 @@ describe(findRedundantOptions, () => {
   // A framework base's own files are nearer than this base once it reaches them by relative path.
   it('never reports a config shipped by a dependency, whatever it restates', () => {
     const entries = [
-      buildChainEntry({ path: 'packages/web/tsconfig.json' }),
-      buildChainEntry({
+      makeTsconfigChainEntry({ path: 'packages/web/tsconfig.json' }),
+      makeTsconfigChainEntry({
         compilerOptions: { strict: true, target: 'ES2025' },
         path: 'node_modules/astro/tsconfigs/base.json',
         specifier: './base.json',
@@ -82,7 +92,7 @@ describe(findRedundantOptions, () => {
 
   it('ignores a key that the base does not declare', () => {
     const entries = [
-      buildChainEntry({ compilerOptions: { types: ['node'] }, path: 'packages/api/tsconfig.json' }),
+      makeTsconfigChainEntry({ compilerOptions: { types: ['node'] }, path: 'packages/api/tsconfig.json' }),
       BASE_ENTRY,
     ];
 
@@ -91,9 +101,9 @@ describe(findRedundantOptions, () => {
 
   it('ignores declarations farther along the chain than the base', () => {
     const entries = [
-      buildChainEntry({ path: 'packages/api/tsconfig.json' }),
+      makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }),
       BASE_ENTRY,
-      buildChainEntry({
+      makeTsconfigChainEntry({
         compilerOptions: { strict: true },
         path: 'tsconfig.legacy.json',
         specifier: './tsconfig.legacy.json',
@@ -104,6 +114,6 @@ describe(findRedundantOptions, () => {
   });
 
   it('returns nothing when the index names no entry', () => {
-    expect(findRedundantOptions([buildChainEntry({ compilerOptions: { strict: true } })], 3)).toStrictEqual([]);
+    expect(findRedundantOptions([makeTsconfigChainEntry({ compilerOptions: { strict: true } })], 3)).toStrictEqual([]);
   });
 });
