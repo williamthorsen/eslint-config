@@ -28,7 +28,7 @@
     "@williamthorsen/strict-lint": "workspace:*",
     "@williamthorsen/toolbelt.vitest": "catalog:",
     "@williamthorsen/tsconfig": "workspace:*",
-    "codeassembly": "0.20.2",
+    "codeassembly": "0.21.0",
     "eslint": "catalog:",
     "eslint-plugin-n": "catalog:",
     "globals": "17.14.0",
