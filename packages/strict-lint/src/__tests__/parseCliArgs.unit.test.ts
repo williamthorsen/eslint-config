@@ -168,6 +168,22 @@ describe(parseCliArgs, () => {
     expect(result.ruleOverrides).toStrictEqual({ 'no-console': 'error' });
   });
 
+  it('parses a numeric --rule severity as a number', () => {
+    const result = parseCliArgs(['--rule', 'no-console: 2', '--rule', 'no-debugger: 0']);
+
+    expect(result.ruleOverrides).toStrictEqual({ 'no-console': 2, 'no-debugger': 0 });
+  });
+
+  it('throws on an invalid --rule severity, listing the accepted severities', () => {
+    expect(() => parseCliArgs(['--rule', 'no-console: typo'])).toThrow(
+      'Invalid --rule value "no-console: typo". Expected a severity of "off", "warn", "error", 0, 1, or 2.',
+    );
+  });
+
+  it('throws on a non-canonical numeric --rule severity', () => {
+    expect(() => parseCliArgs(['--rule', 'no-console: 2.0'])).toThrow('Invalid --rule value');
+  });
+
   it('throws on --rule without colon separator', () => {
     expect(() => parseCliArgs(['--rule', 'no-console'])).toThrow('Invalid --rule value');
   });

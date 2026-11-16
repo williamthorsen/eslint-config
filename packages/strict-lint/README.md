@@ -216,32 +216,32 @@ strict-lint init [options]
 
 `strict-lint` accepts the same arguments as `eslint`. Positional arguments default to `.` (lint the current directory). `init` is a command in first position alone, so `strict-lint ./init` still lints a path of that name; see [Scaffolding a config](#scaffolding-a-config) for its flags.
 
-| Option                         | Description                                                                  |
-| ------------------------------ | ---------------------------------------------------------------------------- |
-| `-c, --config <path>`          | Path to the ESLint config file                                               |
-| `--debug`                      | Report strict-lint's own config resolution on stderr                         |
-| `-h, --help`                   | Show usage for both modes                                                    |
-| `-V, --version`                | Show the version. ESLint's `-v` is not accepted.                             |
-| `--rule <name:severity>`       | Override a single rule (repeatable). Severity: `off` \| `warn` \| `error`.   |
-| `--fix`                        | Auto-fix problems                                                            |
-| `--fix-dry-run`                | Compute fixes but do not write                                               |
-| `--fix-type <type>`            | Limit fix kinds (repeatable): `directive`, `problem`, `suggestion`, `layout` |
-| `--ignore-pattern <glob>`      | Add an ignore pattern (repeatable)                                           |
-| `--no-ignore`                  | Disable ignore globs                                                         |
-| `--error-on-unmatched-pattern` | Error if a pattern matches no files                                          |
-| `--pass-on-no-patterns`        | Exit 0 if no files match                                                     |
-| `--no-inline-config`           | Disable inline `eslint-disable` directives                                   |
-| `--cache`                      | Enable result caching                                                        |
-| `--cache-location <path>`      | Cache file location                                                          |
-| `--cache-strategy <s>`         | `content` or `metadata`                                                      |
-| `--warn-ignored`               | Report ignored files as warnings                                             |
-| `--stats`                      | Include rule timing stats                                                    |
-| `--flag <name>`                | ESLint feature flag (repeatable)                                             |
-| `--concurrency <n\|auto\|off>` | Lint in worker threads. Default `off`.                                       |
-| `--quiet`                      | Show only errors, hide warnings                                              |
-| `--max-warnings <n>`           | Fail if warnings exceed `n`. `-1` disables.                                  |
-| `-f, --format <name>`          | Formatter (default: `stylish`)                                               |
-| `-o, --output-file <path>`     | Write formatter output to a file                                             |
+| Option                         | Description                                                                              |
+| ------------------------------ | ---------------------------------------------------------------------------------------- |
+| `-c, --config <path>`          | Path to the ESLint config file                                                           |
+| `--debug`                      | Report strict-lint's own config resolution on stderr                                     |
+| `-h, --help`                   | Show usage for both modes                                                                |
+| `-V, --version`                | Show the version. ESLint's `-v` is not accepted.                                         |
+| `--rule <name:severity>`       | Override a single rule (repeatable). Severity: `off`, `warn`, `error`, `0`, `1`, or `2`. |
+| `--fix`                        | Auto-fix problems                                                                        |
+| `--fix-dry-run`                | Compute fixes but do not write                                                           |
+| `--fix-type <type>`            | Limit fix kinds (repeatable): `directive`, `problem`, `suggestion`, `layout`             |
+| `--ignore-pattern <glob>`      | Add an ignore pattern (repeatable)                                                       |
+| `--no-ignore`                  | Disable ignore globs                                                                     |
+| `--error-on-unmatched-pattern` | Error if a pattern matches no files                                                      |
+| `--pass-on-no-patterns`        | Exit 0 if no files match                                                                 |
+| `--no-inline-config`           | Disable inline `eslint-disable` directives                                               |
+| `--cache`                      | Enable result caching                                                                    |
+| `--cache-location <path>`      | Cache file location                                                                      |
+| `--cache-strategy <s>`         | `content` or `metadata`                                                                  |
+| `--warn-ignored`               | Report ignored files as warnings                                                         |
+| `--stats`                      | Include rule timing stats                                                                |
+| `--flag <name>`                | ESLint feature flag (repeatable)                                                         |
+| `--concurrency <n\|auto\|off>` | Lint in worker threads. Default `off`.                                                   |
+| `--quiet`                      | Show only errors, hide warnings                                                          |
+| `--max-warnings <n>`           | Fail if warnings exceed `n`. `-1` disables.                                              |
+| `-f, --format <name>`          | Formatter (default: `stylish`)                                                           |
+| `-o, --output-file <path>`     | Write formatter output to a file                                                         |
 
 `--rule` example:
 
@@ -269,7 +269,7 @@ await strictLint({
 | `baseConfig`    | `Linter.Config[]`                                  | Use this config instead of loading a config file from disk.              |
 | `patterns`      | `string[]`                                         | Files or globs to lint (default: `['.']`).                               |
 | `maxSeverity`   | `Record<string, Linter.RuleSeverity \| undefined>` | Per-rule ceiling on promotion; a ceiling below `error` exempts its rule. |
-| `ruleOverrides` | `Record<string, 'off' \| 'warn' \| 'error'>`       | Force rule severity (applied after errorization).                        |
+| `ruleOverrides` | `Record<string, Linter.RuleSeverity>`              | Force rule severity (applied after errorization).                        |
 
 `strictLint()` reads `process.argv` and merges CLI flags with the programmatic options. CLI rule overrides win over programmatic ones.
 
