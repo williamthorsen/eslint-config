@@ -1,8 +1,8 @@
 import { StrictLintError } from './cliErrors.ts';
 
 /**
- * Reports a value thrown out of a CLI command on stderr, under `prefix`, and returns the exit code. An anticipated error
- * prints as one line; anything else prints as an internal error, with its stack frames.
+ * Reports a value thrown out of a CLI command on stderr, under `prefix`, and returns the exit code. An anticipated
+ * error prints as one line; anything else prints as an internal error, with its stack frames.
  */
 export function reportCliError(error: unknown, prefix: string): 1 | 2 {
   if (error instanceof StrictLintError) {
