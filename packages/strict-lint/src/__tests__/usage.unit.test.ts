@@ -22,6 +22,14 @@ describe(showUsage, () => {
 
     expect(reported()).toContain('#cli-reference');
   });
+
+  it('documents -V, --version', () => {
+    const reported = captureInfo();
+
+    showUsage();
+
+    expect(reported()).toContain('-V, --version');
+  });
 });
 
 describe(showInitUsage, () => {

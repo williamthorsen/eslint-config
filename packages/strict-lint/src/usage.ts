@@ -13,7 +13,8 @@ Commands:
                 Run \`strict-lint init --help\` for its options.
 
 Options:
-  -h, --help    Show this help.
+  -h, --help     Show this help.
+  -V, --version  Show the version.
 
 Every other option that strict-lint accepts is an eslint option, forwarded through. The full
 list is in the README: ${README_URL}`);

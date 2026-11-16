@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+
 import { captureError, pointArgvAt } from '@williamthorsen/toolbelt.testing/candidate';
 import {
   disposeOnTestFinished,
@@ -385,6 +387,28 @@ describe(strictLint, () => {
     });
   });
 
+  describe('--version', () => {
+    it.each([['--version'], ['-V']])('prints the version for %s without linting', async (flag) => {
+      using _argv = pointArgvAt([flag]);
+      using silenced = silenceConsole(['info']);
+
+      await strictLint();
+
+      expect(listConsoleLines(silenced.info)).toStrictEqual([readManifestVersion()]);
+      expect(mockEslintConstructor).not.toHaveBeenCalled();
+      expect(exitMock.spy).not.toHaveBeenCalled();
+    });
+
+    it('prints the usage instead when --help is also given', async () => {
+      using _argv = pointArgvAt(['--help', '--version']);
+      using silenced = silenceConsole(['info']);
+
+      await strictLint();
+
+      expect(listConsoleLines(silenced.info).join('\n')).toContain('Usage: strict-lint');
+    });
+  });
+
   describe('CLI behavior', () => {
     it('uses CLI positionals as lint patterns', async () => {
       using _argv = pointArgvAt(['src/', 'lib/']);
@@ -595,6 +619,16 @@ function formattedText(): string {
 /** Checks whether a value is a non-null object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+/** Returns the version that strict-lint's own manifest declares. */
+function readManifestVersion(): string {
+  const manifest: unknown = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+  const version = isRecord(manifest) ? manifest['version'] : undefined;
+  if (typeof version !== 'string') {
+    throw new TypeError('package.json declares no string version');
+  }
+  return version;
 }
 
 /** Returns the severities that the run passed to the formatter, which are the ones that it reports. */

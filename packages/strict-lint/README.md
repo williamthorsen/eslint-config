@@ -221,6 +221,7 @@ strict-lint init [options]
 | `-c, --config <path>`          | Path to the ESLint config file                                               |
 | `--debug`                      | Report strict-lint's own config resolution on stderr                         |
 | `-h, --help`                   | Show usage for both modes                                                    |
+| `-V, --version`                | Show the version. ESLint's `-v` is not accepted.                             |
 | `--rule <name:severity>`       | Override a single rule (repeatable). Severity: `off` \| `warn` \| `error`.   |
 | `--fix`                        | Auto-fix problems                                                            |
 | `--fix-dry-run`                | Compute fixes but do not write                                               |
