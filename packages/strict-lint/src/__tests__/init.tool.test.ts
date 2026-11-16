@@ -1,13 +1,13 @@
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { pathToFileURL } from 'node:url';
 
 import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
 import { describe, expect, it } from 'vitest';
 
 import { CONFIG_TEMPLATE } from '../init/configTemplate.ts';
 import { STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
+import { readJsonReport, runCli } from '../test-utils/strictLintCli.ts';
 
-const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const ROOT_MARKER = 'pnpm-lock.yaml';
 
 // The outcome matrix lives in `init/__tests__/initCommand.unit.test.ts`; these cases cover what only the published
@@ -39,10 +39,9 @@ describe('strict-lint init (subprocess)', () => {
       'init/a.js': "console.log('hi');\n",
     });
 
-    const { stdout } = runCli(tree.dir, ['--format', 'json', './init']);
+    const report = readJsonReport(runCli(tree.dir, ['--format', 'json', './init']));
 
-    const parsed: unknown = JSON.parse(stdout);
-    expect(Array.isArray(parsed)).toBe(true);
+    expect(report).toHaveLength(1);
     expect(tree.exists(STRICT_LINT_CONFIG_NAME)).toBe(false);
   }, 30_000);
 
@@ -111,12 +110,6 @@ function installStubPackage(tree: TempTree): void {
 /** Creates a fresh temp tree with a project-root marker and any given files. */
 function makeTree(files: Record<string, string> = {}): TempTree {
   return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-init-' });
-}
-
-/** Runs the CLI as consumers run it, from `cwd`. */
-function runCli(cwd: string, args: string[]): { status: number | null; stderr: string; stdout: string } {
-  const result = spawnSync(process.execPath, [CLI_PATH, ...args], { cwd, encoding: 'utf8' });
-  return { status: result.status, stderr: result.stderr, stdout: result.stdout };
 }
 
 // endregion | Helpers
