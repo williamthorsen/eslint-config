@@ -1,75 +1,55 @@
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-
-import { afterAll, describe, expect, it } from 'vitest';
+import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
+import { describe, expect, it } from 'vitest';
 
 import { canResolveStrictLint } from '../canResolveStrictLint.ts';
 
-const createdDirs: string[] = [];
-
 describe(canResolveStrictLint, () => {
-  afterAll(() => {
-    for (const dir of createdDirs) {
-      fs.rmSync(dir, { force: true, recursive: true });
-    }
-  });
-
   it('reports an installed package in the directory itself', () => {
-    const dir = makeTree({ install: '.' });
+    using tree = makeTree({ install: '.' });
 
-    expect(canResolveStrictLint(dir)).toBe(true);
+    expect(canResolveStrictLint(tree.dir)).toBe(true);
   });
 
   it('reports an installed package in an ancestor directory', () => {
-    const dir = makeTree({ install: '.' });
+    using tree = makeTree({ install: '.' });
 
-    expect(canResolveStrictLint(path.join(dir, 'packages/pkg/src'))).toBe(true);
+    expect(canResolveStrictLint(tree.resolve('packages/pkg/src'))).toBe(true);
   });
 
   it('reports no package when the tree contains no node_modules', () => {
-    const dir = makeTree({});
+    using tree = makeTree({});
 
-    expect(canResolveStrictLint(path.join(dir, 'packages/pkg'))).toBe(false);
+    expect(canResolveStrictLint(tree.resolve('packages/pkg'))).toBe(false);
   });
 
   it('reports no package when node_modules contains a different package', () => {
-    const dir = makeTree({});
-    writeEmptyJsonFile(path.join(dir, 'node_modules/@williamthorsen/tsconfig/package.json'));
+    using tree = makeTree({});
+    tree.write('node_modules/@williamthorsen/tsconfig/package.json', '{}');
 
-    expect(canResolveStrictLint(dir)).toBe(false);
+    expect(canResolveStrictLint(tree.dir)).toBe(false);
   });
 
   // A pnpm install links the package, so a walk that did not follow the link would miss it.
   it('follows a symlinked install', () => {
-    const dir = makeTree({});
-    const store = path.join(dir, 'store/strict-lint');
-    writeEmptyJsonFile(path.join(store, 'package.json'));
-    const linkParent = path.join(dir, 'node_modules/@williamthorsen');
-    fs.mkdirSync(linkParent, { recursive: true });
-    fs.symlinkSync(store, path.join(linkParent, 'strict-lint'), 'dir');
+    using tree = makeTree({});
+    tree.write('store/strict-lint/package.json', '{}');
+    tree.symlink('node_modules/@williamthorsen/strict-lint', tree.resolve('store/strict-lint'));
 
-    expect(canResolveStrictLint(dir)).toBe(true);
+    expect(canResolveStrictLint(tree.dir)).toBe(true);
   });
 });
 
 // region | Helpers
 
 /** Creates a throwaway tree containing `packages/pkg/src`, optionally with the package installed at `install`. */
-function makeTree({ install }: { install?: string }): string {
-  const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-resolve-')));
-  createdDirs.push(dir);
-  fs.mkdirSync(path.join(dir, 'packages/pkg/src'), { recursive: true });
-  if (install !== undefined) {
-    writeEmptyJsonFile(path.join(dir, install, 'node_modules/@williamthorsen/strict-lint/package.json'));
-  }
-  return dir;
-}
-
-/** Writes an empty JSON object to a file, creating its parent directories. */
-function writeEmptyJsonFile(filePath: string): void {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, '{}');
+function makeTree({ install }: { install?: string }): TempTree {
+  return createTempTree(
+    {
+      'packages/pkg/src/': '',
+      ...(install !== undefined && { [`${install}/node_modules/@williamthorsen/strict-lint/package.json`]: '{}' }),
+    },
+    { prefix: 'strict-lint-resolve-' },
+  );
 }
 
 // endregion | Helpers
