@@ -94,7 +94,7 @@ function buildOverrideConfig(
   if (Object.keys(cliOverrides).length > 0) {
     configs.push({
       rules: Object.fromEntries(
-        Object.entries(cliOverrides).map(([name, severity]) => [name, toRuleSeverity(severity)]),
+        Object.entries(cliOverrides).map(([name, severity]) => [name, parseRuleSeverity(severity)]),
       ),
     });
   }
@@ -230,6 +230,15 @@ function listDistinctProjectRoots(cascades: ReadonlyMap<string, StrictLintCascad
   return roots.values().toArray();
 }
 
+/** Converts a CLI severity string to a typed `Linter.RuleSeverity`. */
+function parseRuleSeverity(value: string): Linter.RuleSeverity {
+  const severity = SEVERITY_MAP[value];
+  if (severity === undefined) {
+    throw new Error(`Invalid rule severity "${value}". Expected "off", "warn", or "error".`);
+  }
+  return severity;
+}
+
 /** Reports where the ceilings came from, on stderr, so that the report stays clear of the formatter output. */
 function reportConfigProvenance(cascades: ReadonlyMap<string, StrictLintCascade>): void {
   if (cascades.size === 0) {
@@ -298,15 +307,6 @@ async function runLint(options: StrictLintOptions | undefined): Promise<{ text: 
     console.error(error);
     process.exit(1);
   }
-}
-
-/** Converts a CLI severity string to a typed `Linter.RuleSeverity`. */
-function toRuleSeverity(value: string): Linter.RuleSeverity {
-  const severity = SEVERITY_MAP[value];
-  if (severity === undefined) {
-    throw new Error(`Invalid rule severity "${value}". Expected "off", "warn", or "error".`);
-  }
-  return severity;
 }
 
 // endregion | Helpers

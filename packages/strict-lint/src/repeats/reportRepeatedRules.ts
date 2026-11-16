@@ -9,7 +9,7 @@ export function reportRepeatedRules(report: RepeatReport, configName: string): v
 
   if (unsortableLabels.length > 0) {
     console.error(
-      `strict-lint: shared-config check skipped: ${countOf(unsortableLabels.length, 'config element')} could not be sorted`,
+      `strict-lint: shared-config check skipped: ${formatCount(unsortableLabels.length, 'config element')} could not be sorted`,
     );
     for (const label of unsortableLabels) {
       console.error(`strict-lint:   ${label}`);
@@ -22,16 +22,18 @@ export function reportRepeatedRules(report: RepeatReport, configName: string): v
     return;
   }
 
-  console.error(`strict-lint: ${configName} repeats the shared config for ${countOf(repeatedRules.length, 'rule')}:`);
+  console.error(
+    `strict-lint: ${configName} repeats the shared config for ${formatCount(repeatedRules.length, 'rule')}:`,
+  );
   for (const { fileCount, ruleId } of repeatedRules) {
-    console.error(`strict-lint:   ${ruleId} (${countOf(fileCount, 'file')})`);
+    console.error(`strict-lint:   ${ruleId} (${formatCount(fileCount, 'file')})`);
   }
 }
 
 // region | Helpers
 
 /** Renders a count with its noun, pluralized by adding an `s`, which every noun that this reporter names accepts. */
-function countOf(count: number, noun: string): string {
+function formatCount(count: number, noun: string): string {
   return `${String(count)} ${noun}${count === 1 ? '' : 's'}`;
 }
 
