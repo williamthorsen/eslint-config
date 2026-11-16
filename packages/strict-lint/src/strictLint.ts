@@ -19,18 +19,30 @@ import type { StrictLintOptions } from './types.ts';
 import { showUsage } from './usage.ts';
 
 /** Runs strict-lint as a CLI entry point, parsing process.argv and exiting on errors. */
-export async function strictLint(options?: StrictLintOptions): Promise<string> {
-  const { text, errorCount } = await runLint(options);
+export const strictLint = createStrictLint();
 
-  // Skip an empty formatter result, which `console.info` would print as a blank line. Test the text, not the problem
-  // count, because `json` reports a clean run as `[]` and `html` reports it as a full document.
-  if (text) {
-    console.info(text);
-  }
-  if (errorCount > 0) {
-    process.exit(1);
-  }
-  return text;
+/** Options for `createStrictLint`; `loadConfigs` defaults to the real cascade walk. */
+export interface StrictLintDependencies {
+  loadConfigs?: typeof loadStrictLintConfigs;
+}
+
+/** Builds a `strictLint` that loads the strict-lint configs through `loadConfigs`. */
+export function createStrictLint({ loadConfigs = loadStrictLintConfigs }: StrictLintDependencies = {}): (
+  options?: StrictLintOptions,
+) => Promise<string> {
+  return async function strictLint(options?: StrictLintOptions): Promise<string> {
+    const { text, errorCount } = await runLint(options, loadConfigs);
+
+    // Skip an empty formatter result, which `console.info` would print as a blank line. Test the text, not the
+    // problem count, because `json` reports a clean run as `[]` and `html` reports it as a full document.
+    if (text) {
+      console.info(text);
+    }
+    if (errorCount > 0) {
+      process.exit(1);
+    }
+    return text;
+  };
 }
 
 // region | Helpers
@@ -102,9 +114,10 @@ async function checkForRepeatedRules(
   options: StrictLintOptions | undefined,
   parsed: ParsedCliArgs,
   results: ESLint.LintResult[],
+  loadConfigs: typeof loadStrictLintConfigs,
 ): Promise<void> {
   const cwd = process.cwd();
-  const sharedElements = resolveSharedConfigs(await loadStrictLintConfigs(cwd));
+  const sharedElements = resolveSharedConfigs(await loadConfigs(cwd));
   if (sharedElements.length === 0) {
     return;
   }
@@ -130,6 +143,7 @@ async function checkForRepeatedRules(
 async function doLint(
   options: StrictLintOptions | undefined,
   args: string[],
+  loadConfigs: typeof loadStrictLintConfigs,
 ): Promise<{ text: string; errorCount: number }> {
   const parsed = parseCliArgs(args);
 
@@ -143,7 +157,7 @@ async function doLint(
     return { text: '', errorCount: 0 };
   }
 
-  const ceilings = createCeilingResolver({ overrides: options?.maxSeverity });
+  const ceilings = createCeilingResolver({ loadConfigs, overrides: options?.maxSeverity });
 
   const eslint = new ESLint(buildEslintOptions(options, parsed));
 
@@ -156,7 +170,7 @@ async function doLint(
     reportConfigProvenance(ceilings.getCascades());
   }
 
-  await checkForRepeatedRules(options, parsed, promotedResults);
+  await checkForRepeatedRules(options, parsed, promotedResults, loadConfigs);
 
   if (!parsed.fixDryRun) {
     await ESLint.outputFixes(promotedResults);
@@ -220,9 +234,12 @@ function resolvePatterns(options: StrictLintOptions | undefined, cliPatterns: st
  * Runs the lint, reporting and exiting when it fails outright. The exit that ends a completed-but-failing run stays
  * with the caller, so it is not caught by the handler for the lint's own failures.
  */
-async function runLint(options: StrictLintOptions | undefined): Promise<{ text: string; errorCount: number }> {
+async function runLint(
+  options: StrictLintOptions | undefined,
+  loadConfigs: typeof loadStrictLintConfigs,
+): Promise<{ text: string; errorCount: number }> {
   try {
-    return await doLint(options, process.argv.slice(2));
+    return await doLint(options, process.argv.slice(2), loadConfigs);
   } catch (error: unknown) {
     process.exit(reportCliError(error, 'strict-lint'));
   }
