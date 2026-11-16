@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { classifyNodeEsYear, findLowestNodeMajor, readNodeMajor } from '../node-floor.ts';
+import {
+  classifyNodeEsYear,
+  findLowestNodeMajor,
+  judgeNodeFloor,
+  NO_BASE_ES_YEAR,
+  readNodeMajor,
+} from '../node-floor.ts';
 
 // Stands in for readyup's table, which covers the even-numbered LTS majors from 18 upward.
 const ES_YEAR_BY_MAJOR: Record<number, string | undefined> = { 18: 'es2022', 20: 'es2023', 22: 'es2024', 24: 'es2025' };
@@ -39,6 +45,58 @@ describe(findLowestNodeMajor, () => {
   it('returns undefined when no floor names a major', () => {
     expect(findLowestNodeMajor([])).toBeUndefined();
     expect(findLowestNodeMajor(['system', 'lts/*'])).toBeUndefined();
+  });
+});
+
+describe(judgeNodeFloor, () => {
+  it('skips when no base ES year is known', () => {
+    expect(judgeNodeFloor(undefined, { esYear: 'es2025', kind: 'exact' })).toStrictEqual({
+      kind: 'skip',
+      reason: NO_BASE_ES_YEAR,
+    });
+  });
+
+  it('skips when no declared Node floor names a major', () => {
+    expect(judgeNodeFloor('es2025', undefined)).toStrictEqual({
+      kind: 'skip',
+      reason: 'no declared Node floor names a major',
+    });
+  });
+
+  it('skips a major that the table does not cover', () => {
+    expect(judgeNodeFloor('es2025', { kind: 'unknown' })).toStrictEqual({
+      kind: 'skip',
+      reason: 'no ES year is known for the declared Node floor',
+    });
+  });
+
+  it('fails a major predating the table when the base year is at least the lowest known year', () => {
+    expect(judgeNodeFloor('es2025', { esYear: 'es2022', kind: 'under' })).toStrictEqual({
+      detail: "the declared Node floor implements less than es2022, below the base's es2025",
+      kind: 'fail',
+    });
+  });
+
+  // Such a major implements less than the lowest known year, which may still reach a base below it.
+  it('skips a major predating the table when the base year is below the lowest known year', () => {
+    expect(judgeNodeFloor('es2021', { esYear: 'es2022', kind: 'under' })).toStrictEqual({
+      kind: 'skip',
+      reason: 'no ES year is known for the declared Node floor',
+    });
+  });
+
+  it('passes a major implementing the base year or later', () => {
+    expect(judgeNodeFloor('es2025', { esYear: 'es2025', kind: 'exact' })).toStrictEqual({
+      detail: 'the declared Node floor implements es2025',
+      kind: 'pass',
+    });
+  });
+
+  it('fails a major implementing a year below the base', () => {
+    expect(judgeNodeFloor('es2025', { esYear: 'es2024', kind: 'exact' })).toStrictEqual({
+      detail: "the declared Node floor implements only es2024, below the base's es2025",
+      kind: 'fail',
+    });
   });
 });
 

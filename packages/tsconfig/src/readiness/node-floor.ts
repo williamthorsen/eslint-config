@@ -1,7 +1,14 @@
+import { isEsYearAtLeast } from './es-year.ts';
+
+export const NO_BASE_ES_YEAR = 'no tsconfig reaches a @williamthorsen/tsconfig base declaring an ES year';
+const NO_NODE_ES_YEAR = 'no ES year is known for the declared Node floor';
+
 const NODE_MAJOR = /^v?(\d+)(?:[.\s]|$)/;
 
 // Bounds the search for the lowest major covered by a table.
 const NODE_MAJOR_CEILING = 99;
+
+export type FloorVerdict = { detail: string; kind: 'fail' | 'pass' } | { kind: 'skip'; reason: string };
 
 export type NodeEsYear = { esYear: string; kind: 'exact' } | { esYear: string; kind: 'under' } | { kind: 'unknown' };
 
@@ -34,6 +41,35 @@ export function findLowestNodeMajor(floors: readonly string[]): number | undefin
     return major === undefined ? [] : major;
   });
   return majors.length === 0 ? undefined : Math.min(...majors);
+}
+
+/**
+ * Judges the ES year that the lowest declared Node floor implements against the ES year set by the
+ * base, or names why the two cannot be compared.
+ */
+export function judgeNodeFloor(baseEsYear: string | undefined, nodeEsYear: NodeEsYear | undefined): FloorVerdict {
+  if (baseEsYear === undefined) return { kind: 'skip', reason: NO_BASE_ES_YEAR };
+  if (nodeEsYear === undefined) return { kind: 'skip', reason: 'no declared Node floor names a major' };
+
+  // A major that the table skips or postdates is unknown, not unsupported: A consumer running ahead
+  // of the table is not in breach.
+  if (nodeEsYear.kind === 'unknown') return { kind: 'skip', reason: NO_NODE_ES_YEAR };
+
+  if (nodeEsYear.kind === 'under') {
+    return isEsYearAtLeast(baseEsYear, nodeEsYear.esYear)
+      ? {
+          detail: `the declared Node floor implements less than ${nodeEsYear.esYear}, below the base's ${baseEsYear}`,
+          kind: 'fail',
+        }
+      : { kind: 'skip', reason: NO_NODE_ES_YEAR };
+  }
+
+  return isEsYearAtLeast(nodeEsYear.esYear, baseEsYear)
+    ? { detail: `the declared Node floor implements ${nodeEsYear.esYear}`, kind: 'pass' }
+    : {
+        detail: `the declared Node floor implements only ${nodeEsYear.esYear}, below the base's ${baseEsYear}`,
+        kind: 'fail',
+      };
 }
 
 /**
