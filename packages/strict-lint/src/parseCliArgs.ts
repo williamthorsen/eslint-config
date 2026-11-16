@@ -2,6 +2,7 @@ import { parseArgs } from 'node:util';
 
 import type { ESLint, Linter } from 'eslint';
 
+import { toUsageError, UsageError } from './common/cliErrors.ts';
 import { formatRuleSeverities, isRuleSeverity } from './common/severity.ts';
 
 /** Result of parsing ESLint CLI arguments into structured fields. */
@@ -22,37 +23,7 @@ export interface ParsedCliArgs {
 
 /** Parses process.argv-style arguments into ESLint constructor options and metadata. */
 export function parseCliArgs(argv: string[]): ParsedCliArgs {
-  const { values, positionals } = parseArgs({
-    args: argv,
-    allowPositionals: true,
-    allowNegative: true,
-    options: {
-      fix: { type: 'boolean', default: false },
-      'fix-dry-run': { type: 'boolean', default: false },
-      'fix-type': { type: 'string', multiple: true },
-      'ignore-pattern': { type: 'string', multiple: true },
-      ignore: { type: 'boolean' },
-      'error-on-unmatched-pattern': { type: 'boolean' },
-      'pass-on-no-patterns': { type: 'boolean', default: false },
-      'inline-config': { type: 'boolean' },
-      cache: { type: 'boolean', default: false },
-      'cache-location': { type: 'string' },
-      'cache-strategy': { type: 'string' },
-      'warn-ignored': { type: 'boolean' },
-      config: { type: 'string', short: 'c' },
-      debug: { type: 'boolean', default: false },
-      help: { type: 'boolean', short: 'h', default: false },
-      stats: { type: 'boolean', default: false },
-      flag: { type: 'string', multiple: true },
-      concurrency: { type: 'string' },
-      rule: { type: 'string', multiple: true },
-      quiet: { type: 'boolean', default: false },
-      'max-warnings': { type: 'string', default: '-1' },
-      format: { type: 'string', short: 'f', default: 'stylish' },
-      'output-file': { type: 'string', short: 'o' },
-      version: { type: 'boolean', short: 'V', default: false },
-    },
-  });
+  const { values, positionals } = parseOptions(argv);
 
   const fixDryRun = values['fix-dry-run'];
   const shouldFix = values.fix || fixDryRun;
@@ -120,12 +91,12 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
     for (const entry of values.rule) {
       const colonIndex = entry.indexOf(':');
       if (colonIndex === -1) {
-        throw new Error(`Invalid --rule value "${entry}". Expected format: "rule-name: severity"`);
+        throw new UsageError(`Invalid --rule value "${entry}". Expected format: "rule-name: severity"`);
       }
       const ruleName = entry.slice(0, colonIndex);
       const severity = entry.slice(colonIndex + 1).trim();
       if (severity === '') {
-        throw new Error(`Invalid --rule value "${entry}". Missing severity after colon.`);
+        throw new UsageError(`Invalid --rule value "${entry}". Missing severity after colon.`);
       }
       ruleOverrides[ruleName] = parseRuleSeverity(entry, severity);
     }
@@ -165,7 +136,7 @@ const CACHE_STRATEGIES: Record<string, ESLint.CacheStrategy> = {
 function parseCacheStrategy(value: string): ESLint.CacheStrategy {
   const strategy = CACHE_STRATEGIES[value];
   if (strategy === undefined) {
-    throw new Error(`Invalid --cache-strategy value "${value}". Expected "content" or "metadata".`);
+    throw new UsageError(`Invalid --cache-strategy value "${value}". Expected "content" or "metadata".`);
   }
   return strategy;
 }
@@ -177,7 +148,7 @@ function parseConcurrency(value: string): number | 'auto' | 'off' {
   }
   const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed) || String(parsed) !== value) {
-    throw new Error(`Invalid --concurrency value "${value}". Expected an integer, "auto", or "off".`);
+    throw new UsageError(`Invalid --concurrency value "${value}". Expected an integer, "auto", or "off".`);
   }
   return parsed;
 }
@@ -186,7 +157,9 @@ function parseConcurrency(value: string): number | 'auto' | 'off' {
 function parseFixType(value: string): ESLint.FixType {
   const fixType = FIX_TYPES[value];
   if (fixType === undefined) {
-    throw new Error(`Invalid --fix-type value "${value}". Expected "directive", "problem", "suggestion", or "layout".`);
+    throw new UsageError(
+      `Invalid --fix-type value "${value}". Expected "directive", "problem", "suggestion", or "layout".`,
+    );
   }
   return fixType;
 }
@@ -195,9 +168,48 @@ function parseFixType(value: string): ESLint.FixType {
 function parseMaxWarnings(value: string): number {
   const parsed = Number.parseInt(value, 10);
   if (Number.isNaN(parsed) || String(parsed) !== value) {
-    throw new Error(`Invalid --max-warnings value "${value}". Expected an integer.`);
+    throw new UsageError(`Invalid --max-warnings value "${value}". Expected an integer.`);
   }
   return parsed;
+}
+
+/** Runs `parseArgs` over the lint command's options, reporting a rejected argument as a usage error. */
+function parseOptions(argv: string[]) {
+  try {
+    return parseArgs({
+      args: argv,
+      allowPositionals: true,
+      allowNegative: true,
+      options: {
+        fix: { type: 'boolean', default: false },
+        'fix-dry-run': { type: 'boolean', default: false },
+        'fix-type': { type: 'string', multiple: true },
+        'ignore-pattern': { type: 'string', multiple: true },
+        ignore: { type: 'boolean' },
+        'error-on-unmatched-pattern': { type: 'boolean' },
+        'pass-on-no-patterns': { type: 'boolean', default: false },
+        'inline-config': { type: 'boolean' },
+        cache: { type: 'boolean', default: false },
+        'cache-location': { type: 'string' },
+        'cache-strategy': { type: 'string' },
+        'warn-ignored': { type: 'boolean' },
+        config: { type: 'string', short: 'c' },
+        debug: { type: 'boolean', default: false },
+        help: { type: 'boolean', short: 'h', default: false },
+        stats: { type: 'boolean', default: false },
+        flag: { type: 'string', multiple: true },
+        concurrency: { type: 'string' },
+        rule: { type: 'string', multiple: true },
+        quiet: { type: 'boolean', default: false },
+        'max-warnings': { type: 'string', default: '-1' },
+        format: { type: 'string', short: 'f', default: 'stylish' },
+        'output-file': { type: 'string', short: 'o' },
+        version: { type: 'boolean', short: 'V', default: false },
+      },
+    });
+  } catch (error: unknown) {
+    throw toUsageError(error);
+  }
 }
 
 /** Validates a `--rule` severity, reading a canonical numeral as the number that it names. */
@@ -205,7 +217,7 @@ function parseRuleSeverity(entry: string, text: string): Linter.RuleSeverity {
   const numeric = Number(text);
   const severity = String(numeric) === text ? numeric : text;
   if (!isRuleSeverity(severity)) {
-    throw new Error(`Invalid --rule value "${entry}". Expected a severity of ${formatRuleSeverities()}.`);
+    throw new UsageError(`Invalid --rule value "${entry}". Expected a severity of ${formatRuleSeverities()}.`);
   }
   return severity;
 }

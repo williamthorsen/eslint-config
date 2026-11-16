@@ -123,7 +123,7 @@ describe(runInit, () => {
     const reported = captureConsole();
 
     expect(runInit([], tree.dir)).toBe(1);
-    expect(reported.error()).toContain('Failed to write');
+    expect(reported.error()).toContain('strict-lint init: failed to write');
     expect(reported.info()).not.toContain('project root at');
   });
 

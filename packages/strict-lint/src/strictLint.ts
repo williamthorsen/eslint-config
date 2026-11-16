@@ -1,10 +1,14 @@
+import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging';
 import { resolveSelfVersion } from '@williamthorsen/toolbelt.packaging/candidate';
 import { ESLint, type Linter } from 'eslint';
 
+import { UsageError } from './common/cliErrors.ts';
 import { describeRootSource } from './common/describeRootSource.ts';
+import { reportCliError } from './common/reportCliError.ts';
 import { createCeilingResolver } from './createCeilingResolver.ts';
 import { loadStrictLintConfigs, resolveSharedConfigs, type StrictLintCascade } from './loadStrictLintConfigs.ts';
 import { parseCliArgs, type ParsedCliArgs } from './parseCliArgs.ts';
@@ -50,9 +54,16 @@ function assertConcurrencyIsOff(concurrency: ESLint.Options['concurrency']): voi
   if (concurrency === undefined || concurrency === 'off') {
     return;
   }
-  throw new Error(
+  throw new UsageError(
     'Concurrency is unavailable with a programmatic `baseConfig`, whose plugin objects cannot cross a worker thread. Load the config from a file instead, or set concurrency to "off".',
   );
+}
+
+/** Rejects a `--config` path that names nothing, which ESLint would report as a config that it could not find. */
+function assertConfigFileExists(configPath: string): void {
+  if (!existsSync(path.resolve(process.cwd(), configPath))) {
+    throw new UsageError(`--config ${configPath}: file not found`);
+  }
 }
 
 /** Assembles the ESLint constructor options, leaving config discovery to ESLint unless the caller pinned a config. */
@@ -67,6 +78,7 @@ function buildEslintOptions(options: StrictLintOptions | undefined, parsed: Pars
   }
 
   if (parsed.configPath !== undefined) {
+    assertConfigFileExists(parsed.configPath);
     return { ...eslintOptions, overrideConfigFile: parsed.configPath };
   }
 
@@ -285,8 +297,7 @@ async function runLint(options: StrictLintOptions | undefined): Promise<{ text: 
   try {
     return await doLint(options, process.argv.slice(2));
   } catch (error: unknown) {
-    console.error(error);
-    process.exit(1);
+    process.exit(reportCliError(error, 'strict-lint'));
   }
 }
 

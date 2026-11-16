@@ -91,11 +91,25 @@ describe(strictLint, () => {
     });
 
     it('pins ESLint to the config named by --config', async () => {
-      using _argv = pointArgvAt(['--config', '/project/custom.config.ts']);
+      // Name a file that exists, which the --config check requires; ESLint itself is mocked.
+      using _argv = pointArgvAt(['--config', import.meta.filename]);
 
       await strictLint();
 
-      expect(readConstructorOptions()).toMatchObject({ overrideConfigFile: '/project/custom.config.ts' });
+      expect(readConstructorOptions()).toMatchObject({ overrideConfigFile: import.meta.filename });
+    });
+
+    it('rejects a --config path that names nothing as a usage error', async () => {
+      using _argv = pointArgvAt(['--config', '/nonexistent/custom.config.ts']);
+      using silenced = silenceConsole(['error']);
+
+      const error = await captureError(ProcessExitError, () => strictLint());
+
+      expect(listConsoleLines(silenced.error)).toStrictEqual([
+        'strict-lint: --config /nonexistent/custom.config.ts: file not found',
+      ]);
+      expect(error.code).toBe(2);
+      expect(mockEslintConstructor).not.toHaveBeenCalled();
     });
 
     it('pins ESLint to a programmatic baseConfig, which has no file to resolve from', async () => {
@@ -233,14 +247,14 @@ describe(strictLint, () => {
       expect(exitMock.spy).not.toHaveBeenCalled();
     });
 
-    it('rejects --concurrency alongside a programmatic baseConfig, naming the option at fault', async () => {
+    it('rejects --concurrency alongside a programmatic baseConfig as a usage error, naming the option at fault', async () => {
       using _argv = pointArgvAt(['--concurrency', 'auto']);
       using silenced = silenceConsole(['error']);
 
       const error = await captureError(ProcessExitError, () => strictLint({ baseConfig: [{ rules: {} }] }));
 
       expect(listConsoleLines(silenced.error).join('\n')).toContain('baseConfig');
-      expect(error.code).toBe(1);
+      expect(error.code).toBe(2);
     });
 
     it('allows a programmatic baseConfig when concurrency is off', async () => {
@@ -377,12 +391,14 @@ describe(strictLint, () => {
       expect(exitMock.spy).toHaveBeenCalledTimes(1);
     });
 
-    it('exits 1 when doLint throws an error', async () => {
-      using _silenced = silenceConsole(['error']);
+    it('reports an unexpected error as an internal error with its stack, and exits 1', async () => {
+      using silenced = silenceConsole(['error']);
       mockLintFiles.mockRejectedValueOnce(new Error('lint failure'));
 
       const error = await captureError(ProcessExitError, () => strictLint());
 
+      const [report] = listConsoleLines(silenced.error);
+      expect(report).toMatch(/^strict-lint: internal error: lint failure\n\s+at /);
       expect(error.code).toBe(1);
     });
   });
@@ -506,13 +522,16 @@ describe(strictLint, () => {
       expect(mockedWriteFile).toHaveBeenCalledWith('results.txt', 'formatted output', 'utf8');
     });
 
-    it('exits 1 when --rule specifies an invalid severity', async () => {
+    it('exits 2 when --rule specifies an invalid severity, reporting one prefixed line', async () => {
       using _argv = pointArgvAt(['--rule', 'no-console: typo']);
-      using _silenced = silenceConsole(['error']);
+      using silenced = silenceConsole(['error']);
 
       const error = await captureError(ProcessExitError, () => strictLint());
 
-      expect(error.code).toBe(1);
+      const lines = listConsoleLines(silenced.error);
+      expect(lines).toHaveLength(1);
+      expect(lines[0]).toMatch(/^strict-lint: Invalid --rule value "no-console: typo"\./);
+      expect(error.code).toBe(2);
     });
   });
 

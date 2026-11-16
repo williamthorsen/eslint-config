@@ -8,6 +8,11 @@ export class StrictLintError extends Error {
   }
 }
 
+/** Rewraps an argument parser's rejection, such as `parseArgs`'s unknown-option error, as a usage error. */
+export function toUsageError(error: unknown): UsageError {
+  return error instanceof Error ? new UsageError(error.message, { cause: error }) : new UsageError(String(error));
+}
+
 /** A mistake in the invocation, such as an unknown option or an invalid value, which exits 2. */
 export class UsageError extends StrictLintError {
   override readonly exitCode = 2;

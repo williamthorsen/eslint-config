@@ -1,15 +1,17 @@
+import { StrictLintError } from './cliErrors.ts';
+
 /**
  * Maps Node's two native-TypeScript failure modes (syntax that type stripping cannot erase, and a TypeScript extension
  * on a runtime whose stripping is disabled) to actionable errors, or returns undefined when the error is unrelated and
  * should propagate as-is. The config cascade calls Node's loader with no runtime pre-check of its own, so an
  * unsupported runtime appears here as an unknown extension rather than as a dedicated diagnostic.
  */
-export function wrapNativeTsError(error: unknown, filePath: string): Error | undefined {
+export function wrapNativeTsError(error: unknown, filePath: string): StrictLintError | undefined {
   if (hasErrorCode(error, 'ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX')) {
-    return new Error(buildUnsupportedSyntaxMessage(filePath), { cause: error });
+    return new StrictLintError(buildUnsupportedSyntaxMessage(filePath), { cause: error });
   }
   if (hasErrorCode(error, 'ERR_UNKNOWN_FILE_EXTENSION') && !process.features.typescript) {
-    return new Error(buildUnsupportedRuntimeMessage(filePath), { cause: error });
+    return new StrictLintError(buildUnsupportedRuntimeMessage(filePath), { cause: error });
   }
   return undefined;
 }

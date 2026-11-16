@@ -221,8 +221,9 @@ describe('native config loading (subprocess)', () => {
 
     // strict-lint loads its own config through Node's native type stripping, which cannot erase an enum.
     expect(status).toBe(1);
+    expect(stderr).toMatch(/^strict-lint: Cannot load the TypeScript config ".*strict-lint\.config\.ts"/);
     expect(stderr).toContain('native type stripping');
-    expect(stderr).toContain('strict-lint.config.ts');
+    expect(stderr).not.toMatch(/^\s+at /m);
   }, 30_000);
 });
 
