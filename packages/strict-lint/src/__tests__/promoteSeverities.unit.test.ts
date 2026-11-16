@@ -1,8 +1,9 @@
-import type { ESLint, Linter } from 'eslint';
+import type { Linter } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
 import type { CeilingResolver } from '../createCeilingResolver.ts';
 import { promoteSeverities } from '../promoteSeverities.ts';
+import { buildResult } from '../test-utils/lintResults.ts';
 import type { MaxSeverityMap } from '../types.ts';
 
 describe(promoteSeverities, () => {
@@ -140,22 +141,6 @@ function buildResolver(ceilingsFor: (filePath: string) => MaxSeverityMap): Ceili
   return {
     getCascades: () => new Map(),
     resolveFor: (filePath) => Promise.resolve(ceilingsFor(filePath)),
-  };
-}
-
-/** Builds a lint result whose counts default to zero, so that a test states only the fields that it asserts against. */
-function buildResult(overrides: Partial<ESLint.LintResult> = {}): ESLint.LintResult {
-  return {
-    errorCount: 0,
-    fatalErrorCount: 0,
-    filePath: '/project/a.ts',
-    fixableErrorCount: 0,
-    fixableWarningCount: 0,
-    messages: [],
-    suppressedMessages: [],
-    usedDeprecatedRules: [],
-    warningCount: 0,
-    ...overrides,
   };
 }
 
