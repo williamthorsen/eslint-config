@@ -1,15 +1,13 @@
-import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-
 import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
 import { ESLint } from 'eslint';
 import { describe, expect, it } from 'vitest';
+
+import { readJsonReport, type ReportedResult, runCli } from '../test-utils/strictLintCli.ts';
 
 // Each case runs `strict-lint` and `eslint` against one fixture and compares what they report, since the two must agree
 // on which config governs a file. strict-lint runs as a subprocess, the way consumers run it; ESLint runs in process,
 // and its own resolution is the reference that the CLI must match.
 
-const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const ROOT_MARKER = 'pnpm-workspace.yaml';
 const TARGET = 'packages/pkg/a.js';
 
@@ -66,25 +64,7 @@ function makeFixture(files: Record<string, string>): TempTree {
 
 /** Runs strict-lint on a target and returns the results from its JSON formatter output. */
 function reportFromStrictLint(cwd: string, target: string = TARGET): ReportedResult[] {
-  const { stdout, stderr } = spawnSync(process.execPath, [CLI_PATH, '--format', 'json', target], {
-    cwd,
-    encoding: 'utf8',
-  });
-  const output = stdout || stderr;
-  const parsed: unknown = JSON.parse(output);
-  if (!Array.isArray(parsed)) {
-    throw new TypeError(`Expected a JSON report, got: ${output}`);
-  }
-  return parsed.map((result: ReportedResult) => ({
-    filePath: result.filePath,
-    messages: result.messages.map((message) => ({ ruleId: message.ruleId, severity: message.severity })),
-  }));
-}
-
-/** The shape that the JSON formatter emits, narrowed to the fields that these tests read. */
-interface ReportedResult {
-  filePath: string;
-  messages: Array<{ ruleId: string | null; severity: number }>;
+  return readJsonReport(runCli(cwd, ['--format', 'json', target]));
 }
 
 /** Returns the rule ids that ESLint itself reports, the reference that strict-lint must match. */

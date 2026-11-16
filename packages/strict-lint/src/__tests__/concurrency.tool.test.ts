@@ -1,14 +1,13 @@
-import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
 import { describe, expect, it } from 'vitest';
 
+import { readJsonReport, runCli } from '../test-utils/strictLintCli.ts';
+
 // Concurrency runs the lint in worker threads, which receive the ESLint options through `structuredClone`. Only a
 // subprocess exercises that: The threads are real, and a plugin object anywhere in the options fails the clone.
 
-const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const ROOT_MARKER = 'pnpm-workspace.yaml';
 const FILE_COUNT = 6;
 
@@ -73,26 +72,14 @@ function makeFixture(extraFiles: Record<string, string> = {}): TempTree {
 
 /** Runs the CLI and returns its report, reduced to what a worker could get wrong and sorted for comparison. */
 function reportOf(cwd: string, concurrency: string): ComparableResult[] {
-  const { stdout, stderr } = runCli(cwd, ['--concurrency', concurrency, '--format', 'json', '.']);
-  const output = stdout || stderr;
-  const parsed: unknown = JSON.parse(output);
-  if (!Array.isArray(parsed)) {
-    throw new TypeError(`Expected a JSON report, got: ${output}`);
-  }
-  return parsed
-    .map((result: ReportedResult) => ({
+  return readJsonReport(runCli(cwd, ['--concurrency', concurrency, '--format', 'json', '.']))
+    .map((result) => ({
       file: path.basename(result.filePath),
       ruleIds: result.messages.map((message) => message.ruleId),
       severities: result.messages.map((message) => message.severity),
     }))
     .filter((result) => result.ruleIds.length > 0)
     .toSorted((a, b) => a.file.localeCompare(b.file));
-}
-
-/** Runs the CLI source under a plain `node` subprocess against the fixture directory. */
-function runCli(cwd: string, args: string[]): { status: number | null; stdout: string; stderr: string } {
-  const result = spawnSync(process.execPath, [CLI_PATH, ...args], { cwd, encoding: 'utf8' });
-  return { status: result.status, stdout: result.stdout, stderr: result.stderr };
 }
 
 /** Writes the given files into a fresh temp tree with a project-root marker. */
@@ -105,12 +92,6 @@ interface ComparableResult {
   file: string;
   ruleIds: Array<string | null>;
   severities: number[];
-}
-
-/** The shape that the JSON formatter emits, narrowed to the fields that these tests read. */
-interface ReportedResult {
-  filePath: string;
-  messages: Array<{ ruleId: string | null; severity: number }>;
 }
 
 // endregion | Helpers

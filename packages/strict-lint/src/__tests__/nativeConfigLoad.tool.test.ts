@@ -1,14 +1,12 @@
-import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
-
 import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
 import { describe, expect, it } from 'vitest';
+
+import { runCli } from '../test-utils/strictLintCli.ts';
 
 // Exercises the real production path: A plain `node` subprocess runs the CLI source with native type stripping.
 // Vitest transforms TypeScript through its own pipeline, so it cannot reproduce Node's native loading,
 // native-syntax failures, or the absence of jiti in-process.
 
-const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const DEFINE_CONFIG_URL = new URL('../defineConfig.ts', import.meta.url).href;
 const UNUSED_VAR_FILE = 'const unused = 1;\n';
 const UNUSED_VAR_AND_CONSOLE_FILE = "const unused = 1;\nconsole.log('hi');\n";
@@ -245,12 +243,6 @@ function makePackageCeilingFixture(): TempTree {
  */
 function makeFixture(files: Record<string, string>): TempTree {
   return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-int-' });
-}
-
-/** Runs the CLI source under a plain `node` subprocess against the fixture directory. */
-function runCli(cwd: string, args: string[]): { status: number | null; stdout: string; stderr: string } {
-  const result = spawnSync(process.execPath, [CLI_PATH, ...args], { cwd, encoding: 'utf8' });
-  return { status: result.status, stdout: result.stdout, stderr: result.stderr };
 }
 
 // endregion | Helpers
