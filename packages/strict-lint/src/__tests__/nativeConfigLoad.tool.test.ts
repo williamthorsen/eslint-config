@@ -1,10 +1,8 @@
 import { spawnSync } from 'node:child_process';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { afterAll, describe, expect, it } from 'vitest';
+import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
+import { describe, expect, it } from 'vitest';
 
 // Exercises the real production path: A plain `node` subprocess runs the CLI source with native type stripping.
 // Vitest transforms TypeScript through its own pipeline, so it cannot reproduce Node's native loading,
@@ -16,22 +14,14 @@ const UNUSED_VAR_FILE = 'const unused = 1;\n';
 const UNUSED_VAR_AND_CONSOLE_FILE = "const unused = 1;\nconsole.log('hi');\n";
 const ROOT_MARKER = 'pnpm-workspace.yaml';
 
-const createdDirs: string[] = [];
-
 describe('native config loading (subprocess)', () => {
-  afterAll(() => {
-    for (const dir of createdDirs) {
-      fs.rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
   it('discovers and natively loads an eslint.config.ts, promoting warn to error', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
       'a.js': UNUSED_VAR_FILE,
     });
 
-    const { status, stdout } = runCli(dir, ['a.js']);
+    const { status, stdout } = runCli(tree.dir, ['a.js']);
 
     expect(status).toBe(1);
     expect(stdout).toContain('no-unused-vars');
@@ -39,26 +29,26 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('prefers eslint.config.js over eslint.config.ts in the same directory', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       'eslint.config.js': "export default [{ rules: { 'no-unused-vars': 'off' } }];\n",
       'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
       'a.js': UNUSED_VAR_FILE,
     });
 
-    const { status } = runCli(dir, ['a.js']);
+    const { status } = runCli(tree.dir, ['a.js']);
 
     // `.js` wins and turns the rule off, so there is nothing to promote.
     expect(status).toBe(0);
   }, 30_000);
 
   it('applies an ancestor strict-lint config when none is beside the ESLint config', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
       'packages/pkg/eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
       'packages/pkg/a.js': UNUSED_VAR_FILE,
     });
 
-    const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+    const { status, stdout } = runCli(tree.resolve('packages/pkg'), ['a.js']);
 
     expect(status).toBe(0);
     // The root config caps the rule below error, so the violation stays a warning instead of being promoted.
@@ -67,18 +57,18 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('applies a package-level strict-lint config when the ESLint config lives at the root', () => {
-    const dir = makePackageCeilingFixture();
+    using tree = makePackageCeilingFixture();
 
-    const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+    const { status, stdout } = runCli(tree.resolve('packages/pkg'), ['a.js']);
 
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
   it('applies a strict-lint config below the directory in which the run starts', () => {
-    const dir = makePackageCeilingFixture();
+    using tree = makePackageCeilingFixture();
 
-    const { status, stdout } = runCli(dir, ['packages/pkg/a.js']);
+    const { status, stdout } = runCli(tree.dir, ['packages/pkg/a.js']);
 
     // Because ceilings follow the linted file, a package's own ceiling governs its files from any working directory.
     expect(status).toBe(0);
@@ -86,7 +76,7 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('merges a package config over the root config, dropping only the entry that it overrides', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       '.config/strict-lint.config.ts':
         "export default { maxSeverity: { 'no-console': 'warn', 'no-unused-vars': 'warn' } };\n",
       'eslint.config.ts': "export default [{ rules: { 'no-console': 'warn', 'no-unused-vars': 'warn' } }];\n",
@@ -94,7 +84,7 @@ describe('native config loading (subprocess)', () => {
       'packages/pkg/a.js': UNUSED_VAR_AND_CONSOLE_FILE,
     });
 
-    const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+    const { status, stdout } = runCli(tree.resolve('packages/pkg'), ['a.js']);
 
     // The package drops the inherited `no-unused-vars` entry by promoting it; the root's `no-console` entry survives.
     expect(status).toBe(1);
@@ -102,21 +92,21 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('ignores a strict-lint config above the project root', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
       [`project/${ROOT_MARKER}`]: '',
       'project/eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
       'project/a.js': UNUSED_VAR_FILE,
     });
 
-    const { status, stdout } = runCli(path.join(dir, 'project'), ['a.js']);
+    const { status, stdout } = runCli(tree.resolve('project'), ['a.js']);
 
     expect(status).toBe(1);
     expect(stdout).toContain('1 error, 0 warnings');
   }, 30_000);
 
   it('stops the ascent at a config declaring shouldIgnoreAncestors', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-console': 'warn' } };\n",
       'eslint.config.ts': "export default [{ rules: { 'no-console': 'warn', 'no-unused-vars': 'warn' } }];\n",
       'packages/pkg/.config/strict-lint.config.ts':
@@ -124,7 +114,7 @@ describe('native config loading (subprocess)', () => {
       'packages/pkg/a.js': UNUSED_VAR_AND_CONSOLE_FILE,
     });
 
-    const { status, stdout } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+    const { status, stdout } = runCli(tree.resolve('packages/pkg'), ['a.js']);
 
     // Only the package's entry applies, so `no-console` is promoted while `no-unused-vars` stays a warning.
     expect(status).toBe(1);
@@ -132,14 +122,14 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('leaves a config above shouldIgnoreAncestors unimported', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       '.config/strict-lint.config.ts': "throw new Error('ancestor config was imported');\n",
       'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
       'packages/pkg/.config/strict-lint.config.ts': 'export default { shouldIgnoreAncestors: true };\n',
       'packages/pkg/a.js': UNUSED_VAR_FILE,
     });
 
-    const { status, stdout, stderr } = runCli(path.join(dir, 'packages/pkg'), ['a.js']);
+    const { status, stdout, stderr } = runCli(tree.resolve('packages/pkg'), ['a.js']);
 
     // A run that imported the ancestor would fail on its throw instead of reporting the promoted rule.
     expect(status).toBe(1);
@@ -149,7 +139,7 @@ describe('native config loading (subprocess)', () => {
 
   it('applies ceilings from a config authored with defineConfig', () => {
     // The fixture tree has no `node_modules`, so the config imports the helper by URL instead of by package name.
-    const dir = makeFixture({
+    using tree = makeFixture({
       '.config/strict-lint.config.ts':
         `import { defineConfig } from '${DEFINE_CONFIG_URL}';\n` +
         "export default defineConfig({ maxSeverity: { 'no-unused-vars': 'warn' } });\n",
@@ -157,19 +147,19 @@ describe('native config loading (subprocess)', () => {
       'a.js': UNUSED_VAR_FILE,
     });
 
-    const { status, stdout } = runCli(dir, ['a.js']);
+    const { status, stdout } = runCli(tree.dir, ['a.js']);
 
     expect(status).toBe(0);
     expect(stdout).toContain('0 errors, 1 warning');
   }, 30_000);
 
   it('leaves the ignored-file notice a warning, so naming an ignored path does not fail the run', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       'eslint.config.ts': "export default [{ ignores: ['ignored/**'] }, { rules: { 'no-unused-vars': 'warn' } }];\n",
       'ignored/a.js': UNUSED_VAR_FILE,
     });
 
-    const { status, stdout } = runCli(dir, ['ignored/a.js']);
+    const { status, stdout } = runCli(tree.dir, ['ignored/a.js']);
 
     // The notice reports no rule and no problem, and `maxSeverity` has no key that could cap it.
     expect(status).toBe(0);
@@ -177,13 +167,13 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('leaves the unused-directive report a warning, which maxSeverity cannot cap', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       'eslint.config.ts':
         "export default [{ linterOptions: { reportUnusedDisableDirectives: 'warn' }, rules: { 'no-unused-vars': 'error' } }];\n",
       'a.js': '// eslint-disable-next-line no-console\nexport const ok = 1;\n',
     });
 
-    const { status, stdout } = runCli(dir, ['a.js']);
+    const { status, stdout } = runCli(tree.dir, ['a.js']);
 
     // Only ESLint raises this one, through `linterOptions.reportUnusedDisableDirectives`.
     expect(status).toBe(0);
@@ -191,30 +181,30 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('promotes a cached result exactly as it promotes a freshly linted one', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
       'a.js': UNUSED_VAR_FILE,
     });
     const cacheArgs = ['--cache', '--format', 'json', 'a.js'];
 
-    const fresh = runCli(dir, cacheArgs);
-    const cached = runCli(dir, cacheArgs);
+    const fresh = runCli(tree.dir, cacheArgs);
+    const cached = runCli(tree.dir, cacheArgs);
 
     // The second run is served from `.eslintcache`, whose entries contain the severities that ESLint recorded before
     // promotion. Promoting only freshly linted files would let this run report a warning and exit 0.
-    expect(fs.existsSync(path.join(dir, '.eslintcache'))).toBe(true);
+    expect(tree.exists('.eslintcache')).toBe(true);
     expect(cached.stdout).toBe(fresh.stdout);
     expect(cached.status).toBe(1);
   }, 30_000);
 
   it('loads an ESLint config containing non-erasable syntax, which ESLint transpiles', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       'eslint.config.ts':
         "enum Severity { Warn = 'warn' }\nexport default [{ rules: { 'no-unused-vars': Severity.Warn } }];\n",
       'a.js': UNUSED_VAR_FILE,
     });
 
-    const { status, stdout } = runCli(dir, ['a.js']);
+    const { status, stdout } = runCli(tree.dir, ['a.js']);
 
     // ESLint loads its own config and transpiles it rather than stripping types, so an enum resolves.
     expect(status).toBe(1);
@@ -222,14 +212,14 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 
   it('fails a strict-lint config with non-erasable syntax with an actionable message', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       '.config/strict-lint.config.ts':
         "enum Level { Warn = 'warn' }\nexport default { maxSeverity: { 'no-unused-vars': Level.Warn } };\n",
       'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
       'a.js': UNUSED_VAR_FILE,
     });
 
-    const { status, stderr } = runCli(dir, ['a.js']);
+    const { status, stderr } = runCli(tree.dir, ['a.js']);
 
     // strict-lint loads its own config through Node's native type stripping, which cannot erase an enum.
     expect(status).toBe(1);
@@ -238,8 +228,10 @@ describe('native config loading (subprocess)', () => {
   }, 30_000);
 });
 
+// region | Helpers
+
 /** Writes a monorepo tree whose only ESLint config is at the root and whose only ceiling is inside the package. */
-function makePackageCeilingFixture(): string {
+function makePackageCeilingFixture(): TempTree {
   return makeFixture({
     'eslint.config.ts': "export default [{ rules: { 'no-unused-vars': 'warn' } }];\n",
     'packages/pkg/.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
@@ -248,20 +240,11 @@ function makePackageCeilingFixture(): string {
 }
 
 /**
- * Writes the given files into a fresh temp directory and returns its path. The directory gets a project-root marker,
- * so that the fixture bounds config discovery, whatever is above the system temp directory on the machine running
- * the suite.
+ * Writes the given files into a fresh temp tree. The tree gets a project-root marker, so that the fixture bounds
+ * config discovery, whatever is above the system temp directory on the machine running the suite.
  */
-function makeFixture(files: Record<string, string>): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-int-'));
-  createdDirs.push(dir);
-  const contents = { [ROOT_MARKER]: '', ...files };
-  for (const [name, content] of Object.entries(contents)) {
-    const full = path.join(dir, name);
-    fs.mkdirSync(path.dirname(full), { recursive: true });
-    fs.writeFileSync(full, content);
-  }
-  return dir;
+function makeFixture(files: Record<string, string>): TempTree {
+  return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-int-' });
 }
 
 /** Runs the CLI source under a plain `node` subprocess against the fixture directory. */
@@ -269,3 +252,5 @@ function runCli(cwd: string, args: string[]): { status: number | null; stdout: s
   const result = spawnSync(process.execPath, [CLI_PATH, ...args], { cwd, encoding: 'utf8' });
   return { status: result.status, stdout: result.stdout, stderr: result.stderr };
 }
+
+// endregion | Helpers

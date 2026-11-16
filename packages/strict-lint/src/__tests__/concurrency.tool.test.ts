@@ -1,10 +1,9 @@
 import { spawnSync } from 'node:child_process';
-import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { afterAll, describe, expect, it } from 'vitest';
+import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
+import { describe, expect, it } from 'vitest';
 
 // Concurrency runs the lint in worker threads, which receive the ESLint options through `structuredClone`. Only a
 // subprocess exercises that: The threads are real, and a plugin object anywhere in the options fails the clone.
@@ -13,53 +12,45 @@ const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url)
 const ROOT_MARKER = 'pnpm-workspace.yaml';
 const FILE_COUNT = 6;
 
-const createdDirs: string[] = [];
-
 describe('concurrency (subprocess)', () => {
-  afterAll(() => {
-    for (const dir of createdDirs) {
-      fs.rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
   it('reports what a single-threaded run reports', () => {
-    const dir = makeFixture();
+    using tree = makeFixture();
 
-    expect(reportOf(dir, '2')).toStrictEqual(reportOf(dir, 'off'));
+    expect(reportOf(tree.dir, '2')).toStrictEqual(reportOf(tree.dir, 'off'));
   }, 30_000);
 
   it('accepts an automatic worker count', () => {
-    const dir = makeFixture();
+    using tree = makeFixture();
 
-    expect(reportOf(dir, 'auto')).toStrictEqual(reportOf(dir, 'off'));
+    expect(reportOf(tree.dir, 'auto')).toStrictEqual(reportOf(tree.dir, 'off'));
   }, 30_000);
 
   it('promotes warnings in a worker exactly as it does in the main thread', () => {
-    const dir = makeFixture();
+    using tree = makeFixture();
 
-    const severities = reportOf(dir, '2').flatMap((result) => result.severities);
+    const severities = reportOf(tree.dir, '2').flatMap((result) => result.severities);
 
     expect(severities).toStrictEqual(Array.from({ length: FILE_COUNT }, () => 2));
   }, 30_000);
 
   it('honours a ceiling in a worker, leaving the capped rule a warning', () => {
-    const dir = makeFixture({
+    using tree = makeFixture({
       '.config/strict-lint.config.ts': "export default { maxSeverity: { 'no-unused-vars': 'warn' } };\n",
     });
 
-    const severities = reportOf(dir, '2').flatMap((result) => result.severities);
+    const severities = reportOf(tree.dir, '2').flatMap((result) => result.severities);
 
     expect(severities).toStrictEqual(Array.from({ length: FILE_COUNT }, () => 1));
   }, 30_000);
 
   it('runs without the clone error that a plugin-bearing config once caused', () => {
     // The config declares a plugin, whose rule functions cannot cross a worker thread.
-    const dir = makeFixture({
+    using tree = makeFixture({
       'eslint.config.ts':
         "export default [{ plugins: { demo: { rules: { noop: { create: () => ({}) } } } }, rules: { 'no-unused-vars': 'warn' } }];\n",
     });
 
-    const { status, stderr } = runCli(dir, ['--concurrency', '2', '--format', 'json', '.']);
+    const { status, stderr } = runCli(tree.dir, ['--concurrency', '2', '--format', 'json', '.']);
 
     expect(stderr).not.toContain('cannot be cloned');
     expect(status).toBe(1);
@@ -69,7 +60,7 @@ describe('concurrency (subprocess)', () => {
 // region | Helpers
 
 /** Writes a flat project with enough files that a worker count above one engages. */
-function makeFixture(extraFiles: Record<string, string> = {}): string {
+function makeFixture(extraFiles: Record<string, string> = {}): TempTree {
   const sources = Object.fromEntries(
     Array.from({ length: FILE_COUNT }, (_, index) => [`f${String(index)}.js`, `const unused${String(index)} = 1;\n`]),
   );
@@ -104,17 +95,9 @@ function runCli(cwd: string, args: string[]): { status: number | null; stdout: s
   return { status: result.status, stdout: result.stdout, stderr: result.stderr };
 }
 
-/** Writes the given files into a fresh temp directory with a project-root marker, and returns its path. */
-function writeFixture(files: Record<string, string>): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-conc-'));
-  createdDirs.push(dir);
-  const entries = Object.entries({ [ROOT_MARKER]: '', ...files });
-  for (const [name, content] of entries) {
-    const full = path.join(dir, name);
-    fs.mkdirSync(path.dirname(full), { recursive: true });
-    fs.writeFileSync(full, content);
-  }
-  return dir;
+/** Writes the given files into a fresh temp tree with a project-root marker. */
+function writeFixture(files: Record<string, string>): TempTree {
+  return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-conc-' });
 }
 
 /** One result, reduced to the fields on which a concurrency comparison depends. */

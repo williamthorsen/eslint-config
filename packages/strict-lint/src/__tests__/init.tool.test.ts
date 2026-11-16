@@ -1,10 +1,8 @@
 import { spawnSync } from 'node:child_process';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { afterAll, describe, expect, it } from 'vitest';
+import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
+import { describe, expect, it } from 'vitest';
 
 import { CONFIG_TEMPLATE } from '../init/configTemplate.ts';
 import { STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
@@ -12,61 +10,53 @@ import { STRICT_LINT_CONFIG_NAME } from '../loadStrictLintConfigs.ts';
 const CLI_PATH = fileURLToPath(new URL('../bin/strict-lint.ts', import.meta.url));
 const ROOT_MARKER = 'pnpm-lock.yaml';
 
-const createdDirs: string[] = [];
-
 // The outcome matrix lives in `init/__tests__/initCommand.unit.test.ts`; these cases cover what only the published
 // binary can show: the dispatch, the argv that it forwards, and the runtime that loads the scaffolded config.
 describe('strict-lint init (subprocess)', () => {
-  afterAll(() => {
-    for (const dir of createdDirs) {
-      fs.rmSync(dir, { force: true, recursive: true });
-    }
-  });
-
   it('dispatches init and writes the config', () => {
-    const dir = makeTree();
+    using tree = makeTree();
 
-    const { status, stdout } = runCli(dir, ['init']);
+    const { status, stdout } = runCli(tree.dir, ['init']);
 
     expect(status).toBe(0);
-    expect(stdout).toContain(`Created ${path.join(dir, STRICT_LINT_CONFIG_NAME)}`);
-    expect(fs.readFileSync(path.join(dir, STRICT_LINT_CONFIG_NAME), 'utf8')).toBe(CONFIG_TEMPLATE);
+    expect(stdout).toContain(`Created ${tree.resolve(STRICT_LINT_CONFIG_NAME)}`);
+    expect(tree.read(STRICT_LINT_CONFIG_NAME)).toBe(CONFIG_TEMPLATE);
   });
 
   it('forwards the flags that follow the command', () => {
-    const dir = makeTree();
+    using tree = makeTree();
 
-    const { status, stdout } = runCli(dir, ['init', '--dry-run']);
+    const { status, stdout } = runCli(tree.dir, ['init', '--dry-run']);
 
     expect(status).toBe(0);
     expect(stdout).toContain('Would create');
-    expect(fs.existsSync(path.join(dir, STRICT_LINT_CONFIG_NAME))).toBe(false);
+    expect(tree.exists(STRICT_LINT_CONFIG_NAME)).toBe(false);
   });
 
   it('lints a path named init rather than scaffolding', () => {
-    const dir = makeTree({
+    using tree = makeTree({
       'eslint.config.ts': "export default [{ rules: { 'no-console': 'warn' } }];\n",
       'init/a.js': "console.log('hi');\n",
     });
 
-    const { stdout } = runCli(dir, ['--format', 'json', './init']);
+    const { stdout } = runCli(tree.dir, ['--format', 'json', './init']);
 
     const parsed: unknown = JSON.parse(stdout);
     expect(Array.isArray(parsed)).toBe(true);
-    expect(fs.existsSync(path.join(dir, STRICT_LINT_CONFIG_NAME))).toBe(false);
+    expect(tree.exists(STRICT_LINT_CONFIG_NAME)).toBe(false);
   }, 30_000);
 
   // The cascade imports the config through Node's native type stripping, which accepts only erasable syntax.
   it('writes a config that loads under native type stripping', () => {
-    const dir = makeTree();
-    installStubPackage(dir);
-    runCli(dir, ['init']);
+    using tree = makeTree();
+    installStubPackage(tree);
+    runCli(tree.dir, ['init']);
 
-    const configUrl = pathToFileURL(path.join(dir, STRICT_LINT_CONFIG_NAME)).href;
+    const configUrl = pathToFileURL(tree.resolve(STRICT_LINT_CONFIG_NAME)).href;
     const { status, stdout } = spawnSync(
       process.execPath,
       ['-e', `import('${configUrl}').then((m) => process.stdout.write(JSON.stringify(m.default)))`],
-      { cwd: dir, encoding: 'utf8' },
+      { cwd: tree.dir, encoding: 'utf8' },
     );
 
     expect(status).toBe(0);
@@ -74,28 +64,28 @@ describe('strict-lint init (subprocess)', () => {
   });
 
   it.each([[['--help']], [['-h']]])('reports both modes for %j', (args) => {
-    const dir = makeTree();
+    using tree = makeTree();
 
-    const { status, stdout } = runCli(dir, args);
+    const { status, stdout } = runCli(tree.dir, args);
 
     expect(status).toBe(0);
     expect(stdout).toContain('strict-lint init [options]');
   });
 
   it('reports the init flags for init --help', () => {
-    const dir = makeTree();
+    using tree = makeTree();
 
-    const { status, stdout } = runCli(dir, ['init', '--help']);
+    const { status, stdout } = runCli(tree.dir, ['init', '--help']);
 
     expect(status).toBe(0);
     expect(stdout).toContain('--dry-run');
-    expect(fs.existsSync(path.join(dir, STRICT_LINT_CONFIG_NAME))).toBe(false);
+    expect(tree.exists(STRICT_LINT_CONFIG_NAME)).toBe(false);
   });
 
   it('reports an unknown init flag on stderr and exits non-zero', () => {
-    const dir = makeTree();
+    using tree = makeTree();
 
-    const { status, stderr } = runCli(dir, ['init', '--overwrite']);
+    const { status, stderr } = runCli(tree.dir, ['init', '--overwrite']);
 
     expect(status).toBe(1);
     expect(stderr).toContain('Unknown option');
@@ -105,38 +95,28 @@ describe('strict-lint init (subprocess)', () => {
 // region | Helpers
 
 /** Installs a stand-in for the published package, so that the scaffolded config's import resolves without a build. */
-function installStubPackage(dir: string): void {
-  const packageDir = path.join(dir, 'node_modules/@williamthorsen/strict-lint');
+function installStubPackage(tree: TempTree): void {
+  const packageDir = 'node_modules/@williamthorsen/strict-lint';
   const manifest = {
     exports: { './config': './defineConfig.js' },
     name: '@williamthorsen/strict-lint',
     type: 'module',
   };
-  writeFile(path.join(packageDir, 'package.json'), JSON.stringify(manifest));
-  writeFile(path.join(packageDir, 'defineConfig.js'), 'export function defineConfig(config) {\n  return config;\n}\n');
+  tree.writeAll({
+    [`${packageDir}/defineConfig.js`]: 'export function defineConfig(config) {\n  return config;\n}\n',
+    [`${packageDir}/package.json`]: JSON.stringify(manifest),
+  });
 }
 
-/** Creates a fresh temp directory with a project-root marker and any given files, and returns its path. */
-function makeTree(files: Record<string, string> = {}): string {
-  const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-init-')));
-  createdDirs.push(dir);
-  const entries = Object.entries({ [ROOT_MARKER]: '', ...files });
-  for (const [name, content] of entries) {
-    writeFile(path.join(dir, name), content);
-  }
-  return dir;
+/** Creates a fresh temp tree with a project-root marker and any given files. */
+function makeTree(files: Record<string, string> = {}): TempTree {
+  return createTempTree({ [ROOT_MARKER]: '', ...files }, { prefix: 'strict-lint-init-' });
 }
 
 /** Runs the CLI as consumers run it, from `cwd`. */
 function runCli(cwd: string, args: string[]): { status: number | null; stderr: string; stdout: string } {
   const result = spawnSync(process.execPath, [CLI_PATH, ...args], { cwd, encoding: 'utf8' });
   return { status: result.status, stderr: result.stderr, stdout: result.stdout };
-}
-
-/** Writes a file, creating its parent directories. */
-function writeFile(filePath: string, content: string): void {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, content);
 }
 
 // endregion | Helpers
