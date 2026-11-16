@@ -1,9 +1,9 @@
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { createTempTree } from '@williamthorsen/toolbelt.testing/candidate';
 import { describe, expect, it } from 'vitest';
 
 import { defineConfig, type MaxSeverityMap, type StrictLintConfig } from '../defineConfig.ts';
@@ -30,19 +30,17 @@ describe(defineConfig, () => {
     // Config files import this module from their own directory, where nothing else of the package resolves. Copied
     // alone into an empty directory, the module fails to load if it retains any specifier (including an inline
     // `import { type … }`, whose specifier Node keeps and tsc elides).
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'strict-lint-config-entry-'));
-    try {
-      const copy = path.join(dir, path.basename(MODULE_PATH));
-      fs.copyFileSync(MODULE_PATH, copy);
-      const script = `await import(${JSON.stringify(pathToFileURL(copy).href)});`;
+    const moduleName = path.basename(MODULE_PATH);
+    using tree = createTempTree(
+      { [moduleName]: fs.readFileSync(MODULE_PATH) },
+      { prefix: 'strict-lint-config-entry-' },
+    );
+    const script = `await import(${JSON.stringify(pathToFileURL(tree.resolve(moduleName)).href)});`;
 
-      const result = spawnSync(process.execPath, ['--input-type=module', '--eval', script], { encoding: 'utf8' });
+    const result = spawnSync(process.execPath, ['--input-type=module', '--eval', script], { encoding: 'utf8' });
 
-      expect(result.stderr).toBe('');
-      expect(result.status).toBe(0);
-    } finally {
-      fs.rmSync(dir, { recursive: true, force: true });
-    }
+    expect(result.stderr).toBe('');
+    expect(result.status).toBe(0);
   });
 
   it('is the module named by the `./config` subpath entry', () => {
