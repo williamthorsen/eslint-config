@@ -1,14 +1,14 @@
+import { makeTsconfigChainEntry } from 'readyup/testing';
 import { describe, expect, it } from 'vitest';
 
 import { findBaseIndex, hasExternalBase, isBaseSpecifier, isConsumerOwnedConfig } from '../base-chain.ts';
-import { buildChainEntry } from '../test-utils/buildChainEntry.ts';
 
 describe(findBaseIndex, () => {
   it('locates the base wherever it is in the chain', () => {
     const entries = [
-      buildChainEntry({ path: 'packages/api/tsconfig.json' }),
-      buildChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
-      buildChainEntry({
+      makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }),
+      makeTsconfigChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
+      makeTsconfigChainEntry({
         path: 'node_modules/.pnpm/@williamthorsen+tsconfig@0.3.0/node_modules/@williamthorsen/tsconfig/tsconfig.base.json',
         specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
       }),
@@ -20,8 +20,8 @@ describe(findBaseIndex, () => {
   // Under a workspace link the base's real path is inside the repo, so it does not name the package.
   it('locates the base whose path is a workspace directory', () => {
     const entries = [
-      buildChainEntry({ path: 'tsconfig.json' }),
-      buildChainEntry({
+      makeTsconfigChainEntry({ path: 'tsconfig.json' }),
+      makeTsconfigChainEntry({
         path: 'packages/tsconfig/tsconfig.base.json',
         specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
       }),
@@ -32,8 +32,8 @@ describe(findBaseIndex, () => {
 
   it('returns undefined when no entry was reached by this package', () => {
     const entries = [
-      buildChainEntry({ path: 'packages/web/tsconfig.json' }),
-      buildChainEntry({ path: 'node_modules/astro/tsconfigs/base.json', specifier: 'astro/tsconfigs/base' }),
+      makeTsconfigChainEntry({ path: 'packages/web/tsconfig.json' }),
+      makeTsconfigChainEntry({ path: 'node_modules/astro/tsconfigs/base.json', specifier: 'astro/tsconfigs/base' }),
     ];
 
     expect(findBaseIndex(entries)).toBeUndefined();
@@ -43,13 +43,13 @@ describe(findBaseIndex, () => {
 describe(hasExternalBase, () => {
   it('is true when an entry was reached by a package specifier naming another package', () => {
     const entries = [
-      buildChainEntry({ path: 'packages/web/tsconfig.json' }),
-      buildChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
-      buildChainEntry({
+      makeTsconfigChainEntry({ path: 'packages/web/tsconfig.json' }),
+      makeTsconfigChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
+      makeTsconfigChainEntry({
         path: 'packages/tsconfig/tsconfig.base.json',
         specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
       }),
-      buildChainEntry({ path: 'node_modules/astro/tsconfigs/base.json', specifier: 'astro/tsconfigs/base' }),
+      makeTsconfigChainEntry({ path: 'node_modules/astro/tsconfigs/base.json', specifier: 'astro/tsconfigs/base' }),
     ];
 
     expect(hasExternalBase(entries)).toBe(true);
@@ -57,9 +57,9 @@ describe(hasExternalBase, () => {
 
   it('is false for a chain of path specifiers and this package alone', () => {
     const entries = [
-      buildChainEntry({ path: 'packages/api/tsconfig.json' }),
-      buildChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
-      buildChainEntry({
+      makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }),
+      makeTsconfigChainEntry({ path: 'tsconfig.json', specifier: '../../tsconfig.json' }),
+      makeTsconfigChainEntry({
         path: 'packages/tsconfig/tsconfig.base.json',
         specifier: '@williamthorsen/tsconfig/tsconfig.base.json',
       }),

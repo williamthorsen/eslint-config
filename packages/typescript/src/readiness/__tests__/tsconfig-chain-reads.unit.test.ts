@@ -1,7 +1,7 @@
 import type { TsconfigChain } from 'readyup/check-utils';
+import { makeTsconfigChainEntry } from 'readyup/testing';
 import { describe, expect, it } from 'vitest';
 
-import { buildChainEntry } from '../test-utils/buildChainEntry.ts';
 import {
   appendUnreadNote,
   describeUnreadChains,
@@ -10,10 +10,10 @@ import {
   sortChainReads,
 } from '../tsconfig-chain-reads.ts';
 
-const READABLE: TsconfigChain = { entries: [buildChainEntry()], unresolvedExtends: [] };
+const READABLE: TsconfigChain = { entries: [makeTsconfigChainEntry()], unresolvedExtends: [] };
 
 const UNRESOLVED: TsconfigChain = {
-  entries: [buildChainEntry({ path: 'packages/a/tsconfig.json' })],
+  entries: [makeTsconfigChainEntry({ path: 'packages/a/tsconfig.json' })],
   unresolvedExtends: [{ from: 'packages/a/tsconfig.json', specifier: '@acme/tsconfig' }],
 };
 
@@ -113,7 +113,7 @@ describe(sortChainReads, () => {
 
   it('names every unresolved extends of a chain', () => {
     const chain: TsconfigChain = {
-      entries: [buildChainEntry()],
+      entries: [makeTsconfigChainEntry()],
       unresolvedExtends: [
         { from: 'tsconfig.json', specifier: './missing.json' },
         { from: 'tsconfig.base.json', specifier: '@acme/tsconfig' },
