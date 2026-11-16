@@ -25,5 +25,10 @@ describe(parseInitArgs, () => {
 
   it('rejects an unknown option', () => {
     expect(() => parseInitArgs(['--overwrite'])).toThrow('Unknown option');
+    expect(() => parseInitArgs(['--overwrite'])).not.toThrow('Did you mean');
+  });
+
+  it('suggests the nearest option for a mistyped one', () => {
+    expect(() => parseInitArgs(['--forse'])).toThrow("Unknown option '--forse'. Did you mean '--force'?");
   });
 });

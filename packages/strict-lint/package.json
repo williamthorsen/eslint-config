@@ -50,7 +50,8 @@
   "dependencies": {
     "@williamthorsen/toolbelt.errors": "0.11.0",
     "@williamthorsen/toolbelt.filesystem": "0.11.1",
-    "@williamthorsen/toolbelt.packaging": "0.9.0"
+    "@williamthorsen/toolbelt.packaging": "0.9.0",
+    "@williamthorsen/toolbelt.strings": "9.0.2"
   },
   "devDependencies": {
     "@williamthorsen/toolbelt.testing": "0.8.4",
