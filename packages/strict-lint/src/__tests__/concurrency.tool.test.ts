@@ -16,13 +16,13 @@ describe('concurrency (subprocess)', () => {
     using tree = makeFixture();
 
     expect(collectComparableReport(tree.dir, '2')).toStrictEqual(collectComparableReport(tree.dir, 'off'));
-  }, 30_000);
+  });
 
   it('accepts an automatic worker count', () => {
     using tree = makeFixture();
 
     expect(collectComparableReport(tree.dir, 'auto')).toStrictEqual(collectComparableReport(tree.dir, 'off'));
-  }, 30_000);
+  });
 
   it('promotes warnings in a worker exactly as it does in the main thread', () => {
     using tree = makeFixture();
@@ -30,7 +30,7 @@ describe('concurrency (subprocess)', () => {
     const severities = collectComparableReport(tree.dir, '2').flatMap((result) => result.severities);
 
     expect(severities).toStrictEqual(Array.from({ length: FILE_COUNT }, () => 2));
-  }, 30_000);
+  });
 
   it('honours a ceiling in a worker, leaving the capped rule a warning', () => {
     using tree = makeFixture({
@@ -40,7 +40,7 @@ describe('concurrency (subprocess)', () => {
     const severities = collectComparableReport(tree.dir, '2').flatMap((result) => result.severities);
 
     expect(severities).toStrictEqual(Array.from({ length: FILE_COUNT }, () => 1));
-  }, 30_000);
+  });
 
   it('runs without the clone error that a plugin-bearing config once caused', () => {
     // The config declares a plugin, whose rule functions cannot cross a worker thread.
@@ -53,7 +53,7 @@ describe('concurrency (subprocess)', () => {
 
     expect(stderr).not.toContain('cannot be cloned');
     expect(status).toBe(1);
-  }, 30_000);
+  });
 });
 
 // region | Helpers

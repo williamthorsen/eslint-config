@@ -31,7 +31,7 @@ describe('CLI error reporting (subprocess)', () => {
 
     expect(status).toBe(1);
     expect(stderr.trim()).toBe("strict-lint: No files matching 'missing-dir' were found.");
-  }, 30_000);
+  });
 });
 
 // region | Helpers
