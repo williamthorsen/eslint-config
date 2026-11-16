@@ -14,7 +14,7 @@ vi.mock('../loadStrictLintConfigs.ts', () => ({
 describe(createCeilingResolver, () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    withCascade();
+    mockCascade();
   });
 
   it('walks from the directory of the linted file, not the working directory', async () => {
@@ -32,14 +32,14 @@ describe(createCeilingResolver, () => {
   });
 
   it('applies the ceilings of the only config in the cascade', async () => {
-    withCascade({ maxSeverity: { 'some-rule': 'warn' } });
+    mockCascade({ maxSeverity: { 'some-rule': 'warn' } });
     const resolver = createCeilingResolver();
 
     await expect(resolver.resolveFor('/project/a.ts')).resolves.toStrictEqual({ 'some-rule': 'warn' });
   });
 
   it('keeps an entry of a farther config that the nearer one does not mention', async () => {
-    withCascade({ maxSeverity: { 'nearer-rule': 'warn' } }, { maxSeverity: { 'farther-rule': 'warn' } });
+    mockCascade({ maxSeverity: { 'nearer-rule': 'warn' } }, { maxSeverity: { 'farther-rule': 'warn' } });
     const resolver = createCeilingResolver();
 
     await expect(resolver.resolveFor('/project/a.ts')).resolves.toStrictEqual({
@@ -49,14 +49,14 @@ describe(createCeilingResolver, () => {
   });
 
   it('lets a nearer config drop an inherited ceiling by promoting it to error', async () => {
-    withCascade({ maxSeverity: { 'shared-rule': 'error' } }, { maxSeverity: { 'shared-rule': 'warn' } });
+    mockCascade({ maxSeverity: { 'shared-rule': 'error' } }, { maxSeverity: { 'shared-rule': 'warn' } });
     const resolver = createCeilingResolver();
 
     await expect(resolver.resolveFor('/project/a.ts')).resolves.toStrictEqual({ 'shared-rule': 'error' });
   });
 
   it('lets programmatic overrides outrank every config in the cascade', async () => {
-    withCascade({ maxSeverity: { 'some-rule': 'error' } }, { maxSeverity: { 'some-rule': 'warn' } });
+    mockCascade({ maxSeverity: { 'some-rule': 'error' } }, { maxSeverity: { 'some-rule': 'warn' } });
     const resolver = createCeilingResolver({ 'some-rule': 'warn' });
 
     await expect(resolver.resolveFor('/project/a.ts')).resolves.toStrictEqual({ 'some-rule': 'warn' });
@@ -92,7 +92,7 @@ describe(createCeilingResolver, () => {
   it('resolves ceilings independently for files under different configs', async () => {
     mockedLoadStrictLintConfigs.mockImplementation((dir: string) =>
       Promise.resolve(
-        cascadeOf([{ maxSeverity: dir === '/project/one' ? { 'rule-one': 'warn' } : { 'rule-two': 'warn' } }]),
+        buildCascade([{ maxSeverity: dir === '/project/one' ? { 'rule-one': 'warn' } : { 'rule-two': 'warn' } }]),
       ),
     );
     const resolver = createCeilingResolver();
@@ -114,7 +114,7 @@ describe(createCeilingResolver, () => {
 // region | Helpers
 
 /** Builds a cascade with one entry per config, nearest first, bounded by a marker-identified project root. */
-function cascadeOf(configs: StrictLintConfig[]) {
+function buildCascade(configs: StrictLintConfig[]) {
   return {
     entries: configs.map((config, index) => ({
       config,
@@ -127,8 +127,8 @@ function cascadeOf(configs: StrictLintConfig[]) {
 }
 
 /** Makes the mocked loader resolve with one cascade entry per config, given nearest first. */
-function withCascade(...configs: StrictLintConfig[]): void {
-  mockedLoadStrictLintConfigs.mockResolvedValue(cascadeOf(configs));
+function mockCascade(...configs: StrictLintConfig[]): void {
+  mockedLoadStrictLintConfigs.mockResolvedValue(buildCascade(configs));
 }
 
 // endregion | Helpers

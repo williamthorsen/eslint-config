@@ -15,7 +15,7 @@ describe('config resolution (subprocess)', () => {
   it('reports the rules eslint reports for a package with its own config', async () => {
     using tree = makeMonorepoFixture();
 
-    const [reported, reference] = [ruleIdsFromStrictLint(tree.dir), await ruleIdsFromEslint(tree.dir)];
+    const [reported, reference] = [collectStrictLintRuleIds(tree.dir), await collectEslintRuleIds(tree.dir)];
 
     expect(reported).toStrictEqual(reference);
   }, 30_000);
@@ -24,13 +24,13 @@ describe('config resolution (subprocess)', () => {
     using tree = makeMonorepoFixture();
 
     // The package turns `no-unused-vars` off and `no-console` on; the root config does neither.
-    expect(ruleIdsFromStrictLint(tree.dir)).toStrictEqual(['no-console']);
+    expect(collectStrictLintRuleIds(tree.dir)).toStrictEqual(['no-console']);
   }, 30_000);
 
   it('promotes the package config warning to an error', () => {
     using tree = makeMonorepoFixture();
 
-    const [result] = reportFromStrictLint(tree.dir);
+    const [result] = collectStrictLintReport(tree.dir);
 
     expect(result?.messages[0]?.severity).toBe(2);
   }, 30_000);
@@ -38,7 +38,7 @@ describe('config resolution (subprocess)', () => {
   it('falls back to the root config for a file governed by no nearer config', () => {
     using tree = makeMonorepoFixture({ 'a.js': "const unused = 1;\nconsole.log('hi');\n" });
 
-    const results = reportFromStrictLint(tree.dir, 'a.js');
+    const results = collectStrictLintReport(tree.dir, 'a.js');
 
     // No config is beside this file, so the root's `no-unused-vars` governs and `no-console` stays unset.
     expect(results[0]?.messages.map((message) => message.ruleId)).toStrictEqual(['no-unused-vars']);
@@ -46,6 +46,22 @@ describe('config resolution (subprocess)', () => {
 });
 
 // region | Helpers
+
+/** Returns the rule ids that ESLint itself reports, the reference that strict-lint must match. */
+async function collectEslintRuleIds(cwd: string): Promise<Array<string | null>> {
+  const results = await new ESLint({ cwd }).lintFiles([TARGET]);
+  return results.flatMap((result) => result.messages.map((message) => message.ruleId));
+}
+
+/** Runs strict-lint on a target and returns the results from its JSON formatter output. */
+function collectStrictLintReport(cwd: string, target: string = TARGET): ReportedResult[] {
+  return readJsonReport(runCli(cwd, ['--format', 'json', target]));
+}
+
+/** Returns the rule ids that strict-lint reports, in the shape of the ESLint reference. */
+function collectStrictLintRuleIds(cwd: string): Array<string | null> {
+  return collectStrictLintReport(cwd).flatMap((result) => result.messages.map((message) => message.ruleId));
+}
 
 /** Writes the given files into a fresh temp tree with a project-root marker. */
 function makeFixture(files: Record<string, string>): TempTree {
@@ -60,22 +76,6 @@ function makeMonorepoFixture(extraFiles: Record<string, string> = {}): TempTree 
     [TARGET]: "const unused = 1;\nconsole.log('hi');\n",
     ...extraFiles,
   });
-}
-
-/** Runs strict-lint on a target and returns the results from its JSON formatter output. */
-function reportFromStrictLint(cwd: string, target: string = TARGET): ReportedResult[] {
-  return readJsonReport(runCli(cwd, ['--format', 'json', target]));
-}
-
-/** Returns the rule ids that ESLint itself reports, the reference that strict-lint must match. */
-async function ruleIdsFromEslint(cwd: string): Promise<Array<string | null>> {
-  const results = await new ESLint({ cwd }).lintFiles([TARGET]);
-  return results.flatMap((result) => result.messages.map((message) => message.ruleId));
-}
-
-/** Returns the rule ids that strict-lint reports, in the shape of the ESLint reference. */
-function ruleIdsFromStrictLint(cwd: string): Array<string | null> {
-  return reportFromStrictLint(cwd).flatMap((result) => result.messages.map((message) => message.ruleId));
 }
 
 // endregion | Helpers

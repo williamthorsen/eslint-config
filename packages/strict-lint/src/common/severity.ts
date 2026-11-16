@@ -34,6 +34,6 @@ export function isRuleSeverity(value: unknown): value is Linter.RuleSeverity {
 }
 
 /** Converts a severity to its numeric form, so that `'error'` and `2` compare as one value. */
-export function toSeverityNumber(severity: Linter.RuleSeverity): 0 | 1 | 2 {
+export function convertSeverityToNumber(severity: Linter.RuleSeverity): 0 | 1 | 2 {
   return typeof severity === 'number' ? severity : SEVERITY_NUMBERS[severity];
 }

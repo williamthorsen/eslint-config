@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { allowsPromotion, formatRuleSeverities, isRuleSeverity, toSeverityNumber } from '../severity.ts';
+import { allowsPromotion, convertSeverityToNumber, formatRuleSeverities, isRuleSeverity } from '../severity.ts';
 
 describe(isRuleSeverity, () => {
   it.each(['off', 'warn', 'error', 0, 1, 2])('accepts the severity %o', (severity) => {
@@ -31,7 +31,7 @@ describe(formatRuleSeverities, () => {
   });
 });
 
-describe(toSeverityNumber, () => {
+describe(convertSeverityToNumber, () => {
   it.each([
     { severity: 'off', expected: 0 },
     { severity: 0, expected: 0 },
@@ -40,6 +40,6 @@ describe(toSeverityNumber, () => {
     { severity: 'error', expected: 2 },
     { severity: 2, expected: 2 },
   ] as const)('renders $severity as $expected', ({ severity, expected }) => {
-    expect(toSeverityNumber(severity)).toBe(expected);
+    expect(convertSeverityToNumber(severity)).toBe(expected);
   });
 });

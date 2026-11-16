@@ -3,13 +3,13 @@ import { isDeepStrictEqual } from 'node:util';
 import { ESLint, type Linter } from 'eslint';
 
 import { isRecord } from '#src/common/isRecord.ts';
-import { isRuleSeverity, toSeverityNumber } from '#src/common/severity.ts';
+import { convertSeverityToNumber, isRuleSeverity } from '#src/common/severity.ts';
 
 import { buildPluginScaffold } from './buildPluginScaffold.ts';
 import { sortConfigElements } from './sortConfigElements.ts';
 
 /** A rule that the consumer's own config sets to the value that the shared config already resolves. */
-export interface RepeatedRule {
+interface RepeatedRule {
   fileCount: number;
   ruleId: string;
 }
@@ -86,7 +86,7 @@ export async function findRepeatedRules(comparison: RepeatComparison): Promise<R
  */
 function canonicalizeRuleEntry(entry: unknown): unknown[] {
   const [severity, ...options] = isUnknownArray(entry) ? entry : [entry];
-  return [isRuleSeverity(severity) ? toSeverityNumber(severity) : severity, ...options];
+  return [isRuleSeverity(severity) ? convertSeverityToNumber(severity) : severity, ...options];
 }
 
 /** Builds an ESLint instance that resolves one side of the comparison over the whole config's plugin registrations. */
