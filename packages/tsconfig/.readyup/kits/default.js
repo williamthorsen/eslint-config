@@ -241,6 +241,8 @@ var cache = {
 var default_default = defineRdyKit({
   description: `Adoption, alignment, and hygiene checks for a project consuming ${PACKAGE_NAME}`,
   defaultSeverity: "warn",
+  // 0.25.0 is the first release to export readTsconfigChain, the newest check-util that the checks use.
+  minReadyupVersion: "0.25.0",
   checklists: [
     {
       name: "adoption",
