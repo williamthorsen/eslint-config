@@ -1,5 +1,107 @@
 [
   {
+    "version": "16.0.0",
+    "date": "2026-11-17",
+    "sections": [
+      {
+        "title": "🎉 Features",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Adds the `--version` and `-V` options to `strict-lint`, which print the package version and exit without linting, and lists them in the `--help` text and the README, which notes that `strict-lint` does not accept ESLint's `-v`. (#356)",
+            "hash": "32145f0c3d96a3bf749a446796c9061bb6e2404c",
+            "entry": 1
+          },
+          {
+            "description": "Makes `strict-lint --rule` accept the numeric severities `0`, `1`, and `2`, as in `--rule \"no-console: 2\"`, and report any other value, such as `2.0`, as an error that lists the accepted severities. (#360)",
+            "hash": "3a39ed629c838d1740e3d8d64cf8802fb0cb5b78",
+            "entry": 1
+          },
+          {
+            "description": "Makes `strict-lint` and `strict-lint init` exit 2 rather than 1 on a usage error: an option that `strict-lint` does not recognize, an invalid value for `--rule`, `--cache-strategy`, `--concurrency`, `--fix-type`, or `--max-warnings`, a `--config` path that does not name an existing file, `--concurrency` together with a programmatic `baseConfig`, or a positional argument to `init`. (#361)",
+            "breaking": true,
+            "migration": "In a script that checks for exit code 1 after a failed `strict-lint` invocation, accept exit code 2 as well, since exit 1 now means only that errors remain, that warnings exceed `--max-warnings`, or that the run failed.",
+            "hash": "0fb7761c8e23aff31647d87228b2dddbb147086c",
+            "entry": 1
+          },
+          {
+            "description": "Changes `strict-lint` to report an anticipated failure, such as an invalid strict-lint config or a native TypeScript load failure, as one line prefixed with `strict-lint:` (`strict-lint init:` for `init`) without a stack trace, and to report any other error as `strict-lint: internal error:` followed by its stack. (#361)",
+            "hash": "0fb7761c8e23aff31647d87228b2dddbb147086c",
+            "entry": 2
+          },
+          {
+            "description": "Adds a suggestion of the nearest declared long option to the unknown-option error of `strict-lint` and `strict-lint init`, which for the lint command also considers negated forms such as `--no-cache`, and leaves a mistyped short option without a suggestion. (#371)",
+            "hash": "322deba5a6a8ac1edbe6b1bafda4661f24fa2078",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Moves each unexported top-level function into a sorted \"Helpers\" region fold at the end of its module across all three workspaces and the root tests, and alphabetizes the exports of `packages/strict-lint/src/common/severity.ts`. (#357)",
+            "hash": "26d951bb1e28ff8a1547cf8adfe4d6c79f28492f",
+            "entry": 2
+          },
+          {
+            "description": "Renames the functions in `strict-lint`'s sources and tests whose names did not start with a verb, such as `toSeverityNumber` to `convertSeverityToNumber` and `countOf` to `formatCount`, and stops exporting the `RepeatedRule` interface, which nothing outside `findRepeatedRules.ts` imported. (#358)",
+            "hash": "73f65696dd905bc5f7d3a34ecd824200aab7cf7b",
+            "entry": 1
+          },
+          {
+            "description": "Moves `reportConfigProvenance` and the helpers used only by it from `strictLint.ts` into `reportConfigProvenance.ts`, and tests it directly in `reportConfigProvenance.unit.test.ts`, leaving only the `--debug` gate's tests of the report in `strictLint.unit.test.ts`. (#362)",
+            "hash": "e9323f8c48dac375a8e75172ee6f6600e0f00467",
+            "entry": 1
+          },
+          {
+            "description": "Adds an internal `createStrictLint` factory and a `loadConfigs` option on `createCeilingResolver`, which now takes an options object rather than a positional `overrides` argument, so that the unit tests pass a stub loader in place of mocking `loadStrictLintConfigs` with `vi.mock`. (#369)",
+            "hash": "30ffe06455b941f0aed136f1437c589a2d73c9d6",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "🧪 Tests",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Replaces the hand-rolled temp-directory fixtures in the `strict-lint` unit and tool tests with `createTempTree` from `@williamthorsen/toolbelt.testing/candidate`, held by `using` declarations so that each tree is removed when its test ends. (#354)",
+            "hash": "998dc2f427f7cdbc8c76b519568f3acef6d9a4e9",
+            "entry": 1
+          },
+          {
+            "description": "Moves the strict-lint tool tests onto `runCli` and `readJsonReport` in `src/test-utils/strictLintCli.ts`, which replace the CLI path, `spawnSync` runner, `ReportedResult` type, and JSON-report parsing that the test files declared for themselves, and tightens the `./init` case to assert that the report contains exactly one linted result. (#355)",
+            "hash": "cd079ca1fca8c6ebe1dd5394d53e075653c2c4e7",
+            "entry": 1
+          },
+          {
+            "description": "Replaces the copies of `buildResult`, `buildCascade`, and `buildConfigPath` in strict-lint's unit tests with shared builders in `src/test-utils/`, and replaces the local `isRecord` in `strictLint.unit.test.ts` with the one from `src/common`. (#368)",
+            "hash": "1c137955f85c7f3e0ea36010152d9b45bea8032f",
+            "entry": 1
+          },
+          {
+            "description": "Removes the per-test `30_000` timeout argument from strict-lint's `*.tool.test.ts` files, leaving the 30-second `testTimeout` that nmr sets for the `tool` tier to govern those tests. (#370)",
+            "hash": "b7b8af961eb7dd6450665e0c11d90aaeca70a96d",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrades `@williamthorsen/toolbelt.errors` to 0.11.0, `toolbelt.filesystem` to 0.11.1, `toolbelt.packaging` to 0.9.0, and `toolbelt.testing` to 0.8.4, and adapts strict-lint's `describeRootSource` to the `ProjectRoot` type of `toolbelt.packaging` 0.9.0, which is now a union discriminated by `source`. (#344)",
+            "hash": "1604326fa01c5d6b06affc7357163855b51907e0",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "15.1.0",
     "date": "2026-11-15",
     "sections": [

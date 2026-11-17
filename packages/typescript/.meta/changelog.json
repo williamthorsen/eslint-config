@@ -1,5 +1,128 @@
 [
   {
+    "version": "23.0.0",
+    "date": "2026-11-17",
+    "sections": [
+      {
+        "title": "🐛 Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Fixes the issue that the readyup kit's extension-import and enumeration checks ignored a `tsconfig.json` that did not parse and judged one whose `extends` did not resolve as though the unresolved configs did not exist, which let them pass without judging anything or fail a tsconfig that an uninstalled base config would have permitted. (#333)",
+            "hash": "dfc469e59c545fe7622c2e2cbf1bc17448e4f15f",
+            "entry": 1
+          },
+          {
+            "description": "Fixes the issue that the JSON, JSON5, and YAML configs never enabled the rules of the `recommended-with-jsonc` and `recommended` configs from `eslint-plugin-jsonc` and `eslint-plugin-yml`, and now enables them at error, except for `yml/no-empty-mapping-value` and the jsonc rules that reject JSON5 syntax. (#336)",
+            "breaking": true,
+            "migration": "Run ESLint on the repository's JSON, JSON5, and YAML files after upgrading, and fix each newly reported violation or turn the rule off in the consumer's own config.",
+            "hash": "7a4f2c4ea858d2c8e23f4ded646dfbb0499e9911",
+            "entry": 1
+          },
+          {
+            "description": "Fixes the issue that `sky-pilot/prefer-function-declaration` skipped an arrow function that does not use `this` whenever the enclosing method, or a function nested inside the arrow, used `this`. (#337)",
+            "hash": "3c5491ff5fb831b36546dfa20e3abf5589dcfbc1",
+            "entry": 1
+          },
+          {
+            "description": "Fixes the issue that readyup 0.35.0 and later reported a false `version-skew` warning for the readiness kits of `@williamthorsen/eslint-config-typescript` and `@williamthorsen/tsconfig` whenever the running readyup was older than the release that compiled the kit, by declaring readyup 0.25.0 as each kit's `minReadyupVersion`. (#380)",
+            "hash": "019e21a543639f38c1199f8e54cd717def9f5191",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Replaces the bare `try`/`catch` wrappers around `getParserServices` in `no-floating-disposable`, `no-js-extension-for-ts`, `no-type-cycle`, and `no-unused-map` with a shared `findParserServices` helper, which checks for both node maps rather than catching every error and silently disabling the rule. (#329)",
+            "hash": "18004c754e7679f4233eb144aad95ab326d3e5f5",
+            "entry": 1
+          },
+          {
+            "description": "Exports each internal config module, each sky-pilot rule, and the sky-pilot-react configs by name instead of as a default, and moves each rule module's helpers below its exported rule into a single helpers region. (#331)",
+            "hash": "7109991c054ef4c18aa8d544ccaf6e98421669c2",
+            "entry": 1
+          },
+          {
+            "description": "Renames the check functions in both readyup kits with a leading `check`, such as `noLegacyParserProject` to `checkNoLegacyParserProject`, and re-sorts each kit's Helpers region to match. (#334)",
+            "hash": "7220c76dadd5e9d1eeb538b6312ac618ef762622",
+            "entry": 1
+          },
+          {
+            "description": "Moves each unexported top-level function into a sorted \"Helpers\" region fold at the end of its module across all three workspaces and the root tests, and alphabetizes the exports of `packages/strict-lint/src/common/severity.ts`. (#357)",
+            "hash": "26d951bb1e28ff8a1547cf8adfe4d6c79f28492f",
+            "entry": 2
+          }
+        ]
+      },
+      {
+        "title": "🧪 Tests",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Makes `lintFixture` and `fixText` fail with the file's name and ESLint's parse error when the input does not parse, and removes the 21 `fatalErrorCount` assertions and the local guard in `baseConfig.tool.test.ts` that guarded against a vacuous pass one test at a time. (#332)",
+            "hash": "9404615c51525e77aacac80c97fa0a0cb30b583a",
+            "entry": 1
+          },
+          {
+            "description": "Replaces the per-file `listCycleMessages` and `listSortMessages` copies with a `listRuleMessages` exported by `lintFixture.ts` that takes the rule id, and moves `toLinterConfigs` from `lintFixture.ts` and `fixText.ts` into its own module in the test utilities. (#332)",
+            "hash": "9404615c51525e77aacac80c97fa0a0cb30b583a",
+            "entry": 2
+          },
+          {
+            "description": "Builds the 15 declaration-rebinding cases in `no-floating-disposable.rules.tool.test.ts` through a `buildRebindCase` helper, which derives the expected suggestion output by rebinding the code's declaration with the given keyword, so that a case no longer restates its error and output by hand. (#335)",
+            "hash": "b87639741696b5db9fb283664f9effe4a2c9d84b",
+            "entry": 1
+          },
+          {
+            "description": "Moves the lint test helpers `lintFixture`, `fixText`, and `toLinterConfigs`, with their `parseGuard` test, from `src/configs/test-utils/` to `src/test-utils/`, the nearest common ancestor of the tests that import them. (#341)",
+            "hash": "a91127f4a07a681d28f5a404e1316760499f27d7",
+            "entry": 1
+          },
+          {
+            "description": "Adds `relativePathToDir.unit.test.ts`, which passes an explicit `currentDir` and sets the working directory to a temporary repo root, and checks the path that `relativePathToDir` returns for a sibling, an outside, and an ancestor target. (#342)",
+            "hash": "5a75200d195f5a7e48c71d279457eee01c453e52",
+            "entry": 1
+          },
+          {
+            "description": "Replaces the two local copies of `buildChainEntry` in the readiness tests with `makeTsconfigChainEntry` from `readyup/testing`, which readyup maintains beside the `TsconfigChainEntry` type, and deletes both `test-utils/buildChainEntry.ts` files. (#377)",
+            "hash": "4160984c5c27de4ea4608be55f27fc3f8ee62598",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrades `@williamthorsen/toolbelt.errors` to 0.11.0, `toolbelt.filesystem` to 0.11.1, `toolbelt.packaging` to 0.9.0, and `toolbelt.testing` to 0.8.4, and adapts strict-lint's `describeRootSource` to the `ProjectRoot` type of `toolbelt.packaging` 0.9.0, which is now a union discriminated by `source`. (#344)",
+            "hash": "1604326fa01c5d6b06affc7357163855b51907e0",
+            "entry": 1
+          },
+          {
+            "description": "Upgrades the catalog's `readyup` from 0.46.2 to 0.46.3 and recompiles the `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript` kits, whose bundles and manifests record the compiler's version. (#344)",
+            "hash": "1604326fa01c5d6b06affc7357163855b51907e0",
+            "entry": 2
+          }
+        ]
+      },
+      {
+        "title": "📚 Documentation",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "States in the doc comment of `relativePathToDir` that `targetDir` is resolved against `currentDir`, which defaults to the module's own directory inside the installed package, and that a caller therefore passes its own directory, such as `import.meta.dirname`. (#342)",
+            "hash": "5a75200d195f5a7e48c71d279457eee01c453e52",
+            "entry": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "22.1.0",
     "date": "2026-11-15",
     "sections": [

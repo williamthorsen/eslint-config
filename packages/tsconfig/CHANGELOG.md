@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.14.1 — 2026-11-17
+
+### 🐛 Bug fixes
+
+- Fixes the issue that the `@williamthorsen/tsconfig` readyup kit failed a tsconfig that does not parse, or whose chain stops at an unresolved `extends`, as not reaching the base, and that the escaping-paths check passed such a tsconfig without counting it; each check that reads chains now names those tsconfigs and why their chains were not read. (#379)
+- Fixes the issue that readyup 0.35.0 and later reported a false `version-skew` warning for the readiness kits of `@williamthorsen/eslint-config-typescript` and `@williamthorsen/tsconfig` whenever the running readyup was older than the release that compiled the kit, by declaring readyup 0.25.0 as each kit's `minReadyupVersion`. (#380)
+
+### ♻️ Refactoring
+
+- Renames the check functions in both readyup kits with a leading `check`, such as `noLegacyParserProject` to `checkNoLegacyParserProject`, and re-sorts each kit's Helpers region to match. (#334)
+- Moves each unexported top-level function into a sorted "Helpers" region fold at the end of its module across all three workspaces and the root tests, and alphabetizes the exports of `packages/strict-lint/src/common/severity.ts`. (#357)
+- Moves `judgeNodeFloor` and the ES-year mismatch scan, now `findEsYearMismatches`, from the tsconfig readyup kit's `.readyup/kits/default.ts` into `src/readiness/`, where unit tests and coverage reach them. (#378)
+
+### 🧪 Tests
+
+- Replaces the two local copies of `buildChainEntry` in the readiness tests with `makeTsconfigChainEntry` from `readyup/testing`, which readyup maintains beside the `TsconfigChainEntry` type, and deletes both `test-utils/buildChainEntry.ts` files. (#377)
+
+### 📦 Dependencies
+
+- Upgrades the catalog's `readyup` from 0.46.2 to 0.46.3 and recompiles the `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript` kits, whose bundles and manifests record the compiler's version. (#344)
+
 ## 0.14.0 — 2026-11-15
 
 ### 🎉 Features

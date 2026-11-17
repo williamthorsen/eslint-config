@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## 23.0.0 — 2026-11-17
+
+### 🐛 Bug fixes
+
+- Fixes the issue that the readyup kit's extension-import and enumeration checks ignored a `tsconfig.json` that did not parse and judged one whose `extends` did not resolve as though the unresolved configs did not exist, which let them pass without judging anything or fail a tsconfig that an uninstalled base config would have permitted. (#333)
+- 🚨 **Breaking:** Fixes the issue that the JSON, JSON5, and YAML configs never enabled the rules of the `recommended-with-jsonc` and `recommended` configs from `eslint-plugin-jsonc` and `eslint-plugin-yml`, and now enables them at error, except for `yml/no-empty-mapping-value` and the jsonc rules that reject JSON5 syntax. (#336)
+- Fixes the issue that `sky-pilot/prefer-function-declaration` skipped an arrow function that does not use `this` whenever the enclosing method, or a function nested inside the arrow, used `this`. (#337)
+- Fixes the issue that readyup 0.35.0 and later reported a false `version-skew` warning for the readiness kits of `@williamthorsen/eslint-config-typescript` and `@williamthorsen/tsconfig` whenever the running readyup was older than the release that compiled the kit, by declaring readyup 0.25.0 as each kit's `minReadyupVersion`. (#380)
+
+### ♻️ Refactoring
+
+- Replaces the bare `try`/`catch` wrappers around `getParserServices` in `no-floating-disposable`, `no-js-extension-for-ts`, `no-type-cycle`, and `no-unused-map` with a shared `findParserServices` helper, which checks for both node maps rather than catching every error and silently disabling the rule. (#329)
+- Exports each internal config module, each sky-pilot rule, and the sky-pilot-react configs by name instead of as a default, and moves each rule module's helpers below its exported rule into a single helpers region. (#331)
+- Renames the check functions in both readyup kits with a leading `check`, such as `noLegacyParserProject` to `checkNoLegacyParserProject`, and re-sorts each kit's Helpers region to match. (#334)
+- Moves each unexported top-level function into a sorted "Helpers" region fold at the end of its module across all three workspaces and the root tests, and alphabetizes the exports of `packages/strict-lint/src/common/severity.ts`. (#357)
+
+### 🧪 Tests
+
+- Makes `lintFixture` and `fixText` fail with the file's name and ESLint's parse error when the input does not parse, and removes the 21 `fatalErrorCount` assertions and the local guard in `baseConfig.tool.test.ts` that guarded against a vacuous pass one test at a time. (#332)
+- Replaces the per-file `listCycleMessages` and `listSortMessages` copies with a `listRuleMessages` exported by `lintFixture.ts` that takes the rule id, and moves `toLinterConfigs` from `lintFixture.ts` and `fixText.ts` into its own module in the test utilities. (#332)
+- Builds the 15 declaration-rebinding cases in `no-floating-disposable.rules.tool.test.ts` through a `buildRebindCase` helper, which derives the expected suggestion output by rebinding the code's declaration with the given keyword, so that a case no longer restates its error and output by hand. (#335)
+- Moves the lint test helpers `lintFixture`, `fixText`, and `toLinterConfigs`, with their `parseGuard` test, from `src/configs/test-utils/` to `src/test-utils/`, the nearest common ancestor of the tests that import them. (#341)
+- Adds `relativePathToDir.unit.test.ts`, which passes an explicit `currentDir` and sets the working directory to a temporary repo root, and checks the path that `relativePathToDir` returns for a sibling, an outside, and an ancestor target. (#342)
+- Replaces the two local copies of `buildChainEntry` in the readiness tests with `makeTsconfigChainEntry` from `readyup/testing`, which readyup maintains beside the `TsconfigChainEntry` type, and deletes both `test-utils/buildChainEntry.ts` files. (#377)
+
+### 📦 Dependencies
+
+- Upgrades `@williamthorsen/toolbelt.errors` to 0.11.0, `toolbelt.filesystem` to 0.11.1, `toolbelt.packaging` to 0.9.0, and `toolbelt.testing` to 0.8.4, and adapts strict-lint's `describeRootSource` to the `ProjectRoot` type of `toolbelt.packaging` 0.9.0, which is now a union discriminated by `source`. (#344)
+- Upgrades the catalog's `readyup` from 0.46.2 to 0.46.3 and recompiles the `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript` kits, whose bundles and manifests record the compiler's version. (#344)
+
+### 📚 Documentation
+
+- States in the doc comment of `relativePathToDir` that `targetDir` is resolved against `currentDir`, which defaults to the module's own directory inside the installed package, and that a caller therefore passes its own directory, such as `import.meta.dirname`. (#342)
+
 ## 22.1.0 — 2026-11-15
 
 ### 🎉 Features

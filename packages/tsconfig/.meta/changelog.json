@@ -1,5 +1,70 @@
 [
   {
+    "version": "0.14.1",
+    "date": "2026-11-17",
+    "sections": [
+      {
+        "title": "🐛 Bug fixes",
+        "audience": "all",
+        "items": [
+          {
+            "description": "Fixes the issue that the `@williamthorsen/tsconfig` readyup kit failed a tsconfig that does not parse, or whose chain stops at an unresolved `extends`, as not reaching the base, and that the escaping-paths check passed such a tsconfig without counting it; each check that reads chains now names those tsconfigs and why their chains were not read. (#379)",
+            "hash": "7c8abfd72faeee477ae4c0aa5cffa8e3681b9129",
+            "entry": 1
+          },
+          {
+            "description": "Fixes the issue that readyup 0.35.0 and later reported a false `version-skew` warning for the readiness kits of `@williamthorsen/eslint-config-typescript` and `@williamthorsen/tsconfig` whenever the running readyup was older than the release that compiled the kit, by declaring readyup 0.25.0 as each kit's `minReadyupVersion`. (#380)",
+            "hash": "019e21a543639f38c1199f8e54cd717def9f5191",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "♻️ Refactoring",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Renames the check functions in both readyup kits with a leading `check`, such as `noLegacyParserProject` to `checkNoLegacyParserProject`, and re-sorts each kit's Helpers region to match. (#334)",
+            "hash": "7220c76dadd5e9d1eeb538b6312ac618ef762622",
+            "entry": 1
+          },
+          {
+            "description": "Moves each unexported top-level function into a sorted \"Helpers\" region fold at the end of its module across all three workspaces and the root tests, and alphabetizes the exports of `packages/strict-lint/src/common/severity.ts`. (#357)",
+            "hash": "26d951bb1e28ff8a1547cf8adfe4d6c79f28492f",
+            "entry": 2
+          },
+          {
+            "description": "Moves `judgeNodeFloor` and the ES-year mismatch scan, now `findEsYearMismatches`, from the tsconfig readyup kit's `.readyup/kits/default.ts` into `src/readiness/`, where unit tests and coverage reach them. (#378)",
+            "hash": "329bf3212f2eb04e660809951fc37f435441b166",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "🧪 Tests",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Replaces the two local copies of `buildChainEntry` in the readiness tests with `makeTsconfigChainEntry` from `readyup/testing`, which readyup maintains beside the `TsconfigChainEntry` type, and deletes both `test-utils/buildChainEntry.ts` files. (#377)",
+            "hash": "4160984c5c27de4ea4608be55f27fc3f8ee62598",
+            "entry": 1
+          }
+        ]
+      },
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrades the catalog's `readyup` from 0.46.2 to 0.46.3 and recompiles the `@williamthorsen/tsconfig` and `@williamthorsen/eslint-config-typescript` kits, whose bundles and manifests record the compiler's version. (#344)",
+            "hash": "1604326fa01c5d6b06affc7357163855b51907e0",
+            "entry": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "0.14.0",
     "date": "2026-11-15",
     "sections": [

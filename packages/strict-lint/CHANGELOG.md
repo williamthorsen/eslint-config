@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## 16.0.0 — 2026-11-17
+
+### 🎉 Features
+
+- Adds the `--version` and `-V` options to `strict-lint`, which print the package version and exit without linting, and lists them in the `--help` text and the README, which notes that `strict-lint` does not accept ESLint's `-v`. (#356)
+- Makes `strict-lint --rule` accept the numeric severities `0`, `1`, and `2`, as in `--rule "no-console: 2"`, and report any other value, such as `2.0`, as an error that lists the accepted severities. (#360)
+- 🚨 **Breaking:** Makes `strict-lint` and `strict-lint init` exit 2 rather than 1 on a usage error: an option that `strict-lint` does not recognize, an invalid value for `--rule`, `--cache-strategy`, `--concurrency`, `--fix-type`, or `--max-warnings`, a `--config` path that does not name an existing file, `--concurrency` together with a programmatic `baseConfig`, or a positional argument to `init`. (#361)
+- Changes `strict-lint` to report an anticipated failure, such as an invalid strict-lint config or a native TypeScript load failure, as one line prefixed with `strict-lint:` (`strict-lint init:` for `init`) without a stack trace, and to report any other error as `strict-lint: internal error:` followed by its stack. (#361)
+- Adds a suggestion of the nearest declared long option to the unknown-option error of `strict-lint` and `strict-lint init`, which for the lint command also considers negated forms such as `--no-cache`, and leaves a mistyped short option without a suggestion. (#371)
+
+### ♻️ Refactoring
+
+- Moves each unexported top-level function into a sorted "Helpers" region fold at the end of its module across all three workspaces and the root tests, and alphabetizes the exports of `packages/strict-lint/src/common/severity.ts`. (#357)
+- Renames the functions in `strict-lint`'s sources and tests whose names did not start with a verb, such as `toSeverityNumber` to `convertSeverityToNumber` and `countOf` to `formatCount`, and stops exporting the `RepeatedRule` interface, which nothing outside `findRepeatedRules.ts` imported. (#358)
+- Moves `reportConfigProvenance` and the helpers used only by it from `strictLint.ts` into `reportConfigProvenance.ts`, and tests it directly in `reportConfigProvenance.unit.test.ts`, leaving only the `--debug` gate's tests of the report in `strictLint.unit.test.ts`. (#362)
+- Adds an internal `createStrictLint` factory and a `loadConfigs` option on `createCeilingResolver`, which now takes an options object rather than a positional `overrides` argument, so that the unit tests pass a stub loader in place of mocking `loadStrictLintConfigs` with `vi.mock`. (#369)
+
+### 🧪 Tests
+
+- Replaces the hand-rolled temp-directory fixtures in the `strict-lint` unit and tool tests with `createTempTree` from `@williamthorsen/toolbelt.testing/candidate`, held by `using` declarations so that each tree is removed when its test ends. (#354)
+- Moves the strict-lint tool tests onto `runCli` and `readJsonReport` in `src/test-utils/strictLintCli.ts`, which replace the CLI path, `spawnSync` runner, `ReportedResult` type, and JSON-report parsing that the test files declared for themselves, and tightens the `./init` case to assert that the report contains exactly one linted result. (#355)
+- Replaces the copies of `buildResult`, `buildCascade`, and `buildConfigPath` in strict-lint's unit tests with shared builders in `src/test-utils/`, and replaces the local `isRecord` in `strictLint.unit.test.ts` with the one from `src/common`. (#368)
+- Removes the per-test `30_000` timeout argument from strict-lint's `*.tool.test.ts` files, leaving the 30-second `testTimeout` that nmr sets for the `tool` tier to govern those tests. (#370)
+
+### 📦 Dependencies
+
+- Upgrades `@williamthorsen/toolbelt.errors` to 0.11.0, `toolbelt.filesystem` to 0.11.1, `toolbelt.packaging` to 0.9.0, and `toolbelt.testing` to 0.8.4, and adapts strict-lint's `describeRootSource` to the `ProjectRoot` type of `toolbelt.packaging` 0.9.0, which is now a union discriminated by `source`. (#344)
+
 ## 15.1.0 — 2026-11-15
 
 ### 🎉 Features
