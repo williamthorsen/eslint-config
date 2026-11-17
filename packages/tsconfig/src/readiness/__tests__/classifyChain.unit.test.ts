@@ -18,7 +18,7 @@ describe(classifyChain, () => {
   it('reports a chain reaching the base as adopted, with its position in the chain', () => {
     const chain = buildChain([makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }), BASE_ENTRY]);
 
-    expect(classifyChain(chain)).toStrictEqual({ baseIndex: 1, kind: 'adopted' });
+    expect(classifyChain(chain)).toStrictEqual({ baseIndex: 1, chain, kind: 'adopted' });
   });
 
   it('reports a chain containing only a base of another package as an opt-out', () => {
@@ -58,6 +58,52 @@ describe(classifyChain, () => {
     );
 
     expect(classifyChain(chain)).toStrictEqual({ kind: 'uninstalled' });
+  });
+
+  it('reports uninstalled ahead of another unresolved extends', () => {
+    const chain = buildChain(
+      [makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' })],
+      [
+        { from: 'packages/api/tsconfig.json', specifier: './tsconfig.shared.json' },
+        { from: 'packages/api/tsconfig.json', specifier: '@williamthorsen/tsconfig/tsconfig.base.json' },
+      ],
+    );
+
+    expect(classifyChain(chain)).toStrictEqual({ kind: 'uninstalled' });
+  });
+
+  it('reports an entry that does not parse as unread', () => {
+    expect(classifyChain(undefined)).toStrictEqual({ kind: 'unread', reason: 'it does not parse' });
+  });
+
+  it('reports a chain stopped by a misspelt local parent as unread, naming the specifier and its config', () => {
+    const chain = buildChain(
+      [makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' })],
+      [{ from: 'packages/api/tsconfig.json', specifier: '../tsconfg.json' }],
+    );
+
+    expect(classifyChain(chain)).toStrictEqual({
+      kind: 'unread',
+      reason: 'extends "../tsconfg.json" in packages/api/tsconfig.json does not resolve or does not parse',
+    });
+  });
+
+  it('reports a chain whose base of another package does not resolve as unread', () => {
+    const chain = buildChain(
+      [makeTsconfigChainEntry({ path: 'packages/web/tsconfig.json' })],
+      [{ from: 'packages/web/tsconfig.json', specifier: 'astro/tsconfigs/base' }],
+    );
+
+    expect(classifyChain(chain)).toMatchObject({ kind: 'unread' });
+  });
+
+  it('reports a chain reaching the base but stopped elsewhere as unread', () => {
+    const chain = buildChain(
+      [makeTsconfigChainEntry({ path: 'packages/api/tsconfig.json' }), BASE_ENTRY],
+      [{ from: 'packages/api/tsconfig.json', specifier: './tsconfig.paths.json' }],
+    );
+
+    expect(classifyChain(chain)).toMatchObject({ kind: 'unread' });
   });
 });
 

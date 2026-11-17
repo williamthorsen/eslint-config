@@ -37,13 +37,50 @@ function isExternalBase(entry) {
   return !PATH_SPECIFIER.test(specifier) && !isBaseSpecifier(specifier);
 }
 
+// src/readiness/tsconfig-chain-reads.ts
+var UNPARSEABLE_REASON = "it does not parse";
+function appendUnreadNote(sentence, unread) {
+  return unread.length === 0 ? sentence : `${sentence}. ${describeUnreadChains(unread)}`;
+}
+function describeUnreadChains(unread) {
+  return `Could not read the tsconfig chain of ${unread.map(({ path, reason }) => `${path} (${reason})`).join("; ")}`;
+}
+function describeUnreadReason(chain) {
+  if (chain === void 0) return UNPARSEABLE_REASON;
+  if (chain.unresolvedExtends.length === 0) return void 0;
+  return chain.unresolvedExtends.map(({ from, specifier }) => `extends "${specifier}" in ${from} does not resolve or does not parse`).join(", ");
+}
+function noteUnreadChains(outcome, unread) {
+  if (unread.length === 0) return outcome;
+  if (outcome === true) return { ok: true, detail: describeUnreadChains(unread) };
+  const detail = outcome.detail === void 0 ? describeUnreadChains(unread) : appendUnreadNote(outcome.detail, unread);
+  return { ...outcome, detail };
+}
+function skipUnlessChainRead(readCount, unread) {
+  return readCount === 0 && unread.length > 0 && describeUnreadChains(unread);
+}
+function sortChainReads(paths, readChain2) {
+  const reads = { read: [], unread: [] };
+  const distinctPaths = new Set(paths);
+  for (const path of distinctPaths) {
+    const chain = readChain2(path);
+    const reason = describeUnreadReason(chain);
+    if (reason !== void 0) reads.unread.push({ path, reason });
+    else if (chain !== void 0) reads.read.push({ chain, path });
+  }
+  return reads;
+}
+
 // src/readiness/classifyChain.ts
 function classifyChain(chain) {
+  if (chain === void 0) return { kind: "unread", reason: UNPARSEABLE_REASON };
   if (chain.unresolvedExtends.some((unresolved) => isBaseSpecifier(unresolved.specifier))) {
     return { kind: "uninstalled" };
   }
+  const unreadReason = describeUnreadReason(chain);
+  if (unreadReason !== void 0) return { kind: "unread", reason: unreadReason };
   const baseIndex = findBaseIndex(chain.entries);
-  if (baseIndex !== void 0) return { baseIndex, kind: "adopted" };
+  if (baseIndex !== void 0) return { baseIndex, chain, kind: "adopted" };
   return { kind: hasExternalBase(chain.entries) ? "external-base" : "unadopted" };
 }
 
@@ -217,6 +254,7 @@ var default_default = defineRdyKit({
         {
           name: "No tsconfig re-declares an option that the base already supplies",
           severity: "recommend",
+          skip: skipUnlessSomeChainWasRead,
           check: checkNoRedundantOptions,
           fix: "Delete each option named above: The base already supplies it with the same value"
         }
@@ -261,11 +299,8 @@ function checkEveryEsYearMatchesTheBase() {
       (mismatch) => `${mismatch.path} (${mismatch.esYear})`
     )
   );
-  if (offenders.length === 0) return { ok: true, detail: `every tsconfig extending the base is at ${baseEsYear}` };
-  return {
-    ok: false,
-    detail: `the base sets ${baseEsYear}; declared otherwise in: ${dedupe(offenders).join(", ")}`
-  };
+  const outcome = offenders.length === 0 ? { ok: true, detail: `every tsconfig extending the base is at ${baseEsYear}` } : { ok: false, detail: `the base sets ${baseEsYear}; declared otherwise in: ${dedupe(offenders).join(", ")}` };
+  return noteUnreadChains(outcome, listUnreadChains());
 }
 function checkEveryTsconfigAdoptsTheBase() {
   const accountable = classifyAdoptions().filter((adoption) => adoption.kind !== "external-base");
@@ -273,33 +308,31 @@ function checkEveryTsconfigAdoptsTheBase() {
   const progress = { type: "fraction", passedCount: adopted.length, count: accountable.length };
   const uninstalled = listPathsOfKind(accountable, "uninstalled");
   const unadopted = listPathsOfKind(accountable, "unadopted");
-  if (uninstalled.length === 0 && unadopted.length === 0) return { ok: true, progress };
+  const unread = listUnreadChains();
+  if (uninstalled.length === 0 && unadopted.length === 0) return noteUnreadChains({ ok: true, progress }, unread);
   const details = [
     uninstalled.length > 0 ? `${PACKAGE_NAME} is named but not installed in: ${uninstalled.join(", ")}` : void 0,
     unadopted.length > 0 ? `no extends chain reaches the base from: ${unadopted.join(", ")}` : void 0
   ].filter((detail) => detail !== void 0);
-  return { ok: false, detail: details.join("; "), progress };
+  return noteUnreadChains({ ok: false, detail: details.join("; "), progress }, unread);
 }
 function checkNodeFloorSupportsBaseEsYear() {
   const verdict = judgeNodeFloor(readBaseEsYear(), readNodeEsYear());
   return verdict.kind === "skip" || { ok: verdict.kind === "pass", detail: verdict.detail };
 }
 function checkNoEscapingPaths() {
-  const judged = findTsconfigs().flatMap((path) => {
-    const chain = readChain(path);
-    return chain === void 0 ? [] : { escapes: findEscapingPaths(chain.entries), path };
-  });
+  const { judged, unread } = sortEscapeJudgements();
   const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
   const progress = {
     type: "fraction",
     passedCount: judged.length - offenders.length,
-    count: judged.length
+    count: judged.length + unread.length
   };
-  if (offenders.length === 0) return { ok: true, progress };
+  if (offenders.length === 0) return noteUnreadChains({ ok: true, progress }, unread);
   const details = offenders.flatMap(
     (offender) => offender.escapes.map((escaping) => `${offender.path} (${describeEscape(offender.path, escaping)})`)
   );
-  return { ok: false, detail: details.join(", "), progress };
+  return noteUnreadChains({ ok: false, detail: details.join(", "), progress }, unread);
 }
 function checkNoRedundantOptions() {
   const offenders = listAdoptedTsconfigs().flatMap(
@@ -307,18 +340,18 @@ function checkNoRedundantOptions() {
       (redundant) => `${redundant.path} (${redundant.key})`
     )
   );
-  if (offenders.length === 0) return true;
-  return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(", ")}` };
+  const outcome = offenders.length === 0 || {
+    ok: false,
+    detail: `the base already supplies: ${dedupe(offenders).join(", ")}`
+  };
+  return noteUnreadChains(outcome, listUnreadChains());
 }
 function classifyAdoptions() {
   cache.adoptions ??= findTsconfigs().map((path) => classifyTsconfig(path));
   return cache.adoptions;
 }
 function classifyTsconfig(path) {
-  const chain = readChain(path);
-  if (chain === void 0) return { kind: "unadopted", path };
-  const classification = classifyChain(chain);
-  return classification.kind === "adopted" ? { baseIndex: classification.baseIndex, chain, kind: "adopted", path } : { kind: classification.kind, path };
+  return { ...classifyChain(readChain(path)), path };
 }
 function dedupe(values) {
   return [...new Set(values)];
@@ -350,6 +383,11 @@ function listPathsOfKind(classified, kind) {
 function listTsconfigSearchDirs() {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
+function listUnreadChains() {
+  return classifyAdoptions().flatMap(
+    (adoption) => adoption.kind === "unread" ? { path: adoption.path, reason: adoption.reason } : []
+  );
+}
 function readBaseEsYear() {
   for (const adoption of listAdoptedTsconfigs()) {
     const baseOptions = adoption.chain.entries[adoption.baseIndex]?.compilerOptions;
@@ -370,19 +408,33 @@ function resolveDirPath(dir, basename) {
   return dir === "." ? basename : `${dir}/${basename}`;
 }
 function skipUnlessBaseEsYearKnown() {
-  return readBaseEsYear() === void 0 && NO_BASE_ES_YEAR;
+  return readBaseEsYear() === void 0 && appendUnreadNote(NO_BASE_ES_YEAR, listUnreadChains());
 }
 function skipUnlessNodeFloorComparable() {
   const verdict = judgeNodeFloor(readBaseEsYear(), readNodeEsYear());
-  return verdict.kind === "skip" && verdict.reason;
+  if (verdict.kind !== "skip") return false;
+  return verdict.reason === NO_BASE_ES_YEAR ? appendUnreadNote(verdict.reason, listUnreadChains()) : verdict.reason;
+}
+function skipUnlessSomeChainWasRead() {
+  const unread = listUnreadChains();
+  return skipUnlessChainRead(classifyAdoptions().length - unread.length, unread);
 }
 function skipUnlessSomeTsconfigIsAccountable() {
   const classified = classifyAdoptions();
   if (classified.length === 0) return "no workspace tsconfig was found";
-  return classified.every((adoption) => adoption.kind === "external-base") && "every workspace tsconfig extends a base belonging to another package";
+  const accountable = classified.filter((adoption) => adoption.kind !== "external-base");
+  if (accountable.length === 0) return "every workspace tsconfig extends a base belonging to another package";
+  const unread = listUnreadChains();
+  return skipUnlessChainRead(accountable.length - unread.length, unread);
 }
 function skipUnlessSomeTsconfigWasFound() {
-  return findTsconfigs().length === 0 && "no workspace tsconfig was found";
+  if (findTsconfigs().length === 0) return "no workspace tsconfig was found";
+  const { judged, unread } = sortEscapeJudgements();
+  return skipUnlessChainRead(judged.length, unread);
+}
+function sortEscapeJudgements() {
+  const { read, unread } = sortChainReads(findTsconfigs(), readChain);
+  return { judged: read.map(({ chain, path }) => ({ escapes: findEscapingPaths(chain.entries), path })), unread };
 }
 export {
   default_default as default

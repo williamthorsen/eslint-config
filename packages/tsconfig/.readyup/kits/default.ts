@@ -21,7 +21,7 @@ import {
   type TsconfigChain,
 } from 'readyup/check-utils';
 
-import { classifyChain } from '../../src/readiness/classifyChain.ts';
+import { type ChainClassification, classifyChain } from '../../src/readiness/classifyChain.ts';
 import { findEsYearMismatches, readDeclaredEsYear } from '../../src/readiness/es-year.ts';
 import { type EscapingPath, findEscapingPaths } from '../../src/readiness/findEscapingPaths.ts';
 import { findRedundantOptions } from '../../src/readiness/findRedundantOptions.ts';
@@ -33,14 +33,19 @@ import {
   NO_BASE_ES_YEAR,
   type NodeEsYear,
 } from '../../src/readiness/node-floor.ts';
+import {
+  appendUnreadNote,
+  noteUnreadChains,
+  skipUnlessChainRead,
+  sortChainReads,
+  type UnreadChain,
+} from '../../src/readiness/tsconfig-chain-reads.ts';
 
 const PACKAGE_NAME = '@williamthorsen/tsconfig';
 const BASE_SPECIFIER = `${PACKAGE_NAME}/tsconfig.base.json`;
 const ADOPTION_URL = 'https://github.com/williamthorsen/eslint-config/tree/main/packages/tsconfig#adopting-the-base';
 
-type Adoption =
-  | { baseIndex: number; chain: TsconfigChain; kind: 'adopted'; path: string }
-  | { kind: 'external-base' | 'unadopted' | 'uninstalled'; path: string };
+type Adoption = ChainClassification & { path: string };
 
 type AdoptedTsconfig = Extract<Adoption, { kind: 'adopted' }>;
 
@@ -65,6 +70,7 @@ export default defineRdyKit({
         {
           name: 'No tsconfig re-declares an option that the base already supplies',
           severity: 'recommend',
+          skip: skipUnlessSomeChainWasRead,
           check: checkNoRedundantOptions,
           fix: 'Delete each option named above: The base already supplies it with the same value',
         },
@@ -114,11 +120,11 @@ function checkEveryEsYearMatchesTheBase(): boolean | CheckOutcome {
       (mismatch) => `${mismatch.path} (${mismatch.esYear})`,
     ),
   );
-  if (offenders.length === 0) return { ok: true, detail: `every tsconfig extending the base is at ${baseEsYear}` };
-  return {
-    ok: false,
-    detail: `the base sets ${baseEsYear}; declared otherwise in: ${dedupe(offenders).join(', ')}`,
-  };
+  const outcome =
+    offenders.length === 0
+      ? { ok: true, detail: `every tsconfig extending the base is at ${baseEsYear}` }
+      : { ok: false, detail: `the base sets ${baseEsYear}; declared otherwise in: ${dedupe(offenders).join(', ')}` };
+  return noteUnreadChains(outcome, listUnreadChains());
 }
 
 /** Fails when a workspace tsconfig neither reaches the base nor legitimately opts out of it. */
@@ -129,13 +135,14 @@ function checkEveryTsconfigAdoptsTheBase(): boolean | CheckOutcome {
 
   const uninstalled = listPathsOfKind(accountable, 'uninstalled');
   const unadopted = listPathsOfKind(accountable, 'unadopted');
-  if (uninstalled.length === 0 && unadopted.length === 0) return { ok: true, progress };
+  const unread = listUnreadChains();
+  if (uninstalled.length === 0 && unadopted.length === 0) return noteUnreadChains({ ok: true, progress }, unread);
 
   const details = [
     uninstalled.length > 0 ? `${PACKAGE_NAME} is named but not installed in: ${uninstalled.join(', ')}` : undefined,
     unadopted.length > 0 ? `no extends chain reaches the base from: ${unadopted.join(', ')}` : undefined,
   ].filter((detail) => detail !== undefined);
-  return { ok: false, detail: details.join('; '), progress };
+  return noteUnreadChains({ ok: false, detail: details.join('; '), progress }, unread);
 }
 
 /** Fails when the lowest declared Node floor predates the ES year set by the base. */
@@ -146,22 +153,19 @@ function checkNodeFloorSupportsBaseEsYear(): boolean | CheckOutcome {
 
 /** Fails when a workspace tsconfig is governed by an include, exclude, or files path outside its own directory. */
 function checkNoEscapingPaths(): boolean | CheckOutcome {
-  const judged = findTsconfigs().flatMap((path) => {
-    const chain = readChain(path);
-    return chain === undefined ? [] : { escapes: findEscapingPaths(chain.entries), path };
-  });
+  const { judged, unread } = sortEscapeJudgements();
   const offenders = judged.filter((judgedConfig) => judgedConfig.escapes.length > 0);
   const progress: Progress = {
     type: 'fraction',
     passedCount: judged.length - offenders.length,
-    count: judged.length,
+    count: judged.length + unread.length,
   };
-  if (offenders.length === 0) return { ok: true, progress };
+  if (offenders.length === 0) return noteUnreadChains({ ok: true, progress }, unread);
 
   const details = offenders.flatMap((offender) =>
     offender.escapes.map((escaping) => `${offender.path} (${describeEscape(offender.path, escaping)})`),
   );
-  return { ok: false, detail: details.join(', '), progress };
+  return noteUnreadChains({ ok: false, detail: details.join(', '), progress }, unread);
 }
 
 /** Fails when a tsconfig re-declares an option that the base already supplies with the same value. */
@@ -171,8 +175,11 @@ function checkNoRedundantOptions(): boolean | CheckOutcome {
       (redundant) => `${redundant.path} (${redundant.key})`,
     ),
   );
-  if (offenders.length === 0) return true;
-  return { ok: false, detail: `the base already supplies: ${dedupe(offenders).join(', ')}` };
+  const outcome = offenders.length === 0 || {
+    ok: false,
+    detail: `the base already supplies: ${dedupe(offenders).join(', ')}`,
+  };
+  return noteUnreadChains(outcome, listUnreadChains());
 }
 
 /** Classifies every workspace tsconfig by how it reaches, or fails to reach, this package's base. */
@@ -183,13 +190,7 @@ function classifyAdoptions(): Adoption[] {
 
 /** Classifies one tsconfig by how it reaches, or fails to reach, this package's base. */
 function classifyTsconfig(path: string): Adoption {
-  const chain = readChain(path);
-  if (chain === undefined) return { kind: 'unadopted', path };
-
-  const classification = classifyChain(chain);
-  return classification.kind === 'adopted'
-    ? { baseIndex: classification.baseIndex, chain, kind: 'adopted', path }
-    : { kind: classification.kind, path };
+  return { ...classifyChain(readChain(path)), path };
 }
 
 /** Removes repeats while keeping first-seen order, so that a shared config is named once. */
@@ -242,6 +243,13 @@ function listTsconfigSearchDirs(): string[] {
   return listSearchDirs(discoverWorkspaces().map((workspace) => workspace.dir));
 }
 
+/** Lists the tsconfigs whose chains could not be read in full, and why. */
+function listUnreadChains(): UnreadChain[] {
+  return classifyAdoptions().flatMap((adoption) =>
+    adoption.kind === 'unread' ? { path: adoption.path, reason: adoption.reason } : [],
+  );
+}
+
 /**
  * Reads the ES year from the base's own chain entry, so that the comparison tracks the version
  * that the consumer extends.
@@ -276,30 +284,53 @@ function resolveDirPath(dir: string, basename: string): string {
   return dir === '.' ? basename : `${dir}/${basename}`;
 }
 
-/** Skips the ES year check until some chain reaches a base declaring one. */
+/**
+ * Skips the ES year check until some chain reaches a base declaring one, naming the unread chains,
+ * any of which may be the one that reaches it.
+ */
 function skipUnlessBaseEsYearKnown(): false | string {
-  return readBaseEsYear() === undefined && NO_BASE_ES_YEAR;
+  return readBaseEsYear() === undefined && appendUnreadNote(NO_BASE_ES_YEAR, listUnreadChains());
 }
 
 /** Skips the Node floor check when either side of the comparison is unavailable. */
 function skipUnlessNodeFloorComparable(): false | string {
   const verdict = judgeNodeFloor(readBaseEsYear(), readNodeEsYear());
-  return verdict.kind === 'skip' && verdict.reason;
+  if (verdict.kind !== 'skip') return false;
+  return verdict.reason === NO_BASE_ES_YEAR ? appendUnreadNote(verdict.reason, listUnreadChains()) : verdict.reason;
+}
+
+/** Skips a check that judges the configs reaching the base when no chain could be read. */
+function skipUnlessSomeChainWasRead(): false | string {
+  const unread = listUnreadChains();
+  return skipUnlessChainRead(classifyAdoptions().length - unread.length, unread);
 }
 
 /** Skips the adoption check when every tsconfig found extends a base belonging to another package. */
 function skipUnlessSomeTsconfigIsAccountable(): false | string {
   const classified = classifyAdoptions();
   if (classified.length === 0) return 'no workspace tsconfig was found';
-  return (
-    classified.every((adoption) => adoption.kind === 'external-base') &&
-    'every workspace tsconfig extends a base belonging to another package'
-  );
+  const accountable = classified.filter((adoption) => adoption.kind !== 'external-base');
+  if (accountable.length === 0) return 'every workspace tsconfig extends a base belonging to another package';
+
+  const unread = listUnreadChains();
+  return skipUnlessChainRead(accountable.length - unread.length, unread);
 }
 
-/** Skips the escaping-path check when the project has no tsconfig to judge. */
+/** Skips the escaping-path check when the project has no tsconfig to judge or could read none. */
 function skipUnlessSomeTsconfigWasFound(): false | string {
-  return findTsconfigs().length === 0 && 'no workspace tsconfig was found';
+  if (findTsconfigs().length === 0) return 'no workspace tsconfig was found';
+  const { judged, unread } = sortEscapeJudgements();
+  return skipUnlessChainRead(judged.length, unread);
+}
+
+/**
+ * Judges every workspace tsconfig read in full for escaping paths. Any unresolved `extends` leaves
+ * a chain unread here, the base's own included, since the check judges what the chain declares
+ * rather than whether it adopts the base.
+ */
+function sortEscapeJudgements(): { judged: Array<{ escapes: EscapingPath[]; path: string }>; unread: UnreadChain[] } {
+  const { read, unread } = sortChainReads(findTsconfigs(), readChain);
+  return { judged: read.map(({ chain, path }) => ({ escapes: findEscapingPaths(chain.entries), path })), unread };
 }
 
 // endregion | Helpers
