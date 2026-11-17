@@ -1,6 +1,9 @@
 import type { CheckOutcome } from 'readyup';
 import type { TsconfigChain } from 'readyup/check-utils';
 
+/** Why a tsconfig whose entry could not be read has no chain. */
+export const UNPARSEABLE_REASON = 'it does not parse';
+
 /** A tsconfig whose chain could not be read in full, and why. */
 export interface UnreadChain {
   path: string;
@@ -23,7 +26,7 @@ export function describeUnreadChains(unread: readonly UnreadChain[]): string {
  * could not reach.
  */
 export function describeUnreadReason(chain: TsconfigChain | undefined): string | undefined {
-  if (chain === undefined) return 'it does not parse';
+  if (chain === undefined) return UNPARSEABLE_REASON;
   if (chain.unresolvedExtends.length === 0) return undefined;
   return chain.unresolvedExtends
     .map(({ from, specifier }) => `extends "${specifier}" in ${from} does not resolve or does not parse`)
