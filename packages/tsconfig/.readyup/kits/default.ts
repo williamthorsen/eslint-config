@@ -35,9 +35,9 @@ import {
 } from '../../src/readiness/node-floor.ts';
 import {
   appendUnreadNote,
-  describeUnreadReason,
   noteUnreadChains,
   skipUnlessChainRead,
+  sortChainReads,
   type UnreadChain,
 } from '../../src/readiness/tsconfig-chain-reads.ts';
 
@@ -324,19 +324,13 @@ function skipUnlessSomeTsconfigWasFound(): false | string {
 }
 
 /**
- * Sorts each workspace tsconfig into one judged for escaping paths and one whose chain was not read
- * in full. Any unresolved `extends` leaves a chain unread here, the base's own included, since the
- * check judges what the chain declares rather than whether it adopts the base.
+ * Judges every workspace tsconfig read in full for escaping paths. Any unresolved `extends` leaves
+ * a chain unread here, the base's own included, since the check judges what the chain declares
+ * rather than whether it adopts the base.
  */
 function sortEscapeJudgements(): { judged: Array<{ escapes: EscapingPath[]; path: string }>; unread: UnreadChain[] } {
-  const sorted: ReturnType<typeof sortEscapeJudgements> = { judged: [], unread: [] };
-  for (const path of findTsconfigs()) {
-    const chain = readChain(path);
-    const reason = describeUnreadReason(chain);
-    if (reason !== undefined) sorted.unread.push({ path, reason });
-    else if (chain !== undefined) sorted.judged.push({ escapes: findEscapingPaths(chain.entries), path });
-  }
-  return sorted;
+  const { read, unread } = sortChainReads(findTsconfigs(), readChain);
+  return { judged: read.map(({ chain, path }) => ({ escapes: findEscapingPaths(chain.entries), path })), unread };
 }
 
 // endregion | Helpers

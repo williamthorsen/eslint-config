@@ -59,6 +59,17 @@ function noteUnreadChains(outcome, unread) {
 function skipUnlessChainRead(readCount, unread) {
   return readCount === 0 && unread.length > 0 && describeUnreadChains(unread);
 }
+function sortChainReads(paths, readChain2) {
+  const reads = { read: [], unread: [] };
+  const distinctPaths = new Set(paths);
+  for (const path of distinctPaths) {
+    const chain = readChain2(path);
+    const reason = describeUnreadReason(chain);
+    if (reason !== void 0) reads.unread.push({ path, reason });
+    else if (chain !== void 0) reads.read.push({ chain, path });
+  }
+  return reads;
+}
 
 // src/readiness/classifyChain.ts
 function classifyChain(chain) {
@@ -422,14 +433,8 @@ function skipUnlessSomeTsconfigWasFound() {
   return skipUnlessChainRead(judged.length, unread);
 }
 function sortEscapeJudgements() {
-  const sorted = { judged: [], unread: [] };
-  for (const path of findTsconfigs()) {
-    const chain = readChain(path);
-    const reason = describeUnreadReason(chain);
-    if (reason !== void 0) sorted.unread.push({ path, reason });
-    else if (chain !== void 0) sorted.judged.push({ escapes: findEscapingPaths(chain.entries), path });
-  }
-  return sorted;
+  const { read, unread } = sortChainReads(findTsconfigs(), readChain);
+  return { judged: read.map(({ chain, path }) => ({ escapes: findEscapingPaths(chain.entries), path })), unread };
 }
 export {
   default_default as default

@@ -4,6 +4,17 @@ import type { TsconfigChain } from 'readyup/check-utils';
 /** Why a tsconfig whose entry could not be read has no chain. */
 export const UNPARSEABLE_REASON = 'it does not parse';
 
+export interface ChainReads {
+  read: ReadChain[];
+  unread: UnreadChain[];
+}
+
+/** A tsconfig whose chain was read in full. */
+export interface ReadChain {
+  chain: TsconfigChain;
+  path: string;
+}
+
 /** A tsconfig whose chain could not be read in full, and why. */
 export interface UnreadChain {
   path: string;
@@ -48,4 +59,20 @@ export function noteUnreadChains(outcome: true | CheckOutcome, unread: readonly 
 /** Skips a check when it needed chains and could read none of them. */
 export function skipUnlessChainRead(readCount: number, unread: readonly UnreadChain[]): false | string {
   return readCount === 0 && unread.length > 0 && describeUnreadChains(unread);
+}
+
+/** Sorts each distinct tsconfig into one whose chain was read in full and one whose chain was not. */
+export function sortChainReads(
+  paths: readonly string[],
+  readChain: (path: string) => TsconfigChain | undefined,
+): ChainReads {
+  const reads: ChainReads = { read: [], unread: [] };
+  const distinctPaths = new Set(paths);
+  for (const path of distinctPaths) {
+    const chain = readChain(path);
+    const reason = describeUnreadReason(chain);
+    if (reason !== undefined) reads.unread.push({ path, reason });
+    else if (chain !== undefined) reads.read.push({ chain, path });
+  }
+  return reads;
 }
