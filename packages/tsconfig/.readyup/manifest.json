@@ -33,7 +33,7 @@
       "esbuildVersion": "0.28.2",
       "inputs": [
         {
-          "hash": "513a207d",
+          "hash": "f06ec080",
           "kind": "module",
           "path": "kits/default.ts"
         },
@@ -43,7 +43,7 @@
           "path": "../src/readiness/base-chain.ts"
         },
         {
-          "hash": "f8442965",
+          "hash": "b7c2b3c0",
           "kind": "module",
           "path": "../src/readiness/classifyChain.ts"
         },
@@ -71,14 +71,19 @@
           "hash": "1a29bed0",
           "kind": "module",
           "path": "../src/readiness/node-floor.ts"
+        },
+        {
+          "hash": "491199af",
+          "kind": "module",
+          "path": "../src/readiness/tsconfig-chain-reads.ts"
         }
       ],
       "name": "default",
       "path": "kits/default.js",
       "readyupVersion": "0.47.0",
       "source": "kits/default.ts",
-      "sourceHash": "513a207d",
-      "targetHash": "ed0dcb78"
+      "sourceHash": "f06ec080",
+      "targetHash": "517b7fcc"
     }
   ]
 }
