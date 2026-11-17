@@ -665,7 +665,7 @@ export default defineRdyConfig({
 });
 ```
 
-The `readyup >=0.33.0` peer names the version against which the kit is developed and tested. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it.
+The `readyup >=0.33.0` peer names the version against which the kit is developed and tested. Below 0.33.0, readyup does not report the repo root among a monorepo's workspaces, so the kit supplies the root itself and sweeps every member package alongside it. The kit declares readyup 0.25.0 as its floor (`minReadyupVersion`), the oldest release that runs its checks correctly, so readyup does not warn of version skew when the running release is older than the one that compiled the kit.
 
 The kit runs at the version resolved from the project's `node_modules` and reports whether the configuration matches that version. It never reports whether that version is current.
 
