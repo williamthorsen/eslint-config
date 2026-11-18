@@ -70,10 +70,10 @@
   "devDependencies": {
     "@eslint/config-helpers": "0.7.0",
     "@next/eslint-plugin-next": "16.4.6",
-    "@typescript-eslint/rule-tester": "8.72.2",
-    "@typescript-eslint/utils": "8.72.2",
+    "@typescript-eslint/rule-tester": "8.73.0",
+    "@typescript-eslint/utils": "8.73.0",
     "@vitest/eslint-plugin": "1.6.28",
-    "@williamthorsen/toolbelt.testing": "0.8.6",
+    "@williamthorsen/toolbelt.testing": "0.8.7",
     "esbuild": "0.28.2",
     "eslint": "catalog:",
     "eslint-plugin-jest-dom": "5.10.2",

@@ -4,11 +4,10 @@
     "severityThreshold": "moderate",
     "allowlist": [
       {
-        "addedAt": "2026-11-05T07:15:49.088Z",
-        "id": "1244623",
-        "path": ".>typescript-eslint>@typescript-eslint/parser>@typescript-eslint/typescript-estree>minimatch",
-        "reason": "Added by v11y sync at 2026-11-05 07:15:49 UTC",
-        "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249"
+        "addedAt": "2026-11-18T13:20:42.282Z",
+        "id": "1247710",
+        "reason": "Added by v11y sync at 2026-11-18 13:20:42 UTC",
+        "url": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf"
       }
     ]
   },
@@ -16,11 +15,10 @@
     "severityThreshold": "low",
     "allowlist": [
       {
-        "addedAt": "2026-11-05T07:15:49.090Z",
-        "id": "1244623",
-        "path": "packages__typescript>eslint-plugin-import-x>minimatch",
-        "reason": "Added by v11y sync at 2026-11-05 07:15:49 UTC",
-        "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249"
+        "addedAt": "2026-11-18T13:20:42.286Z",
+        "id": "1247710",
+        "reason": "Added by v11y sync at 2026-11-18 13:20:42 UTC",
+        "url": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf"
       }
     ]
   }
