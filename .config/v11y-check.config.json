@@ -2,24 +2,10 @@
   "$schema": "https://github.com/williamthorsen/node-monorepo-tools/raw/audit-deps-v0.6.0/packages/audit-deps/schemas/config.json",
   "dev": {
     "severityThreshold": "moderate",
-    "allowlist": [
-      {
-        "addedAt": "2026-11-18T13:20:42.282Z",
-        "id": "1247710",
-        "reason": "Added by v11y sync at 2026-11-18 13:20:42 UTC",
-        "url": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf"
-      }
-    ]
+    "allowlist": []
   },
   "prod": {
     "severityThreshold": "low",
-    "allowlist": [
-      {
-        "addedAt": "2026-11-18T13:20:42.286Z",
-        "id": "1247710",
-        "reason": "Added by v11y sync at 2026-11-18 13:20:42 UTC",
-        "url": "https://github.com/advisories/GHSA-fc5q-39xc-vjpf"
-      }
-    ]
+    "allowlist": []
   }
 }
