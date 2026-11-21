@@ -6,7 +6,7 @@ import { javaScriptConfig } from './javascript.ts';
 import { jsonConfig } from './json.ts';
 import { json5Config } from './json5.ts';
 import { nConfig } from './n.ts';
-import { packageJsonConfig } from './package-json.ts';
+import { packageJsonConfig, packageJsonPrivateRepoConfig } from './package-json.ts';
 import { simpleImportSortConfig } from './simple-import-sort.ts';
 import { typeScriptConfig } from './typescript.ts';
 import { unicornConfig } from './unicorn.ts';
@@ -20,6 +20,7 @@ export type ConfigName =
   | 'json5'
   | 'n'
   | 'packageJson'
+  | 'packageJsonPrivateRepo'
   | 'simpleImportSort'
   | 'typeScript'
   | 'unicorn'
@@ -33,6 +34,7 @@ export const configs: Record<ConfigName, Config[]> = {
   json5: json5Config,
   n: nConfig,
   packageJson: packageJsonConfig,
+  packageJsonPrivateRepo: packageJsonPrivateRepoConfig,
   simpleImportSort: simpleImportSortConfig,
   typeScript: typeScriptConfig,
   unicorn: unicornConfig,
