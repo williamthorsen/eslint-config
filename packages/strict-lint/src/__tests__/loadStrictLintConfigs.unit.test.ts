@@ -18,12 +18,11 @@ const { mockedFindProjectRoot, mockedLoadConfigCascade } = vi.hoisted(() => ({
   mockedLoadConfigCascade: vi.fn<(options: CascadeOptions) => Promise<unknown>>(),
 }));
 
-vi.mock('@williamthorsen/toolbelt.filesystem', () => ({
+vi.mock('@williamthorsen/toolbelt.filesystem/candidate', () => ({
   loadConfigCascade: mockedLoadConfigCascade,
 }));
 
-// The real `findProjectRoot` calls `findDirectoryChainMatch`, which the filesystem mock above omits.
-vi.mock('@williamthorsen/toolbelt.packaging', () => ({
+vi.mock('@williamthorsen/toolbelt.packaging/candidate', () => ({
   findProjectRoot: mockedFindProjectRoot,
 }));
 

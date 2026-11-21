@@ -1,4 +1,5 @@
-import { createTempTree, pointCwdAt } from '@williamthorsen/toolbelt.testing/candidate';
+import { pointCwdAt } from '@williamthorsen/toolbelt.testing';
+import { createTempTree } from '@williamthorsen/toolbelt.testing/candidate';
 import { describe, expect, it } from 'vitest';
 
 import { relativePathToDir } from '../relativePathToDir.ts';

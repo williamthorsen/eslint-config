@@ -1,5 +1,6 @@
 import { createTempTree, type TempTree } from '@williamthorsen/toolbelt.testing/candidate';
-import { disposeOnTestFinished, listConsoleLines, silenceConsole } from '@williamthorsen/toolbelt.vitest/candidate';
+import { disposeOnTestFinished, silenceConsole } from '@williamthorsen/toolbelt.vitest';
+import { listConsoleLines } from '@williamthorsen/toolbelt.vitest/candidate';
 import { describe, expect, it } from 'vitest';
 
 import { STRICT_LINT_CONFIG_NAME } from '#src/loadStrictLintConfigs.ts';

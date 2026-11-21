@@ -1,14 +1,15 @@
 import fs from 'node:fs';
 
-import { captureError, pointArgvAt } from '@williamthorsen/toolbelt.testing/candidate';
+import { captureError } from '@williamthorsen/toolbelt.testing';
+import { pointArgvAt } from '@williamthorsen/toolbelt.testing/candidate';
 import {
   disposeOnTestFinished,
-  listConsoleLines,
   type MockedProcessExit,
   ProcessExitError,
   silenceConsole,
   throwOnProcessExit,
-} from '@williamthorsen/toolbelt.vitest/candidate';
+} from '@williamthorsen/toolbelt.vitest';
+import { listConsoleLines } from '@williamthorsen/toolbelt.vitest/candidate';
 import type { ESLint, Linter } from 'eslint';
 import { beforeEach, describe, expect, it, type MockInstance, vi } from 'vitest';
 

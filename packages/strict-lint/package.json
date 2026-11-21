@@ -48,13 +48,13 @@
     "prepublishOnly": "nmr build"
   },
   "dependencies": {
-    "@williamthorsen/toolbelt.errors": "0.11.3",
-    "@williamthorsen/toolbelt.filesystem": "0.11.4",
-    "@williamthorsen/toolbelt.packaging": "0.9.3",
-    "@williamthorsen/toolbelt.strings": "10.0.1"
+    "@williamthorsen/toolbelt.errors": "0.11.4",
+    "@williamthorsen/toolbelt.filesystem": "0.12.0",
+    "@williamthorsen/toolbelt.packaging": "0.10.0",
+    "@williamthorsen/toolbelt.strings": "11.0.0"
   },
   "devDependencies": {
-    "@williamthorsen/toolbelt.testing": "0.8.7",
+    "@williamthorsen/toolbelt.testing": "0.9.0",
     "@williamthorsen/toolbelt.vitest": "catalog:",
     "eslint": "catalog:",
     "vitest": "catalog:"
