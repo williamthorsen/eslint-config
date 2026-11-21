@@ -174,8 +174,8 @@ settings:
 catalogs:
   default:
     '@williamthorsen/toolbelt.vitest':
-      specifier: 0.13.8
-      version: 0.13.8
+      specifier: 0.14.0
+      version: 0.14.0
     eslint:
       specifier: 10.15.0
       version: 10.15.0
@@ -222,7 +222,7 @@ importers:
         version: link:packages/strict-lint
       '@williamthorsen/toolbelt.vitest':
         specifier: 'catalog:'
-        version: 0.13.8(vitest@5.1.1)
+        version: 0.14.0(vitest@5.1.1)
       '@williamthorsen/tsconfig':
         specifier: workspace:*
         version: link:packages/tsconfig
@@ -275,24 +275,24 @@ importers:
   packages/strict-lint:
     dependencies:
       '@williamthorsen/toolbelt.errors':
-        specifier: 0.11.3
-        version: 0.11.3
-      '@williamthorsen/toolbelt.filesystem':
         specifier: 0.11.4
         version: 0.11.4
+      '@williamthorsen/toolbelt.filesystem':
+        specifier: 0.12.0
+        version: 0.12.0
       '@williamthorsen/toolbelt.packaging':
-        specifier: 0.9.3
-        version: 0.9.3
+        specifier: 0.10.0
+        version: 0.10.0
       '@williamthorsen/toolbelt.strings':
-        specifier: 10.0.1
-        version: 10.0.1
+        specifier: 11.0.0
+        version: 11.0.0
     devDependencies:
       '@williamthorsen/toolbelt.testing':
-        specifier: 0.8.7
-        version: 0.8.7
+        specifier: 0.9.0
+        version: 0.9.0
       '@williamthorsen/toolbelt.vitest':
         specifier: 'catalog:'
-        version: 0.13.8(vitest@5.1.1)
+        version: 0.14.0(vitest@5.1.1)
       eslint:
         specifier: 'catalog:'
         version: 10.15.0(jiti@2.7.0)
@@ -370,8 +370,8 @@ importers:
         specifier: 1.6.28
         version: 1.6.28(@typescript-eslint/eslint-plugin@8.73.0(@typescript-eslint/parser@8.73.0(eslint@10.15.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.15.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.15.0(jiti@2.7.0))(typescript@6.0.3)(vitest@5.1.1)
       '@williamthorsen/toolbelt.testing':
-        specifier: 0.8.7
-        version: 0.8.7
+        specifier: 0.9.0
+        version: 0.9.0
       esbuild:
         specifier: 0.28.2
         version: 0.28.2
@@ -1400,12 +1400,12 @@ packages:
     resolution: {integrity: sha512-o1KKmDqNFT7eMXbOy6oQlOAky7+0f6YIC1gKKQKAk6LzGGGE1p5x1uanLH6hSENGeIxZhHkUDMTkdQbv/9wCmQ==}
     engines: {node: '>=24.0.0'}
 
-  '@williamthorsen/toolbelt.testing@0.8.7':
-    resolution: {integrity: sha512-cRFnvu+E+5h0nXnFF4ixjED2eRjBEF1o+rpSG5fddnMtRdvCGs+hkfZBH1ZZf0SObv49p2RNSxtZtRZxdYWWKg==}
+  '@williamthorsen/toolbelt.testing@0.9.0':
+    resolution: {integrity: sha512-W1jOan95DqMvcQk4KwYO/a0hy+ihZNww79X8V9MC2vhX1cNHw9sI4oCljli/8u3h5G8WAY6Opv3r7U58i+0q3A==}
     engines: {node: '>=24.0.0'}
 
-  '@williamthorsen/toolbelt.vitest@0.13.8':
-    resolution: {integrity: sha512-i5pn7Q4OltwhrJ4pygifhGe2+Uk3V8Ukkhblob46fff2iOmVTZ4431kmQ2+e7zyc94HS/n2lIewXBjclOqHGZQ==}
+  '@williamthorsen/toolbelt.vitest@0.14.0':
+    resolution: {integrity: sha512-wh/xkw09lBgCVwsnhxGf9zKEzVGEB7xF8azQLJesS+zbvAQGi+UgquT2yGNfFlVRKPw7aNh21v5TOsqSePkdew==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       vitest: ^4.0.0 || ^5.0.0
@@ -4239,13 +4239,14 @@ snapshots:
       string-width: 9.0.0
       wrap-ansi: 10.0.2
 
-  '@williamthorsen/toolbelt.testing@0.8.7':
+  '@williamthorsen/toolbelt.testing@0.9.0':
     dependencies:
-      '@williamthorsen/toolbelt.errors': 0.11.3
+      '@williamthorsen/toolbelt.errors': 0.11.4
+      '@williamthorsen/toolbelt.objects': 5.0.0
 
-  '@williamthorsen/toolbelt.vitest@0.13.8(vitest@5.1.1)':
+  '@williamthorsen/toolbelt.vitest@0.14.0(vitest@5.1.1)':
     dependencies:
-      '@williamthorsen/toolbelt.objects': 4.4.6
+      '@williamthorsen/toolbelt.objects': 5.0.0
       vitest: 5.1.1(@types/node@24.19.2)(@vitest/coverage-v8@5.1.1)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
   acorn-jsx@5.3.2(acorn@8.19.0):

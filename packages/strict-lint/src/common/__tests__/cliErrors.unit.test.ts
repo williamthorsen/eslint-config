@@ -1,6 +1,6 @@
 import { parseArgs, type ParseArgsConfig } from 'node:util';
 
-import { captureError } from '@williamthorsen/toolbelt.testing/candidate';
+import { captureError } from '@williamthorsen/toolbelt.testing';
 import { describe, expect, it } from 'vitest';
 
 import { toUsageError, UsageError } from '../cliErrors.ts';

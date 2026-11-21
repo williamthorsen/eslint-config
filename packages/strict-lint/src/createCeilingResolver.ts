@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import type { ConfigEntry } from '@williamthorsen/toolbelt.filesystem';
+import type { ConfigEntry } from '@williamthorsen/toolbelt.filesystem/candidate';
 
 import { loadStrictLintConfigs, type StrictLintCascade } from './loadStrictLintConfigs.ts';
 import type { MaxSeverityMap, StrictLintConfig } from './types.ts';

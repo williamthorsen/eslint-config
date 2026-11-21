@@ -1,4 +1,4 @@
-import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging';
+import type { ProjectRoot } from '@williamthorsen/toolbelt.packaging/candidate';
 
 import { describeRootSource } from './common/describeRootSource.ts';
 import type { StrictLintCascade } from './loadStrictLintConfigs.ts';

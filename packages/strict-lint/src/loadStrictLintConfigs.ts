@@ -1,5 +1,5 @@
-import { type ConfigCascade, loadConfigCascade } from '@williamthorsen/toolbelt.filesystem';
-import { findProjectRoot, type ProjectRoot } from '@williamthorsen/toolbelt.packaging';
+import { type ConfigCascade, loadConfigCascade } from '@williamthorsen/toolbelt.filesystem/candidate';
+import { findProjectRoot, type ProjectRoot } from '@williamthorsen/toolbelt.packaging/candidate';
 import type { Linter } from 'eslint';
 
 import { StrictLintError } from './common/cliErrors.ts';

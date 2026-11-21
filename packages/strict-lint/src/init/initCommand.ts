@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { type FileReconciliation, reconcileFile } from '@williamthorsen/toolbelt.filesystem';
-import { findProjectRoot } from '@williamthorsen/toolbelt.packaging';
+import { findProjectRoot } from '@williamthorsen/toolbelt.packaging/candidate';
 
 import { describeRootSource } from '#src/common/describeRootSource.ts';
 import { STRICT_LINT_CONFIG_NAME } from '#src/loadStrictLintConfigs.ts';
