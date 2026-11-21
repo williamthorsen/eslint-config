@@ -108,6 +108,16 @@ The default export bundles configs for the following surfaces:
 
 Every `package.json` must declare `author` and `engines`, and may not contain an empty field. One that publishes must also declare `bugs`, `homepage`, `keywords`, `repository`, and `sideEffects`, and may not declare a dependency on a local path (`file:`, `link:`, or a relative path). Every peer dependency declared by a package must also appear in its own `devDependencies`; in a pnpm workspace a [catalog](https://pnpm.io/catalogs) entry (`"eslint": "catalog:"`) satisfies this without repeating the version.
 
+A package that publishes from a private repository cannot link to it, since each link would point readers at a page that they cannot open. Appending `configs.packageJsonPrivateRepo` drops the `bugs`, `homepage`, and `repository` requirements:
+
+```ts
+import { defineConfig } from 'eslint/config';
+
+import config, { configs } from '@williamthorsen/eslint-config-typescript';
+
+export default defineConfig(config, configs.packageJsonPrivateRepo);
+```
+
 Test files (`*.spec.*` / `*.test.*`) have several strict rules disabled (e.g., `no-unsafe-assignment`, `unbound-method`, `no-extraneous-class`) so that spec files are not reported for patterns that tests use routinely. They also get [`sky-pilot/no-real-time-sleep`](#sky-pilotno-real-time-sleep), which reports a wait on a real timer.
 
 `unicorn/no-top-level-side-effects` reports a module that has runtime exports and mutates global state at its top level. It keeps the plugin's default and does not report calls whose effects it cannot determine; the rule's [`checkUnknownCalls`](https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/no-top-level-side-effects.md#checkunknowncalls) option enables that check.
@@ -466,19 +476,20 @@ export default defineConfig(
 );
 ```
 
-| Config                     | Targets                                    |
-| -------------------------- | ------------------------------------------ |
-| `configs.javaScript`       | core JavaScript rules                      |
-| `configs.typeScript`       | TypeScript rules (type-aware)              |
-| `configs.eslintComments`   | `eslint-disable` comment hygiene           |
-| `configs.import`           | import order and resolution                |
-| `configs.n`                | Node.js (`eslint-plugin-n`) rules          |
-| `configs.simpleImportSort` | sorted imports                             |
-| `configs.unicorn`          | `eslint-plugin-unicorn` rules              |
-| `configs.json`             | JSON rules                                 |
-| `configs.json5`            | JSON5 rules (apply _after_ `configs.json`) |
-| `configs.packageJson`      | `package.json` rules                       |
-| `configs.yaml`             | YAML rules                                 |
+| Config                           | Targets                                                                            |
+| -------------------------------- | ---------------------------------------------------------------------------------- |
+| `configs.javaScript`             | core JavaScript rules                                                              |
+| `configs.typeScript`             | TypeScript rules (type-aware)                                                      |
+| `configs.eslintComments`         | `eslint-disable` comment hygiene                                                   |
+| `configs.import`                 | import order and resolution                                                        |
+| `configs.n`                      | Node.js (`eslint-plugin-n`) rules                                                  |
+| `configs.simpleImportSort`       | sorted imports                                                                     |
+| `configs.unicorn`                | `eslint-plugin-unicorn` rules                                                      |
+| `configs.json`                   | JSON rules                                                                         |
+| `configs.json5`                  | JSON5 rules (apply _after_ `configs.json`)                                         |
+| `configs.packageJson`            | `package.json` rules                                                               |
+| `configs.packageJsonPrivateRepo` | link fields dropped for a private repository (apply _after_ `configs.packageJson`) |
+| `configs.yaml`                   | YAML rules                                                                         |
 
 ## Framework configs (lazy-loaded)
 
