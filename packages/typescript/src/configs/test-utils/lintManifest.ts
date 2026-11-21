@@ -1,6 +1,7 @@
 import path from 'node:path';
 
 import { ESLint } from 'eslint';
+import type { Config } from 'eslint/config';
 
 import { packageJsonConfig } from '#src/configs/package-json.ts';
 
@@ -9,14 +10,18 @@ import { packageJsonConfig } from '#src/configs/package-json.ts';
 const manifestPath = path.join(import.meta.dirname, 'package.json');
 
 /**
- * Lints a manifest given as an object and returns the ids of the rules that reported against it.
- * A message with no rule id means nothing was linted, which throws rather than reading as a clean run.
+ * Lints a manifest given as an object, under the package.json config followed by any appended configs, and returns
+ * the ids of the rules that reported against it. A message with no rule id means nothing was linted, which throws
+ * rather than reading as a clean run.
  */
-export async function lintManifest(manifest: Record<string, unknown>): Promise<string[]> {
+export async function lintManifest(
+  manifest: Record<string, unknown>,
+  appendedConfigs: readonly Config[] = [],
+): Promise<string[]> {
   const eslint = new ESLint({
     cwd: import.meta.dirname,
     overrideConfigFile: true,
-    overrideConfig: packageJsonConfig,
+    overrideConfig: [...packageJsonConfig, ...appendedConfigs],
   });
 
   const results = await eslint.lintText(JSON.stringify(manifest, null, 2), { filePath: manifestPath });

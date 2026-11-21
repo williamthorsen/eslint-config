@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { packageJsonPrivateRepoConfig } from '../package-json.ts';
 import { lintManifest } from '../test-utils/lintManifest.ts';
 
 // A manifest satisfying every rule under test. Each case departs from it in one field, so a report names
@@ -29,6 +30,14 @@ const universalTierRules = ['package-json/require-author', 'package-json/require
 const publishableTierFields = ['bugs', 'homepage', 'keywords'];
 
 const universalTierFields = ['author', 'engines'];
+
+const linkRules = new Set([
+  'package-json/require-bugs',
+  'package-json/require-homepage',
+  'package-json/require-repository',
+]);
+
+const linkFields = ['bugs', 'homepage', 'repository'];
 
 describe('rules binding only publishable packages', () => {
   it('report nothing against a private manifest omitting every field that they require', async () => {
@@ -102,6 +111,21 @@ describe('rules that the preset supplies and this config no longer suppresses', 
   it('require sideEffects of a publishable manifest', async () => {
     const reported = await lintManifest(omitCompliantFields(['sideEffects']));
 
+    expect(reported).toContain('package-json/require-sideEffects');
+  });
+});
+
+describe('the config for a public package from a private repository', () => {
+  it('drops the link requirements from a publishable manifest', async () => {
+    const reported = await lintManifest(omitCompliantFields(linkFields), packageJsonPrivateRepoConfig);
+
+    expect(reported.filter((ruleId) => linkRules.has(ruleId))).toStrictEqual([]);
+  });
+
+  it('keeps the other publishable requirements', async () => {
+    const reported = await lintManifest(omitCompliantFields(['keywords', 'sideEffects']), packageJsonPrivateRepoConfig);
+
+    expect(reported).toContain('package-json/require-keywords');
     expect(reported).toContain('package-json/require-sideEffects');
   });
 });
