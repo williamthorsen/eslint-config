@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 16.0.1 — 2026-11-21
+
+### 📦 Dependencies
+
+- Upgrades `toolbelt.vitest` to 0.14.0, `toolbelt.testing` to 0.9.0, `toolbelt.packaging` to 0.10.0, `toolbelt.filesystem` to 0.12.0, `toolbelt.strings` to 11.0.0, and `toolbelt.errors` to 0.11.4, and moves each import of an export that changed entry point, which leaves the published `strict-lint` code importing `findProjectRoot` and `loadConfigCascade` from `/candidate`. (#384)
+
 ## 16.0.0 — 2026-11-17
 
 ### 🎉 Features

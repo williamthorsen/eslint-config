@@ -1,5 +1,22 @@
 [
   {
+    "version": "16.0.1",
+    "date": "2026-11-21",
+    "sections": [
+      {
+        "title": "📦 Dependencies",
+        "audience": "dev",
+        "items": [
+          {
+            "description": "Upgrades `toolbelt.vitest` to 0.14.0, `toolbelt.testing` to 0.9.0, `toolbelt.packaging` to 0.10.0, `toolbelt.filesystem` to 0.12.0, `toolbelt.strings` to 11.0.0, and `toolbelt.errors` to 0.11.4, and moves each import of an export that changed entry point, which leaves the published `strict-lint` code importing `findProjectRoot` and `loadConfigCascade` from `/candidate`. (#384)",
+            "hash": "e665e4097f736b59ffbbd36e0a7dc30f8ba821f1",
+            "entry": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
     "version": "16.0.0",
     "date": "2026-11-17",
     "sections": [
